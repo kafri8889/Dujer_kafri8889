@@ -1,0 +1,15 @@
+<resources>
+    <string name="app_name">Dujer</string>
+
+    <string name="dashboard">Dashboard</string>
+    <string name="available_balance">Available balance</string>
+    <string name="see_details">See Details</string>
+    <string name="cash">Cash</string>
+    <string name="income">Income</string>
+    <string name="expenses">Expenses</string>
+    <string name="my_spending">My Spending</string>
+    <string name="my_income">My Income</string>
+    <string name="income_for">Income for %1$s</string>
+    <string name="your_income">Your income</string>
+
+</resources>
