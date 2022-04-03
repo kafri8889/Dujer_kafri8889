@@ -10,6 +10,8 @@
     <string name="my_spending">My Spending</string>
     <string name="my_income">My Income</string>
     <string name="income_for">Income for %1$s</string>
+    <string name="expenses_for">Expenses for %1$s</string>
     <string name="your_income">Your income</string>
+    <string name="your_expenses">Your expenses</string>
 
 </resources>

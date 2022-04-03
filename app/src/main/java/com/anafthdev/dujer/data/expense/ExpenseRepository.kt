@@ -12,7 +12,17 @@ class ExpenseRepository(
 		return appDatabase.financialDao().getExpense()
 	}
 	
-	override fun newExpense(financial: Financial) {
-		appDatabase.financialDao().insert(financial)
+	override fun newExpense(vararg financial: Financial) {
+		appDatabase.financialDao().insert(*financial)
 	}
+	
+	override fun deleteExpense(vararg financial: Financial) {
+		appDatabase.financialDao().delete(*financial)
+	}
+	
+	override fun updateExpense(vararg financial: Financial) {
+		appDatabase.financialDao().update(*financial)
+	}
+	
+	
 }

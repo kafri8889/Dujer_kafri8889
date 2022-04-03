@@ -7,5 +7,9 @@ interface IIncomeRepository {
 	
 	fun getIncome(): Flow<List<Financial>>
 	
-	fun newIncome(financial: Financial)
+	fun newIncome(vararg financial: Financial)
+	
+	fun deleteIncome(vararg financial: Financial)
+	
+	fun updateIncome(vararg financial: Financial)
 }

@@ -1,24 +1,26 @@
 package com.anafthdev.dujer.data
 
-import android.content.Context
 import com.anafthdev.dujer.data.datastore.AppDatastore
 import com.anafthdev.dujer.data.db.AppDatabase
+import com.anafthdev.dujer.data.db.model.Financial
 import com.anafthdev.dujer.data.expense.ExpenseRepository
 import com.anafthdev.dujer.data.expense.IExpenseRepository
 import com.anafthdev.dujer.data.income.IIncomeRepository
 import com.anafthdev.dujer.data.income.IncomeRepository
 import javax.inject.Inject
 
-interface AppRepository {
+interface IAppRepository {
 	val appDatastore: AppDatastore
 	val incomeRepository: IIncomeRepository
 	val expenseRepository: IExpenseRepository
+	
+	fun delete(vararg financial: Financial)
 }
 
-class AppRepositoryImpl @Inject constructor(
+class AppRepository @Inject constructor(
 	private val appDatabase: AppDatabase,
 	override val appDatastore: AppDatastore
-): AppRepository {
+): IAppRepository {
 	
 	override val incomeRepository: IIncomeRepository by lazy {
 		IncomeRepository(appDatabase)
@@ -26,5 +28,12 @@ class AppRepositoryImpl @Inject constructor(
 	
 	override val expenseRepository: IExpenseRepository by lazy {
 		ExpenseRepository(appDatabase)
+	}
+	
+	override fun delete(vararg financials: Financial) {
+		financials.forEach { financial ->
+			if (financial.type == FinancialType.INCOME) incomeRepository.deleteIncome(financial)
+			else expenseRepository.deleteExpense(financial)
+		}
 	}
 }

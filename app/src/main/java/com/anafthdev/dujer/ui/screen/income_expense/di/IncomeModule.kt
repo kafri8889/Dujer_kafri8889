@@ -1,8 +1,9 @@
-package com.anafthdev.dujer.ui.screen.income.di
+package com.anafthdev.dujer.ui.screen.income_expense.di
 
 import android.content.Context
 import com.anafthdev.dujer.di.AppModule
-import com.anafthdev.dujer.ui.screen.income.IncomeViewModel
+import com.anafthdev.dujer.foundation.common.vibrator.VibratorModule
+import com.anafthdev.dujer.ui.screen.income_expense.IncomeExpenseViewModel
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -16,7 +17,8 @@ object IncomeModule {
 	@Provides
 	fun provideIncomeViewModel(
 		@ApplicationContext context: Context
-	): IncomeViewModel = IncomeViewModel(
+	): IncomeExpenseViewModel = IncomeExpenseViewModel(
+		VibratorModule.provideVibratorManager(context),
 		AppModule.provideAppRepository(context)
 	)
 	

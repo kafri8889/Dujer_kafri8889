@@ -12,6 +12,7 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.dp
 import com.anafthdev.dujer.data.FinancialType
 import com.anafthdev.dujer.data.db.model.Financial
 import com.anafthdev.dujer.foundation.extension.toColor
@@ -29,102 +30,91 @@ fun FinancialCard(
 	onClick: () -> Unit
 ) {
 	
-	Box(
+	Card(
+		shape = big_shape,
+		containerColor = Color.White,
+		onClick = onClick,
+		elevation = CardDefaults.cardElevation(
+			defaultElevation = 1.dp
+		),
 		modifier = modifier
-			.background(
-				shape = big_shape,
-				color = Color(0x80F8F8F8)
-			)
 	) {
-		Card(
-			shape = big_shape,
-			containerColor = Color.White,
-			onClick = onClick,
+		Row(
 			modifier = Modifier
-				.padding(
-					top = 2.dpScaled,
-					start = 4.dpScaled,
-					end = 4.dpScaled,
-					bottom = 8.dpScaled,
-				)
+				.fillMaxWidth()
+				.padding(8.dpScaled)
 		) {
-			Row(
+			Box(
+				contentAlignment = Alignment.Center,
 				modifier = Modifier
-					.fillMaxWidth()
-					.padding(8.dpScaled)
+					.size(64.dpScaled)
+					.clip(normal_shape)
+					.background(financial.category.tint.backgroundTint.toColor())
 			) {
-				Box(
-					contentAlignment = Alignment.Center,
+				Icon(
+					painter = painterResource(id = financial.category.iconID),
+					tint = financial.category.tint.iconTint.toColor(),
+					contentDescription = null
+				)
+			}
+			
+			Row(
+				verticalAlignment = Alignment.CenterVertically,
+				modifier = Modifier
+					.padding(start = 8.dpScaled)
+					.fillMaxSize()
+					.height(64.dpScaled)
+			) {
+				Column(
 					modifier = Modifier
-						.size(64.dpScaled)
-						.clip(normal_shape)
-						.background(financial.category.tint.backgroundTint.toColor())
+						.weight(0.4f)
 				) {
-					Icon(
-						painter = painterResource(id = financial.category.iconID),
-						tint = financial.category.tint.iconTint.toColor(),
-						contentDescription = null
+					Text(
+						text = financial.name,
+						style = Typography.bodyMedium.copy(
+							fontFamily = Inter,
+							fontWeight = FontWeight.SemiBold,
+							fontSize = Typography.bodyMedium.fontSize.spScaled
+						)
+					)
+					
+					Text(
+						text = SimpleDateFormat("dd MMM yyyy", Locale.getDefault()).format(financial.dateCreated),
+						style = Typography.labelSmall.copy(
+							fontFamily = Inter,
+							fontWeight = FontWeight.Normal,
+							fontSize = Typography.labelSmall.fontSize.spScaled
+						),
+						modifier = Modifier
+							.padding(top = 8.dpScaled)
 					)
 				}
 				
-				Row(
-					verticalAlignment = Alignment.CenterVertically,
+				Column(
+					horizontalAlignment = Alignment.End,
 					modifier = Modifier
-						.padding(start = 8.dpScaled)
-						.fillMaxSize()
-						.height(64.dpScaled)
+						.weight(0.6f)
 				) {
-					Column(
-						modifier = Modifier
-							.weight(0.4f)
-					) {
-						Text(
-							text = financial.name,
-							style = Typography.bodyMedium.copy(
-								fontFamily = Inter,
-								fontWeight = FontWeight.SemiBold,
-								fontSize = Typography.bodyMedium.fontSize.spScaled
-							)
+					Text(
+						text = "${if (financial.type == FinancialType.INCOME) "+" else "-"}${financial.currency.symbol} ${financial.amount}",
+						style = Typography.bodyMedium.copy(
+							fontFamily = Inter,
+							fontWeight = FontWeight.SemiBold,
+							fontSize = Typography.bodyMedium.fontSize.spScaled
 						)
-						
-						Text(
-							text = SimpleDateFormat("dd MMM yyyy", Locale.getDefault()).format(financial.dateCreated),
-							style = Typography.labelSmall.copy(
-								fontFamily = Inter,
-								fontWeight = FontWeight.Normal,
-								fontSize = Typography.labelSmall.fontSize.spScaled
-							),
-							modifier = Modifier
-								.padding(top = 8.dpScaled)
-						)
-					}
+					)
 					
-					Column(
-						horizontalAlignment = Alignment.End,
+					Text(
+						text = financial.type.name,
+						style = Typography.labelSmall.copy(
+							color = Color(0xFF4A5568),
+							fontFamily = Inter,
+							fontWeight = FontWeight.Medium,
+							fontSize = Typography.labelSmall.fontSize.spScaled
+						),
 						modifier = Modifier
-							.weight(0.6f)
-					) {
-						Text(
-							text = "${if (financial.type == FinancialType.INCOME) "+" else "-"}${financial.currency.symbol} ${financial.amount}",
-							style = Typography.bodyMedium.copy(
-								fontFamily = Inter,
-								fontWeight = FontWeight.SemiBold,
-								fontSize = Typography.bodyMedium.fontSize.spScaled
-							)
-						)
-						
-						Text(
-							text = financial.type.name,
-							style = Typography.labelSmall.copy(
-								color = Color(0xFF4A5568),
-								fontFamily = Inter,
-								fontWeight = FontWeight.Medium,
-								fontSize = Typography.labelSmall.fontSize.spScaled
-							),
-							modifier = Modifier
-								.padding(top = 8.dpScaled)
-						)
-					}
+							.padding(top = 8.dpScaled)
+					)
 				}
 			}
 		}

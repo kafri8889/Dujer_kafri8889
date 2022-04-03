@@ -12,7 +12,15 @@ class IncomeRepository(
 		return appDatabase.financialDao().getIncome()
 	}
 	
-	override fun newIncome(financial: Financial) {
-		appDatabase.financialDao().insert(financial)
+	override fun newIncome(vararg financial: Financial) {
+		appDatabase.financialDao().insert(*financial)
+	}
+	
+	override fun deleteIncome(vararg financial: Financial) {
+		appDatabase.financialDao().delete(*financial)
+	}
+	
+	override fun updateIncome(vararg financial: Financial) {
+		appDatabase.financialDao().update(*financial)
 	}
 }

@@ -1,28 +1,31 @@
 package com.anafthdev.dujer.ui
 
-import androidx.compose.foundation.ExperimentalFoundationApi
-import androidx.compose.foundation.gestures.LocalOverScrollConfiguration
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.SideEffect
 import androidx.compose.ui.graphics.Color
+import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import androidx.navigation.navArgument
 import com.anafthdev.dujer.data.DujerDestination
+import com.anafthdev.dujer.data.FinancialType
 import com.anafthdev.dujer.ui.screen.dashboard.DashboardScreen
-import com.anafthdev.dujer.ui.screen.income.IncomeScreen
+import com.anafthdev.dujer.ui.screen.income_expense.IncomeExpenseScreen
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
 
 @Composable
 fun DujerApp() {
+	
+	val systemBarsBackground = MaterialTheme.colorScheme.background
 	
 	val navController = rememberNavController()
 	val systemUiController = rememberSystemUiController()
 	
 	SideEffect {
 		systemUiController.setSystemBarsColor(
-			color = Color.Transparent,
+			color = systemBarsBackground,
 			darkIcons = true
 		)
 	}
@@ -36,8 +39,20 @@ fun DujerApp() {
 			DashboardScreen(navController = navController)
 		}
 		
-		composable(DujerDestination.Income.route) {
-			IncomeScreen(navController = navController)
+		composable(
+			route = DujerDestination.IncomeExpense.route,
+			arguments = listOf(
+				navArgument("type") {
+					type = NavType.IntType
+				}
+			)
+		) { entry ->
+			val type = entry.arguments?.getInt("type") ?: 0
+			
+			IncomeExpenseScreen(
+				navController = navController,
+				type = FinancialType.values()[type]
+			)
 		}
 	}
 }

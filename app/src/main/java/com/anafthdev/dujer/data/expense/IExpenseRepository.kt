@@ -7,5 +7,9 @@ interface IExpenseRepository {
 	
 	fun getExpense(): Flow<List<Financial>>
 	
-	fun newExpense(financial: Financial)
+	fun newExpense(vararg financial: Financial)
+	
+	fun deleteExpense(vararg financial: Financial)
+	
+	fun updateExpense(vararg financial: Financial)
 }

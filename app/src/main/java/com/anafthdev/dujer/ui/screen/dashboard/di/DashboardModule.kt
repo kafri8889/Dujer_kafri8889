@@ -2,6 +2,7 @@ package com.anafthdev.dujer.ui.screen.dashboard.di
 
 import android.content.Context
 import com.anafthdev.dujer.di.AppModule
+import com.anafthdev.dujer.foundation.common.vibrator.VibratorModule
 import com.anafthdev.dujer.ui.screen.dashboard.DashboardViewModel
 import dagger.Module
 import dagger.Provides
@@ -16,5 +17,9 @@ object DashboardModule {
 	@Provides
 	fun provideDashboardViewModel(
 		@ApplicationContext context: Context
-	): DashboardViewModel = DashboardViewModel(AppModule.provideAppRepository(context))
+	): DashboardViewModel = DashboardViewModel(
+		VibratorModule.provideVibratorManager(context),
+		AppModule.provideAppRepository(context)
+	)
+	
 }

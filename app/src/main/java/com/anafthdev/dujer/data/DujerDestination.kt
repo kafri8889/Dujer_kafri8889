@@ -4,7 +4,9 @@ sealed class DujerDestination(val route: String) {
 	
 	object Dashboard: DujerDestination("dashboard")
 	
-	object Income: DujerDestination("income")
-	
-	object Expense: DujerDestination("expense")
+	object IncomeExpense: DujerDestination("incomeExpense/{type}") {
+		fun createRoute(type: FinancialType): String {
+			return "incomeExpense/${type.ordinal}"
+		}
+	}
 }
