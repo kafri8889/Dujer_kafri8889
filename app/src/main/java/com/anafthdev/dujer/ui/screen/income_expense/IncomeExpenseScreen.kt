@@ -34,14 +34,17 @@ import androidx.compose.ui.viewinterop.AndroidView
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.anafthdev.dujer.R
+import com.anafthdev.dujer.data.DujerDestination
 import com.anafthdev.dujer.data.FinancialType
 import com.anafthdev.dujer.data.db.model.Financial
 import com.anafthdev.dujer.foundation.extension.getBy
 import com.anafthdev.dujer.foundation.window.dpScaled
 import com.anafthdev.dujer.foundation.window.spScaled
 import com.anafthdev.dujer.model.Currency
+import com.anafthdev.dujer.ui.app.DujerViewModel
 import com.anafthdev.dujer.ui.component.FinancialCard
 import com.anafthdev.dujer.ui.component.TopAppBar
+import com.anafthdev.dujer.ui.screen.financial.FinancialViewModel
 import com.anafthdev.dujer.ui.theme.*
 import com.anafthdev.dujer.util.AppUtil
 import com.anafthdev.dujer.view.LineChartMarkerView
@@ -59,7 +62,8 @@ import java.util.*
 @Composable
 fun IncomeExpenseScreen(
 	navController: NavController,
-	type: FinancialType
+	type: FinancialType,
+	dujerViewModel: DujerViewModel
 ) {
 	
 	val context = LocalContext.current
@@ -318,7 +322,7 @@ fun IncomeExpenseScreen(
 			
 			val dismissState = rememberDismissState(
 				confirmStateChange = {
-					if (it == DismissValue.DismissedToStart) {
+					if (it == DismissValue.DismissedToEnd) {
 						incomeExpenseViewModel.delete(financial)
 					} else {
 						hasVibrate = false
@@ -328,20 +332,20 @@ fun IncomeExpenseScreen(
 				}
 			)
 			
+			if (
+				((2 * dismissState.progress.fraction) >= 1f) and
+				(dismissState.targetValue == DismissValue.DismissedToEnd) and
+				!hasVibrate
+			) {
+				incomeExpenseViewModel.vibratorManager.vibrate(100)
+				hasVibrate = true
+			}
+			
 			SwipeToDismiss(
 				state = dismissState,
-				directions = setOf(DismissDirection.EndToStart),
+				directions = setOf(DismissDirection.StartToEnd),
 				dismissThresholds = { FractionalThreshold(.6f) },
 				background = {
-					
-					if (
-						((2 * dismissState.progress.fraction) >= 1f) and
-						(dismissState.targetValue == DismissValue.DismissedToStart) and
-						!hasVibrate
-					) {
-						incomeExpenseViewModel.vibratorManager.vibrate(100)
-						hasVibrate = true
-					}
 					
 					Timber.i("swipe fraction: ${(2 * dismissState.progress.fraction)}")
 					
@@ -374,7 +378,7 @@ fun IncomeExpenseScreen(
 									if (hasVibrate) 28.dpScaled
 									else 28.dpScaled * (2 * dismissState.progress.fraction)
 								)
-								.align(Alignment.CenterEnd)
+								.align(Alignment.CenterStart)
 						)
 					}
 				}
@@ -382,7 +386,10 @@ fun IncomeExpenseScreen(
 				FinancialCard(
 					financial = financial,
 					onClick = {
-					
+						dujerViewModel.navigateToFinancialScreen(
+							id = financial.id,
+							action = FinancialViewModel.FINANCIAL_ACTION_EDIT
+						)
 					},
 					modifier = Modifier
 						.padding(8.dpScaled)

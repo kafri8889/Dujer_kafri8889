@@ -13,5 +13,9 @@
     <string name="expenses_for">Expenses for %1$s</string>
     <string name="your_income">Your income</string>
     <string name="your_expenses">Your expenses</string>
+    <string name="add_income">Add income</string>
+    <string name="add_expenses">Add expenses</string>
+    <string name="_new">New</string>
+    <string name="edit">Edit</string>
 
 </resources>

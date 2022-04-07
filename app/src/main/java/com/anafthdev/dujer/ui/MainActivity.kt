@@ -6,14 +6,11 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.gestures.LocalOverScrollConfiguration
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.Surface
-import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
-import androidx.compose.ui.Modifier
 import com.anafthdev.dujer.BuildConfig
 import com.anafthdev.dujer.data.datastore.AppDatastore
+import com.anafthdev.dujer.ui.app.DujerApp
 import com.anafthdev.dujer.ui.theme.DujerTheme
 import dagger.hilt.android.AndroidEntryPoint
 import timber.log.Timber

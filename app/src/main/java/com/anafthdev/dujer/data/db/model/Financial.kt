@@ -15,4 +15,16 @@ data class Financial(
 	@ColumnInfo(name = "category") var category: Category,
 	@ColumnInfo(name = "currency") var currency: Currency,
 	@ColumnInfo(name = "dateCreated") var dateCreated: Long,
-)
+) {
+	companion object {
+		val default = Financial(
+			id = 0,
+			name = "default",
+			amount = 0.0,
+			type = FinancialType.INCOME,
+			category = Category.default,
+			currency = Currency.INDONESIAN,
+			dateCreated = System.currentTimeMillis()
+		)
+	}
+}

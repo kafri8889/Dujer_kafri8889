@@ -14,7 +14,12 @@ interface IAppRepository {
 	val incomeRepository: IIncomeRepository
 	val expenseRepository: IExpenseRepository
 	
-	fun delete(vararg financial: Financial)
+	fun delete(vararg financials: Financial)
+	
+	fun update(vararg financials: Financial)
+	
+	fun get(id: Int): Financial
+	
 }
 
 class AppRepository @Inject constructor(
@@ -35,5 +40,16 @@ class AppRepository @Inject constructor(
 			if (financial.type == FinancialType.INCOME) incomeRepository.deleteIncome(financial)
 			else expenseRepository.deleteExpense(financial)
 		}
+	}
+	
+	override fun update(vararg financials: Financial) {
+		financials.forEach { financial ->
+			if (financial.type == FinancialType.INCOME) incomeRepository.updateIncome(financial)
+			else expenseRepository.updateExpense(financial)
+		}
+	}
+	
+	override fun get(id: Int): Financial {
+		return appDatabase.financialDao().get(id)
 	}
 }

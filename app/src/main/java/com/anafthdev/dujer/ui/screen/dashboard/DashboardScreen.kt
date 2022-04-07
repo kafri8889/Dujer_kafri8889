@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.*
@@ -24,6 +25,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -43,19 +45,24 @@ import com.anafthdev.dujer.ui.theme.Typography
 import com.anafthdev.dujer.foundation.window.dpScaled
 import com.anafthdev.dujer.foundation.window.spScaled
 import com.anafthdev.dujer.model.Currency
+import com.anafthdev.dujer.ui.app.DujerViewModel
 import com.anafthdev.dujer.ui.component.FinancialCard
 import com.anafthdev.dujer.ui.screen.dashboard.component.ExpenseCard
 import com.anafthdev.dujer.ui.screen.dashboard.component.FABNewFinancial
 import com.anafthdev.dujer.ui.screen.dashboard.component.IncomeCard
+import com.anafthdev.dujer.ui.screen.financial.FinancialViewModel
 import com.anafthdev.dujer.ui.theme.Inter
 import com.anafthdev.dujer.ui.theme.big_shape
+import com.anafthdev.dujer.util.AppUtil.toast
+import kotlinx.coroutines.launch
 import timber.log.Timber
 import kotlin.random.Random
 
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun DashboardScreen(
-	navController: NavController
+	navController: NavController,
+	dujerViewModel: DujerViewModel
 ) {
 	
 	val dashboardViewModel = hiltViewModel<DashboardViewModel>()
@@ -77,38 +84,56 @@ fun DashboardScreen(
 		modifier = Modifier
 			.fillMaxSize()
 	) {
-		FABNewFinancial(
-			onNewIncome = {
-				dashboardViewModel.newRecord(
-					Financial(
-						id = Random.nextInt(),
-						name = "tes",
-						amount = 5000.0,
-						type = FinancialType.INCOME,
-						category = Category.food,
-						currency = currentCurrency,
-						dateCreated = System.currentTimeMillis()
-					)
-				)
-			},
-			onNewExpense = {
-				dashboardViewModel.newRecord(
-					Financial(
-						id = Random.nextInt(),
-						name = "soping",
-						amount = 5000.0,
-						type = FinancialType.EXPENSE,
-						category = Category.shopping,
-						currency = currentCurrency,
-						dateCreated = System.currentTimeMillis()
-					)
+//		FABNewFinancial(
+//			onNewIncome = {
+//				dashboardViewModel.newRecord(
+//					Financial(
+//						id = Random.nextInt(),
+//						name = "tes",
+//						amount = 5000.0,
+//						type = FinancialType.INCOME,
+//						category = Category.food,
+//						currency = currentCurrency,
+//						dateCreated = System.currentTimeMillis()
+//					)
+//				)
+//			},
+//			onNewExpense = {
+//				dashboardViewModel.newRecord(
+//					Financial(
+//						id = Random.nextInt(),
+//						name = "soping",
+//						amount = 5000.0,
+//						type = FinancialType.EXPENSE,
+//						category = Category.shopping,
+//						currency = currentCurrency,
+//						dateCreated = System.currentTimeMillis()
+//					)
+//				)
+//			},
+//			modifier = Modifier
+//				.padding(32.dpScaled)
+//				.align(Alignment.BottomEnd)
+//				.zIndex(2f)
+//		)
+		
+		FloatingActionButton(
+			onClick = {
+				dujerViewModel.navigateToFinancialScreen(
+					id = 0,
+					action = FinancialViewModel.FINANCIAL_ACTION_NEW
 				)
 			},
 			modifier = Modifier
 				.padding(32.dpScaled)
 				.align(Alignment.BottomEnd)
 				.zIndex(2f)
-		)
+		) {
+			Icon(
+				imageVector = Icons.Rounded.Add,
+				contentDescription = null,
+			)
+		}
 		
 		LazyColumn(
 			modifier = Modifier
@@ -186,7 +211,7 @@ fun DashboardScreen(
 				
 				val dismissState = rememberDismissState(
 					confirmStateChange = {
-						if (it == DismissValue.DismissedToStart) {
+						if (it == DismissValue.DismissedToEnd) {
 							dashboardViewModel.deleteRecord(financial)
 						} else {
 							hasVibrate = false
@@ -196,30 +221,28 @@ fun DashboardScreen(
 					}
 				)
 				
+				if (
+					((2 * dismissState.progress.fraction) >= 1f) and
+					(dismissState.targetValue == DismissValue.DismissedToEnd) and
+					!hasVibrate
+				) {
+					dashboardViewModel.vibratorManager.vibrate(100)
+					hasVibrate = true
+				}
+				
 				SwipeToDismiss(
 					state = dismissState,
-					directions = setOf(DismissDirection.EndToStart),
+					directions = setOf(DismissDirection.StartToEnd),
 					dismissThresholds = { FractionalThreshold(.6f) },
 					background = {
-						
-						if (
-							((2 * dismissState.progress.fraction) >= 1f) and
-							(dismissState.targetValue == DismissValue.DismissedToStart) and
-							!hasVibrate
-						) {
-							dashboardViewModel.vibratorManager.vibrate(100)
-							hasVibrate = true
-						}
 						
 						Timber.i("swipe fraction: ${(2 * dismissState.progress.fraction)}")
 						
 						Box(
 							modifier = Modifier
 								.padding(
-									start = 14.dpScaled,
-									end = 14.dpScaled,
-									top = 8.dpScaled,
-									bottom = if (index.lastIndexOf(mixedFinancialList)) 96.dpScaled else 8.dpScaled
+									horizontal = 14.dpScaled,
+									vertical = 8.dpScaled
 								)
 								.fillMaxSize()
 								.clip(big_shape)
@@ -244,7 +267,7 @@ fun DashboardScreen(
 										if (hasVibrate) 28.dpScaled
 										else 28.dpScaled * (2 * dismissState.progress.fraction)
 									)
-									.align(Alignment.CenterEnd)
+									.align(Alignment.CenterStart)
 							)
 						}
 					}
@@ -252,20 +275,25 @@ fun DashboardScreen(
 					FinancialCard(
 						financial = financial,
 						onClick = {
-						
+							dujerViewModel.navigateToFinancialScreen(
+								id = financial.id,
+								action = FinancialViewModel.FINANCIAL_ACTION_EDIT
+							)
 						},
 						modifier = Modifier
-							.padding(
-								start = 8.dpScaled,
-								end = 8.dpScaled,
-								top = 8.dpScaled,
-								
-								// fab size: 56 dp, fab bottom padding: 24 dp, card to fab padding: 16 dp
-								bottom = if (index.lastIndexOf(mixedFinancialList)) 96.dpScaled else 8.dpScaled
-							)
+							.padding(8.dpScaled)
 							.fillMaxWidth()
 					)
 				}
+			}
+			
+			item {
+				// fab size: 56 dp, fab bottom padding: 24 dp, card to fab padding: 16 dp = 96 dp
+				Spacer(
+					modifier = Modifier
+						.fillMaxWidth()
+						.height(96.dpScaled)
+				)
 			}
 		}
 	}

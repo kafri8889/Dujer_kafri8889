@@ -14,6 +14,9 @@ interface FinancialDAO {
 	@Query("SELECT * FROM financial WHERE type= :mType")
 	fun getByType(mType: Int): Flow<List<Financial>>
 	
+	@Query("SELECT * FROM financial WHERE id= :mID")
+	fun get(mID: Int): Financial
+	
 	@Update
 	fun update(vararg financial: Financial)
 	
