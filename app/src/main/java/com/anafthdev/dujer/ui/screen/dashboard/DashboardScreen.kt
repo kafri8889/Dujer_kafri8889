@@ -150,7 +150,6 @@ fun DashboardScreen(
 						Text(
 							text = stringResource(id = R.string.dashboard),
 							style = Typography.titleLarge.copy(
-								fontFamily = Inter,
 								fontWeight = FontWeight.Bold,
 								fontSize = Typography.titleLarge.fontSize.spScaled
 							)
@@ -203,10 +202,10 @@ fun DashboardScreen(
 				}
 			}
 			
-			itemsIndexed(
+			items(
 				items = mixedFinancialList,
-				key = { _: Int, item: Financial -> item.id }
-			) { index, financial ->
+				key = { item: Financial -> item.id }
+			) { financial ->
 				var hasVibrate by remember { mutableStateOf(false) }
 				
 				val dismissState = rememberDismissState(

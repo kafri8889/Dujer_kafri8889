@@ -4,6 +4,7 @@ import android.os.Bundle
 import android.telephony.TelephonyManager
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.gestures.LocalOverScrollConfiguration
 import androidx.compose.material3.Surface
@@ -17,7 +18,7 @@ import timber.log.Timber
 import javax.inject.Inject
 
 @AndroidEntryPoint
-class MainActivity : ComponentActivity() {
+class MainActivity : AppCompatActivity() {
 	
 	@Inject lateinit var appDatastore: AppDatastore
 	

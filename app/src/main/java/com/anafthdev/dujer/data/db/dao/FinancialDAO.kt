@@ -15,17 +15,17 @@ interface FinancialDAO {
 	fun getByType(mType: Int): Flow<List<Financial>>
 	
 	@Query("SELECT * FROM financial WHERE id= :mID")
-	fun get(mID: Int): Financial
+	suspend fun get(mID: Int): Financial
 	
 	@Update
-	fun update(vararg financial: Financial)
+	suspend fun update(vararg financial: Financial)
 	
 	@Delete
-	fun delete(vararg financial: Financial)
+	suspend fun delete(vararg financial: Financial)
 	
 	@Insert(onConflict = OnConflictStrategy.REPLACE)
-	fun insert(vararg financial: Financial)
+	suspend fun insert(vararg financial: Financial)
 	
-	fun getIncome(): Flow<List<Financial>> = getByType(FinancialType.INCOME.ordinal)
-	fun getExpense(): Flow<List<Financial>> = getByType(FinancialType.EXPENSE.ordinal)
+	suspend fun getIncome(): Flow<List<Financial>> = getByType(FinancialType.INCOME.ordinal)
+	suspend fun getExpense(): Flow<List<Financial>> = getByType(FinancialType.EXPENSE.ordinal)
 }

@@ -19,7 +19,7 @@ data class Financial(
 	companion object {
 		val default = Financial(
 			id = 0,
-			name = "default",
+			name = "",
 			amount = 0.0,
 			type = FinancialType.INCOME,
 			category = Category.default,

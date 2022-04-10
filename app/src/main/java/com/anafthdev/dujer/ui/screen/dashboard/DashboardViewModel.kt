@@ -4,7 +4,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.anafthdev.dujer.data.IAppRepository
+import com.anafthdev.dujer.data.repository.app.IAppRepository
 import com.anafthdev.dujer.data.FinancialType
 import com.anafthdev.dujer.data.db.model.Financial
 import com.anafthdev.dujer.foundation.common.vibrator.VibratorManager
@@ -20,7 +20,7 @@ import javax.inject.Inject
 @HiltViewModel
 class DashboardViewModel @Inject constructor(
 	val vibratorManager: VibratorManager,
-	private val iAppRepository: IAppRepository
+	private val appRepository: IAppRepository
 ): ViewModel() {
 
 	private val _mixedFinancialList = MutableLiveData(emptyList<Financial>())
@@ -32,12 +32,12 @@ class DashboardViewModel @Inject constructor(
 	private val _expenseFinancialList = MutableLiveData(emptyList<Financial>())
 	val expenseFinancialList: LiveData<List<Financial>> = _expenseFinancialList
 	
-	val datastore = iAppRepository.appDatastore
+	val datastore = appRepository.appDatastore
 	
 	init {
 		viewModelScope.launch {
-			iAppRepository.expenseRepository.getExpense().combine(
-				iAppRepository.incomeRepository.getIncome()
+			appRepository.expenseRepository.getExpense().combine(
+				appRepository.incomeRepository.getIncome()
 			) { expense, income ->
 				expense to income
 			}.collect { pair ->
@@ -52,11 +52,15 @@ class DashboardViewModel @Inject constructor(
 	}
 	
 	fun newRecord(financial: Financial) {
-		if (financial.type == FinancialType.INCOME) iAppRepository.incomeRepository.newIncome(financial)
-		else iAppRepository.expenseRepository.newExpense(financial)
+		viewModelScope.launch {
+			if (financial.type == FinancialType.INCOME) appRepository.incomeRepository.newIncome(financial)
+			else appRepository.expenseRepository.newExpense(financial)
+		}
 	}
 	
 	fun deleteRecord(financial: Financial) {
-		iAppRepository.delete(financial)
+		viewModelScope.launch {
+			appRepository.delete(financial)
+		}
 	}
 }

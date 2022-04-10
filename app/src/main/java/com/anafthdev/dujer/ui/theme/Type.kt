@@ -8,7 +8,6 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.sp
 import com.anafthdev.dujer.R
 
-val Roboto = FontFamily.Default
 val Inter = FontFamily(
 	Font(R.font.inter_thin, FontWeight.Thin),
 	Font(R.font.inter_extra_light, FontWeight.ExtraLight),
@@ -22,7 +21,7 @@ val Inter = FontFamily(
 
 val Typography = Typography(
 	displayLarge = TextStyle(
-		fontFamily = Roboto,
+		fontFamily = Inter,
 //		color = on_primary_container_background,
 		fontWeight = FontWeight.W400,
 		fontSize = 57.sp,
@@ -30,7 +29,7 @@ val Typography = Typography(
 		letterSpacing = (-0.25).sp,
 	),
 	displayMedium = TextStyle(
-		fontFamily = Roboto,
+		fontFamily = Inter,
 //		color = on_primary_container_background,
 		fontWeight = FontWeight.W400,
 		fontSize = 45.sp,
@@ -38,7 +37,7 @@ val Typography = Typography(
 		letterSpacing = 0.sp,
 	),
 	displaySmall = TextStyle(
-		fontFamily = Roboto,
+		fontFamily = Inter,
 //		color = on_primary_container_background,
 		fontWeight = FontWeight.W400,
 		fontSize = 36.sp,
@@ -46,7 +45,7 @@ val Typography = Typography(
 		letterSpacing = 0.sp,
 	),
 	headlineLarge = TextStyle(
-		fontFamily = Roboto,
+		fontFamily = Inter,
 //		color = on_primary_container_background,
 		fontWeight = FontWeight.W400,
 		fontSize = 32.sp,
@@ -54,7 +53,7 @@ val Typography = Typography(
 		letterSpacing = 0.sp,
 	),
 	headlineMedium = TextStyle(
-		fontFamily = Roboto,
+		fontFamily = Inter,
 //		color = on_primary_container_background,
 		fontWeight = FontWeight.W400,
 		fontSize = 28.sp,
@@ -62,7 +61,7 @@ val Typography = Typography(
 		letterSpacing = 0.sp,
 	),
 	headlineSmall = TextStyle(
-		fontFamily = Roboto,
+		fontFamily = Inter,
 //		color = on_primary_container_background,
 		fontWeight = FontWeight.W400,
 		fontSize = 24.sp,
@@ -70,7 +69,7 @@ val Typography = Typography(
 		letterSpacing = 0.sp,
 	),
 	titleLarge = TextStyle(
-		fontFamily = Roboto,
+		fontFamily = Inter,
 //		color = on_primary_container_background,
 		fontWeight = FontWeight.W400,
 		fontSize = 22.sp,
@@ -78,7 +77,7 @@ val Typography = Typography(
 		letterSpacing = 0.sp,
 	),
 	titleMedium = TextStyle(
-		fontFamily = Roboto,
+		fontFamily = Inter,
 //		color = on_primary_container_background,
 		fontWeight = FontWeight.Medium,
 		fontSize = 16.sp,
@@ -86,7 +85,7 @@ val Typography = Typography(
 		letterSpacing = 0.1.sp,
 	),
 	titleSmall = TextStyle(
-		fontFamily = Roboto,
+		fontFamily = Inter,
 //		color = on_primary_container_background,
 		fontWeight = FontWeight.Medium,
 		fontSize = 14.sp,
@@ -94,7 +93,7 @@ val Typography = Typography(
 		letterSpacing = 0.1.sp,
 	),
 	labelLarge = TextStyle(
-		fontFamily = Roboto,
+		fontFamily = Inter,
 //		color = on_primary_container_background,
 		fontWeight = FontWeight.Medium,
 		fontSize = 14.sp,
@@ -102,7 +101,7 @@ val Typography = Typography(
 		letterSpacing = 0.1.sp,
 	),
 	bodyLarge = TextStyle(
-		fontFamily = Roboto,
+		fontFamily = Inter,
 //		color = on_primary_container_background,
 		fontWeight = FontWeight.W400,
 		fontSize = 16.sp,
@@ -110,7 +109,7 @@ val Typography = Typography(
 		letterSpacing = 0.5.sp,
 	),
 	bodyMedium = TextStyle(
-		fontFamily = Roboto,
+		fontFamily = Inter,
 //		color = on_primary_container_background,
 		fontWeight = FontWeight.W400,
 		fontSize = 14.sp,
@@ -118,7 +117,7 @@ val Typography = Typography(
 		letterSpacing = 0.25.sp,
 	),
 	bodySmall = TextStyle(
-		fontFamily = Roboto,
+		fontFamily = Inter,
 //		color = on_primary_container_background,
 		fontWeight = FontWeight.W400,
 		fontSize = 12.sp,
@@ -126,7 +125,7 @@ val Typography = Typography(
 		letterSpacing = 0.4.sp,
 	),
 	labelMedium = TextStyle(
-		fontFamily = Roboto,
+		fontFamily = Inter,
 //		color = on_primary_container_background,
 		fontWeight = FontWeight.Medium,
 		fontSize = 12.sp,
@@ -134,7 +133,7 @@ val Typography = Typography(
 		letterSpacing = 0.5.sp,
 	),
 	labelSmall = TextStyle(
-		fontFamily = Roboto,
+		fontFamily = Inter,
 //		color = on_primary_container_background,
 		fontWeight = FontWeight.Medium,
 		fontSize = 11.sp,

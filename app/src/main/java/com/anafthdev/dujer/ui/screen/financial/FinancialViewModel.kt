@@ -3,9 +3,13 @@ package com.anafthdev.dujer.ui.screen.financial
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import com.anafthdev.dujer.data.IAppRepository
+import androidx.lifecycle.viewModelScope
+import com.anafthdev.dujer.data.repository.app.IAppRepository
+import com.anafthdev.dujer.data.db.model.Category
 import com.anafthdev.dujer.data.db.model.Financial
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
@@ -16,8 +20,37 @@ class FinancialViewModel @Inject constructor(
 	private val _financial = MutableLiveData(Financial.default)
 	val financial: LiveData<Financial> = _financial
 	
-	fun getFinancial(id: Int) {
-		_financial.value = appRepository.get(id)
+	private val _categories = MutableLiveData(emptyList<Category>())
+	val categories: LiveData<List<Category>> = _categories
+	
+	val currentCurrency = appRepository.appDatastore.getCurrentCurrency
+	
+	init {
+		viewModelScope.launch {
+			appRepository.categoryRepository.getAllCategory().collect{ categoryList ->
+				_categories.value = categoryList
+			}
+		}
+	}
+	
+	fun getFinancial(id: Int, action: (Financial) -> Unit) {
+		viewModelScope.launch {
+			_financial.value = appRepository.get(id).also(action)
+		}
+	}
+	
+	fun updateFinancial(financial: Financial, action: () -> Unit) {
+		viewModelScope.launch {
+			appRepository.update(financial)
+			action()
+		}
+	}
+	
+	fun insertFinancial(financial: Financial, action: () -> Unit) {
+		viewModelScope.launch {
+			appRepository.insert(financial)
+			action()
+		}
 	}
 	
 	companion object {

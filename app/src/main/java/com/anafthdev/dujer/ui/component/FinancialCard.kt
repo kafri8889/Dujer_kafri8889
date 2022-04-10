@@ -72,7 +72,6 @@ fun FinancialCard(
 					Text(
 						text = financial.name,
 						style = Typography.bodyMedium.copy(
-							fontFamily = Inter,
 							fontWeight = FontWeight.SemiBold,
 							fontSize = Typography.bodyMedium.fontSize.spScaled
 						)
@@ -81,7 +80,6 @@ fun FinancialCard(
 					Text(
 						text = SimpleDateFormat("dd MMM yyyy", Locale.getDefault()).format(financial.dateCreated),
 						style = Typography.labelSmall.copy(
-							fontFamily = Inter,
 							fontWeight = FontWeight.Normal,
 							fontSize = Typography.labelSmall.fontSize.spScaled
 						),
@@ -98,7 +96,6 @@ fun FinancialCard(
 					Text(
 						text = "${if (financial.type == FinancialType.INCOME) "+" else "-"}${financial.currency.symbol} ${financial.amount}",
 						style = Typography.bodyMedium.copy(
-							fontFamily = Inter,
 							fontWeight = FontWeight.SemiBold,
 							fontSize = Typography.bodyMedium.fontSize.spScaled
 						)
@@ -108,7 +105,6 @@ fun FinancialCard(
 						text = financial.type.name,
 						style = Typography.labelSmall.copy(
 							color = Color(0xFF4A5568),
-							fontFamily = Inter,
 							fontWeight = FontWeight.Medium,
 							fontSize = Typography.labelSmall.fontSize.spScaled
 						),

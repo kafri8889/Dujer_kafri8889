@@ -61,7 +61,6 @@ fun BalanceCard(
 				text = stringResource(id = R.string.available_balance),
 				style = Typography.bodyMedium.copy(
 					color = Color.White,
-					fontFamily = Inter,
 					fontWeight = FontWeight.Normal
 				)
 			)
@@ -70,7 +69,6 @@ fun BalanceCard(
 				text = "${currency.symbol} $balance",
 				style = Typography.headlineMedium.copy(
 					color = Color.White,
-					fontFamily = Inter,
 					fontWeight = FontWeight.SemiBold
 				),
 				modifier = Modifier
@@ -86,7 +84,6 @@ fun BalanceCard(
 				text = stringResource(id = R.string.see_details),
 				style = Typography.bodyMedium.copy(
 					color = Color.White,
-					fontFamily = Inter,
 					fontWeight = FontWeight.SemiBold
 				)
 			)

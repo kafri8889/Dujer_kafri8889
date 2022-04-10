@@ -74,7 +74,6 @@ fun ExpenseCard(
 				text = "${currency.symbol} $expense",
 				style = Typography.bodyMedium.copy(
 					color = black01,
-					fontFamily = Inter,
 					fontWeight = FontWeight.Bold
 				),
 				modifier = Modifier
@@ -87,7 +86,6 @@ fun ExpenseCard(
 				text = stringResource(id = R.string.expenses),
 				style = Typography.bodySmall.copy(
 					color = black05,
-					fontFamily = Inter,
 					fontWeight = FontWeight.Normal
 				),
 				modifier = Modifier

@@ -1,4 +1,4 @@
-package com.anafthdev.dujer.data.expense
+package com.anafthdev.dujer.data.repository.expense
 
 import com.anafthdev.dujer.data.db.AppDatabase
 import com.anafthdev.dujer.data.db.model.Financial
@@ -8,19 +8,19 @@ class ExpenseRepository(
 	private val appDatabase: AppDatabase
 ): IExpenseRepository {
 	
-	override fun getExpense(): Flow<List<Financial>> {
+	override suspend fun getExpense(): Flow<List<Financial>> {
 		return appDatabase.financialDao().getExpense()
 	}
 	
-	override fun newExpense(vararg financial: Financial) {
+	override suspend fun newExpense(vararg financial: Financial) {
 		appDatabase.financialDao().insert(*financial)
 	}
 	
-	override fun deleteExpense(vararg financial: Financial) {
+	override suspend fun deleteExpense(vararg financial: Financial) {
 		appDatabase.financialDao().delete(*financial)
 	}
 	
-	override fun updateExpense(vararg financial: Financial) {
+	override suspend fun updateExpense(vararg financial: Financial) {
 		appDatabase.financialDao().update(*financial)
 	}
 	

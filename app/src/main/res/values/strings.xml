@@ -17,5 +17,14 @@
     <string name="add_expenses">Add expenses</string>
     <string name="_new">New</string>
     <string name="edit">Edit</string>
+    <string name="title">Title</string>
+    <string name="amount">Amount</string>
+    <string name="category">Category</string>
+    <string name="type">Type</string>
+    <string name="date">Date</string>
+    <string name="save">Save</string>
+    <string name="title_cannot_be_empty">Title cannot be empty</string>
+    <string name="amount_cannot_be_empty">Amount cannot be empty</string>
+    <string name="category_cannot_be_empty">Category cannot be empty</string>
 
 </resources>

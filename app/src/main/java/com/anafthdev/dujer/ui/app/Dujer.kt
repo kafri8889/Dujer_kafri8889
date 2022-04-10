@@ -20,6 +20,7 @@ import androidx.navigation.navArgument
 import com.anafthdev.dujer.data.DujerDestination
 import com.anafthdev.dujer.data.FinancialType
 import com.anafthdev.dujer.data.db.model.Financial
+import com.anafthdev.dujer.foundation.extension.currentFraction
 import com.anafthdev.dujer.ui.screen.dashboard.DashboardScreen
 import com.anafthdev.dujer.ui.screen.financial.FinancialScreen
 import com.anafthdev.dujer.ui.screen.financial.FinancialViewModel
@@ -37,25 +38,30 @@ fun DujerApp() {
 	
 	val dujerViewModel = hiltViewModel<DujerViewModel>()
 	
-	val scope = rememberCoroutineScope { Dispatchers.Main }
-	val navController = rememberNavController()
-	val systemUiController = rememberSystemUiController()
-	val financialScreenSheetState = rememberModalBottomSheetState(
-		initialValue = ModalBottomSheetValue.Hidden,
-		skipHalfExpanded = true,
-		confirmStateChange = { sheetValue ->
-			if (sheetValue == ModalBottomSheetValue.Hidden) dujerViewModel.hideFinancialSheet()
-			else dujerViewModel.showFinancialSheet()
-			
-			true
-		}
-	)
-	
 	val isFinancialSheetShowed by dujerViewModel.isFinancialSheetShowed.observeAsState(initial = false)
 	val financialID by dujerViewModel.financialID.observeAsState(initial = Financial.default.id)
 	val financialAction by dujerViewModel.financialAction.observeAsState(
 		initial = FinancialViewModel.FINANCIAL_ACTION_NEW
 	)
+	
+	val scope = rememberCoroutineScope { Dispatchers.Main }
+	val navController = rememberNavController()
+	val systemUiController = rememberSystemUiController()
+	val financialScreenSheetState = rememberModalBottomSheetState(
+		initialValue = ModalBottomSheetValue.Hidden,
+		skipHalfExpanded = true
+	)
+	
+	Timber.i("isFinancialSheetShowed: $isFinancialSheetShowed")
+	Timber.i("bs value: ${financialScreenSheetState.currentValue}")
+	
+	if (financialScreenSheetState.currentValue != ModalBottomSheetValue.Hidden) {
+		DisposableEffect(Unit) {
+			onDispose {
+				dujerViewModel.hideFinancialSheet()
+			}
+		}
+	}
 	
 	BackHandler(isFinancialSheetShowed) {
 		dujerViewModel.hideFinancialSheet()

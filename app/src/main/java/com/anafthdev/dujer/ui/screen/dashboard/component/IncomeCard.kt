@@ -75,7 +75,6 @@ fun IncomeCard(
 				text = "${currency.symbol} $income",
 				style = Typography.bodyMedium.copy(
 					color = black01,
-					fontFamily = Inter,
 					fontWeight = FontWeight.Bold
 				),
 				modifier = Modifier
@@ -88,7 +87,6 @@ fun IncomeCard(
 				text = stringResource(id = R.string.income),
 				style = Typography.bodySmall.copy(
 					color = black05,
-					fontFamily = Inter,
 					fontWeight = FontWeight.Normal
 				),
 				modifier = Modifier

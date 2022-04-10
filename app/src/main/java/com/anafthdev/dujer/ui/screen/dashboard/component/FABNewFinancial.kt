@@ -113,7 +113,6 @@ fun FABNewFinancial(
 					Text(
 						text = stringResource(id = R.string.income),
 						style = Typography.bodyMedium.copy(
-							fontFamily = Inter,
 							fontSize = Typography.bodyMedium.fontSize.spScaled
 						)
 					)
@@ -148,7 +147,6 @@ fun FABNewFinancial(
 					Text(
 						text = stringResource(id = R.string.expenses),
 						style = Typography.bodyMedium.copy(
-							fontFamily = Inter,
 							fontSize = Typography.bodyMedium.fontSize.spScaled
 						)
 					)

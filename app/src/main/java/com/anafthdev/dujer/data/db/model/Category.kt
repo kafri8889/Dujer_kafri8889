@@ -16,6 +16,7 @@ data class Category(
 ) {
 	
 	companion object {
+		
 		val default = Category(
 			id = 0,
 			name = "-",
@@ -46,6 +47,12 @@ data class Category(
 			iconID = R.drawable.ic_bus,
 			tint = CategoryTint.tint_3,
 			defaultCategory = true
+		)
+		
+		val values = listOf(
+			shopping,
+			food,
+			transport
 		)
 	}
 }

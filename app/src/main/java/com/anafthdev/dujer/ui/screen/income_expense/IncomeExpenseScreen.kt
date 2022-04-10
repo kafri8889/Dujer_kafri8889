@@ -153,7 +153,6 @@ fun IncomeExpenseScreen(
 							id = if (type == FinancialType.INCOME) R.string.my_income else R.string.my_spending
 						),
 						style = Typography.titleLarge.copy(
-							fontFamily = Inter,
 							fontWeight = FontWeight.Bold,
 							fontSize = Typography.titleLarge.fontSize.spScaled
 						)
@@ -257,7 +256,6 @@ fun IncomeExpenseScreen(
 								),
 								style = Typography.bodyMedium.copy(
 									color = Color.White,
-									fontFamily = Inter,
 									fontWeight = FontWeight.SemiBold,
 									fontSize = Typography.bodyMedium.fontSize.spScaled
 								)
@@ -274,7 +272,6 @@ fun IncomeExpenseScreen(
 								}",
 								style = Typography.titleMedium.copy(
 									color = Color.White,
-									fontFamily = Inter,
 									fontWeight = FontWeight.Bold,
 									fontSize = Typography.titleMedium.fontSize.spScaled
 								)
@@ -299,7 +296,6 @@ fun IncomeExpenseScreen(
 							),
 							style = Typography.bodyMedium.copy(
 								color = black01,
-								fontFamily = Inter,
 								fontWeight = FontWeight.SemiBold,
 								fontSize = Typography.bodyMedium.fontSize.spScaled
 							),
