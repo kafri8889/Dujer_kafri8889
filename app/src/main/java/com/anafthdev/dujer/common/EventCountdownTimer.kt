@@ -10,6 +10,8 @@ class EventCountdownTimer {
 	private var _isTimerRunning: Boolean = false
 	val isTimerRunning: Boolean = _isTimerRunning
 	
+	private var countdownTimer: CountDownTimer? = null
+	
 	fun startTimer(
 		millisInFuture: Long,
 		onTick: (Long) -> Unit,
@@ -18,7 +20,7 @@ class EventCountdownTimer {
 		if (!_isTimerRunning) {
 			_isTimerRunning = true
 			
-			object : CountDownTimer(millisInFuture, 1000) {
+			countdownTimer = object : CountDownTimer(millisInFuture, 1000) {
 				override fun onTick(millisUntilFinished: Long) {
 					onTick(millisUntilFinished)
 					Timber.i("millisUntilFinished: $millisUntilFinished")
@@ -28,8 +30,15 @@ class EventCountdownTimer {
 					_isTimerRunning = false
 					onFinish()
 				}
-			}.start()
+			}
+			
+			countdownTimer!!.start()
 		}
+	}
+	
+	fun stop() {
+		countdownTimer?.cancel()
+		countdownTimer = null
 	}
 	
 }

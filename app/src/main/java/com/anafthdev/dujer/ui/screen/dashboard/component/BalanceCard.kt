@@ -22,6 +22,7 @@ import androidx.compose.ui.unit.DpSize
 import androidx.compose.ui.unit.dp
 import com.anafthdev.dujer.R
 import com.anafthdev.dujer.common.EventCountdownTimer
+import com.anafthdev.dujer.foundation.extension.horizontalScroll
 import com.anafthdev.dujer.foundation.extension.toDp
 import com.anafthdev.dujer.foundation.window.dpScaled
 import com.anafthdev.dujer.model.Currency
@@ -43,29 +44,7 @@ fun BalanceCard(
 	
 	val density = LocalDensity.current
 	
-	val scope = rememberCoroutineScope()
-	val textAmountScrollState = rememberScrollState()
-	
 	var cardHeight by remember { mutableStateOf(0.dpScaled) }
-	val eventCountdownTimer by remember { mutableStateOf(EventCountdownTimer()) }
-	
-	DisposableEffect(textAmountScrollState.isScrollInProgress) {
-		if (!eventCountdownTimer.isTimerRunning) {
-			eventCountdownTimer.startTimer(
-				millisInFuture = 3000,
-				onTick = {},
-				onFinish = {
-					scope.launch {
-						textAmountScrollState.animateScrollTo(
-							value = 0,
-							animationSpec = tween(600)
-						)
-					}
-				}
-			)
-		}
-		onDispose {}
-	}
 	
 	Card(
 		shape = big_shape,
@@ -109,7 +88,8 @@ fun BalanceCard(
 				modifier = Modifier
 					.padding(top = 16.dpScaled)
 					.horizontalScroll(
-						textAmountScrollState
+						state = rememberScrollState(),
+						autoRestart = true
 					)
 			)
 			

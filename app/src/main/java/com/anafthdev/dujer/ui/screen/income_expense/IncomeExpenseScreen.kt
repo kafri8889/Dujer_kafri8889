@@ -40,6 +40,7 @@ import com.anafthdev.dujer.data.DujerDestination
 import com.anafthdev.dujer.data.FinancialType
 import com.anafthdev.dujer.data.db.model.Financial
 import com.anafthdev.dujer.foundation.extension.getBy
+import com.anafthdev.dujer.foundation.extension.horizontalScroll
 import com.anafthdev.dujer.foundation.window.dpScaled
 import com.anafthdev.dujer.foundation.window.spScaled
 import com.anafthdev.dujer.model.Currency
@@ -76,14 +77,9 @@ fun IncomeExpenseScreen(
 	
 	val incomeExpenseViewModel = hiltViewModel<IncomeExpenseViewModel>()
 	
-	val scope = rememberCoroutineScope()
-	val textIncomeExpenseForScrollState = rememberScrollState()
-	
 	val currentCurrency by incomeExpenseViewModel.datastore.getCurrentCurrency.collectAsState(initial = Currency.INDONESIAN)
 	val incomeFinancialList by incomeExpenseViewModel.incomeFinancialList.observeAsState(initial = emptyList())
 	val expenseFinancialList by incomeExpenseViewModel.expenseFinancialList.observeAsState(initial = emptyList())
-	
-	val eventCountdownTimer by remember { mutableStateOf(EventCountdownTimer()) }
 	
 	val incomeBalance by rememberUpdatedState(
 		newValue = incomeFinancialList.getBy { it.amount }.sum()
@@ -132,23 +128,6 @@ fun IncomeExpenseScreen(
 		)
 	)
 	
-	DisposableEffect(textIncomeExpenseForScrollState.isScrollInProgress) {
-		if (!eventCountdownTimer.isTimerRunning) {
-			eventCountdownTimer.startTimer(
-				millisInFuture = 3000,
-				onTick = {},
-				onFinish = {
-					scope.launch {
-						textIncomeExpenseForScrollState.animateScrollTo(
-							value = 0,
-							animationSpec = tween(600)
-						)
-					}
-				}
-			)
-		}
-		onDispose {}
-	}
 	
 	LazyColumn(
 		modifier = Modifier
@@ -191,7 +170,10 @@ fun IncomeExpenseScreen(
 				Column(
 					modifier = Modifier
 						.fillMaxWidth()
-						.horizontalScroll(rememberScrollState())
+						.horizontalScroll(
+							rememberScrollState(),
+							enabled = true
+						)
 				) {
 					AndroidView(
 						factory = { context ->
@@ -307,7 +289,10 @@ fun IncomeExpenseScreen(
 								),
 								modifier = Modifier
 									.padding(start = 16.dpScaled)
-									.horizontalScroll(textIncomeExpenseForScrollState)
+									.horizontalScroll(
+										state = rememberScrollState(),
+										autoRestart = true
+									)
 							)
 						}
 					}
