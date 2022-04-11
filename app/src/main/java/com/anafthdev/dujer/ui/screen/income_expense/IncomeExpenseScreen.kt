@@ -1,6 +1,7 @@
 package com.anafthdev.dujer.ui.screen.income_expense
 
 import androidx.compose.animation.core.animateDpAsState
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.*
@@ -34,6 +35,7 @@ import androidx.compose.ui.viewinterop.AndroidView
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.anafthdev.dujer.R
+import com.anafthdev.dujer.common.EventCountdownTimer
 import com.anafthdev.dujer.data.DujerDestination
 import com.anafthdev.dujer.data.FinancialType
 import com.anafthdev.dujer.data.db.model.Financial
@@ -47,6 +49,7 @@ import com.anafthdev.dujer.ui.component.TopAppBar
 import com.anafthdev.dujer.ui.screen.financial.FinancialViewModel
 import com.anafthdev.dujer.ui.theme.*
 import com.anafthdev.dujer.util.AppUtil
+import com.anafthdev.dujer.util.CurrencyFormatter
 import com.anafthdev.dujer.view.LineChartMarkerView
 import com.github.mikephil.charting.charts.LineChart
 import com.github.mikephil.charting.components.XAxis
@@ -55,6 +58,7 @@ import com.github.mikephil.charting.data.Entry
 import com.github.mikephil.charting.data.LineData
 import com.github.mikephil.charting.data.LineDataSet
 import com.github.mikephil.charting.formatter.IndexAxisValueFormatter
+import kotlinx.coroutines.launch
 import timber.log.Timber
 import java.util.*
 
@@ -72,9 +76,14 @@ fun IncomeExpenseScreen(
 	
 	val incomeExpenseViewModel = hiltViewModel<IncomeExpenseViewModel>()
 	
+	val scope = rememberCoroutineScope()
+	val textIncomeExpenseForScrollState = rememberScrollState()
+	
 	val currentCurrency by incomeExpenseViewModel.datastore.getCurrentCurrency.collectAsState(initial = Currency.INDONESIAN)
 	val incomeFinancialList by incomeExpenseViewModel.incomeFinancialList.observeAsState(initial = emptyList())
 	val expenseFinancialList by incomeExpenseViewModel.expenseFinancialList.observeAsState(initial = emptyList())
+	
+	val eventCountdownTimer by remember { mutableStateOf(EventCountdownTimer()) }
 	
 	val incomeBalance by rememberUpdatedState(
 		newValue = incomeFinancialList.getBy { it.amount }.sum()
@@ -82,6 +91,7 @@ fun IncomeExpenseScreen(
 	val expenseBalance by rememberUpdatedState(
 		newValue = expenseFinancialList.getBy { it.amount }.sum()
 	)
+	
 	val incomeExpenseLineDataSetEntry by rememberUpdatedState(
 		newValue = arrayListOf<Entry>().apply {
 			// TODO: kalkulasi datanya
@@ -112,6 +122,7 @@ fun IncomeExpenseScreen(
 			add(Entry(11f, 3500f))
 		}
 	)
+	
 	val incomeExpenseLineDataset by rememberUpdatedState(
 		newValue = LineDataSet(
 			incomeExpenseLineDataSetEntry,
@@ -120,6 +131,24 @@ fun IncomeExpenseScreen(
 			)
 		)
 	)
+	
+	DisposableEffect(textIncomeExpenseForScrollState.isScrollInProgress) {
+		if (!eventCountdownTimer.isTimerRunning) {
+			eventCountdownTimer.startTimer(
+				millisInFuture = 3000,
+				onTick = {},
+				onFinish = {
+					scope.launch {
+						textIncomeExpenseForScrollState.animateScrollTo(
+							value = 0,
+							animationSpec = tween(600)
+						)
+					}
+				}
+			)
+		}
+		onDispose {}
+	}
 	
 	LazyColumn(
 		modifier = Modifier
@@ -241,7 +270,7 @@ fun IncomeExpenseScreen(
 					Column(
 						horizontalAlignment = Alignment.CenterHorizontally,
 						modifier = Modifier
-							.padding(32.dpScaled)
+							.padding(24.dpScaled)
 							.fillMaxWidth()
 					) {
 						Row(
@@ -267,14 +296,18 @@ fun IncomeExpenseScreen(
 							)
 							
 							Text(
-								text = "${currentCurrency.symbol} ${
-									if (type == FinancialType.INCOME) incomeBalance else expenseBalance
-								}",
+								text = CurrencyFormatter.format(
+									locale = AppUtil.deviceLocale,
+									amount = if (type == FinancialType.INCOME) incomeBalance else expenseBalance
+								),
 								style = Typography.titleMedium.copy(
 									color = Color.White,
 									fontWeight = FontWeight.Bold,
 									fontSize = Typography.titleMedium.fontSize.spScaled
-								)
+								),
+								modifier = Modifier
+									.padding(start = 16.dpScaled)
+									.horizontalScroll(textIncomeExpenseForScrollState)
 							)
 						}
 					}

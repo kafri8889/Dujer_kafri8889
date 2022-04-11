@@ -20,6 +20,8 @@ import com.anafthdev.dujer.foundation.extension.sizeBasedWidth
 import com.anafthdev.dujer.foundation.window.dpScaled
 import com.anafthdev.dujer.model.Currency
 import com.anafthdev.dujer.ui.theme.*
+import com.anafthdev.dujer.util.AppUtil
+import com.anafthdev.dujer.util.CurrencyFormatter
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -71,7 +73,7 @@ fun ExpenseCard(
 			)
 			
 			Text(
-				text = "${currency.symbol} $expense",
+				text = CurrencyFormatter.format(AppUtil.deviceLocale, expense),
 				style = Typography.bodyMedium.copy(
 					color = black01,
 					fontWeight = FontWeight.Bold

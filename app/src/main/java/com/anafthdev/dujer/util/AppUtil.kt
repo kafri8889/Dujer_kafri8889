@@ -9,15 +9,12 @@ import java.util.*
 
 object AppUtil {
 	
-	val shortMonths: Array<String> = DateFormatSymbols(
-		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) Resources.getSystem().configuration.locales[0]
-		else Resources.getSystem().configuration.locale
-	).shortMonths
+	val deviceLocale = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) Resources.getSystem().configuration.locales[0]
+	else Resources.getSystem().configuration.locale
 	
-	val longMonths: Array<String> = DateFormatSymbols(
-		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) Resources.getSystem().configuration.locales[0]
-		else Resources.getSystem().configuration.locale
-	).months
+	val shortMonths: Array<String> = DateFormatSymbols(deviceLocale).shortMonths
+	
+	val longMonths: Array<String> = DateFormatSymbols(deviceLocale).months
 	
 	fun Any?.toast(context: Context, length: Int = Toast.LENGTH_SHORT) = Toast.makeText(context, this.toString(), length).show()
 	

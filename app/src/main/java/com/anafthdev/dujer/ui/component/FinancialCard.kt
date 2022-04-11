@@ -19,6 +19,8 @@ import com.anafthdev.dujer.foundation.extension.toColor
 import com.anafthdev.dujer.foundation.window.dpScaled
 import com.anafthdev.dujer.foundation.window.spScaled
 import com.anafthdev.dujer.ui.theme.*
+import com.anafthdev.dujer.util.AppUtil
+import com.anafthdev.dujer.util.CurrencyFormatter
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -94,7 +96,8 @@ fun FinancialCard(
 						.weight(0.6f)
 				) {
 					Text(
-						text = "${if (financial.type == FinancialType.INCOME) "+" else "-"}${financial.currency.symbol} ${financial.amount}",
+						text = (if (financial.type == FinancialType.INCOME) "+" else "-") +
+								CurrencyFormatter.format(AppUtil.deviceLocale, financial.amount),
 						style = Typography.bodyMedium.copy(
 							fontWeight = FontWeight.SemiBold,
 							fontSize = Typography.bodyMedium.fontSize.spScaled

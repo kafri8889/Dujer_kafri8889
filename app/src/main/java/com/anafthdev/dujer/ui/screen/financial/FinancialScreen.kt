@@ -51,7 +51,10 @@ import com.anafthdev.dujer.ui.theme.Inter
 import com.anafthdev.dujer.ui.theme.Typography
 import com.anafthdev.dujer.ui.theme.black04
 import com.anafthdev.dujer.ui.theme.small_shape
+import com.anafthdev.dujer.util.AppUtil
 import com.anafthdev.dujer.util.AppUtil.toast
+import com.anafthdev.dujer.util.CurrencyFormatter
+import timber.log.Timber
 import java.text.SimpleDateFormat
 import java.util.*
 import kotlin.random.Random
@@ -69,11 +72,12 @@ fun FinancialScreen(
 	val dujerViewModel = hiltViewModel<DujerViewModel>()
 	
 	val currentCurrency by financialViewModel.currentCurrency.collectAsState(initial = Currency.INDONESIAN)
-	val categories by financialViewModel.categories.observeAsState(initial = emptyList())
+	val categories by financialViewModel.categories.observeAsState(initial = Category.values)
 	val isFinancialSheetShowed by dujerViewModel.isFinancialSheetShowed.observeAsState(initial = false)
 	
 	var financial by remember { mutableStateOf(Financial.default) }
 	var financialTitle: String by remember { mutableStateOf("") }
+	var financialAmountDouble: Double by remember { mutableStateOf(0.0) }
 	var financialAmount: TextFieldValue by remember { mutableStateOf(TextFieldValue()) }
 	var financialDate: Long by remember { mutableStateOf(System.currentTimeMillis()) }
 	var financialCategory: Category by remember { mutableStateOf(Category.default) }
@@ -88,9 +92,16 @@ fun FinancialScreen(
 			financialViewModel.getFinancial(financialID) { mFinancial ->
 				financial = mFinancial
 				financialTitle = financial.name
-				financialAmount = financialAmount.copy(financial.amount.toString())
 				financialDate = financial.dateCreated
 				financialCategory = financial.category
+				financialAmountDouble = financial.amount
+				financialAmount = financialAmount.copy(
+					CurrencyFormatter.format(
+						locale = AppUtil.deviceLocale,
+						amount = financial.amount,
+						useSymbol = false
+					)
+				)
 				
 				true.also {
 					hasNavigate = it
@@ -102,10 +113,17 @@ fun FinancialScreen(
 	if (!isFinancialSheetShowed) {
 		financial = Financial.default
 		financialTitle = ""
-		financialAmount = TextFieldValue()
 		financialDate = System.currentTimeMillis()
 		financialCategory = Category.default
 		financialType = FinancialType.INCOME
+		financialAmountDouble = 0.0
+		financialAmount = TextFieldValue(
+			text = CurrencyFormatter.format(
+				locale = AppUtil.deviceLocale,
+				amount = 0.0,
+				useSymbol = false
+			)
+		)
 		
 		focusManager.clearFocus(force = true)
 		hasNavigate = false
@@ -214,8 +232,18 @@ fun FinancialScreen(
 							selectionIndex = TextRange.Zero
 						}
 						
+						financialAmountDouble = CurrencyFormatter.parse(
+							locale = AppUtil.deviceLocale,
+							amount = "${currentCurrency.symbol}$amount"
+						)
+						Timber.i("amont: $financialAmountDouble")
+						Timber.i("amont s: $amount")
 						financialAmount = s.copy(
-							text = amount,
+							text = CurrencyFormatter.format(
+								locale = AppUtil.deviceLocale,
+								amount = financialAmountDouble,
+								useSymbol = false
+							),
 							selection = selectionIndex
 						)
 					},
@@ -249,7 +277,9 @@ fun FinancialScreen(
 				)
 				
 				OutlinedTextField(
-					value = SimpleDateFormat("dd MMM yyyy", Locale.getDefault()).format(financialDate),
+					value = SimpleDateFormat("dd MMM yyyy", Locale.getDefault()).format(
+						financialDate
+					),
 					singleLine = true,
 					readOnly = true,
 					shape = small_shape,
@@ -337,7 +367,7 @@ fun FinancialScreen(
 						.padding(top = 8.dpScaled)
 				) {
 					CategoryList(
-						categories = Category.values,
+						categories = categories,
 						onItemClick = { category ->
 							financialCategory = category
 							showCategoryList = false
@@ -345,26 +375,27 @@ fun FinancialScreen(
 					)
 				}
 				
-				if (financialAction == FinancialViewModel.FINANCIAL_ACTION_NEW) {
-					Text(
-						text = stringResource(id = R.string.type),
-						style = Typography.bodyLarge.copy(
-							fontSize = Typography.bodyLarge.fontSize.spScaled
-						),
-						modifier = Modifier
-							.padding(top = 24.dpScaled)
-					)
-					
-					OutlinedTextField(
-						value = financialType.name,
-						singleLine = true,
-						readOnly = true,
-						shape = small_shape,
-						textStyle = LocalTextStyle.current.copy(
-							fontFamily = Inter
-						),
-						onValueChange = {},
-						trailingIcon = {
+				Text(
+					text = stringResource(id = R.string.type),
+					style = Typography.bodyLarge.copy(
+						fontSize = Typography.bodyLarge.fontSize.spScaled
+					),
+					modifier = Modifier
+						.padding(top = 24.dpScaled)
+				)
+				
+				OutlinedTextField(
+					value = financialType.name,
+					singleLine = true,
+					readOnly = true,
+					enabled = financialAction == FinancialViewModel.FINANCIAL_ACTION_NEW,
+					shape = small_shape,
+					textStyle = LocalTextStyle.current.copy(
+						fontFamily = Inter
+					),
+					onValueChange = {},
+					trailingIcon = {
+						if (financialAction == FinancialViewModel.FINANCIAL_ACTION_NEW) {
 							IconButton(
 								onClick = {
 									showFinancialTypeList = !showFinancialTypeList
@@ -379,35 +410,36 @@ fun FinancialScreen(
 										)
 								)
 							}
-						},
-						keyboardOptions = KeyboardOptions(
-							keyboardType = KeyboardType.Text,
-							imeAction = ImeAction.Next
-						),
-						modifier = Modifier
-							.padding(top = 8.dpScaled)
-							.fillMaxWidth()
+						}
+					},
+					keyboardOptions = KeyboardOptions(
+						keyboardType = KeyboardType.Text,
+						imeAction = ImeAction.Next
+					),
+					modifier = Modifier
+						.padding(top = 8.dpScaled)
+						.fillMaxWidth()
+				)
+				
+				AnimatedVisibility(
+					visible = showFinancialTypeList,
+					enter = expandVertically(
+						animationSpec = tween(600),
+					),
+					exit = shrinkVertically(
+						animationSpec = tween(600),
+					),
+					modifier = Modifier
+						.padding(top = 8.dpScaled)
+				) {
+					FinancialTypeList(
+						types = FinancialType.values().toList()
+							.filter { it != FinancialType.NOTHING },
+						onItemClick = { type ->
+							financialType = type
+							showFinancialTypeList = false
+						}
 					)
-					
-					AnimatedVisibility(
-						visible = showFinancialTypeList,
-						enter = expandVertically(
-							animationSpec = tween(600),
-						),
-						exit = shrinkVertically(
-							animationSpec = tween(600),
-						),
-						modifier = Modifier
-							.padding(top = 8.dpScaled)
-					) {
-						FinancialTypeList(
-							types = FinancialType.values().toList().filter { it != FinancialType.NOTHING },
-							onItemClick = { type ->
-								financialType = type
-								showFinancialTypeList = false
-							}
-						)
-					}
 				}
 				
 				FilledTonalButton(
@@ -416,8 +448,7 @@ fun FinancialScreen(
 							financialViewModel.updateFinancial(
 								financial = financial.copy(
 									name = financialTitle,
-									// TODO: benerin format amountnya
-									amount = financialAmount.text.toDouble(),
+									amount = financialAmountDouble,
 									dateCreated = financialDate,
 									category = financialCategory
 								),
@@ -441,8 +472,7 @@ fun FinancialScreen(
 										financial = Financial(
 											id = Random.nextInt(),
 											name = financialTitle,
-											// TODO: benerin format amountnya
-											amount = financialAmount.text.toDouble(),
+											amount = financialAmountDouble,
 											type = financialType,
 											category = financialCategory,
 											currency = currentCurrency,
