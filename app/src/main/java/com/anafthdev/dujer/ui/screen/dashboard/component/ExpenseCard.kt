@@ -2,6 +2,7 @@ package com.anafthdev.dujer.ui.screen.dashboard.component
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -16,6 +17,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.anafthdev.dujer.R
+import com.anafthdev.dujer.foundation.extension.horizontalScroll
 import com.anafthdev.dujer.foundation.extension.sizeBasedWidth
 import com.anafthdev.dujer.foundation.window.dpScaled
 import com.anafthdev.dujer.model.Currency
@@ -81,6 +83,10 @@ fun ExpenseCard(
 				modifier = Modifier
 					.padding(
 						vertical = 4.dpScaled
+					)
+					.horizontalScroll(
+						state = rememberScrollState(),
+						autoRestart = true
 					)
 			)
 			
