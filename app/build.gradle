@@ -84,6 +84,10 @@ dependencies {
     implementation 'androidx.lifecycle:lifecycle-extensions:2.2.0'
     kapt 'androidx.lifecycle:lifecycle-common-java8:2.4.1'
 
+    // Biometric
+    implementation 'androidx.biometric:biometric:1.1.0'
+    implementation 'androidx.biometric:biometric-ktx:1.2.0-alpha04'
+
     // Dependency Injection
     implementation 'com.google.dagger:hilt-android:2.39.1'
     implementation 'androidx.hilt:hilt-lifecycle-viewmodel:1.0.0-alpha03'

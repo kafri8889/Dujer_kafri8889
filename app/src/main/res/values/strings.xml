@@ -26,5 +26,18 @@
     <string name="title_cannot_be_empty">Title cannot be empty</string>
     <string name="amount_cannot_be_empty">Amount cannot be empty</string>
     <string name="category_cannot_be_empty">Category cannot be empty</string>
+    <string name="category_summary">Add or remove category</string>
+    <string name="biometric_authentication">Biometric Authentication</string>
+    <string name="biometric_authentication_summary">Use biometric authentication</string>
+    <string name="bio_auth_title">Verification</string>
+    <string name="bio_auth_description">Verify that this is you</string>
+    <string name="auth_failed">Authentication Failed</string>
+    <string name="add_fingerprint_first">Add fingerprint first</string>
+    <string name="no_fp_sensor_detected">Fingerprint sensor not detected</string>
+    <string name="session_time_out">Session time out</string>
+    <string name="security">Security</string>
+    <string name="configuration">Configuration</string>
+    <string name="currency">Currency</string>
+    <string name="setting">Setting</string>
 
 </resources>

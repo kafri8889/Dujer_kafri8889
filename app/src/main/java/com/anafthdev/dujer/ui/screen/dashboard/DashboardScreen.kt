@@ -19,6 +19,7 @@ import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.blur
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
@@ -209,7 +210,9 @@ fun DashboardScreen(
 						
 						IconButton(
 							onClick = {
-							
+								navController.navigate(DujerDestination.Setting.route) {
+									launchSingleTop = true
+								}
 							},
 							modifier = Modifier
 								.align(Alignment.CenterEnd)

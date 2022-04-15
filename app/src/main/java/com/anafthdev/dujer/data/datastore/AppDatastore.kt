@@ -4,10 +4,7 @@ import android.content.Context
 import android.os.Handler
 import android.os.Looper
 import androidx.datastore.core.DataStore
-import androidx.datastore.preferences.core.Preferences
-import androidx.datastore.preferences.core.doublePreferencesKey
-import androidx.datastore.preferences.core.edit
-import androidx.datastore.preferences.core.stringPreferencesKey
+import androidx.datastore.preferences.core.*
 import androidx.datastore.preferences.preferencesDataStore
 import com.anafthdev.dujer.data.preference.Preference
 import com.anafthdev.dujer.foundation.extension.get
@@ -25,6 +22,7 @@ class AppDatastore @Inject constructor(private val context: Context) {
 	
 	private val userBalance = doublePreferencesKey(Preference.USER_BALANCE)
 	private val currentCurrency = stringPreferencesKey(Preference.CURRENT_CURRENCY)
+	private val useBioAuth = booleanPreferencesKey(Preference.USE_BIO_AUTH)
 	
 	private val scope = CoroutineScope(Job() + Dispatchers.IO)
 	private fun postAction(action: () -> Unit) = Handler(Looper.getMainLooper()).post { action() }
@@ -45,14 +43,26 @@ class AppDatastore @Inject constructor(private val context: Context) {
 		}.invokeOnCompletion { postAction(action) }
 	}
 	
-	val getUserBalance: Flow<Double> = context.datastore.data.map {
-		it[userBalance] ?: 0.0
+	fun setUseBioAuth(use: Boolean, action: () -> Unit) {
+		scope.launch {
+			context.datastore.edit { preferences ->
+				preferences[useBioAuth] = use
+			}
+		}.invokeOnCompletion { postAction(action) }
+	}
+	
+	val getUserBalance: Flow<Double> = context.datastore.data.map { preferences ->
+		preferences[userBalance] ?: 0.0
 	}
 	
 	val getCurrentCurrency: Flow<Currency> = context.datastore.data.map { preferences ->
 		Currency.values.get {
 			it.countryCode == (preferences[currentCurrency] ?: Currency.INDONESIAN.countryCode)
 		}?: Currency.INDONESIAN
+	}
+	
+	val isUseBioAuth: Flow<Boolean> = context.datastore.data.map { preferences ->
+		preferences[useBioAuth] ?: false
 	}
 	
 	companion object {

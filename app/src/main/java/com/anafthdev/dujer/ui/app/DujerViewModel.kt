@@ -47,4 +47,5 @@ class DujerViewModel @Inject constructor(): ViewModel() {
 	fun hideFinancialSheet() {
 		_isFinancialSheetShowed.value = false
 	}
+	
 }

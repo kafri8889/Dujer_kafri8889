@@ -9,4 +9,6 @@ sealed class DujerDestination(val route: String) {
 			return "incomeExpense/${type.ordinal}"
 		}
 	}
+	
+	object Setting: DujerDestination("setting")
 }
