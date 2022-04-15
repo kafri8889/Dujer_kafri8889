@@ -1,15 +1,14 @@
 package com.anafthdev.dujer.ui.screen.financial
 
+import android.view.ContextThemeWrapper
+import android.view.LayoutInflater
 import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.expandVertically
 import androidx.compose.animation.shrinkVertically
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
@@ -31,6 +30,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.TextFieldValue
+import androidx.compose.ui.viewinterop.AndroidView
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.anafthdev.dujer.R
 import com.anafthdev.dujer.data.FinancialType
@@ -54,6 +54,8 @@ import com.anafthdev.dujer.ui.theme.small_shape
 import com.anafthdev.dujer.util.AppUtil
 import com.anafthdev.dujer.util.AppUtil.toast
 import com.anafthdev.dujer.util.CurrencyFormatter
+import com.google.android.material.chip.Chip
+import com.google.android.material.chip.ChipDrawable
 import timber.log.Timber
 import java.text.SimpleDateFormat
 import java.util.*
@@ -84,7 +86,6 @@ fun FinancialScreen(
 	var financialType: FinancialType by remember { mutableStateOf(FinancialType.INCOME) }
 	
 	var showCategoryList by remember { mutableStateOf(false) }
-	var showFinancialTypeList by remember { mutableStateOf(false) }
 	var hasNavigate by remember { mutableStateOf(false) }
 	
 	when {
@@ -234,7 +235,7 @@ fun FinancialScreen(
 						
 						financialAmountDouble = CurrencyFormatter.parse(
 							locale = AppUtil.deviceLocale,
-							amount = "${currentCurrency.symbol}$amount"
+							amount = "${financialViewModel.deviceCurrency.symbol}$amount"
 						)
 						Timber.i("amont: $financialAmountDouble")
 						Timber.i("amont s: $amount")
@@ -367,7 +368,7 @@ fun FinancialScreen(
 						.padding(top = 8.dpScaled)
 				) {
 					CategoryList(
-						categories = categories,
+						categories = Category.values,
 						onItemClick = { category ->
 							financialCategory = category
 							showCategoryList = false
@@ -384,62 +385,12 @@ fun FinancialScreen(
 						.padding(top = 24.dpScaled)
 				)
 				
-				OutlinedTextField(
-					value = financialType.name,
-					singleLine = true,
-					readOnly = true,
-					enabled = financialAction == FinancialViewModel.FINANCIAL_ACTION_NEW,
-					shape = small_shape,
-					textStyle = LocalTextStyle.current.copy(
-						fontFamily = Inter
-					),
-					onValueChange = {},
-					trailingIcon = {
-						if (financialAction == FinancialViewModel.FINANCIAL_ACTION_NEW) {
-							IconButton(
-								onClick = {
-									showFinancialTypeList = !showFinancialTypeList
-								}
-							) {
-								Icon(
-									imageVector = Icons.Rounded.ArrowDropDown,
-									contentDescription = null,
-									modifier = Modifier
-										.rotate(
-											if (showFinancialTypeList) 180f else 0f
-										)
-								)
-							}
-						}
-					},
-					keyboardOptions = KeyboardOptions(
-						keyboardType = KeyboardType.Text,
-						imeAction = ImeAction.Next
-					),
+				Row(
 					modifier = Modifier
 						.padding(top = 8.dpScaled)
 						.fillMaxWidth()
-				)
-				
-				AnimatedVisibility(
-					visible = showFinancialTypeList,
-					enter = expandVertically(
-						animationSpec = tween(600),
-					),
-					exit = shrinkVertically(
-						animationSpec = tween(600),
-					),
-					modifier = Modifier
-						.padding(top = 8.dpScaled)
 				) {
-					FinancialTypeList(
-						types = FinancialType.values().toList()
-							.filter { it != FinancialType.NOTHING },
-						onItemClick = { type ->
-							financialType = type
-							showFinancialTypeList = false
-						}
-					)
+					// TODO: Pake chip MD3
 				}
 				
 				FilledTonalButton(

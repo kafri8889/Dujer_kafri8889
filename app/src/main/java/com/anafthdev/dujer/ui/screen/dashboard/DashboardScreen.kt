@@ -1,30 +1,26 @@
 package com.anafthdev.dujer.ui.screen.dashboard
 
-import androidx.compose.animation.AnimatedContent
-import androidx.compose.animation.core.animateFloatAsState
-import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.lazy.itemsIndexed
-import androidx.compose.foundation.lazy.rememberLazyListState
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.*
+import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.Add
 import androidx.compose.material3.FloatingActionButton
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
+import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
-import androidx.compose.ui.draw.rotate
-import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.toArgb
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -35,28 +31,20 @@ import androidx.navigation.NavController
 import com.anafthdev.dujer.R
 import com.anafthdev.dujer.data.DujerDestination
 import com.anafthdev.dujer.data.FinancialType
-import com.anafthdev.dujer.data.db.model.Category
 import com.anafthdev.dujer.data.db.model.Financial
+import com.anafthdev.dujer.foundation.extension.combine
 import com.anafthdev.dujer.foundation.extension.getBy
-import com.anafthdev.dujer.foundation.extension.lastIndexOf
-import com.anafthdev.dujer.ui.screen.dashboard.component.BalanceCard
-import com.anafthdev.dujer.ui.component.TopAppBar
-import com.anafthdev.dujer.ui.theme.Typography
 import com.anafthdev.dujer.foundation.window.dpScaled
 import com.anafthdev.dujer.foundation.window.spScaled
 import com.anafthdev.dujer.model.Currency
 import com.anafthdev.dujer.ui.app.DujerViewModel
-import com.anafthdev.dujer.ui.component.FinancialCard
-import com.anafthdev.dujer.ui.screen.dashboard.component.ExpenseCard
-import com.anafthdev.dujer.ui.screen.dashboard.component.FABNewFinancial
-import com.anafthdev.dujer.ui.screen.dashboard.component.IncomeCard
+import com.anafthdev.dujer.ui.component.TopAppBar
+import com.anafthdev.dujer.ui.screen.dashboard.component.*
 import com.anafthdev.dujer.ui.screen.financial.FinancialViewModel
-import com.anafthdev.dujer.ui.theme.Inter
-import com.anafthdev.dujer.ui.theme.big_shape
-import com.anafthdev.dujer.util.AppUtil.toast
-import kotlinx.coroutines.launch
-import timber.log.Timber
-import kotlin.random.Random
+import com.anafthdev.dujer.ui.theme.Typography
+import com.anafthdev.dujer.ui.theme.expenseColor
+import com.anafthdev.dujer.ui.theme.incomeColor
+import com.github.mikephil.charting.data.LineDataSet
 
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
@@ -65,19 +53,84 @@ fun DashboardScreen(
 	dujerViewModel: DujerViewModel
 ) {
 	
+	val context = LocalContext.current
+	val config = LocalConfiguration.current
+	
 	val dashboardViewModel = hiltViewModel<DashboardViewModel>()
 	
 	val userBalance by dashboardViewModel.datastore.getUserBalance.collectAsState(initial = 0.0)
 	val currentCurrency by dashboardViewModel.datastore.getCurrentCurrency.collectAsState(initial = Currency.INDONESIAN)
-	val mixedFinancialList by dashboardViewModel.mixedFinancialList.observeAsState(initial = emptyList())
 	val incomeFinancialList by dashboardViewModel.incomeFinancialList.observeAsState(initial = emptyList())
 	val expenseFinancialList by dashboardViewModel.expenseFinancialList.observeAsState(initial = emptyList())
+	val incomeLineDataSetEntry by dashboardViewModel.incomeLineDataSetEntry.observeAsState(initial = emptyList())
+	val expenseLineDataSetEntry by dashboardViewModel.expenseLineDataSetEntry.observeAsState(initial = emptyList())
+
+//	val incomeLineDataSetEntry by rememberUpdatedState(
+//		newValue = arrayListOf<Entry>().apply {
+//			add(Entry(0f, 2200f))
+//			add(Entry(1f, 1000f))
+//			add(Entry(2f, 3500f))
+//			add(Entry(3f, 0f))
+//			add(Entry(4f, 9500f))
+//			add(Entry(5f, 4000f))
+//			add(Entry(6f, 10000f))
+//			add(Entry(7f, 12000f))
+//			add(Entry(8f, 6400f))
+//			add(Entry(9f, 15200f))
+//			add(Entry(10f, 7000f))
+//			add(Entry(11f, 3500f))
+//		}
+//	)
 	
-	val incomeBalance by rememberUpdatedState(
-		newValue = incomeFinancialList.getBy { it.amount }.sum()
+//	val expenseLineDataSetEntry by rememberUpdatedState(
+//		newValue = arrayListOf<Entry>().apply {
+//			add(Entry(0f, 1200f))
+//			add(Entry(1f, 2800f))
+//			add(Entry(2f, 7500f))
+//			add(Entry(3f, 6256f))
+//			add(Entry(4f, 2400f))
+//			add(Entry(5f, 0f))
+//			add(Entry(6f, 12200f))
+//			add(Entry(7f, 1300f))
+//			add(Entry(8f, 5000f))
+//			add(Entry(9f, 11200f))
+//			add(Entry(10f, 4900f))
+//			add(Entry(11f, 6300f))
+//		}
+//	)
+	
+	val incomeLineDataset by rememberUpdatedState(
+		newValue = LineDataSet(
+			incomeLineDataSetEntry,
+			context.getString(R.string.income)
+		).apply {
+			lineWidth = 2.5f
+			cubicIntensity = .2f
+			mode = LineDataSet.Mode.CUBIC_BEZIER
+			color = incomeColor.toArgb()
+			setDrawValues(false)
+			setDrawFilled(false)
+			setDrawCircles(false)
+			setCircleColor(incomeColor.toArgb())
+			setDrawHorizontalHighlightIndicator(false)
+		}
 	)
-	val expenseBalance by rememberUpdatedState(
-		newValue = expenseFinancialList.getBy { it.amount }.sum()
+	
+	val expenseLineDataset by rememberUpdatedState(
+		newValue = LineDataSet(
+			expenseLineDataSetEntry,
+			context.getString(R.string.income)
+		).apply {
+			lineWidth = 2.5f
+			cubicIntensity = .2f
+			mode = LineDataSet.Mode.CUBIC_BEZIER
+			color = expenseColor.toArgb()
+			setDrawValues(false)
+			setDrawFilled(false)
+			setDrawCircles(false)
+			setCircleColor(expenseColor.toArgb())
+			setDrawHorizontalHighlightIndicator(false)
+		}
 	)
 	
 	Box(
@@ -143,7 +196,6 @@ fun DashboardScreen(
 			item {
 				Column(
 					modifier = Modifier
-						.padding(horizontal = 16.dpScaled)
 						.fillMaxSize()
 				) {
 					TopAppBar {
@@ -154,136 +206,96 @@ fun DashboardScreen(
 								fontSize = Typography.titleLarge.fontSize.spScaled
 							)
 						)
-					}
-					
-					BalanceCard(
-						balance = userBalance,
-						currency = currentCurrency
-					)
-					
-					Row(
-						verticalAlignment = Alignment.CenterVertically,
-						modifier = Modifier
-							.fillMaxWidth()
-							.padding(
-								vertical = 16.dpScaled
-							)
-					) {
-						IncomeCard(
-							income = incomeBalance,
-							currency = currentCurrency,
+						
+						IconButton(
 							onClick = {
-								navController.navigate(
-									DujerDestination.IncomeExpense.createRoute(FinancialType.INCOME)
-								) {
-									launchSingleTop = true
-								}
+							
 							},
 							modifier = Modifier
-								.padding(end = 4.dpScaled)
-								.weight(1f)
+								.align(Alignment.CenterEnd)
+						) {
+							Icon(
+								painter = painterResource(id = R.drawable.ic_setting),
+								contentDescription = null
+							)
+						}
+					}
+					
+					Column(
+						modifier = Modifier
+							.padding(horizontal = 16.dpScaled)
+					) {
+						BalanceCard(
+							balance = userBalance,
+							currency = currentCurrency
 						)
 						
-						ExpenseCard(
-							expense = expenseBalance,
-							currency = currentCurrency,
-							onClick = {
-								navController.navigate(
-									DujerDestination.IncomeExpense.createRoute(FinancialType.EXPENSE)
-								) {
-									launchSingleTop = true
-								}
-							},
+						Row(
+							verticalAlignment = Alignment.CenterVertically,
 							modifier = Modifier
-								.padding(start = 4.dpScaled)
-								.weight(1f)
-						)
+								.fillMaxWidth()
+								.padding(
+									vertical = 16.dpScaled
+								)
+						) {
+							IncomeCard(
+								income = incomeFinancialList.getBy { it.amount }.sum(),
+								currency = currentCurrency,
+								onClick = {
+									navController.navigate(
+										DujerDestination.IncomeExpense.createRoute(FinancialType.INCOME)
+									) {
+										launchSingleTop = true
+									}
+								},
+								modifier = Modifier
+									.padding(end = 4.dpScaled)
+									.weight(1f)
+							)
+							
+							ExpenseCard(
+								expense = expenseFinancialList.getBy { it.amount }.sum(),
+								currency = currentCurrency,
+								onClick = {
+									navController.navigate(
+										DujerDestination.IncomeExpense.createRoute(FinancialType.EXPENSE)
+									) {
+										launchSingleTop = true
+									}
+								},
+								modifier = Modifier
+									.padding(start = 4.dpScaled)
+									.weight(1f)
+							)
+						}
 					}
 				}
+				
+				FinancialLineChart(
+					incomeLineDataset = incomeLineDataset,
+					expenseLineDataset = expenseLineDataset
+				)
 			}
 			
 			items(
-				items = mixedFinancialList,
+				items = incomeFinancialList.combine(expenseFinancialList).sortedBy { it.dateCreated },
 				key = { item: Financial -> item.id }
 			) { financial ->
-				var hasVibrate by remember { mutableStateOf(false) }
-				
-				val dismissState = rememberDismissState(
-					confirmStateChange = {
-						if (it == DismissValue.DismissedToEnd) {
-							dashboardViewModel.deleteRecord(financial)
-						} else {
-							hasVibrate = false
-						}
-						
-						true
+				SwipeableFinancialCard(
+					financial = financial,
+					onDismissToEnd = {
+						dashboardViewModel.deleteRecord(financial)
+					},
+					onCanDelete = {
+						dashboardViewModel.vibratorManager.vibrate(100)
+					},
+					onClick = {
+						dujerViewModel.navigateToFinancialScreen(
+							id = financial.id,
+							action = FinancialViewModel.FINANCIAL_ACTION_EDIT
+						)
 					}
 				)
-				
-				if (
-					((2 * dismissState.progress.fraction) >= 1f) and
-					(dismissState.targetValue == DismissValue.DismissedToEnd) and
-					!hasVibrate
-				) {
-					dashboardViewModel.vibratorManager.vibrate(100)
-					hasVibrate = true
-				}
-				
-				SwipeToDismiss(
-					state = dismissState,
-					directions = setOf(DismissDirection.StartToEnd),
-					dismissThresholds = { FractionalThreshold(.6f) },
-					background = {
-						
-						Timber.i("swipe fraction: ${(2 * dismissState.progress.fraction)}")
-						
-						Box(
-							modifier = Modifier
-								.padding(
-									horizontal = 14.dpScaled,
-									vertical = 8.dpScaled
-								)
-								.fillMaxSize()
-								.clip(big_shape)
-								.background(
-									Color(0xFFff4444).copy(
-										alpha = (.3f + dismissState.progress.fraction).coerceIn(
-											maximumValue = 1f,
-											minimumValue = 0f
-										)
-									)
-								)
-								.align(Alignment.CenterVertically)
-						) {
-							Icon(
-								painter = painterResource(id = R.drawable.ic_trash),
-								contentDescription = null,
-								modifier = Modifier
-									.padding(
-										horizontal = 24.dpScaled
-									)
-									.size(
-										if (hasVibrate) 28.dpScaled
-										else 28.dpScaled * (2 * dismissState.progress.fraction)
-									)
-									.align(Alignment.CenterStart)
-							)
-						}
-					}
-				) {
-					FinancialCard(
-						financial = financial,
-						onClick = {
-							dujerViewModel.navigateToFinancialScreen(
-								id = financial.id,
-								action = FinancialViewModel.FINANCIAL_ACTION_EDIT
-							)
-						},
-						modifier = Modifier
-							.padding(8.dpScaled)
-							.fillMaxWidth()
-					)
-				}
 			}
 			
 			item {

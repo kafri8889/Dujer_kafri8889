@@ -6,7 +6,10 @@
         <entry key="..\:/DOCUMENTS/Android/AndroidStudioComposeProject/Dujer/app/src/main/res/drawable/is_triangle_right.xml" value="0.112" />
         <entry key="..\:/DOCUMENTS/Android/AndroidStudioComposeProject/Dujer/app/src/main/res/drawable/line_chart_marker_background.xml" value="0.112" />
         <entry key="..\:/DOCUMENTS/Android/AndroidStudioComposeProject/Dujer/app/src/main/res/drawable/triangle.xml" value="0.112" />
+        <entry key="..\:/DOCUMENTS/Android/AndroidStudioComposeProject/Dujer/app/src/main/res/layout/chip.xml" value="0.1" />
         <entry key="..\:/DOCUMENTS/Android/AndroidStudioComposeProject/Dujer/app/src/main/res/layout/line_chart_marker.xml" value="0.67" />
+        <entry key="..\:/DOCUMENTS/Android/AndroidStudioComposeProject/Dujer/app/src/main/res/layout/multi_line_chart_marker.xml" value="0.25" />
+        <entry key="..\:/DOCUMENTS/Android/AndroidStudioComposeProject/Dujer/app/src/main/res/layout/single_line_chart_marker.xml" value="0.25" />
       </map>
     </option>
   </component>

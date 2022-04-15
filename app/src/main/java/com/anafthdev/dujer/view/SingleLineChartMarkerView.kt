@@ -5,6 +5,8 @@ import android.content.Context
 import android.widget.TextView
 import com.anafthdev.dujer.R
 import com.anafthdev.dujer.model.Currency
+import com.anafthdev.dujer.util.AppUtil
+import com.anafthdev.dujer.util.CurrencyFormatter
 import com.github.mikephil.charting.components.IMarker
 import com.github.mikephil.charting.components.MarkerView
 import com.github.mikephil.charting.data.Entry
@@ -12,16 +14,18 @@ import com.github.mikephil.charting.highlight.Highlight
 import com.github.mikephil.charting.utils.MPPointF
 
 @SuppressLint("ViewConstructor")
-class LineChartMarkerView(
-	context: Context,
-	private val currency: Currency
-): MarkerView(context, R.layout.line_chart_marker), IMarker {
+class SingleLineChartMarkerView(
+	context: Context
+): MarkerView(context, R.layout.single_line_chart_marker), IMarker {
 	
-	private val tvAmount = findViewById<TextView>(R.id.tvAmount_LineChartMarker)
+	private val tvAmount = findViewById<TextView>(R.id.tvAmount_SingleLineChartMarker)
 	
 	@SuppressLint("SetTextI18n")
 	override fun refreshContent(e: Entry, highlight: Highlight?) {
-		tvAmount.text = "${currency.symbol} ${e.y}"
+		tvAmount.text = CurrencyFormatter.format(
+			locale = AppUtil.deviceLocale,
+			amount = e.y.toDouble()
+		)
 		
 		super.refreshContent(e, highlight)
 	}

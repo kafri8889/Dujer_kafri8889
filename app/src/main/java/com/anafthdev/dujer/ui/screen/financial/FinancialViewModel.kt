@@ -7,9 +7,12 @@ import androidx.lifecycle.viewModelScope
 import com.anafthdev.dujer.data.repository.app.IAppRepository
 import com.anafthdev.dujer.data.db.model.Category
 import com.anafthdev.dujer.data.db.model.Financial
+import com.anafthdev.dujer.util.AppUtil
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
+import java.util.*
 import javax.inject.Inject
 
 @HiltViewModel
@@ -23,7 +26,8 @@ class FinancialViewModel @Inject constructor(
 	private val _categories = MutableLiveData(emptyList<Category>())
 	val categories: LiveData<List<Category>> = _categories
 	
-	val currentCurrency = appRepository.appDatastore.getCurrentCurrency
+	val currentCurrency: Flow<com.anafthdev.dujer.model.Currency> = appRepository.appDatastore.getCurrentCurrency
+	val deviceCurrency: Currency = Currency.getInstance(AppUtil.deviceLocale)
 	
 	init {
 		viewModelScope.launch {

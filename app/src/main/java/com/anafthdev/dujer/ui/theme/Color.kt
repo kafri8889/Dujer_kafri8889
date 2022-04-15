@@ -66,6 +66,8 @@ val black09 = Color(0xFFCDCDCD)
 val seed = Color(0xFF37474f)
 val error = Color(0xFFba1b1b)
 val Custom0 = Color(0xFFc1d34d)
+val incomeColor = Color(0xFF82DD55)
+val expenseColor = Color(0xFFE23636)
 
 val balance_card_background = Color(0xFF37474F)
 val income_card_background = Color(0xFFD9E7E5)

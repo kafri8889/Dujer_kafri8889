@@ -1,7 +1,5 @@
 package com.anafthdev.dujer.ui.screen.income_expense
 
-import androidx.compose.animation.core.animateDpAsState
-import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.*
@@ -9,7 +7,6 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CornerSize
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.ArrowBack
@@ -24,7 +21,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
-import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
@@ -35,8 +31,6 @@ import androidx.compose.ui.viewinterop.AndroidView
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.anafthdev.dujer.R
-import com.anafthdev.dujer.common.EventCountdownTimer
-import com.anafthdev.dujer.data.DujerDestination
 import com.anafthdev.dujer.data.FinancialType
 import com.anafthdev.dujer.data.db.model.Financial
 import com.anafthdev.dujer.foundation.extension.getBy
@@ -51,7 +45,7 @@ import com.anafthdev.dujer.ui.screen.financial.FinancialViewModel
 import com.anafthdev.dujer.ui.theme.*
 import com.anafthdev.dujer.util.AppUtil
 import com.anafthdev.dujer.util.CurrencyFormatter
-import com.anafthdev.dujer.view.LineChartMarkerView
+import com.anafthdev.dujer.view.SingleLineChartMarkerView
 import com.github.mikephil.charting.charts.LineChart
 import com.github.mikephil.charting.components.XAxis
 import com.github.mikephil.charting.components.YAxis
@@ -59,7 +53,6 @@ import com.github.mikephil.charting.data.Entry
 import com.github.mikephil.charting.data.LineData
 import com.github.mikephil.charting.data.LineDataSet
 import com.github.mikephil.charting.formatter.IndexAxisValueFormatter
-import kotlinx.coroutines.launch
 import timber.log.Timber
 import java.util.*
 
@@ -125,7 +118,17 @@ fun IncomeExpenseScreen(
 			context.getString(
 				if (type == FinancialType.INCOME) R.string.income else R.string.expenses
 			)
-		)
+		).apply {
+			lineWidth = 2.5f
+			cubicIntensity = .25f
+			mode = LineDataSet.Mode.CUBIC_BEZIER
+			color = android.graphics.Color.parseColor("#81B2CA")
+			setDrawValues(false)
+			setDrawFilled(false)
+			setDrawCircles(false)
+			setDrawHorizontalHighlightIndicator(false)
+			setCircleColor(android.graphics.Color.parseColor("#81B2CA"))
+		}
 	)
 	
 	
@@ -177,57 +180,54 @@ fun IncomeExpenseScreen(
 				) {
 					AndroidView(
 						factory = { context ->
-							LineChart(context)
+							LineChart(context).apply {
+								extraBottomOffset = 8f
+								isDragEnabled = false
+								description.isEnabled = false
+								axisRight.isEnabled = false
+								legend.isEnabled = false
+								setDrawGridBackground(false)
+								setPinchZoom(false)
+								setScaleEnabled(false)
+								
+								val yAxisLeft = axisLeft
+								yAxisLeft.textSize = 14f
+								yAxisLeft.axisMinimum = 0f
+								yAxisLeft.textColor = android.graphics.Color.BLACK
+								yAxisLeft.axisLineColor = android.graphics.Color.TRANSPARENT
+								yAxisLeft.setDrawGridLines(true)
+								yAxisLeft.setPosition(YAxis.YAxisLabelPosition.OUTSIDE_CHART)
+								yAxisLeft.enableGridDashedLine(12f, 12f, 0f)
+								
+								val xAxis = xAxis
+								xAxis.position = XAxis.XAxisPosition.BOTTOM
+								xAxis.textColor = android.graphics.Color.BLACK
+								xAxis.textSize = 14f
+								xAxis.setLabelCount(AppUtil.shortMonths.size, true)
+								xAxis.axisLineColor = black09.toArgb()
+								xAxis.valueFormatter = IndexAxisValueFormatter(AppUtil.shortMonths)
+								xAxis.setDrawGridLines(false)
+								xAxis.setCenterAxisLabels(false)
+								
+								incomeExpenseLineDataset.setFillFormatter { _, _ -> return@setFillFormatter axisLeft.axisMinimum }
+							}
 						},
 						update = { lineChart ->
-							lineChart.extraBottomOffset = 8f
-							lineChart.isDragEnabled = false
-							lineChart.description.isEnabled = false
-							lineChart.axisRight.isEnabled = false
-							lineChart.legend.isEnabled = false
-							lineChart.setDrawGridBackground(false)
-							lineChart.setPinchZoom(false)
-							lineChart.setScaleEnabled(false)
-							
-							val yAxisLeft = lineChart.axisLeft
-							yAxisLeft.textColor = android.graphics.Color.BLACK
-							yAxisLeft.textSize = 14f
-							yAxisLeft.setPosition(YAxis.YAxisLabelPosition.OUTSIDE_CHART)
-							yAxisLeft.setDrawGridLines(true)
-							yAxisLeft.enableGridDashedLine(12f, 12f, 0f)
-							yAxisLeft.axisLineColor = android.graphics.Color.TRANSPARENT
-							
-							val xAxis = lineChart.xAxis
-							xAxis.position = XAxis.XAxisPosition.BOTTOM
-							xAxis.textColor = android.graphics.Color.BLACK
-							xAxis.textSize = 14f
-							xAxis.setLabelCount(AppUtil.shortMonths.size, true)
-							xAxis.axisLineColor = black09.toArgb()
-							xAxis.valueFormatter = IndexAxisValueFormatter(AppUtil.shortMonths)
-							xAxis.setDrawGridLines(false)
-							xAxis.setCenterAxisLabels(false)
-							
-							incomeExpenseLineDataset.lineWidth = 2.5f
-							incomeExpenseLineDataset.cubicIntensity = .25f
-							incomeExpenseLineDataset.mode = LineDataSet.Mode.CUBIC_BEZIER
-							incomeExpenseLineDataset.color = android.graphics.Color.parseColor("#81B2CA")
-							incomeExpenseLineDataset.setDrawValues(false)
-							incomeExpenseLineDataset.setDrawFilled(false)
-							incomeExpenseLineDataset.setDrawCircles(false)
-							incomeExpenseLineDataset.setCircleColor(android.graphics.Color.parseColor("#81B2CA"))
-							incomeExpenseLineDataset.setDrawHorizontalHighlightIndicator(false)
-							incomeExpenseLineDataset.setFillFormatter { _, _ -> return@setFillFormatter lineChart.axisLeft.axisMinimum }
-							
-							lineChart.marker = LineChartMarkerView(context, currentCurrency)
+							lineChart.marker = SingleLineChartMarkerView(context)
 							lineChart.data = LineData(incomeExpenseLineDataset)
 							lineChart.invalidate()
 						},
 						modifier = Modifier
-							.width(config.smallestScreenWidthDp.times(2).dpScaled)
+							.width(
+								config.smallestScreenWidthDp
+								.times(2)
+								.dpScaled
+							)
 							.height(
 								config.smallestScreenWidthDp
 									.times(2)
-									.times(.4f).dpScaled
+									.times(.4f)
+									.dpScaled
 							)
 							.padding(
 								horizontal = 8.dpScaled

@@ -96,7 +96,10 @@ fun DujerApp() {
 		) {
 			
 			composable(DujerDestination.Dashboard.route) {
-				DashboardScreen(navController = navController, dujerViewModel = dujerViewModel)
+				DashboardScreen(
+					navController = navController,
+					dujerViewModel = dujerViewModel
+				)
 			}
 			
 			composable(

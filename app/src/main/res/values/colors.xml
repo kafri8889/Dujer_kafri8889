@@ -58,6 +58,9 @@
     <color name="md_theme_dark_shadow">#000000</color>
     <color name="md_theme_dark_primaryInverse">#006684</color>
 
+    <color name="income">#82DD55</color>
+    <color name="expense">#E23636</color>
+
     <color name="seed">#37474F</color>
     <color name="error">#BA1B1B</color>
     <color name="Custom0">#C1D34D</color>

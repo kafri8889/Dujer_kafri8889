@@ -108,8 +108,13 @@ dependencies {
     implementation "com.google.accompanist:accompanist-pager:$accompanist_version"
     implementation "com.google.accompanist:accompanist-systemuicontroller:$accompanist_version"
 
+    // Scalable Unit
+    implementation 'com.intuit.sdp:sdp-android:1.0.6'
+    implementation 'com.intuit.ssp:ssp-android:1.0.6'
+
     // Other
-    implementation 'com.github.PhilJay:MPAndroidChart:v3.1.0'
+    implementation 'de.hdodenhof:circleimageview:3.1.0'
+    implementation "com.github.AppDevNext:MPAndroidChart:3.1.0.7"
     implementation "com.google.code.gson:gson:2.8.6"
     implementation 'com.jakewharton.timber:timber:5.0.1'
     implementation 'joda-time:joda-time:2.10.13'
