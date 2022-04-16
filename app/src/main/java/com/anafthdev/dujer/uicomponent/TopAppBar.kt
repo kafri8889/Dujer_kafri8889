@@ -1,4 +1,4 @@
-package com.anafthdev.dujer.ui.component
+package com.anafthdev.dujer.uicomponent
 
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxScope

@@ -20,13 +20,13 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.anafthdev.dujer.R
-import com.anafthdev.dujer.data.FinancialType
+import com.anafthdev.dujer.data.DujerDestination
 import com.anafthdev.dujer.foundation.extension.indexOf
 import com.anafthdev.dujer.foundation.window.dpScaled
 import com.anafthdev.dujer.foundation.window.spScaled
 import com.anafthdev.dujer.model.SettingPreference
-import com.anafthdev.dujer.ui.component.SettingPreferences
-import com.anafthdev.dujer.ui.component.TopAppBar
+import com.anafthdev.dujer.uicomponent.SettingPreferences
+import com.anafthdev.dujer.uicomponent.TopAppBar
 import com.anafthdev.dujer.ui.theme.Typography
 import com.anafthdev.dujer.ui.theme.black04
 
@@ -45,12 +45,14 @@ fun SettingScreen(
 		SettingPreference(
 			title = stringResource(id = R.string.category),
 			summary = stringResource(id = R.string.category_summary),
+			iconResId = R.drawable.ic_category_2,
 			value = "",
 			category = stringResource(id = R.string.configuration)
 		),
 		SettingPreference(
 			title = stringResource(id = R.string.biometric_authentication),
 			summary = stringResource(id = R.string.biometric_authentication_summary),
+			iconResId = R.drawable.ic_finger_scan,
 			value = isUseBioAuth,
 			category = stringResource(id = R.string.security),
 			type = SettingPreference.PreferenceType.SWITCH
@@ -99,7 +101,11 @@ fun SettingScreen(
 				}
 				
 				when (indexSettingPreference) {
-					0 -> {}
+					0 -> {
+						navController.navigate(DujerDestination.Category.route) {
+							launchSingleTop = true
+						}
+					}
 					1 -> {
 						settingViewModel.appDatastore.setUseBioAuth(preference.value as Boolean) {}
 					}

@@ -1,7 +1,6 @@
 package com.anafthdev.dujer.ui.app
 
 import androidx.activity.compose.BackHandler
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.ModalBottomSheetLayout
@@ -13,9 +12,6 @@ import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.viewinterop.AndroidView
-import androidx.compose.ui.zIndex
-import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -24,12 +20,12 @@ import androidx.navigation.navArgument
 import com.anafthdev.dujer.data.DujerDestination
 import com.anafthdev.dujer.data.FinancialType
 import com.anafthdev.dujer.data.db.model.Financial
+import com.anafthdev.dujer.ui.category.CategoryScreen
 import com.anafthdev.dujer.ui.screen.dashboard.DashboardScreen
 import com.anafthdev.dujer.ui.screen.financial.FinancialScreen
 import com.anafthdev.dujer.ui.screen.financial.FinancialViewModel
 import com.anafthdev.dujer.ui.screen.income_expense.IncomeExpenseScreen
 import com.anafthdev.dujer.ui.screen.setting.SettingScreen
-import com.github.mmin18.widget.RealtimeBlurView
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -92,7 +88,8 @@ fun DujerApp(
 		sheetContent = {
 			FinancialScreen(
 				financialID = financialID,
-				financialAction = financialAction
+				financialAction = financialAction,
+				dujerViewModel = dujerViewModel
 			)
 		}
 	) {
@@ -129,6 +126,12 @@ fun DujerApp(
 			
 			composable(DujerDestination.Setting.route) {
 				SettingScreen(
+					navController = navController
+				)
+			}
+			
+			composable(DujerDestination.Category.route) {
+				CategoryScreen(
 					navController = navController
 				)
 			}

@@ -11,4 +11,6 @@ sealed class DujerDestination(val route: String) {
 	}
 	
 	object Setting: DujerDestination("setting")
+	
+	object Category: DujerDestination("category")
 }

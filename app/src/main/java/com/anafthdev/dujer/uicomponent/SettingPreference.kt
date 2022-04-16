@@ -1,4 +1,4 @@
-package com.anafthdev.dujer.ui.component
+package com.anafthdev.dujer.uicomponent
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -112,10 +112,20 @@ fun SettingPreference(
 						onClick(!(preference.value as Boolean))
 					}
 			) {
+				if (preference.iconResId != null) {
+					Icon(
+						painter = painterResource(id = preference.iconResId),
+						contentDescription = null,
+						modifier = Modifier
+							.size(24.dpScaled)
+							.weight(0.12f)
+					)
+				}
+				
 				Column(
 					verticalArrangement = Arrangement.Center,
 					modifier = Modifier
-						.weight(2f)
+						.weight(0.6f)
 				) {
 					Text(
 						text = preference.title,
@@ -124,7 +134,9 @@ fun SettingPreference(
 							fontSize = Typography.titleMedium.fontSize.spScaled
 						),
 						modifier = Modifier
-							.padding(start = 12.dpScaled)
+							.padding(
+								start = if (preference.iconResId != null) 0.dpScaled else 12.dpScaled
+							)
 					)
 					
 					if (preference.summary.isNotBlank()) {
@@ -136,7 +148,9 @@ fun SettingPreference(
 								fontSize = Typography.titleSmall.fontSize.spScaled
 							),
 							modifier = Modifier
-								.padding(start = 12.dpScaled)
+								.padding(
+									start = if (preference.iconResId != null) 0.dpScaled else 12.dpScaled
+								)
 						)
 					}
 				}
@@ -147,7 +161,7 @@ fun SettingPreference(
 						onClick(!(preference.value as Boolean))
 					},
 					modifier = Modifier
-						.weight(0.4f)
+						.weight(0.28f)
 				)
 			}
 		}

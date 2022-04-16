@@ -19,7 +19,6 @@ import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.blur
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
@@ -39,7 +38,7 @@ import com.anafthdev.dujer.foundation.window.dpScaled
 import com.anafthdev.dujer.foundation.window.spScaled
 import com.anafthdev.dujer.model.Currency
 import com.anafthdev.dujer.ui.app.DujerViewModel
-import com.anafthdev.dujer.ui.component.TopAppBar
+import com.anafthdev.dujer.uicomponent.TopAppBar
 import com.anafthdev.dujer.ui.screen.dashboard.component.*
 import com.anafthdev.dujer.ui.screen.financial.FinancialViewModel
 import com.anafthdev.dujer.ui.theme.Typography

@@ -1,7 +1,5 @@
 package com.anafthdev.dujer.ui.screen.financial
 
-import android.view.ContextThemeWrapper
-import android.view.LayoutInflater
 import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.tween
@@ -30,7 +28,6 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.TextFieldValue
-import androidx.compose.ui.viewinterop.AndroidView
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.anafthdev.dujer.R
 import com.anafthdev.dujer.data.FinancialType
@@ -44,9 +41,8 @@ import com.anafthdev.dujer.foundation.window.dpScaled
 import com.anafthdev.dujer.foundation.window.spScaled
 import com.anafthdev.dujer.model.Currency
 import com.anafthdev.dujer.ui.app.DujerViewModel
-import com.anafthdev.dujer.ui.component.TopAppBar
+import com.anafthdev.dujer.uicomponent.TopAppBar
 import com.anafthdev.dujer.ui.screen.financial.component.CategoryList
-import com.anafthdev.dujer.ui.screen.financial.component.FinancialTypeList
 import com.anafthdev.dujer.ui.theme.Inter
 import com.anafthdev.dujer.ui.theme.Typography
 import com.anafthdev.dujer.ui.theme.black04
@@ -54,8 +50,6 @@ import com.anafthdev.dujer.ui.theme.small_shape
 import com.anafthdev.dujer.util.AppUtil
 import com.anafthdev.dujer.util.AppUtil.toast
 import com.anafthdev.dujer.util.CurrencyFormatter
-import com.google.android.material.chip.Chip
-import com.google.android.material.chip.ChipDrawable
 import timber.log.Timber
 import java.text.SimpleDateFormat
 import java.util.*
@@ -64,14 +58,14 @@ import kotlin.random.Random
 @Composable
 fun FinancialScreen(
 	financialID: Int,
-	financialAction: String
+	financialAction: String,
+	dujerViewModel: DujerViewModel
 ) {
 	
 	val context = LocalContext.current
 	val focusManager = LocalFocusManager.current
 	
 	val financialViewModel = hiltViewModel<FinancialViewModel>()
-	val dujerViewModel = hiltViewModel<DujerViewModel>()
 	
 	val currentCurrency by financialViewModel.currentCurrency.collectAsState(initial = Currency.INDONESIAN)
 	val categories by financialViewModel.categories.observeAsState(initial = Category.values)

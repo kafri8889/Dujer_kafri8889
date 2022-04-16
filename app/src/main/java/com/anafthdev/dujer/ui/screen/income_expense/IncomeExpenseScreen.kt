@@ -39,8 +39,8 @@ import com.anafthdev.dujer.foundation.window.dpScaled
 import com.anafthdev.dujer.foundation.window.spScaled
 import com.anafthdev.dujer.model.Currency
 import com.anafthdev.dujer.ui.app.DujerViewModel
-import com.anafthdev.dujer.ui.component.FinancialCard
-import com.anafthdev.dujer.ui.component.TopAppBar
+import com.anafthdev.dujer.uicomponent.FinancialCard
+import com.anafthdev.dujer.uicomponent.TopAppBar
 import com.anafthdev.dujer.ui.screen.financial.FinancialViewModel
 import com.anafthdev.dujer.ui.theme.*
 import com.anafthdev.dujer.util.AppUtil
