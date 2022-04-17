@@ -1,16 +1,19 @@
 package com.anafthdev.dujer.ui.app.di
 
-import com.anafthdev.dujer.ui.app.DujerViewModel
+import com.anafthdev.dujer.ui.app.environment.DujerEnvironment
+import com.anafthdev.dujer.ui.app.environment.IDujerEnvironment
+import dagger.Binds
 import dagger.Module
-import dagger.Provides
 import dagger.hilt.InstallIn
-import dagger.hilt.components.SingletonComponent
+import dagger.hilt.android.components.ViewModelComponent
 
 @Module
-@InstallIn(SingletonComponent::class)
-object DujerModule {
+@InstallIn(ViewModelComponent::class)
+abstract class DujerModule {
 	
-	@Provides
-	fun provideDujerViewModel(): DujerViewModel = DujerViewModel()
+	@Binds
+	abstract fun provideEnvironment(
+		environment: DujerEnvironment
+	): IDujerEnvironment
 	
 }

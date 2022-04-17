@@ -15,7 +15,6 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.*
-import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -37,12 +36,11 @@ import com.anafthdev.dujer.foundation.extension.getBy
 import com.anafthdev.dujer.foundation.extension.horizontalScroll
 import com.anafthdev.dujer.foundation.window.dpScaled
 import com.anafthdev.dujer.foundation.window.spScaled
-import com.anafthdev.dujer.model.Currency
 import com.anafthdev.dujer.ui.app.DujerViewModel
-import com.anafthdev.dujer.uicomponent.FinancialCard
-import com.anafthdev.dujer.uicomponent.TopAppBar
 import com.anafthdev.dujer.ui.screen.financial.FinancialViewModel
 import com.anafthdev.dujer.ui.theme.*
+import com.anafthdev.dujer.uicomponent.FinancialCard
+import com.anafthdev.dujer.uicomponent.TopAppBar
 import com.anafthdev.dujer.util.AppUtil
 import com.anafthdev.dujer.util.CurrencyFormatter
 import com.anafthdev.dujer.view.SingleLineChartMarkerView
@@ -70,9 +68,10 @@ fun IncomeExpenseScreen(
 	
 	val incomeExpenseViewModel = hiltViewModel<IncomeExpenseViewModel>()
 	
-	val currentCurrency by incomeExpenseViewModel.datastore.getCurrentCurrency.collectAsState(initial = Currency.INDONESIAN)
-	val incomeFinancialList by incomeExpenseViewModel.incomeFinancialList.observeAsState(initial = emptyList())
-	val expenseFinancialList by incomeExpenseViewModel.expenseFinancialList.observeAsState(initial = emptyList())
+	val state by incomeExpenseViewModel.state.collectAsState()
+	
+	val incomeFinancialList = state.incomeFinancialList
+	val expenseFinancialList = state.expenseFinancialList
 	
 	val incomeBalance by rememberUpdatedState(
 		newValue = incomeFinancialList.getBy { it.amount }.sum()
@@ -220,8 +219,8 @@ fun IncomeExpenseScreen(
 						modifier = Modifier
 							.width(
 								config.smallestScreenWidthDp
-								.times(2)
-								.dpScaled
+									.times(2)
+									.dpScaled
 							)
 							.height(
 								config.smallestScreenWidthDp
@@ -351,7 +350,7 @@ fun IncomeExpenseScreen(
 				(dismissState.targetValue == DismissValue.DismissedToEnd) and
 				!hasVibrate
 			) {
-				incomeExpenseViewModel.vibratorManager.vibrate(100)
+//				incomeExpenseViewModel.vibratorManager.vibrate(100)
 				hasVibrate = true
 			}
 			

@@ -1,25 +1,19 @@
 package com.anafthdev.dujer.ui.screen.dashboard.di
 
-import android.content.Context
-import com.anafthdev.dujer.di.AppModule
-import com.anafthdev.dujer.foundation.common.vibrator.VibratorModule
-import com.anafthdev.dujer.ui.screen.dashboard.DashboardViewModel
+import com.anafthdev.dujer.ui.screen.dashboard.environment.DashboardEnvironment
+import com.anafthdev.dujer.ui.screen.dashboard.environment.IDashboardEnvironment
+import dagger.Binds
 import dagger.Module
-import dagger.Provides
 import dagger.hilt.InstallIn
-import dagger.hilt.android.qualifiers.ApplicationContext
-import dagger.hilt.components.SingletonComponent
+import dagger.hilt.android.components.ViewModelComponent
 
 @Module
-@InstallIn(SingletonComponent::class)
-object DashboardModule {
+@InstallIn(ViewModelComponent::class)
+abstract class DashboardModule {
 	
-	@Provides
-	fun provideDashboardViewModel(
-		@ApplicationContext context: Context
-	): DashboardViewModel = DashboardViewModel(
-		VibratorModule.provideVibratorManager(context),
-		AppModule.provideAppRepository(context)
-	)
+	@Binds
+	abstract fun provideEnvironment(
+		environment: DashboardEnvironment
+	): IDashboardEnvironment
 	
 }

@@ -1,51 +1,79 @@
 package com.anafthdev.dujer.ui.app
 
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.anafthdev.dujer.data.db.model.Financial
+import com.anafthdev.dujer.foundation.viewmodel.StatefulViewModel
+import com.anafthdev.dujer.ui.app.environment.IDujerEnvironment
 import com.anafthdev.dujer.ui.screen.financial.FinancialViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
-class DujerViewModel @Inject constructor(): ViewModel() {
+class DujerViewModel @Inject constructor(
+	dujerEnvironment: IDujerEnvironment
+): StatefulViewModel<DujerState, IDujerEnvironment>(DujerState(), dujerEnvironment) {
 	
-	private val _isFinancialSheetShowed = MutableLiveData(false)
-	val isFinancialSheetShowed: LiveData<Boolean> = _isFinancialSheetShowed
+	init {
+		getIsFinancialSheetShowed()
+		getFinancialID()
+		getFinancialAction()
+	}
 	
-	private val _financialID = MutableLiveData(Financial.default.id)
-	val financialID: LiveData<Int> = _financialID
+	private fun getIsFinancialSheetShowed() {
+		viewModelScope.launch(environment.dispatcher) {
+			environment.getIsFinancialSheetShowed().collect { isShowing ->
+				setState {
+					copy(
+						isFinancialSheetShowed = isShowing
+					)
+				}
+			}
+		}
+	}
 	
-	private val _financialAction = MutableLiveData(FinancialViewModel.FINANCIAL_ACTION_NEW)
-	val financialAction: LiveData<String> = _financialAction
+	private fun getFinancialID() {
+		viewModelScope.launch(environment.dispatcher) {
+			environment.getFinancialID().collect { id ->
+				setState {
+					copy(
+						financialID = id
+					)
+				}
+			}
+		}
+	}
+	
+	private fun getFinancialAction() {
+		viewModelScope.launch(environment.dispatcher) {
+			environment.getFinancialAction().collect { action ->
+				setState {
+					copy(
+						financialAction = action
+					)
+				}
+			}
+		}
+	}
 	
 	fun navigateToFinancialScreen(id: Int, action: String) {
-		setFinancialID(id)
-		setFinancialAction(action)
+		environment.setFinancialID(id)
+		environment.setFinancialAction(action)
 		showFinancialSheet()
 	}
 	
 	fun reset() {
-		setFinancialID(Financial.default.id)
-		setFinancialAction(FinancialViewModel.FINANCIAL_ACTION_NEW)
+		environment.setFinancialID(Financial.default.id)
+		environment.setFinancialAction(FinancialViewModel.FINANCIAL_ACTION_NEW)
 		hideFinancialSheet()
 	}
 	
-	fun setFinancialAction(action: String) {
-		_financialAction.value = action
-	}
-	
-	fun setFinancialID(id: Int) {
-		_financialID.value = id
-	}
-	
 	fun showFinancialSheet() {
-		_isFinancialSheetShowed.value = true
+		environment.showFinancialSheet()
 	}
 	
 	fun hideFinancialSheet() {
-		_isFinancialSheetShowed.value = false
+		environment.hideFinancialSheet()
 	}
 	
 }

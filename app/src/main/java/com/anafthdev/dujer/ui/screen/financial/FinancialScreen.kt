@@ -15,7 +15,6 @@ import androidx.compose.material.icons.rounded.ArrowBack
 import androidx.compose.material.icons.rounded.ArrowDropDown
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
-import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.rotate
@@ -39,14 +38,13 @@ import com.anafthdev.dujer.foundation.extension.showDatePicker
 import com.anafthdev.dujer.foundation.extension.startsWith
 import com.anafthdev.dujer.foundation.window.dpScaled
 import com.anafthdev.dujer.foundation.window.spScaled
-import com.anafthdev.dujer.model.Currency
 import com.anafthdev.dujer.ui.app.DujerViewModel
-import com.anafthdev.dujer.uicomponent.TopAppBar
 import com.anafthdev.dujer.ui.screen.financial.component.CategoryList
 import com.anafthdev.dujer.ui.theme.Inter
 import com.anafthdev.dujer.ui.theme.Typography
 import com.anafthdev.dujer.ui.theme.black04
 import com.anafthdev.dujer.ui.theme.small_shape
+import com.anafthdev.dujer.uicomponent.TopAppBar
 import com.anafthdev.dujer.util.AppUtil
 import com.anafthdev.dujer.util.AppUtil.toast
 import com.anafthdev.dujer.util.CurrencyFormatter
@@ -67,9 +65,12 @@ fun FinancialScreen(
 	
 	val financialViewModel = hiltViewModel<FinancialViewModel>()
 	
-	val currentCurrency by financialViewModel.currentCurrency.collectAsState(initial = Currency.INDONESIAN)
-	val categories by financialViewModel.categories.observeAsState(initial = Category.values)
-	val isFinancialSheetShowed by dujerViewModel.isFinancialSheetShowed.observeAsState(initial = false)
+	val state by financialViewModel.state.collectAsState()
+	val dujerState by dujerViewModel.state.collectAsState()
+	
+	val currentCurrency = state.currentCurrency
+	val categories = state.categories
+	val isFinancialSheetShowed = dujerState.isFinancialSheetShowed
 	
 	var financial by remember { mutableStateOf(Financial.default) }
 	var financialTitle: String by remember { mutableStateOf("") }
@@ -83,7 +84,10 @@ fun FinancialScreen(
 	var hasNavigate by remember { mutableStateOf(false) }
 	
 	when {
-		(financialAction == FinancialViewModel.FINANCIAL_ACTION_EDIT) and isFinancialSheetShowed and !hasNavigate -> {
+		(financialAction == FinancialViewModel.FINANCIAL_ACTION_EDIT) and
+				isFinancialSheetShowed and
+				!hasNavigate -> {
+			
 			financialViewModel.getFinancial(financialID) { mFinancial ->
 				financial = mFinancial
 				financialTitle = financial.name

@@ -1,23 +1,19 @@
 package com.anafthdev.dujer.ui.screen.financial.di
 
-import android.content.Context
-import com.anafthdev.dujer.di.AppModule
-import com.anafthdev.dujer.ui.screen.financial.FinancialViewModel
+import com.anafthdev.dujer.ui.screen.financial.environment.FinancialEnvironment
+import com.anafthdev.dujer.ui.screen.financial.environment.IFinancialEnvironment
+import dagger.Binds
 import dagger.Module
-import dagger.Provides
 import dagger.hilt.InstallIn
-import dagger.hilt.android.qualifiers.ApplicationContext
-import dagger.hilt.components.SingletonComponent
+import dagger.hilt.android.components.ViewModelComponent
 
 @Module
-@InstallIn(SingletonComponent::class)
-object FinancialModule {
+@InstallIn(ViewModelComponent::class)
+abstract class FinancialModule {
 	
-	@Provides
-	fun provideFinancialViewModel(
-		@ApplicationContext context: Context
-	): FinancialViewModel = FinancialViewModel(
-		AppModule.provideAppRepository(context)
-	)
+	@Binds
+	abstract fun provideEnvironment(
+		financialEnvironment: FinancialEnvironment
+	): IFinancialEnvironment
 	
 }

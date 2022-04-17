@@ -7,21 +7,17 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.Add
-import androidx.compose.material3.FloatingActionButton
-import androidx.compose.material3.IconButton
-import androidx.compose.material3.Icon
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Text
+import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -36,14 +32,13 @@ import com.anafthdev.dujer.foundation.extension.combine
 import com.anafthdev.dujer.foundation.extension.getBy
 import com.anafthdev.dujer.foundation.window.dpScaled
 import com.anafthdev.dujer.foundation.window.spScaled
-import com.anafthdev.dujer.model.Currency
 import com.anafthdev.dujer.ui.app.DujerViewModel
-import com.anafthdev.dujer.uicomponent.TopAppBar
 import com.anafthdev.dujer.ui.screen.dashboard.component.*
 import com.anafthdev.dujer.ui.screen.financial.FinancialViewModel
 import com.anafthdev.dujer.ui.theme.Typography
 import com.anafthdev.dujer.ui.theme.expenseColor
 import com.anafthdev.dujer.ui.theme.incomeColor
+import com.anafthdev.dujer.uicomponent.TopAppBar
 import com.github.mikephil.charting.data.LineDataSet
 
 @OptIn(ExperimentalMaterialApi::class)
@@ -58,12 +53,13 @@ fun DashboardScreen(
 	
 	val dashboardViewModel = hiltViewModel<DashboardViewModel>()
 	
-	val userBalance by dashboardViewModel.datastore.getUserBalance.collectAsState(initial = 0.0)
-	val currentCurrency by dashboardViewModel.datastore.getCurrentCurrency.collectAsState(initial = Currency.INDONESIAN)
-	val incomeFinancialList by dashboardViewModel.incomeFinancialList.observeAsState(initial = emptyList())
-	val expenseFinancialList by dashboardViewModel.expenseFinancialList.observeAsState(initial = emptyList())
-	val incomeLineDataSetEntry by dashboardViewModel.incomeLineDataSetEntry.observeAsState(initial = emptyList())
-	val expenseLineDataSetEntry by dashboardViewModel.expenseLineDataSetEntry.observeAsState(initial = emptyList())
+	val state by dashboardViewModel.state.collectAsState()
+	val userBalance = state.userBalance
+	val currentCurrency = state.currentCurrency
+	val incomeFinancialList = state.incomeFinancialList
+	val expenseFinancialList = state.expenseFinancialList
+	val incomeLineDataSetEntry = state.incomeLineDataSetEntry
+	val expenseLineDataSetEntry = state.expenseLineDataSetEntry
 
 //	val incomeLineDataSetEntry by rememberUpdatedState(
 //		newValue = arrayListOf<Entry>().apply {
@@ -137,39 +133,6 @@ fun DashboardScreen(
 		modifier = Modifier
 			.fillMaxSize()
 	) {
-//		FABNewFinancial(
-//			onNewIncome = {
-//				dashboardViewModel.newRecord(
-//					Financial(
-//						id = Random.nextInt(),
-//						name = "tes",
-//						amount = 5000.0,
-//						type = FinancialType.INCOME,
-//						category = Category.food,
-//						currency = currentCurrency,
-//						dateCreated = System.currentTimeMillis()
-//					)
-//				)
-//			},
-//			onNewExpense = {
-//				dashboardViewModel.newRecord(
-//					Financial(
-//						id = Random.nextInt(),
-//						name = "soping",
-//						amount = 5000.0,
-//						type = FinancialType.EXPENSE,
-//						category = Category.shopping,
-//						currency = currentCurrency,
-//						dateCreated = System.currentTimeMillis()
-//					)
-//				)
-//			},
-//			modifier = Modifier
-//				.padding(32.dpScaled)
-//				.align(Alignment.BottomEnd)
-//				.zIndex(2f)
-//		)
-		
 		FloatingActionButton(
 			onClick = {
 				dujerViewModel.navigateToFinancialScreen(
@@ -289,14 +252,16 @@ fun DashboardScreen(
 						dashboardViewModel.deleteRecord(financial)
 					},
 					onCanDelete = {
-						dashboardViewModel.vibratorManager.vibrate(100)
+//						dashboardViewModel.vibratorManager.vibrate(100)
 					},
 					onClick = {
 						dujerViewModel.navigateToFinancialScreen(
 							id = financial.id,
 							action = FinancialViewModel.FINANCIAL_ACTION_EDIT
 						)
-					}
+					},
+					modifier = Modifier
+						.testTag("SwipeableFinancialCard")
 				)
 			}
 			

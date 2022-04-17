@@ -1,7 +1,10 @@
 package com.anafthdev.dujer.ui.screen.dashboard.component
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
 import androidx.compose.material.*
 import androidx.compose.material3.Icon
 import androidx.compose.runtime.*
@@ -13,13 +16,14 @@ import androidx.compose.ui.res.painterResource
 import com.anafthdev.dujer.R
 import com.anafthdev.dujer.data.db.model.Financial
 import com.anafthdev.dujer.foundation.window.dpScaled
-import com.anafthdev.dujer.uicomponent.FinancialCard
 import com.anafthdev.dujer.ui.theme.big_shape
+import com.anafthdev.dujer.uicomponent.FinancialCard
 
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun SwipeableFinancialCard(
 	financial: Financial,
+	modifier: Modifier = Modifier,
 	onDismissToEnd: () -> Unit,
 	onClick: () -> Unit,
 	onCanDelete: () -> Unit
@@ -74,7 +78,8 @@ fun SwipeableFinancialCard(
 						.align(Alignment.CenterStart)
 				)
 			}
-		}
+		},
+		modifier = modifier
 	) {
 		FinancialCard(
 			financial = financial,

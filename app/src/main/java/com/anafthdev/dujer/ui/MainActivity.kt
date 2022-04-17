@@ -2,10 +2,8 @@ package com.anafthdev.dujer.ui
 
 import android.os.Bundle
 import android.telephony.TelephonyManager
-import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.appcompat.app.AppCompatActivity
-import androidx.biometric.BiometricManager
 import androidx.biometric.BiometricPrompt
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.gestures.LocalOverScrollConfiguration
@@ -15,9 +13,7 @@ import androidx.lifecycle.lifecycleScope
 import com.anafthdev.dujer.BuildConfig
 import com.anafthdev.dujer.data.datastore.AppDatastore
 import com.anafthdev.dujer.ui.app.DujerApp
-import com.anafthdev.dujer.ui.app.DujerViewModel
 import com.anafthdev.dujer.ui.theme.DujerTheme
-import com.anafthdev.dujer.util.AppUtil.toast
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.first
@@ -29,7 +25,6 @@ import javax.inject.Inject
 class MainActivity : AppCompatActivity() {
 	
 	@Inject lateinit var appDatastore: AppDatastore
-	@Inject lateinit var dujerViewModel: DujerViewModel
 	
 	private lateinit var telephonyManager: TelephonyManager
 	private lateinit var biometricManager: com.anafthdev.dujer.common.BiometricManager
@@ -94,7 +89,7 @@ class MainActivity : AppCompatActivity() {
 					CompositionLocalProvider(
 						LocalOverScrollConfiguration provides null
 					) {
-						DujerApp(dujerViewModel)
+						DujerApp()
 					}
 				}
 			}
