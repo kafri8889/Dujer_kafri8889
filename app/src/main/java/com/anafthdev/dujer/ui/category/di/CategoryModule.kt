@@ -1,22 +1,18 @@
 package com.anafthdev.dujer.ui.category.di
 
-import android.content.Context
-import com.anafthdev.dujer.di.AppModule
-import com.anafthdev.dujer.ui.category.CategoryViewModel
+import com.anafthdev.dujer.ui.category.environment.CategoryEnvironment
+import com.anafthdev.dujer.ui.category.environment.ICategoryEnvironment
+import dagger.Binds
 import dagger.Module
-import dagger.Provides
 import dagger.hilt.InstallIn
-import dagger.hilt.android.qualifiers.ApplicationContext
-import dagger.hilt.components.SingletonComponent
+import dagger.hilt.android.components.ViewModelComponent
 
 @Module
-@InstallIn(SingletonComponent::class)
-object CategoryModule {
+@InstallIn(ViewModelComponent::class)
+abstract class CategoryModule {
 	
-	@Provides
-	fun provideCategoryViewModel(
-		@ApplicationContext context: Context
-	): CategoryViewModel = CategoryViewModel(
-		AppModule.provideAppRepository(context)
-	)
+	@Binds
+	abstract fun provideEnvironment(
+		categoryEnvironment: CategoryEnvironment
+	): ICategoryEnvironment
 }

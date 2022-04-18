@@ -1,30 +1,43 @@
 package com.anafthdev.dujer.ui.category
 
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.anafthdev.dujer.data.db.model.Category
-import com.anafthdev.dujer.data.repository.app.IAppRepository
 import com.anafthdev.dujer.foundation.extension.combine
+import com.anafthdev.dujer.foundation.viewmodel.StatefulViewModel
+import com.anafthdev.dujer.ui.category.environment.ICategoryEnvironment
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
 class CategoryViewModel @Inject constructor(
-	private val appRepository: IAppRepository
-) : ViewModel() {
-	
-	private val _categories = MutableLiveData(emptyList<Category>())
-	val categories: LiveData<List<Category>> = _categories
+	categoryEnvironment: ICategoryEnvironment
+): StatefulViewModel<CategoryState, ICategoryEnvironment>(CategoryState(), categoryEnvironment) {
 	
 	init {
-		viewModelScope.launch {
-			appRepository.categoryRepository.getAllCategory().collect { categoryList ->
-				_categories.value = categoryList.combine(Category.values).distinctBy { it.id }
+		viewModelScope.launch(environment.dispatcher) {
+			environment.getAllCategory().collect { categories ->
+				setState {
+					copy(
+						categories = categories
+							.combine(Category.values)
+							.distinctBy { it.id }
+							.sortedBy { it.name }
+					)
+				}
 			}
 		}
 	}
 	
+	fun updateCategory(category: Category) {
+		viewModelScope.launch(environment.dispatcher) {
+			environment.updateCategory(category)
+		}
+	}
+	
+	fun insertCategory(category: Category) {
+		viewModelScope.launch(environment.dispatcher) {
+			environment.insertCategory(category)
+		}
+	}
 }
