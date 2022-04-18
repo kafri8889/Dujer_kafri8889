@@ -1,4 +1,4 @@
-package com.anafthdev.dujer.ui.screen.financial.environment
+package com.anafthdev.dujer.ui.financial.environment
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
@@ -26,7 +26,10 @@ class FinancialEnvironment @Inject constructor(
 	}
 	
 	override suspend fun getFinancial(id: Int, action: (Financial) -> Unit) {
-		action(appRepository.get(id))
+		if (id != Financial.default.id) {
+			val financial = appRepository.get(id) ?: Financial.default
+			action(financial)
+		}
 	}
 	
 	override suspend fun updateFinancial(financial: Financial, action: () -> Unit) {

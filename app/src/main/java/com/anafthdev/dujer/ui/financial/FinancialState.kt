@@ -1,4 +1,4 @@
-package com.anafthdev.dujer.ui.screen.financial
+package com.anafthdev.dujer.ui.financial
 
 import com.anafthdev.dujer.data.db.model.Category
 import com.anafthdev.dujer.model.Currency

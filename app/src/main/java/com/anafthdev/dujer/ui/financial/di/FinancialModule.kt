@@ -1,7 +1,7 @@
-package com.anafthdev.dujer.ui.screen.financial.di
+package com.anafthdev.dujer.ui.financial.di
 
-import com.anafthdev.dujer.ui.screen.financial.environment.FinancialEnvironment
-import com.anafthdev.dujer.ui.screen.financial.environment.IFinancialEnvironment
+import com.anafthdev.dujer.ui.financial.environment.FinancialEnvironment
+import com.anafthdev.dujer.ui.financial.environment.IFinancialEnvironment
 import dagger.Binds
 import dagger.Module
 import dagger.hilt.InstallIn

@@ -1,4 +1,4 @@
-package com.anafthdev.dujer.ui.screen.financial.environment
+package com.anafthdev.dujer.ui.financial.environment
 
 import com.anafthdev.dujer.data.db.model.Category
 import com.anafthdev.dujer.data.db.model.Financial

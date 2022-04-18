@@ -1,4 +1,4 @@
-package com.anafthdev.dujer.ui.screen.financial
+package com.anafthdev.dujer.ui.financial
 
 import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.animation.AnimatedVisibility
@@ -39,7 +39,7 @@ import com.anafthdev.dujer.foundation.extension.startsWith
 import com.anafthdev.dujer.foundation.window.dpScaled
 import com.anafthdev.dujer.foundation.window.spScaled
 import com.anafthdev.dujer.ui.app.DujerViewModel
-import com.anafthdev.dujer.ui.screen.financial.component.CategoryList
+import com.anafthdev.dujer.ui.financial.component.CategoryList
 import com.anafthdev.dujer.ui.theme.Inter
 import com.anafthdev.dujer.ui.theme.Typography
 import com.anafthdev.dujer.ui.theme.black04
@@ -55,9 +55,10 @@ import kotlin.random.Random
 
 @Composable
 fun FinancialScreen(
-	financialID: Int,
+	financial: Financial,
 	financialAction: String,
-	dujerViewModel: DujerViewModel
+	onBack: () -> Unit,
+	onSave: () -> Unit
 ) {
 	
 	val context = LocalContext.current
@@ -66,13 +67,11 @@ fun FinancialScreen(
 	val financialViewModel = hiltViewModel<FinancialViewModel>()
 	
 	val state by financialViewModel.state.collectAsState()
-	val dujerState by dujerViewModel.state.collectAsState()
 	
 	val currentCurrency = state.currentCurrency
 	val categories = state.categories
-	val isFinancialSheetShowed = dujerState.isFinancialSheetShowed
 	
-	var financial by remember { mutableStateOf(Financial.default) }
+	var financialNew by remember { mutableStateOf(Financial.default) }
 	var financialTitle: String by remember { mutableStateOf("") }
 	var financialAmountDouble: Double by remember { mutableStateOf(0.0) }
 	var financialAmount: TextFieldValue by remember { mutableStateOf(TextFieldValue()) }
@@ -81,64 +80,56 @@ fun FinancialScreen(
 	var financialType: FinancialType by remember { mutableStateOf(FinancialType.INCOME) }
 	
 	var showCategoryList by remember { mutableStateOf(false) }
-	var hasNavigate by remember { mutableStateOf(false) }
 	
 	when {
-		(financialAction == FinancialViewModel.FINANCIAL_ACTION_EDIT) and
-				isFinancialSheetShowed and
-				!hasNavigate -> {
-			
-			financialViewModel.getFinancial(financialID) { mFinancial ->
-				financial = mFinancial
-				financialTitle = financial.name
-				financialDate = financial.dateCreated
-				financialCategory = financial.category
-				financialAmountDouble = financial.amount
-				financialAmount = financialAmount.copy(
-					CurrencyFormatter.format(
-						locale = AppUtil.deviceLocale,
-						amount = financial.amount,
-						useSymbol = false
-					)
+		(financialAction == FinancialViewModel.FINANCIAL_ACTION_EDIT) and (financial.id != financialNew.id) -> {
+			financialNew = financial
+			financialTitle = financial.name
+			financialDate = financial.dateCreated
+			financialCategory = financial.category
+			financialAmountDouble = financial.amount
+			financialAmount = financialAmount.copy(
+				CurrencyFormatter.format(
+					locale = AppUtil.deviceLocale,
+					amount = financial.amount,
+					useSymbol = false
 				)
-				
-				true.also {
-					hasNavigate = it
-				}
-			}
+			)
 		}
 	}
 	
-	if (!isFinancialSheetShowed) {
-		financial = Financial.default
-		financialTitle = ""
-		financialDate = System.currentTimeMillis()
-		financialCategory = Category.default
-		financialType = FinancialType.INCOME
-		financialAmountDouble = 0.0
-		financialAmount = TextFieldValue(
-			text = CurrencyFormatter.format(
-				locale = AppUtil.deviceLocale,
-				amount = 0.0,
-				useSymbol = false
+	Timber.i("${financial.name} ?= ${financialNew.name}")
+	
+	DisposableEffect(financialAction) {
+		onDispose {
+			financialNew = Financial.default
+			financialTitle = ""
+			financialDate = System.currentTimeMillis()
+			financialCategory = Category.default
+			financialType = FinancialType.INCOME
+			financialAmountDouble = 0.0
+			financialAmount = TextFieldValue(
+				text = CurrencyFormatter.format(
+					locale = AppUtil.deviceLocale,
+					amount = 0.0,
+					useSymbol = false
+				)
 			)
-		)
-		
-		focusManager.clearFocus(force = true)
-		hasNavigate = false
+
+			focusManager.clearFocus(force = true)
+		}
 	}
 	
 	Column(
 		modifier = Modifier
 			.fillMaxSize()
 			.background(MaterialTheme.colorScheme.background)
+			.systemBarsPadding()
 			.verticalScroll(rememberScrollState())
 	) {
 		TopAppBar {
 			IconButton(
-				onClick = {
-					dujerViewModel.reset()
-				},
+				onClick = onBack,
 				modifier = Modifier
 					.padding(start = 8.dpScaled)
 					.align(Alignment.CenterStart)
@@ -249,7 +240,7 @@ fun FinancialScreen(
 					leadingIcon = {
 						Text(
 							text = if (financialAction == FinancialViewModel.FINANCIAL_ACTION_EDIT) {
-								financial.currency.symbol
+								financialNew.currency.symbol
 							} else currentCurrency.symbol,
 							style = Typography.bodyMedium.copy(
 								fontWeight = FontWeight.Medium,
@@ -395,15 +386,13 @@ fun FinancialScreen(
 					onClick = {
 						if (financialAction == FinancialViewModel.FINANCIAL_ACTION_EDIT) {
 							financialViewModel.updateFinancial(
-								financial = financial.copy(
+								financial = financialNew.copy(
 									name = financialTitle,
 									amount = financialAmountDouble,
 									dateCreated = financialDate,
 									category = financialCategory
 								),
-								action = {
-									dujerViewModel.reset()
-								}
+								action = onSave
 							)
 						} else {
 							when {
@@ -427,9 +416,7 @@ fun FinancialScreen(
 											currency = currentCurrency,
 											dateCreated = financialDate
 										),
-										action = {
-											dujerViewModel.reset()
-										}
+										action = onSave
 									)
 								}
 							}
