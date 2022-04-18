@@ -1,9 +1,9 @@
-package com.anafthdev.dujer.ui.screen.dashboard
+package com.anafthdev.dujer.ui.dashboard
 
 import androidx.lifecycle.viewModelScope
 import com.anafthdev.dujer.data.db.model.Financial
 import com.anafthdev.dujer.foundation.viewmodel.StatefulViewModel
-import com.anafthdev.dujer.ui.screen.dashboard.environment.IDashboardEnvironment
+import com.anafthdev.dujer.ui.dashboard.environment.IDashboardEnvironment
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.launch
@@ -15,12 +15,34 @@ class DashboardViewModel @Inject constructor(
 ): StatefulViewModel<DashboardState, IDashboardEnvironment>(DashboardState(), dashboardEnvironment) {
 	
 	init {
-		init()
-	}
-	
-	private fun init() {
 		getUserBalanceAndCurrentCurrency()
 		getFinancialListAndCalculateEntry()
+		getFinancialID()
+		getFinancialAction()
+	}
+	
+	private fun getFinancialAction() {
+		viewModelScope.launch(environment.dispatcher) {
+			environment.getFinancialAction().collect { action ->
+				setState {
+					copy(
+						financialAction = action
+					)
+				}
+			}
+		}
+	}
+	
+	private fun getFinancialID() {
+		viewModelScope.launch(environment.dispatcher) {
+			environment.getFinancial().collect { financial ->
+				setState {
+					copy(
+						financial = financial
+					)
+				}
+			}
+		}
 	}
 	
 	private fun getUserBalanceAndCurrentCurrency() {
@@ -83,5 +105,15 @@ class DashboardViewModel @Inject constructor(
 		viewModelScope.launch {
 			environment.deleteRecord(financial)
 		}
+	}
+	
+	fun setFinancialID(id: Int) {
+		viewModelScope.launch(environment.dispatcher) {
+			environment.setFinancialID(id)
+		}
+	}
+	
+	fun setFinancialAction(action: String) {
+		environment.setFinancialAction(action)
 	}
 }

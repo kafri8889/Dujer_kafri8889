@@ -1,7 +1,7 @@
-package com.anafthdev.dujer.ui.screen.dashboard.di
+package com.anafthdev.dujer.ui.dashboard.di
 
-import com.anafthdev.dujer.ui.screen.dashboard.environment.DashboardEnvironment
-import com.anafthdev.dujer.ui.screen.dashboard.environment.IDashboardEnvironment
+import com.anafthdev.dujer.ui.dashboard.environment.DashboardEnvironment
+import com.anafthdev.dujer.ui.dashboard.environment.IDashboardEnvironment
 import dagger.Binds
 import dagger.Module
 import dagger.hilt.InstallIn

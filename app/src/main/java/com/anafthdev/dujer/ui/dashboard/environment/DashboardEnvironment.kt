@@ -1,26 +1,47 @@
-package com.anafthdev.dujer.ui.screen.dashboard.environment
+package com.anafthdev.dujer.ui.dashboard.environment
 
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.asFlow
 import com.anafthdev.dujer.data.db.model.Financial
 import com.anafthdev.dujer.data.repository.app.IAppRepository
 import com.anafthdev.dujer.foundation.di.DiName
 import com.anafthdev.dujer.foundation.extension.forEachMap
 import com.anafthdev.dujer.foundation.extension.indexOf
 import com.anafthdev.dujer.model.Currency
+import com.anafthdev.dujer.ui.financial.FinancialViewModel
 import com.anafthdev.dujer.util.AppUtil
 import com.github.mikephil.charting.data.Entry
 import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.withContext
+import java.lang.Exception
 import java.text.SimpleDateFormat
 import javax.inject.Inject
 import javax.inject.Named
 
 class DashboardEnvironment @Inject constructor(
-	@Named(DiName.DISPATCHER_IO) override val dispatcher: CoroutineDispatcher,
+	@Named(DiName.DISPATCHER_MAIN) override val dispatcher: CoroutineDispatcher,
 	private val appRepository: IAppRepository
 ): IDashboardEnvironment {
 	
+	private val _financial = MutableLiveData(Financial.default)
+	private val financial: LiveData<Financial> = _financial
+	
+	private val _financialAction = MutableLiveData(FinancialViewModel.FINANCIAL_ACTION_NEW)
+	private val financialAction: LiveData<String> = _financialAction
+	
 	override suspend fun deleteRecord(financial: Financial) {
 		appRepository.delete(financial)
+	}
+	
+	override suspend fun getFinancial(): Flow<Financial> {
+		return financial.asFlow()
+	}
+	
+	override suspend fun getFinancialAction(): Flow<String> {
+		return financialAction.asFlow()
 	}
 	
 	override suspend fun getUserBalance(): Flow<Double> {
@@ -97,6 +118,14 @@ class DashboardEnvironment @Inject constructor(
 		}
 		
 		return incomeListEntry to expenseListEntry
+	}
+	
+	override suspend fun setFinancialID(id: Int) {
+		_financial.value = appRepository.get(id) ?: Financial.default
+	}
+	
+	override fun setFinancialAction(action: String) {
+		_financialAction.value = action
 	}
 	
 }
