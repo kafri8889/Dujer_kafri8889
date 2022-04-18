@@ -1,6 +1,7 @@
 package com.anafthdev.dujer.ui.app
 
 import androidx.activity.compose.BackHandler
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.ModalBottomSheetLayout
@@ -20,10 +21,10 @@ import androidx.navigation.navArgument
 import com.anafthdev.dujer.data.DujerDestination
 import com.anafthdev.dujer.data.FinancialType
 import com.anafthdev.dujer.ui.category.CategoryScreen
-import com.anafthdev.dujer.ui.screen.dashboard.DashboardScreen
-import com.anafthdev.dujer.ui.screen.financial.FinancialScreen
-import com.anafthdev.dujer.ui.screen.income_expense.IncomeExpenseScreen
-import com.anafthdev.dujer.ui.screen.setting.SettingScreen
+import com.anafthdev.dujer.ui.dashboard.DashboardScreen
+import com.anafthdev.dujer.ui.financial.FinancialScreen
+import com.anafthdev.dujer.ui.income_expense.IncomeExpenseScreen
+import com.anafthdev.dujer.ui.setting.SettingScreen
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -32,107 +33,66 @@ import timber.log.Timber
 
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
-fun DujerApp(
-) {
+fun DujerApp() {
 	
 	val context = LocalContext.current
 	
-	val systemBarsBackground = MaterialTheme.colorScheme.background
+	val isSystemInDarkTheme = isSystemInDarkTheme()
 	
 	val dujerViewModel = hiltViewModel<DujerViewModel>()
 	
 	val state by dujerViewModel.state.collectAsState()
-	val isFinancialSheetShowed = state.isFinancialSheetShowed
-	val financialID = state.financialID
-	val financialAction = state.financialAction
 	
-	val scope = rememberCoroutineScope { Dispatchers.Main }
 	val navController = rememberNavController()
 	val systemUiController = rememberSystemUiController()
-	val financialScreenSheetState = rememberModalBottomSheetState(
-		initialValue = ModalBottomSheetValue.Hidden,
-		skipHalfExpanded = true
-	)
-	
-	Timber.i("isFinancialSheetShowed: $isFinancialSheetShowed")
-	Timber.i("bs value: ${financialScreenSheetState.currentValue}")
-	
-	if (financialScreenSheetState.currentValue != ModalBottomSheetValue.Hidden) {
-		DisposableEffect(Unit) {
-			onDispose {
-				dujerViewModel.hideFinancialSheet()
-			}
-		}
-	}
-	
-	BackHandler(isFinancialSheetShowed) {
-		dujerViewModel.hideFinancialSheet()
-	}
 	
 	SideEffect {
 		systemUiController.setSystemBarsColor(
-			color = systemBarsBackground,
-			darkIcons = true
+			color = Color.Transparent,
+			darkIcons = isSystemInDarkTheme
 		)
-		
-		scope.launch {
-			if (isFinancialSheetShowed) financialScreenSheetState.show() else financialScreenSheetState.hide()
-		}
 	}
 	
-	ModalBottomSheetLayout(
-		sheetState = financialScreenSheetState,
-		scrimColor = Color.Unspecified,
-		sheetContent = {
-			FinancialScreen(
-				financialID = financialID,
-				financialAction = financialAction,
+	NavHost(
+		navController = navController,
+		startDestination = DujerDestination.Dashboard.route,
+		modifier = Modifier
+			.fillMaxSize()
+	) {
+		composable(DujerDestination.Dashboard.route) {
+			DashboardScreen(
+				navController = navController,
 				dujerViewModel = dujerViewModel
 			)
 		}
-	) {
-		NavHost(
-			navController = navController,
-			startDestination = DujerDestination.Dashboard.route,
-			modifier = Modifier
-				.fillMaxSize()
-		) {
+		
+		composable(
+			route = DujerDestination.IncomeExpense.route,
+			arguments = listOf(
+				navArgument("type") {
+					type = NavType.IntType
+				}
+			)
+		) { entry ->
+			val type = entry.arguments?.getInt("type") ?: 0
 			
-			composable(DujerDestination.Dashboard.route) {
-				DashboardScreen(
-					navController = navController,
-					dujerViewModel = dujerViewModel
-				)
-			}
-			
-			composable(
-				route = DujerDestination.IncomeExpense.route,
-				arguments = listOf(
-					navArgument("type") {
-						type = NavType.IntType
-					}
-				)
-			) { entry ->
-				val type = entry.arguments?.getInt("type") ?: 0
-				
-				IncomeExpenseScreen(
-					navController = navController,
-					type = FinancialType.values()[type],
-					dujerViewModel = dujerViewModel
-				)
-			}
-			
-			composable(DujerDestination.Setting.route) {
-				SettingScreen(
-					navController = navController
-				)
-			}
-			
-			composable(DujerDestination.Category.route) {
-				CategoryScreen(
-					navController = navController
-				)
-			}
+			IncomeExpenseScreen(
+				navController = navController,
+				type = FinancialType.values()[type],
+				dujerViewModel = dujerViewModel
+			)
+		}
+		
+		composable(DujerDestination.Setting.route) {
+			SettingScreen(
+				navController = navController
+			)
+		}
+		
+		composable(DujerDestination.Category.route) {
+			CategoryScreen(
+				navController = navController
+			)
 		}
 	}
 }
