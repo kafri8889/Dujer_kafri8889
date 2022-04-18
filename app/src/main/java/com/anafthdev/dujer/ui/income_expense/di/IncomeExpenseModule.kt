@@ -1,7 +1,7 @@
-package com.anafthdev.dujer.ui.screen.income_expense.di
+package com.anafthdev.dujer.ui.income_expense.di
 
-import com.anafthdev.dujer.ui.screen.income_expense.environment.IIncomeExpenseEnvironment
-import com.anafthdev.dujer.ui.screen.income_expense.environment.IncomeExpenseEnvironment
+import com.anafthdev.dujer.ui.income_expense.environment.IIncomeExpenseEnvironment
+import com.anafthdev.dujer.ui.income_expense.environment.IncomeExpenseEnvironment
 import dagger.Binds
 import dagger.Module
 import dagger.hilt.InstallIn

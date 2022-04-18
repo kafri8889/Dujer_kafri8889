@@ -1,9 +1,9 @@
-package com.anafthdev.dujer.ui.screen.income_expense
+package com.anafthdev.dujer.ui.income_expense
 
 import androidx.lifecycle.viewModelScope
 import com.anafthdev.dujer.data.db.model.Financial
 import com.anafthdev.dujer.foundation.viewmodel.StatefulViewModel
-import com.anafthdev.dujer.ui.screen.income_expense.environment.IIncomeExpenseEnvironment
+import com.anafthdev.dujer.ui.income_expense.environment.IIncomeExpenseEnvironment
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.launch
@@ -28,11 +28,27 @@ class IncomeExpenseViewModel @Inject constructor(
 					}
 				}
 		}
+		
+		viewModelScope.launch(environment.dispatcher) {
+			environment.getFinancial().collect { financial ->
+				setState {
+					copy(
+						financial = financial
+					)
+				}
+			}
+		}
 	}
 	
 	fun delete(financial: Financial) {
 		viewModelScope.launch(environment.dispatcher) {
 			environment.deleteFinancial(financial)
+		}
+	}
+	
+	fun setFinancialID(id: Int) {
+		viewModelScope.launch(environment.dispatcher) {
+			environment.setFinancialID(id)
 		}
 	}
 	

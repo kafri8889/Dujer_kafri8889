@@ -1,5 +1,8 @@
-package com.anafthdev.dujer.ui.screen.income_expense.environment
+package com.anafthdev.dujer.ui.income_expense.environment
 
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.asFlow
 import com.anafthdev.dujer.data.db.model.Financial
 import com.anafthdev.dujer.data.repository.app.IAppRepository
 import com.anafthdev.dujer.foundation.di.DiName
@@ -9,9 +12,12 @@ import javax.inject.Inject
 import javax.inject.Named
 
 class IncomeExpenseEnvironment @Inject constructor(
-	@Named(DiName.DISPATCHER_IO) override val dispatcher: CoroutineDispatcher,
+	@Named(DiName.DISPATCHER_MAIN) override val dispatcher: CoroutineDispatcher,
 	private val appRepository: IAppRepository
 ): IIncomeExpenseEnvironment {
+	
+	private val _financial = MutableLiveData(Financial.default)
+	private val financial: LiveData<Financial> = _financial
 	
 	override suspend fun deleteFinancial(financial: Financial) {
 		appRepository.delete(financial)
@@ -25,5 +31,12 @@ class IncomeExpenseEnvironment @Inject constructor(
 		return appRepository.expenseRepository.getExpense()
 	}
 	
+	override suspend fun getFinancial(): Flow<Financial> {
+		return financial.asFlow()
+	}
+	
+	override suspend fun setFinancialID(id: Int) {
+		_financial.value = appRepository.get(id) ?: Financial.default
+	}
 	
 }

@@ -1,4 +1,4 @@
-package com.anafthdev.dujer.ui.screen.income_expense.environment
+package com.anafthdev.dujer.ui.income_expense.environment
 
 import com.anafthdev.dujer.data.db.model.Financial
 import kotlinx.coroutines.CoroutineDispatcher
@@ -13,5 +13,9 @@ interface IIncomeExpenseEnvironment {
 	suspend fun getIncomeFinancialList(): Flow<List<Financial>>
 	
 	suspend fun getExpenseFinancialList(): Flow<List<Financial>>
+	
+	suspend fun getFinancial(): Flow<Financial>
+	
+	suspend fun setFinancialID(id: Int)
 	
 }
