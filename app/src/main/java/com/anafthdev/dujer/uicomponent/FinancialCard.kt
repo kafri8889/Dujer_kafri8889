@@ -18,7 +18,9 @@ import com.anafthdev.dujer.foundation.extension.horizontalScroll
 import com.anafthdev.dujer.foundation.extension.toColor
 import com.anafthdev.dujer.foundation.window.dpScaled
 import com.anafthdev.dujer.foundation.window.spScaled
-import com.anafthdev.dujer.ui.theme.*
+import com.anafthdev.dujer.ui.theme.Typography
+import com.anafthdev.dujer.ui.theme.large_shape
+import com.anafthdev.dujer.ui.theme.medium_shape
 import com.anafthdev.dujer.util.AppUtil
 import com.anafthdev.dujer.util.CurrencyFormatter
 import java.text.SimpleDateFormat
@@ -33,7 +35,7 @@ fun FinancialCard(
 ) {
 	
 	Card(
-		shape = big_shape,
+		shape = large_shape,
 		containerColor = Color.White,
 		onClick = onClick,
 		elevation = CardDefaults.cardElevation(
@@ -50,7 +52,7 @@ fun FinancialCard(
 				contentAlignment = Alignment.Center,
 				modifier = Modifier
 					.size(64.dpScaled)
-					.clip(normal_shape)
+					.clip(medium_shape)
 					.background(financial.category.tint.backgroundTint.toColor())
 			) {
 				Icon(

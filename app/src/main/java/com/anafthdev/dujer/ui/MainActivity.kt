@@ -9,6 +9,7 @@ import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.gestures.LocalOverScrollConfiguration
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.core.view.WindowCompat
 import androidx.lifecycle.lifecycleScope
 import com.anafthdev.dujer.BuildConfig
 import com.anafthdev.dujer.data.datastore.AppDatastore
@@ -39,6 +40,8 @@ class MainActivity : AppCompatActivity() {
 				}
 			})
 		}
+		
+		WindowCompat.setDecorFitsSystemWindows(window, false)
 		
 		telephonyManager = getSystemService(TELEPHONY_SERVICE) as TelephonyManager
 		appDatastore.setCurrentCurrency(telephonyManager.networkCountryIso) {

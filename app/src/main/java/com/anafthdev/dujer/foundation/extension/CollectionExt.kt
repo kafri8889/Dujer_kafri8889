@@ -1,7 +1,5 @@
 package com.anafthdev.dujer.foundation.extension
 
-import java.util.ArrayList
-
 fun <T> Int.lastIndexOf(list: Collection<T>) = this == list.size - 1
 
 /**

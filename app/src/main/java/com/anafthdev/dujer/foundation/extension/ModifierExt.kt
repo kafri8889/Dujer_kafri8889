@@ -1,6 +1,5 @@
 package com.anafthdev.dujer.foundation.extension
 
-import androidx.annotation.FloatRange
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.ScrollState
 import androidx.compose.foundation.horizontalScroll
@@ -9,11 +8,9 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.composed
 import androidx.compose.ui.layout.onGloballyPositioned
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.dp
 import com.anafthdev.dujer.common.EventCountdownTimer
-import com.anafthdev.dujer.util.AppUtil.toast
 import kotlinx.coroutines.launch
 
 fun Modifier.sizeBasedWidth(

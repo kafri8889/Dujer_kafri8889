@@ -4,8 +4,6 @@ import android.content.Context
 import android.os.Build
 import android.os.VibrationEffect
 import android.os.Vibrator
-import android.os.VibratorManager
-import androidx.annotation.RequiresApi
 import javax.inject.Inject
 
 class VibratorManager @Inject constructor(context: Context) {

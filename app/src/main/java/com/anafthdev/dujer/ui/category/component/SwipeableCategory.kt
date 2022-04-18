@@ -3,7 +3,6 @@ package com.anafthdev.dujer.ui.category.component
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.*
 import androidx.compose.material3.Icon
@@ -16,8 +15,7 @@ import androidx.compose.ui.res.painterResource
 import com.anafthdev.dujer.R
 import com.anafthdev.dujer.data.db.model.Category
 import com.anafthdev.dujer.foundation.window.dpScaled
-import com.anafthdev.dujer.ui.theme.big_shape
-import com.anafthdev.dujer.uicomponent.FinancialCard
+import com.anafthdev.dujer.ui.theme.large_shape
 
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
@@ -59,7 +57,7 @@ fun SwipeableCategory(
 			Box(
 				modifier = Modifier
 					.fillMaxSize()
-					.clip(big_shape)
+					.clip(large_shape)
 					.background(Color(0xFFF38B8B))
 					.align(Alignment.CenterVertically)
 			) {

@@ -1,17 +1,15 @@
-package com.anafthdev.dujer.ui.screen.dashboard.component
+package com.anafthdev.dujer.ui.dashboard.component
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.layout.onGloballyPositioned
-import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -27,16 +25,16 @@ import com.anafthdev.dujer.util.CurrencyFormatter
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun ExpenseCard(
-	expense: Double,
+fun IncomeCard(
+	income: Double,
 	currency: Currency,
 	modifier: Modifier = Modifier,
 	onClick: () -> Unit
 ) {
 	
 	Card(
-		shape = big_shape,
-		containerColor = expense_card_background,
+		shape = large_shape,
+		containerColor = income_card_background,
 		onClick = onClick,
 		elevation = CardDefaults.cardElevation(
 			defaultElevation = 0.dp,
@@ -60,10 +58,10 @@ fun ExpenseCard(
 				modifier = Modifier
 					.size(48.dpScaled)
 					.clip(RoundedCornerShape(100))
-					.background(Color(0xFF836F81))
+					.background(Color(0xFF48827C))
 			) {
 				Icon(
-					painter = painterResource(id = R.drawable.ic_bxs_wallet),
+					painter = painterResource(id = R.drawable.ic_bxs_bank),
 					tint = Color.White,
 					contentDescription = null
 				)
@@ -75,7 +73,7 @@ fun ExpenseCard(
 			)
 			
 			Text(
-				text = CurrencyFormatter.format(AppUtil.deviceLocale, expense),
+				text = CurrencyFormatter.format(AppUtil.deviceLocale, income),
 				style = Typography.bodyMedium.copy(
 					color = black01,
 					fontWeight = FontWeight.Bold
@@ -91,7 +89,7 @@ fun ExpenseCard(
 			)
 			
 			Text(
-				text = stringResource(id = R.string.expenses),
+				text = stringResource(id = R.string.income),
 				style = Typography.bodySmall.copy(
 					color = black05,
 					fontWeight = FontWeight.Normal

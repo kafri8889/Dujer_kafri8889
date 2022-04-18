@@ -15,7 +15,7 @@ interface FinancialDAO {
 	fun getByType(mType: Int): Flow<List<Financial>>
 	
 	@Query("SELECT * FROM financial WHERE id= :mID")
-	suspend fun get(mID: Int): Financial
+	suspend fun get(mID: Int): Financial?
 	
 	@Update
 	suspend fun update(vararg financial: Financial)

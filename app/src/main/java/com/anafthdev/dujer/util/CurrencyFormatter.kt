@@ -1,6 +1,5 @@
 package com.anafthdev.dujer.util
 
-import android.icu.number.Precision.currency
 import com.anafthdev.dujer.foundation.extension.isMinus
 import java.text.NumberFormat
 import java.text.ParseException

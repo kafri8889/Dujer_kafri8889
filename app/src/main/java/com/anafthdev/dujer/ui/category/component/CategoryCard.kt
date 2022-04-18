@@ -1,7 +1,6 @@
 package com.anafthdev.dujer.ui.category.component
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
@@ -17,8 +16,8 @@ import com.anafthdev.dujer.foundation.extension.toColor
 import com.anafthdev.dujer.foundation.window.dpScaled
 import com.anafthdev.dujer.foundation.window.spScaled
 import com.anafthdev.dujer.ui.theme.Typography
-import com.anafthdev.dujer.ui.theme.big_shape
-import com.anafthdev.dujer.ui.theme.normal_shape
+import com.anafthdev.dujer.ui.theme.large_shape
+import com.anafthdev.dujer.ui.theme.medium_shape
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -28,7 +27,7 @@ fun CategoryCard(
 ) {
 	
 	Card(
-		shape = big_shape,
+		shape = large_shape,
 		containerColor = Color.White,
 		elevation = CardDefaults.cardElevation(
 			defaultElevation = 1.dp
@@ -45,7 +44,7 @@ fun CategoryCard(
 				contentAlignment = Alignment.Center,
 				modifier = Modifier
 					.size(48.dpScaled)
-					.clip(normal_shape)
+					.clip(medium_shape)
 					.background(category.tint.backgroundTint.toColor())
 			) {
 				Icon(

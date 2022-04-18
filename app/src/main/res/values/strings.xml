@@ -39,5 +39,7 @@
     <string name="configuration">Configuration</string>
     <string name="currency">Currency</string>
     <string name="setting">Setting</string>
+    <string name="new_category">New category</string>
+    <string name="category_name">Category name</string>
 
 </resources>

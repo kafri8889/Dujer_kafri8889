@@ -1,4 +1,4 @@
-package com.anafthdev.dujer.ui.screen.dashboard.component
+package com.anafthdev.dujer.ui.dashboard.component
 
 import android.graphics.Color
 import androidx.compose.foundation.horizontalScroll

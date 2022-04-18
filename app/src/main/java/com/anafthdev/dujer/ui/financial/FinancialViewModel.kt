@@ -1,9 +1,9 @@
-package com.anafthdev.dujer.ui.screen.financial
+package com.anafthdev.dujer.ui.financial
 
 import androidx.lifecycle.viewModelScope
 import com.anafthdev.dujer.data.db.model.Financial
 import com.anafthdev.dujer.foundation.viewmodel.StatefulViewModel
-import com.anafthdev.dujer.ui.screen.financial.environment.IFinancialEnvironment
+import com.anafthdev.dujer.ui.financial.environment.IFinancialEnvironment
 import com.anafthdev.dujer.util.AppUtil
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch

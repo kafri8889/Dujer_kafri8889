@@ -29,7 +29,7 @@ class AppRepository @Inject constructor(
 		ExpenseRepository(appDatabase)
 	}
 	
-	override suspend fun get(id: Int): Financial {
+	override suspend fun get(id: Int): Financial? {
 		return appDatabase.financialDao().get(id)
 	}
 	

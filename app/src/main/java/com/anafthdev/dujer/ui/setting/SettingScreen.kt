@@ -1,17 +1,20 @@
-package com.anafthdev.dujer.ui.screen.setting
+package com.anafthdev.dujer.ui.setting
 
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.ArrowBack
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -25,10 +28,10 @@ import com.anafthdev.dujer.foundation.extension.indexOf
 import com.anafthdev.dujer.foundation.window.dpScaled
 import com.anafthdev.dujer.foundation.window.spScaled
 import com.anafthdev.dujer.model.SettingPreference
-import com.anafthdev.dujer.uicomponent.SettingPreferences
-import com.anafthdev.dujer.uicomponent.TopAppBar
 import com.anafthdev.dujer.ui.theme.Typography
 import com.anafthdev.dujer.ui.theme.black04
+import com.anafthdev.dujer.uicomponent.SettingPreferences
+import com.anafthdev.dujer.uicomponent.TopAppBar
 
 @Composable
 fun SettingScreen(
@@ -67,6 +70,7 @@ fun SettingScreen(
 		modifier = Modifier
 			.fillMaxSize()
 			.background(MaterialTheme.colorScheme.background)
+			.systemBarsPadding()
 	) {
 		TopAppBar {
 			IconButton(

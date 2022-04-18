@@ -1,4 +1,4 @@
-package com.anafthdev.dujer.ui.screen.dashboard.component
+package com.anafthdev.dujer.ui.dashboard.component
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
@@ -16,7 +16,7 @@ import androidx.compose.ui.res.painterResource
 import com.anafthdev.dujer.R
 import com.anafthdev.dujer.data.db.model.Financial
 import com.anafthdev.dujer.foundation.window.dpScaled
-import com.anafthdev.dujer.ui.theme.big_shape
+import com.anafthdev.dujer.ui.theme.large_shape
 import com.anafthdev.dujer.uicomponent.FinancialCard
 
 @OptIn(ExperimentalMaterialApi::class)
@@ -64,7 +64,7 @@ fun SwipeableFinancialCard(
 						vertical = 8.dpScaled
 					)
 					.fillMaxSize()
-					.clip(big_shape)
+					.clip(large_shape)
 					.background(Color(0xFFF38B8B))
 					.align(Alignment.CenterVertically)
 			) {

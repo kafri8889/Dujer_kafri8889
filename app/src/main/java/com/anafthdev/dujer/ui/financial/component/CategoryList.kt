@@ -1,9 +1,8 @@
-package com.anafthdev.dujer.ui.screen.financial.component
+package com.anafthdev.dujer.ui.financial.component
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
-import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -18,8 +17,8 @@ import com.anafthdev.dujer.foundation.extension.toColor
 import com.anafthdev.dujer.foundation.window.dpScaled
 import com.anafthdev.dujer.foundation.window.spScaled
 import com.anafthdev.dujer.ui.theme.Typography
-import com.anafthdev.dujer.ui.theme.big_shape
-import com.anafthdev.dujer.ui.theme.normal_shape
+import com.anafthdev.dujer.ui.theme.large_shape
+import com.anafthdev.dujer.ui.theme.medium_shape
 
 @Composable
 fun CategoryList(
@@ -30,7 +29,7 @@ fun CategoryList(
 	Column(
 		modifier = Modifier
 			.fillMaxWidth()
-			.clip(big_shape)
+			.clip(large_shape)
 			.background(MaterialTheme.colorScheme.secondaryContainer)
 	) {
 		categories.forEach { category ->
@@ -47,7 +46,7 @@ fun CategoryList(
 					contentAlignment = Alignment.Center,
 					modifier = Modifier
 						.size(48.dpScaled)
-						.clip(normal_shape)
+						.clip(medium_shape)
 						.background(category.tint.backgroundTint.toColor())
 				) {
 					Icon(

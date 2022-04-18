@@ -5,7 +5,6 @@ import android.content.res.Resources
 import android.os.Build
 import android.widget.Toast
 import java.text.DateFormatSymbols
-import java.util.*
 
 object AppUtil {
 	

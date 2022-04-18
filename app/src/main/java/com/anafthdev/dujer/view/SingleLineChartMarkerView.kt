@@ -4,7 +4,6 @@ import android.annotation.SuppressLint
 import android.content.Context
 import android.widget.TextView
 import com.anafthdev.dujer.R
-import com.anafthdev.dujer.model.Currency
 import com.anafthdev.dujer.util.AppUtil
 import com.anafthdev.dujer.util.CurrencyFormatter
 import com.github.mikephil.charting.components.IMarker

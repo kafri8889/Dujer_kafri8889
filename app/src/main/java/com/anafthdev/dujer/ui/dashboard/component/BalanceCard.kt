@@ -1,8 +1,5 @@
-package com.anafthdev.dujer.ui.screen.dashboard.component
+package com.anafthdev.dujer.ui.dashboard.component
 
-import androidx.compose.animation.core.tween
-import androidx.compose.foundation.gestures.ScrollableDefaults
-import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.material3.Card
@@ -15,25 +12,17 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.AnnotatedString
-import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.unit.DpSize
 import androidx.compose.ui.unit.dp
 import com.anafthdev.dujer.R
-import com.anafthdev.dujer.common.EventCountdownTimer
 import com.anafthdev.dujer.foundation.extension.horizontalScroll
-import com.anafthdev.dujer.foundation.extension.toDp
 import com.anafthdev.dujer.foundation.window.dpScaled
 import com.anafthdev.dujer.model.Currency
-import com.anafthdev.dujer.ui.theme.Inter
 import com.anafthdev.dujer.ui.theme.Typography
 import com.anafthdev.dujer.ui.theme.balance_card_background
-import com.anafthdev.dujer.ui.theme.big_shape
+import com.anafthdev.dujer.ui.theme.large_shape
 import com.anafthdev.dujer.util.AppUtil
 import com.anafthdev.dujer.util.CurrencyFormatter
-import kotlinx.coroutines.launch
-import timber.log.Timber
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -47,7 +36,7 @@ fun BalanceCard(
 	var cardHeight by remember { mutableStateOf(0.dpScaled) }
 	
 	Card(
-		shape = big_shape,
+		shape = large_shape,
 		containerColor = balance_card_background,
 		elevation = CardDefaults.cardElevation(
 			defaultElevation = 4.dp

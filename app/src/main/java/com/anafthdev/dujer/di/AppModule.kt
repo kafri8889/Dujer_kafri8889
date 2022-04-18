@@ -1,10 +1,10 @@
 package com.anafthdev.dujer.di
 
 import android.content.Context
-import com.anafthdev.dujer.data.repository.app.IAppRepository
-import com.anafthdev.dujer.data.repository.app.AppRepository
 import com.anafthdev.dujer.data.datastore.di.DatastoreModule
 import com.anafthdev.dujer.data.db.AppDatabase
+import com.anafthdev.dujer.data.repository.app.AppRepository
+import com.anafthdev.dujer.data.repository.app.IAppRepository
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn

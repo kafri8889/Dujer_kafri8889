@@ -1,6 +1,8 @@
 package com.anafthdev.dujer.foundation.extension
 
-import androidx.compose.material.*
+import androidx.compose.material.ExperimentalMaterialApi
+import androidx.compose.material.ModalBottomSheetState
+import androidx.compose.material.ModalBottomSheetValue
 
 @OptIn(ExperimentalMaterialApi::class)
 val ModalBottomSheetState.currentFraction: Float
