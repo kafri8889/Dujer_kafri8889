@@ -5,6 +5,7 @@ import com.google.android.material.datepicker.MaterialDatePicker
 
 fun AppCompatActivity.showDatePicker(
 	selection: Long = MaterialDatePicker.todayInUtcMilliseconds(),
+	onCancel: () -> Unit = {},
 	onPick: (Long) -> Unit
 ) {
 	
@@ -14,5 +15,7 @@ fun AppCompatActivity.showDatePicker(
 			.build()
 	
 	datePicker.addOnPositiveButtonClickListener(onPick)
+	datePicker.addOnCancelListener { onCancel() }
+	datePicker.addOnNegativeButtonClickListener { onCancel() }
 	datePicker.show(this.supportFragmentManager, "ActivityExt")
 }

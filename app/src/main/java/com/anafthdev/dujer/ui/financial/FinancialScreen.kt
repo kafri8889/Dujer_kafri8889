@@ -18,6 +18,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.rotate
+import androidx.compose.ui.focus.*
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.painterResource
@@ -71,6 +72,11 @@ fun FinancialScreen(
 	val currentCurrency = state.currentCurrency
 	val categories = state.categories
 	
+	val textFieldDateFocusRequester = remember { FocusRequester() }
+	val textFieldCategoryFocusRequester = remember { FocusRequester() }
+	var categoryFocusRequesterHasFocus by remember { mutableStateOf(false) }
+	var dateFocusRequesterHasFocus by remember { mutableStateOf(false) }
+	
 	var financialNew by remember { mutableStateOf(Financial.default) }
 	var financialTitle: String by remember { mutableStateOf("") }
 	var financialAmountDouble: Double by remember { mutableStateOf(0.0) }
@@ -79,7 +85,8 @@ fun FinancialScreen(
 	var financialCategory: Category by remember { mutableStateOf(Category.default) }
 	var financialType: FinancialType by remember { mutableStateOf(FinancialType.INCOME) }
 	
-	var showCategoryList by remember { mutableStateOf(false) }
+	var isCategoryListShowed by remember { mutableStateOf(false) }
+	var isDatePickerShowed by remember { mutableStateOf(false) }
 	
 	when {
 		(financialAction == FinancialViewModel.FINANCIAL_ACTION_EDIT) and (financial.id != financialNew.id) -> {
@@ -118,6 +125,31 @@ fun FinancialScreen(
 
 			focusManager.clearFocus(force = true)
 		}
+	}
+	
+	DisposableEffect(dateFocusRequesterHasFocus) {
+		onDispose {
+			if (dateFocusRequesterHasFocus) {
+				(context as AppCompatActivity).showDatePicker(
+					selection = financialDate,
+					onPick = { timeInMillis ->
+						financialDate = timeInMillis
+						focusManager.moveFocus(FocusDirection.Next)
+					},
+					onCancel = {
+						isDatePickerShowed = false
+						focusManager.moveFocus(FocusDirection.Next)
+					}
+				)
+			}
+		}
+	}
+	
+	SideEffect {
+		if (!isCategoryListShowed and categoryFocusRequesterHasFocus) {
+			focusManager.clearFocus(force = true)
+		}
+		
 	}
 	
 	Column(
@@ -280,11 +312,8 @@ fun FinancialScreen(
 					trailingIcon = {
 						IconButton(
 							onClick = {
-								(context as AppCompatActivity).showDatePicker(
-									selection = financialDate
-								) { timeInMillis ->
-									financialDate = timeInMillis
-								}
+								isDatePickerShowed = true
+								textFieldDateFocusRequester.requestFocus()
 							}
 						) {
 							Icon(
@@ -300,6 +329,10 @@ fun FinancialScreen(
 					modifier = Modifier
 						.padding(top = 8.dpScaled)
 						.fillMaxWidth()
+						.focusRequester(textFieldDateFocusRequester)
+						.onFocusChanged { focusState ->
+							dateFocusRequesterHasFocus = focusState.hasFocus
+						}
 				)
 				
 				Text(
@@ -323,7 +356,8 @@ fun FinancialScreen(
 					trailingIcon = {
 						IconButton(
 							onClick = {
-								showCategoryList = !showCategoryList
+								isCategoryListShowed = !isCategoryListShowed
+								textFieldCategoryFocusRequester.requestFocus()
 							}
 						) {
 							Icon(
@@ -331,22 +365,24 @@ fun FinancialScreen(
 								contentDescription = null,
 								modifier = Modifier
 									.rotate(
-										if (showCategoryList) 180f else 0f
+										if (isCategoryListShowed) 180f else 0f
 									)
 							)
 						}
 					},
-					keyboardOptions = KeyboardOptions(
-						keyboardType = KeyboardType.Text,
-						imeAction = ImeAction.Next
-					),
 					modifier = Modifier
 						.padding(top = 8.dpScaled)
 						.fillMaxWidth()
+						.focusRequester(textFieldCategoryFocusRequester)
+						.onFocusChanged { focusState ->
+							categoryFocusRequesterHasFocus = focusState.hasFocus.also {
+								isCategoryListShowed = it
+							}
+						}
 				)
 				
 				AnimatedVisibility(
-					visible = showCategoryList,
+					visible = isCategoryListShowed,
 					enter = expandVertically(
 						animationSpec = tween(600),
 					),
@@ -357,10 +393,10 @@ fun FinancialScreen(
 						.padding(top = 8.dpScaled)
 				) {
 					CategoryList(
-						categories = Category.values,
+						categories = categories,
 						onItemClick = { category ->
 							financialCategory = category
-							showCategoryList = false
+							isCategoryListShowed = false
 						}
 					)
 				}

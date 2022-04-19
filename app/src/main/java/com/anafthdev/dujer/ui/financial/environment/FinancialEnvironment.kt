@@ -18,11 +18,8 @@ class FinancialEnvironment @Inject constructor(
 	private val appRepository: IAppRepository
 ): IFinancialEnvironment {
 	
-	private val _categories = MutableLiveData(emptyList<Category>())
-	private val categories: LiveData<List<Category>> = _categories
-	
 	override suspend fun getCategories(): Flow<List<Category>> {
-		return categories.asFlow()
+		return appRepository.categoryRepository.getAllCategory()
 	}
 	
 	override suspend fun getFinancial(id: Int, action: (Financial) -> Unit) {
