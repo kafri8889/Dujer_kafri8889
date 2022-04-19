@@ -51,3 +51,30 @@ fun String.replaceFirstChar(
 	
 	return result
 }
+
+fun String.removeFirstAndLastWhitespace(): String {
+	
+	var result = ""
+	var firstCharContainWhitespace = false
+	var lastCharContainWhitespace = false
+	
+	for (i in this.indices) {
+		if (!this[i].isWhitespace()) {
+			firstCharContainWhitespace = true
+			result = this.substring(i, this.length).reversed()
+			break
+		}
+	}
+	
+	result = if (!firstCharContainWhitespace) result.reversed() else result
+	
+	for (i in result.indices) {
+		if (!result[i].isWhitespace()) {
+			lastCharContainWhitespace = true
+			result = result.substring(i, result.length).reversed()
+			break
+		}
+	}
+	
+	return if (lastCharContainWhitespace) result else result.reversed()
+}

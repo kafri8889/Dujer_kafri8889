@@ -41,5 +41,6 @@
     <string name="setting">Setting</string>
     <string name="new_category">New category</string>
     <string name="category_name">Category name</string>
+    <string name="category_name_cannot_be_empty">Category name cannot be empty</string>
 
 </resources>

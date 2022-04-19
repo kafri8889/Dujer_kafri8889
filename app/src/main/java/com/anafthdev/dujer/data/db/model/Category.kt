@@ -25,18 +25,18 @@ data class Category(
 			defaultCategory = false
 		)
 		
-		val shopping = Category(
+		val food = Category(
 			id = 1,
-			name = "Shopping",
-			iconID = R.drawable.ic_shop,
+			name = "Food",
+			iconID = R.drawable.ic_coffee,
 			tint = CategoryTint.tint_1,
 			defaultCategory = true
 		)
 		
-		val food = Category(
+		val shopping = Category(
 			id = 2,
-			name = "Food",
-			iconID = R.drawable.ic_coffee,
+			name = "Shopping",
+			iconID = R.drawable.ic_shop,
 			tint = CategoryTint.tint_2,
 			defaultCategory = true
 		)

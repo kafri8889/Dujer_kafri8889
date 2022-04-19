@@ -25,6 +25,7 @@ import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
@@ -36,15 +37,19 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.anafthdev.dujer.R
 import com.anafthdev.dujer.data.db.model.Category
+import com.anafthdev.dujer.foundation.extension.removeFirstAndLastWhitespace
 import com.anafthdev.dujer.foundation.window.dpScaled
 import com.anafthdev.dujer.foundation.window.spScaled
+import com.anafthdev.dujer.model.CategoryTint
 import com.anafthdev.dujer.ui.category.component.SwipeableCategory
 import com.anafthdev.dujer.ui.theme.Inter
 import com.anafthdev.dujer.ui.theme.Typography
 import com.anafthdev.dujer.ui.theme.black04
 import com.anafthdev.dujer.ui.theme.shapes
 import com.anafthdev.dujer.uicomponent.TopAppBar
+import com.anafthdev.dujer.util.AppUtil.toast
 import kotlinx.coroutines.launch
+import kotlin.random.Random
 
 @OptIn(ExperimentalMaterialApi::class, ExperimentalComposeUiApi::class)
 @Composable
@@ -52,8 +57,7 @@ fun CategoryScreen(
 	navController: NavController
 ) {
 	
-	val ime = WindowInsets.Companion.ime
-	val density = LocalDensity.current
+	val context = LocalContext.current
 	val focusManager = LocalFocusManager.current
 	val keyboardController = LocalSoftwareKeyboardController.current
 	
@@ -132,7 +136,25 @@ fun CategoryScreen(
 				
 				IconButton(
 					onClick = {
-						// TODO: Insert new category
+						when {
+							newCategoryName.isBlank() -> context.getString(
+								R.string.category_name_cannot_be_empty
+							).toast(context)
+							else -> {
+								categoryViewModel.insertCategory(
+									Category(
+										id = Random.nextInt(),
+										name = newCategoryName.removeFirstAndLastWhitespace(),
+										iconID = R.drawable.ic_finger_scan,
+										tint = CategoryTint.getRandomTint()
+									)
+								)
+								
+								scope.launch {
+									sheetState.hide()
+								}
+							}
+						}
 					},
 					modifier = Modifier
 						.align(Alignment.CenterEnd)
@@ -237,7 +259,9 @@ fun CategoryScreen(
 					SwipeableCategory(
 						category = category,
 						onCanDelete = {},
-						onDismissToEnd = {},
+						onDismissToEnd = {
+							categoryViewModel.deleteCategory(category)
+						},
 						modifier = Modifier
 							.padding(
 								vertical = 4.dpScaled,

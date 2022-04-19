@@ -35,6 +35,12 @@ class CategoryViewModel @Inject constructor(
 		}
 	}
 	
+	fun deleteCategory(category: Category) {
+		viewModelScope.launch(environment.dispatcher) {
+			environment.deleteCategory(category)
+		}
+	}
+	
 	fun insertCategory(category: Category) {
 		viewModelScope.launch(environment.dispatcher) {
 			environment.insertCategory(category)
