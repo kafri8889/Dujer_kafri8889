@@ -13,6 +13,7 @@ import androidx.core.view.WindowCompat
 import androidx.lifecycle.lifecycleScope
 import com.anafthdev.dujer.BuildConfig
 import com.anafthdev.dujer.data.datastore.AppDatastore
+import com.anafthdev.dujer.foundation.localized.LocalizedActivity
 import com.anafthdev.dujer.ui.app.DujerApp
 import com.anafthdev.dujer.ui.theme.DujerTheme
 import dagger.hilt.android.AndroidEntryPoint
@@ -23,7 +24,7 @@ import timber.log.Timber
 import javax.inject.Inject
 
 @AndroidEntryPoint
-class MainActivity : AppCompatActivity() {
+class MainActivity : LocalizedActivity() {
 	
 	@Inject lateinit var appDatastore: AppDatastore
 	

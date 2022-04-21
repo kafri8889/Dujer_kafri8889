@@ -8,7 +8,7 @@ import javax.inject.Inject
 @HiltViewModel
 class DujerViewModel @Inject constructor(
 	dujerEnvironment: IDujerEnvironment
-): StatefulViewModel<DujerState, IDujerEnvironment>(DujerState(), dujerEnvironment) {
+): StatefulViewModel<DujerState, Unit, IDujerEnvironment>(DujerState(), dujerEnvironment) {
 	
 	init {
 	

@@ -34,12 +34,14 @@ fun IncomeCard(
 	
 	Card(
 		shape = large_shape,
-		containerColor = income_card_background,
 		onClick = onClick,
 		elevation = CardDefaults.cardElevation(
 			defaultElevation = 0.dp,
 			focusedElevation = 0.dp,
 			hoveredElevation = 0.dp
+		),
+		colors = CardDefaults.cardColors(
+			containerColor = income_card_background
 		),
 		modifier = modifier
 			.fillMaxWidth()

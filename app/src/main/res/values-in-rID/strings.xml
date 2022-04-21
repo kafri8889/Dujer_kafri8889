@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="dashboard">Dasbor</string>
+    <string name="available_balance">Saldo tersedia</string>
+    <string name="see_details">See Details</string>
+    <string name="cash">Cash</string>
+    <string name="income">Pemasukan</string>
+    <string name="expenses">Pengeluaran</string>
+    <string name="my_spending">Pengeluaran saya</string>
+    <string name="my_income">Pemasukan saya</string>
+    <string name="income_for">Pemasukan untuk %1$s</string>
+    <string name="expenses_for">Pengeluaran untuk %1$s</string>
+    <string name="your_income">Pemasukan kamu</string>
+    <string name="your_expenses">Pengeluaran kamu</string>
+    <string name="add_income">Tambah pemasukan</string>
+    <string name="add_expenses">Tambah pengeluaran</string>
+    <string name="_new">Baru</string>
+    <string name="edit">Edit</string>
+    <string name="title">Judul</string>
+    <string name="amount">Jumlah</string>
+    <string name="category">Kategori</string>
+    <string name="type">Tipe</string>
+    <string name="date">Tanggal</string>
+    <string name="save">Simpan</string>
+    <string name="title_cannot_be_empty">Judul tidak boleh kosong</string>
+    <string name="amount_cannot_be_empty">Jumlah tidak boleh kosong</string>
+    <string name="category_cannot_be_empty">Kategori tidak boleh kosong</string>
+    <string name="category_summary">Tambah atau hapus kategori</string>
+    <string name="biometric_authentication">Otentikasi biometrik</string>
+    <string name="biometric_authentication_summary">Gunakan otentikasi biometrik</string>
+    <string name="bio_auth_title">Verifikasi</string>
+    <string name="bio_auth_description">Verifikasi bahwa ini adalah Anda</string>
+    <string name="auth_failed">Otentikasi gagal</string>
+    <string name="add_fingerprint_first">Tambah sidik jari terlebih dahulu</string>
+    <string name="no_fp_sensor_detected">Sensor sidik jari tidak terdeteksi</string>
+    <string name="session_time_out">Waktu sesi habis</string>
+    <string name="security">Keamanan</string>
+    <string name="configuration">Konfigurasi</string>
+    <string name="currency">Mata uang</string>
+    <string name="setting">Pengaturan</string>
+    <string name="language">Bahasa</string>
+    <string name="language_summary">Pilih bahasa yang kamu gunakan</string>
+    <string name="choose_your_language">Pilih bahasa mu</string>
+    <string name="new_category">Kategori baru</string>
+    <string name="category_name">Nama kategori</string>
+    <string name="category_name_cannot_be_empty">Nama kategori tidak boleh kosong</string>
+
+</resources>

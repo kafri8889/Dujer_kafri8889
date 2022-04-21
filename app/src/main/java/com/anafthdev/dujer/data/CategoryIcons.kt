@@ -14,6 +14,8 @@ object CategoryIcons {
 	const val salary = R.drawable.ic_salary
 	const val health = R.drawable.ic_health
 	const val mobile = R.drawable.ic_mobile
+	const val bitcoin = R.drawable.ic_bitcoin
+	const val blogger = R.drawable.ic_blogger
 	const val electronic = R.drawable.ic_electronic
 	const val investment = R.drawable.ic_investment
 	const val moneyReceive = R.drawable.ic_money_receive
@@ -34,6 +36,8 @@ object CategoryIcons {
 		salary,
 		health,
 		mobile,
+		bitcoin,
+		blogger,
 		electronic,
 		investment,
 		moneyReceive,

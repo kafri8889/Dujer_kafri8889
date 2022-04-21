@@ -12,7 +12,7 @@ import javax.inject.Inject
 @HiltViewModel
 class IncomeExpenseViewModel @Inject constructor(
 	incomeExpenseEnvironment: IIncomeExpenseEnvironment
-): StatefulViewModel<IncomeExpenseState, IIncomeExpenseEnvironment>(IncomeExpenseState(), incomeExpenseEnvironment) {
+): StatefulViewModel<IncomeExpenseState, Unit, IIncomeExpenseEnvironment>(IncomeExpenseState(), incomeExpenseEnvironment) {
 	
 	init {
 		viewModelScope.launch(environment.dispatcher) {

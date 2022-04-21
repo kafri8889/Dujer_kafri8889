@@ -34,12 +34,14 @@ fun ExpenseCard(
 	
 	Card(
 		shape = large_shape,
-		containerColor = expense_card_background,
 		onClick = onClick,
 		elevation = CardDefaults.cardElevation(
 			defaultElevation = 0.dp,
 			focusedElevation = 0.dp,
 			hoveredElevation = 0.dp
+		),
+		colors = CardDefaults.cardColors(
+			containerColor = expense_card_background
 		),
 		modifier = modifier
 			.fillMaxWidth()

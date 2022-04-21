@@ -15,7 +15,7 @@ import javax.inject.Inject
 @HiltViewModel
 class FinancialViewModel @Inject constructor(
 	financialEnvironment: IFinancialEnvironment
-): StatefulViewModel<FinancialState, IFinancialEnvironment>(FinancialState(), financialEnvironment) {
+): StatefulViewModel<FinancialState, Unit, IFinancialEnvironment>(FinancialState(), financialEnvironment) {
 	
 	val deviceCurrency: Currency = Currency.getInstance(AppUtil.deviceLocale)
 	

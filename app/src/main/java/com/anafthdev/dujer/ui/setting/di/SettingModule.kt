@@ -1,22 +1,18 @@
 package com.anafthdev.dujer.ui.setting.di
 
-import android.content.Context
-import com.anafthdev.dujer.data.datastore.di.DatastoreModule
-import com.anafthdev.dujer.ui.setting.SettingViewModel
+import com.anafthdev.dujer.ui.setting.environment.ISettingEnvironment
+import com.anafthdev.dujer.ui.setting.environment.SettingEnvironment
+import dagger.Binds
 import dagger.Module
-import dagger.Provides
 import dagger.hilt.InstallIn
-import dagger.hilt.android.qualifiers.ApplicationContext
-import dagger.hilt.components.SingletonComponent
+import dagger.hilt.android.components.ViewModelComponent
 
 @Module
-@InstallIn(SingletonComponent::class)
-object SettingModule {
+@InstallIn(ViewModelComponent::class)
+abstract class SettingModule {
 	
-	@Provides
-	fun provideSettingViewModel(
-		@ApplicationContext context: Context
-	): SettingViewModel = SettingViewModel(
-		DatastoreModule.provideAppDatastore(context)
-	)
+	@Binds
+	abstract fun provideEnvironment(
+		settingEnvironment: SettingEnvironment
+	): ISettingEnvironment
 }

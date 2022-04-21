@@ -37,10 +37,12 @@ fun FinancialCard(
 	
 	Card(
 		shape = large_shape,
-		containerColor = Color.White,
 		onClick = onClick,
 		elevation = CardDefaults.cardElevation(
 			defaultElevation = 1.dp
+		),
+		colors = CardDefaults.cardColors(
+			containerColor = Color.White
 		),
 		modifier = modifier
 	) {

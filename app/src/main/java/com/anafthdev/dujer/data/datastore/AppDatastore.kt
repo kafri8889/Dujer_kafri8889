@@ -6,6 +6,7 @@ import android.os.Looper
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.*
 import androidx.datastore.preferences.preferencesDataStore
+import com.anafthdev.dujer.data.preference.Language
 import com.anafthdev.dujer.data.preference.Preference
 import com.anafthdev.dujer.foundation.extension.get
 import com.anafthdev.dujer.model.Currency
@@ -18,10 +19,6 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 class AppDatastore @Inject constructor(private val context: Context) {
-	
-	private val userBalance = doublePreferencesKey(Preference.USER_BALANCE)
-	private val currentCurrency = stringPreferencesKey(Preference.CURRENT_CURRENCY)
-	private val useBioAuth = booleanPreferencesKey(Preference.USE_BIO_AUTH)
 	
 	private val scope = CoroutineScope(Job() + Dispatchers.IO)
 	private fun postAction(action: () -> Unit) = Handler(Looper.getMainLooper()).post { action() }
@@ -50,6 +47,14 @@ class AppDatastore @Inject constructor(private val context: Context) {
 		}.invokeOnCompletion { postAction(action) }
 	}
 	
+	fun setLanguage(lang: Language, action: () -> Unit) {
+		scope.launch {
+			context.datastore.edit { preferences ->
+				preferences[language] = lang.ordinal
+			}
+		}.invokeOnCompletion { postAction(action) }
+	}
+	
 	val getUserBalance: Flow<Double> = context.datastore.data.map { preferences ->
 		preferences[userBalance] ?: 0.0
 	}
@@ -64,7 +69,16 @@ class AppDatastore @Inject constructor(private val context: Context) {
 		preferences[useBioAuth] ?: false
 	}
 	
+	val getLanguage: Flow<Language> = context.datastore.data.map { preferences ->
+		Language.values()[preferences[language] ?: Language.ENGLISH.ordinal]
+	}
+	
 	companion object {
 		val Context.datastore: DataStore<Preferences> by preferencesDataStore("app_datastore")
+		
+		val userBalance = doublePreferencesKey(Preference.USER_BALANCE)
+		val currentCurrency = stringPreferencesKey(Preference.CURRENT_CURRENCY)
+		val useBioAuth = booleanPreferencesKey(Preference.USE_BIO_AUTH)
+		val language = intPreferencesKey(Preference.LANGUAGE)
 	}
 }

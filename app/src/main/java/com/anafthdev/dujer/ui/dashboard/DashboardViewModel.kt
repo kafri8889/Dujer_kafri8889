@@ -12,7 +12,7 @@ import javax.inject.Inject
 @HiltViewModel
 class DashboardViewModel @Inject constructor(
 	dashboardEnvironment: IDashboardEnvironment
-): StatefulViewModel<DashboardState, IDashboardEnvironment>(DashboardState(), dashboardEnvironment) {
+): StatefulViewModel<DashboardState, Unit, IDashboardEnvironment>(DashboardState(), dashboardEnvironment) {
 	
 	init {
 		getUserBalanceAndCurrentCurrency()

@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">Dujer</string>
+    <string name="app_name" translatable="false">Dujer</string>
 
     <string name="dashboard">Dashboard</string>
     <string name="available_balance">Available balance</string>
@@ -39,6 +39,9 @@
     <string name="configuration">Configuration</string>
     <string name="currency">Currency</string>
     <string name="setting">Setting</string>
+    <string name="language">Language</string>
+    <string name="language_summary">Choose the language you use</string>
+    <string name="choose_your_language">Choose your language</string>
     <string name="new_category">New category</string>
     <string name="category_name">Category name</string>
     <string name="category_name_cannot_be_empty">Category name cannot be empty</string>

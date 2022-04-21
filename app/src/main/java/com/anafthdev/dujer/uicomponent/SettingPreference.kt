@@ -7,6 +7,8 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -28,142 +30,17 @@ fun SettingPreference(
 ) {
 	when (preference.type) {
 		SettingPreference.PreferenceType.BASIC -> {
-			Row(
-				verticalAlignment = Alignment.CenterVertically,
-				modifier = Modifier
-					.fillMaxWidth()
-					.height(64.dpScaled)
-					.clickable { onClick(null) }
-			) {
-				if (preference.iconResId != null) {
-					Icon(
-						painter = painterResource(id = preference.iconResId),
-						contentDescription = null,
-						modifier = Modifier
-							.size(24.dpScaled)
-							.weight(0.12f)
-					)
-				}
-				
-				Column(
-					verticalArrangement = Arrangement.Center,
-					modifier = Modifier
-						.weight(0.6f)
-				) {
-					Text(
-						text = preference.title,
-						style = Typography.titleMedium.copy(
-							fontWeight = FontWeight.Medium,
-							fontSize = Typography.titleMedium.fontSize.spScaled
-						),
-						modifier = Modifier
-							.padding(
-								start = if (preference.iconResId != null) 0.dpScaled else 12.dpScaled
-							)
-					)
-					
-					if (preference.summary.isNotBlank()) {
-						Text(
-							text = preference.summary,
-							maxLines = 1,
-							overflow = TextOverflow.Ellipsis,
-							style = Typography.titleSmall.copy(
-								color = Color.Gray,
-								fontWeight = FontWeight.Normal,
-								fontSize = Typography.titleSmall.fontSize.spScaled
-							),
-							modifier = Modifier
-								.padding(
-									start = if (preference.iconResId != null) 0.dpScaled else 12.dpScaled
-								)
-						)
-					}
-				}
-				
-				Box(
-					contentAlignment = Alignment.CenterEnd,
-					modifier = Modifier
-						.padding(end = 12.dpScaled)
-						.weight(0.28f)
-				) {
-					if (preference.showValue) {
-						Text(
-							text = preference.value.toString(),
-							textAlign = TextAlign.End,
-							style = Typography.titleMedium.copy(
-								fontSize = 15.spScaled,
-								fontWeight = FontWeight.Normal,
-								color = MaterialTheme.colorScheme.primary
-							)
-						)
-					}
-					
-				}
-			}
+			BasicPreference(
+				preference = preference,
+				onClick = onClick
+			)
 		}
 		
 		SettingPreference.PreferenceType.SWITCH -> {
-			Row(
-				verticalAlignment = Alignment.CenterVertically,
-				modifier = Modifier
-					.fillMaxWidth()
-					.height(64.dpScaled)
-					.clickable {
-						onClick(!(preference.value as Boolean))
-					}
-			) {
-				if (preference.iconResId != null) {
-					Icon(
-						painter = painterResource(id = preference.iconResId),
-						contentDescription = null,
-						modifier = Modifier
-							.size(24.dpScaled)
-							.weight(0.12f)
-					)
-				}
-				
-				Column(
-					verticalArrangement = Arrangement.Center,
-					modifier = Modifier
-						.weight(0.6f)
-				) {
-					Text(
-						text = preference.title,
-						style = Typography.titleMedium.copy(
-							fontWeight = FontWeight.Medium,
-							fontSize = Typography.titleMedium.fontSize.spScaled
-						),
-						modifier = Modifier
-							.padding(
-								start = if (preference.iconResId != null) 0.dpScaled else 12.dpScaled
-							)
-					)
-					
-					if (preference.summary.isNotBlank()) {
-						Text(
-							text = preference.summary,
-							style = Typography.titleSmall.copy(
-								color = Color.Gray,
-								fontWeight = FontWeight.Normal,
-								fontSize = Typography.titleSmall.fontSize.spScaled
-							),
-							modifier = Modifier
-								.padding(
-									start = if (preference.iconResId != null) 0.dpScaled else 12.dpScaled
-								)
-						)
-					}
-				}
-				
-				Switch(
-					checked = preference.value as Boolean,
-					onCheckedChange = {
-						onClick(!(preference.value as Boolean))
-					},
-					modifier = Modifier
-						.weight(0.28f)
-				)
-			}
+			SwitchPreference(
+				preference = preference,
+				onClick = onClick
+			)
 		}
 		SettingPreference.PreferenceType.CUSTOM -> {
 		
@@ -215,49 +92,154 @@ fun SettingPreferences(
 }
 
 @Composable
-fun CustomPreference(
-	customPreference: SettingPreference.Custom
+internal fun BasicPreference(
+	preference: SettingPreference,
+	onClick: (Any?) -> Unit
 ) {
 	Row(
 		verticalAlignment = Alignment.CenterVertically,
 		modifier = Modifier
 			.fillMaxWidth()
 			.height(64.dpScaled)
-			.clickable { customPreference.onClick() }
+			.clickable { onClick(null) }
 	) {
-		if (customPreference.iconContent != null) {
-			Column(
-				horizontalAlignment = Alignment.CenterHorizontally,
-				verticalArrangement = Arrangement.Center,
+		if (preference.iconResId != null) {
+			Icon(
+				painter = painterResource(id = preference.iconResId),
+				contentDescription = null,
 				modifier = Modifier
-					.weight(0.12f)
-			) {
-				customPreference.iconContent.invoke(this)
-			}
+					.size(24.dpScaled)
+					.weight(
+						weight = 0.12f
+					)
+			)
 		}
 		
 		Column(
 			verticalArrangement = Arrangement.Center,
 			modifier = Modifier
-				.padding(
-					start = if (customPreference.iconContent != null) 0.dpScaled else 12.dpScaled
+				.weight(
+					weight = if (preference.showValue) 0.6f else 0.88f
 				)
-				.weight(0.6f)
 		) {
-			customPreference.titleContent(this)
+			Text(
+				text = preference.title,
+				style = Typography.titleMedium.copy(
+					fontWeight = FontWeight.Medium,
+					fontSize = Typography.titleMedium.fontSize.spScaled
+				),
+				modifier = Modifier
+					.padding(
+						start = if (preference.iconResId != null) 0.dpScaled else 12.dpScaled
+					)
+			)
+			
+			if (preference.summary.isNotBlank()) {
+				Text(
+					text = preference.summary,
+					maxLines = 1,
+					overflow = TextOverflow.Ellipsis,
+					style = Typography.titleSmall.copy(
+						color = Color.Gray,
+						fontWeight = FontWeight.Normal,
+						fontSize = Typography.titleSmall.fontSize.spScaled
+					),
+					modifier = Modifier
+						.padding(
+							start = if (preference.iconResId != null) 0.dpScaled else 12.dpScaled
+						)
+				)
+			}
 		}
 		
-		
-		if (customPreference.valueContent != null) {
-			Column(
-				horizontalAlignment = Alignment.CenterHorizontally,
-				verticalArrangement = Arrangement.Center,
+		if (preference.showValue) {
+			Box(
+				contentAlignment = Alignment.CenterEnd,
 				modifier = Modifier
 					.padding(end = 12.dpScaled)
 					.weight(0.28f)
 			) {
-				customPreference.valueContent.invoke(this)
+				Text(
+					text = preference.value.toString(),
+					textAlign = TextAlign.End,
+					style = Typography.titleMedium.copy(
+						fontSize = 15.spScaled,
+						fontWeight = FontWeight.Normal,
+						color = MaterialTheme.colorScheme.primary
+					)
+				)
 			}
 		}
+	}
+}
+
+@Composable
+internal fun SwitchPreference(
+	preference: SettingPreference,
+	onClick: (Any?) -> Unit
+) {
+	
+	val isChecked by rememberUpdatedState(newValue = preference.value as Boolean)
+	
+	Row(
+		verticalAlignment = Alignment.CenterVertically,
+		modifier = Modifier
+			.fillMaxWidth()
+			.height(64.dpScaled)
+			.clickable {
+				onClick(!isChecked)
+			}
+	) {
+		if (preference.iconResId != null) {
+			Icon(
+				painter = painterResource(id = preference.iconResId),
+				contentDescription = null,
+				modifier = Modifier
+					.size(24.dpScaled)
+					.weight(0.12f)
+			)
+		}
+		
+		Column(
+			verticalArrangement = Arrangement.Center,
+			modifier = Modifier
+				.weight(0.6f)
+		) {
+			Text(
+				text = preference.title,
+				style = Typography.titleMedium.copy(
+					fontWeight = FontWeight.Medium,
+					fontSize = Typography.titleMedium.fontSize.spScaled
+				),
+				modifier = Modifier
+					.padding(
+						start = if (preference.iconResId != null) 0.dpScaled else 12.dpScaled
+					)
+			)
+			
+			if (preference.summary.isNotBlank()) {
+				Text(
+					text = preference.summary,
+					style = Typography.titleSmall.copy(
+						color = Color.Gray,
+						fontWeight = FontWeight.Normal,
+						fontSize = Typography.titleSmall.fontSize.spScaled
+					),
+					modifier = Modifier
+						.padding(
+							start = if (preference.iconResId != null) 0.dpScaled else 12.dpScaled
+						)
+				)
+			}
+		}
+		
+		Switch(
+			checked = isChecked,
+			onCheckedChange = {
+				onClick(!isChecked)
+			},
+			modifier = Modifier
+				.weight(0.28f)
+		)
 	}
 }

@@ -12,7 +12,7 @@ import javax.inject.Inject
 @HiltViewModel
 class CategoryViewModel @Inject constructor(
 	categoryEnvironment: ICategoryEnvironment
-): StatefulViewModel<CategoryState, ICategoryEnvironment>(CategoryState(), categoryEnvironment) {
+): StatefulViewModel<CategoryState, Unit, ICategoryEnvironment>(CategoryState(), categoryEnvironment) {
 	
 	init {
 		viewModelScope.launch(environment.dispatcher) {

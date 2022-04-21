@@ -37,9 +37,11 @@ fun BalanceCard(
 	
 	Card(
 		shape = large_shape,
-		containerColor = balance_card_background,
 		elevation = CardDefaults.cardElevation(
 			defaultElevation = 4.dp
+		),
+		colors = CardDefaults.cardColors(
+			containerColor = balance_card_background
 		),
 		modifier = Modifier
 			.fillMaxWidth()

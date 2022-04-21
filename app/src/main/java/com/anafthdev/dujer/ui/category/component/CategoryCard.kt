@@ -28,9 +28,11 @@ fun CategoryCard(
 	
 	Card(
 		shape = large_shape,
-		containerColor = Color.White,
 		elevation = CardDefaults.cardElevation(
 			defaultElevation = 1.dp
+		),
+		colors = CardDefaults.cardColors(
+			containerColor = Color.White
 		),
 		modifier = modifier
 	) {
