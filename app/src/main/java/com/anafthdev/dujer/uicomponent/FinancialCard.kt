@@ -11,6 +11,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.anafthdev.dujer.data.FinancialType
 import com.anafthdev.dujer.data.db.model.Financial
@@ -112,7 +113,9 @@ fun FinancialCard(
 					)
 					
 					Text(
-						text = financial.type.name,
+						text = financial.category.name,
+						maxLines = 1,
+						overflow = TextOverflow.Ellipsis,
 						style = Typography.labelSmall.copy(
 							color = Color(0xFF4A5568),
 							fontWeight = FontWeight.Medium,

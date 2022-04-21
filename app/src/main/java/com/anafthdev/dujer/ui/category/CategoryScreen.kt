@@ -2,9 +2,12 @@ package com.anafthdev.dujer.ui.category
 
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.CornerSize
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
@@ -23,12 +26,16 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
+import androidx.compose.ui.focus.onFocusChanged
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
@@ -36,8 +43,14 @@ import androidx.compose.ui.zIndex
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.anafthdev.dujer.R
+import com.anafthdev.dujer.data.CategoryIcons
 import com.anafthdev.dujer.data.db.model.Category
+import com.anafthdev.dujer.foundation.common.keyboard.isHide
+import com.anafthdev.dujer.foundation.common.keyboard.isShowed
+import com.anafthdev.dujer.foundation.common.keyboard.keyboardAsState
+import com.anafthdev.dujer.foundation.extension.lastIndexOf
 import com.anafthdev.dujer.foundation.extension.removeFirstAndLastWhitespace
+import com.anafthdev.dujer.foundation.extension.toDp
 import com.anafthdev.dujer.foundation.window.dpScaled
 import com.anafthdev.dujer.foundation.window.spScaled
 import com.anafthdev.dujer.model.CategoryTint
@@ -46,8 +59,13 @@ import com.anafthdev.dujer.ui.theme.Inter
 import com.anafthdev.dujer.ui.theme.Typography
 import com.anafthdev.dujer.ui.theme.black04
 import com.anafthdev.dujer.ui.theme.shapes
+import com.anafthdev.dujer.uicomponent.OutlinedTextFieldCounter
 import com.anafthdev.dujer.uicomponent.TopAppBar
 import com.anafthdev.dujer.util.AppUtil.toast
+import com.google.accompanist.flowlayout.FlowCrossAxisAlignment
+import com.google.accompanist.flowlayout.FlowMainAxisAlignment
+import com.google.accompanist.flowlayout.FlowRow
+import com.google.accompanist.flowlayout.MainAxisAlignment
 import kotlinx.coroutines.launch
 import kotlin.random.Random
 
@@ -64,16 +82,16 @@ fun CategoryScreen(
 	val categoryViewModel = hiltViewModel<CategoryViewModel>()
 	
 	val scope = rememberCoroutineScope()
+	val sheetState = rememberModalBottomSheetState(
+		initialValue = ModalBottomSheetValue.Hidden
+	)
 	
 	val state by categoryViewModel.state.collectAsState()
 	
 	val categories = state.categories
 	
-	val sheetState = rememberModalBottomSheetState(
-		initialValue = ModalBottomSheetValue.Hidden
-	)
-	
 	var newCategoryName by remember { mutableStateOf("") }
+	var selectedCategoryIcon by remember { mutableStateOf(CategoryIcons.other) }
 	val categoryNameFocusRequester by remember { mutableStateOf(FocusRequester()) }
 	
 	DisposableEffect(
@@ -105,100 +123,147 @@ fun CategoryScreen(
 			bottomStart = CornerSize(0.dpScaled)
 		),
 		sheetContent = {
-			Box(
+			Column(
 				modifier = Modifier
-					.fillMaxWidth()
-			) {
-				IconButton(
-					onClick = {
-						scope.launch {
-							sheetState.hide()
-						}
-					},
-					modifier = Modifier
-						.align(Alignment.CenterStart)
-				) {
-					Icon(
-						imageVector = Icons.Rounded.Close,
-						contentDescription = null
-					)
-				}
-				
-				Text(
-					text = stringResource(id = R.string.new_category),
-					style = Typography.bodyLarge.copy(
-						fontWeight = FontWeight.Medium,
-						fontSize = Typography.bodyLarge.fontSize.spScaled
-					),
-					modifier = Modifier
-						.align(Alignment.Center)
-				)
-				
-				IconButton(
-					onClick = {
-						when {
-							newCategoryName.isBlank() -> context.getString(
-								R.string.category_name_cannot_be_empty
-							).toast(context)
-							else -> {
-								categoryViewModel.insertCategory(
-									Category(
-										id = Random.nextInt(),
-										name = newCategoryName.removeFirstAndLastWhitespace(),
-										iconID = R.drawable.ic_finger_scan,
-										tint = CategoryTint.getRandomTint()
-									)
-								)
-								
-								scope.launch {
-									sheetState.hide()
-								}
-							}
-						}
-					},
-					modifier = Modifier
-						.align(Alignment.CenterEnd)
-				) {
-					Icon(
-						imageVector = Icons.Rounded.Check,
-						contentDescription = null
-					)
-				}
-			}
-			
-			OutlinedTextField(
-				singleLine = true,
-				value = newCategoryName,
-				onValueChange = { s ->
-					newCategoryName = s
-				},
-				textStyle = LocalTextStyle.current.copy(
-					fontFamily = Inter
-				),
-				keyboardOptions = KeyboardOptions(
-					imeAction = ImeAction.Done
-				),
-				keyboardActions = KeyboardActions(
-					onDone = {
-						scope.launch {
-							sheetState.hide()
-						}
-					}
-				),
-				placeholder = {
-					Text(stringResource(id = R.string.new_category))
-				},
-				modifier = Modifier
-					.padding(
-						top = 8.dpScaled,
-						end = 16.dpScaled,
-						start = 16.dpScaled,
-						bottom = 16.dpScaled
-					)
 					.fillMaxWidth()
 					.imePadding()
-					.focusRequester(categoryNameFocusRequester)
-			)
+			) {
+				Box(
+					modifier = Modifier
+						.fillMaxWidth()
+				) {
+					IconButton(
+						onClick = {
+							scope.launch {
+								sheetState.hide()
+							}
+						},
+						modifier = Modifier
+							.align(Alignment.CenterStart)
+					) {
+						Icon(
+							imageVector = Icons.Rounded.Close,
+							contentDescription = null
+						)
+					}
+					
+					Text(
+						text = stringResource(id = R.string.new_category),
+						style = Typography.bodyLarge.copy(
+							fontWeight = FontWeight.Medium,
+							fontSize = Typography.bodyLarge.fontSize.spScaled
+						),
+						modifier = Modifier
+							.align(Alignment.Center)
+					)
+					
+					IconButton(
+						onClick = {
+							when {
+								newCategoryName.isBlank() -> context.getString(
+									R.string.category_name_cannot_be_empty
+								).toast(context)
+								else -> {
+									categoryViewModel.insertCategory(
+										Category(
+											id = Random.nextInt(),
+											name = newCategoryName.removeFirstAndLastWhitespace(),
+											iconID = selectedCategoryIcon,
+											tint = CategoryTint.getRandomTint()
+										)
+									)
+									
+									scope.launch {
+										sheetState.hide()
+									}
+								}
+							}
+						},
+						modifier = Modifier
+							.align(Alignment.CenterEnd)
+					) {
+						Icon(
+							imageVector = Icons.Rounded.Check,
+							contentDescription = null
+						)
+					}
+				}
+				
+				OutlinedTextFieldCounter(
+					singleLine = true,
+					maxCounter = 30,
+					value = newCategoryName,
+					onValueChange = { s ->
+						newCategoryName = s
+					},
+					textStyle = LocalTextStyle.current.copy(
+						fontFamily = Inter
+					),
+					keyboardOptions = KeyboardOptions(
+						imeAction = ImeAction.Done
+					),
+					keyboardActions = KeyboardActions(
+						onDone = {
+							scope.launch {
+								sheetState.hide()
+							}
+						}
+					),
+					placeholder = {
+						Text(stringResource(id = R.string.new_category))
+					},
+					modifier = Modifier
+						.padding(
+							top = 8.dpScaled,
+							end = 16.dpScaled,
+							start = 16.dpScaled,
+							bottom = 16.dpScaled
+						)
+						.fillMaxWidth()
+						.focusRequester(categoryNameFocusRequester)
+				)
+				
+				FlowRow(
+					lastLineMainAxisAlignment = FlowMainAxisAlignment.Center,
+					crossAxisAlignment = FlowCrossAxisAlignment.Center,
+					mainAxisAlignment = MainAxisAlignment.Center,
+					modifier = Modifier
+						.padding(
+							top = 8.dpScaled,
+							end = 16.dpScaled,
+							start = 16.dpScaled,
+							bottom = 16.dpScaled
+						)
+						.fillMaxWidth()
+				) {
+					for (icon in CategoryIcons.values) {
+						Box(
+							contentAlignment = Alignment.Center,
+							modifier = Modifier
+								.padding(4.dpScaled)
+								.size(48.dpScaled)
+								.clip(shapes.small)
+								.background(
+									color = if (selectedCategoryIcon == icon) MaterialTheme.colorScheme.primaryContainer
+									else Color.Transparent
+								)
+								.border(
+									width = 1.dpScaled,
+									color = MaterialTheme.colorScheme.outline,
+									shape = shapes.small
+								)
+								.clickable {
+									selectedCategoryIcon = icon
+								}
+						) {
+							Icon(
+								painter = painterResource(id = icon),
+								contentDescription = null
+							)
+						}
+					}
+				}
+			}
 		}
 	) {
 		Box(
@@ -252,10 +317,10 @@ fun CategoryScreen(
 					}
 				}
 				
-				items(
+				itemsIndexed(
 					items = categories,
-					key = { item: Category -> item.id }
-				) { category ->
+					key = { _: Int, item: Category -> item.id }
+				) { i, category ->
 					SwipeableCategory(
 						category = category,
 						onCanDelete = {},
@@ -264,8 +329,10 @@ fun CategoryScreen(
 						},
 						modifier = Modifier
 							.padding(
-								vertical = 4.dpScaled,
-								horizontal = 8.dpScaled
+								start = 8.dpScaled,
+								end = 8.dpScaled,
+								top = 4.dpScaled,
+								bottom = if (i.lastIndexOf(categories)) 96.dpScaled else 4.dpScaled,
 							)
 					)
 				}

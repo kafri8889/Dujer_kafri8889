@@ -38,3 +38,33 @@ fun Color.lightenColor(
 		blue = this.blue + (1 - this.blue) * factor
 	)
 }
+
+enum class ColorSchemeKeyTokens {
+	Background,
+	Error,
+	ErrorContainer,
+	InverseOnSurface,
+	InversePrimary,
+	InverseSurface,
+	OnBackground,
+	OnError,
+	OnErrorContainer,
+	OnPrimary,
+	OnPrimaryContainer,
+	OnSecondary,
+	OnSecondaryContainer,
+	OnSurface,
+	OnSurfaceVariant,
+	OnTertiary,
+	OnTertiaryContainer,
+	Outline,
+	Primary,
+	PrimaryContainer,
+	Secondary,
+	SecondaryContainer,
+	Surface,
+	SurfaceTint,
+	SurfaceVariant,
+	Tertiary,
+	TertiaryContainer,
+}

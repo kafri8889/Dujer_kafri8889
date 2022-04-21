@@ -1,8 +1,10 @@
 package com.anafthdev.dujer.ui.financial.component
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
+import androidx.compose.material3.Divider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -19,6 +21,7 @@ import com.anafthdev.dujer.foundation.window.spScaled
 import com.anafthdev.dujer.ui.theme.Typography
 import com.anafthdev.dujer.ui.theme.large_shape
 import com.anafthdev.dujer.ui.theme.medium_shape
+import com.anafthdev.dujer.ui.theme.shapes
 
 @Composable
 fun CategoryList(
@@ -29,8 +32,12 @@ fun CategoryList(
 	Column(
 		modifier = Modifier
 			.fillMaxWidth()
-			.clip(large_shape)
-			.background(MaterialTheme.colorScheme.secondaryContainer)
+			.clip(shapes.large)
+			.border(
+				width = 1.dpScaled,
+				color = MaterialTheme.colorScheme.outline,
+				shape = shapes.large
+			)
 	) {
 		categories.forEach { category ->
 			Row(
