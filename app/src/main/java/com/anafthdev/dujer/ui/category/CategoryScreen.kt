@@ -47,6 +47,7 @@ import com.anafthdev.dujer.foundation.extension.removeFirstAndLastWhitespace
 import com.anafthdev.dujer.foundation.window.dpScaled
 import com.anafthdev.dujer.foundation.window.spScaled
 import com.anafthdev.dujer.model.CategoryTint
+import com.anafthdev.dujer.ui.app.DujerViewModel
 import com.anafthdev.dujer.ui.category.component.SwipeableCategory
 import com.anafthdev.dujer.ui.category.data.CategoryAction
 import com.anafthdev.dujer.ui.theme.Inter
@@ -68,7 +69,8 @@ import kotlin.random.Random
 fun CategoryScreen(
 	id: Int = Category.default.id,
 	action: String = CategoryAction.NOTHING,
-	navController: NavController
+	navController: NavController,
+	dujerViewModel: DujerViewModel
 ) {
 	
 	val context = LocalContext.current
@@ -102,19 +104,23 @@ fun CategoryScreen(
 		Unit
 	}
 	
+	val getCategory = {
+		categoryViewModel.get(id) { mCategory ->
+			category = mCategory
+			newCategoryName = category.name
+			selectedCategoryIcon = category.iconID
+			
+			showSheet()
+			
+			true.also {
+				hasNavigate = it
+			}
+		}
+	}
+	
 	if (!hasNavigate) {
 		if ((id != Category.default.id) and (categoryAction == CategoryAction.EDIT)) {
-			categoryViewModel.get(id) { mCategory ->
-				category = mCategory
-				newCategoryName = category.name
-				selectedCategoryIcon = category.iconID
-				
-				showSheet()
-				
-				true.also {
-					hasNavigate = it
-				}
-			}
+			getCategory()
 		}
 	}
 	
@@ -346,13 +352,23 @@ fun CategoryScreen(
 				itemsIndexed(
 					items = categories,
 					key = { _: Int, item: Category -> item.id }
-				) { i, category ->
+				) { i, item ->
 					SwipeableCategory(
-						category = category,
-						onCanDelete = {},
-						onDismissToStart = {},
+						category = item,
+						onCanDelete = {
+							dujerViewModel.vibrate(100)
+						},
+						onDismissToStart = {
+							categoryViewModel.get(item.id) { mCategory ->
+								category = mCategory
+								newCategoryName = category.name
+								selectedCategoryIcon = category.iconID
+								
+								showSheet()
+							}
+						},
 						onDismissToEnd = {
-							categoryViewModel.deleteCategory(category)
+							categoryViewModel.deleteCategory(item)
 						},
 						modifier = Modifier
 							.padding(

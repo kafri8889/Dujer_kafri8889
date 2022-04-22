@@ -109,7 +109,8 @@ fun DujerApp() {
 			CategoryScreen(
 				id = id,
 				action = action,
-				navController = navController
+				navController = navController,
+				dujerViewModel = dujerViewModel
 			)
 		}
 		
