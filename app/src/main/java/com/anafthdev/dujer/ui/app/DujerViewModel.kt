@@ -12,6 +12,18 @@ class DujerViewModel @Inject constructor(
 	dujerEnvironment: IDujerEnvironment
 ): StatefulViewModel<DujerState, Unit, IDujerEnvironment>(DujerState(), dujerEnvironment) {
 	
+	init {
+		viewModelScope.launch(environment.dispatcher) {
+			environment.getCurrentCurrency().collect { currency ->
+				setState {
+					copy(
+						currentCurrency = currency
+					)
+				}
+			}
+		}
+	}
+	
 	fun vibrate(millis: Long) {
 		viewModelScope.launch {
 			environment.vibrate(millis)

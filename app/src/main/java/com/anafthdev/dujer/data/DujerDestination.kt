@@ -22,4 +22,6 @@ sealed class DujerDestination(val route: String) {
 	object Dashboard: DujerDestination("dashboard")
 	
 	object Setting: DujerDestination("setting")
+	
+	object Currency: DujerDestination("currency")
 }

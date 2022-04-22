@@ -11,6 +11,7 @@ import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.viewinterop.AndroidView
 import com.anafthdev.dujer.foundation.window.dpScaled
+import com.anafthdev.dujer.model.LocalCurrency
 import com.anafthdev.dujer.ui.theme.black09
 import com.anafthdev.dujer.util.AppUtil
 import com.anafthdev.dujer.view.MultiLineChartMarkerView
@@ -29,6 +30,7 @@ fun FinancialLineChart(
 	
 	val context = LocalContext.current
 	val config = LocalConfiguration.current
+	val localCurrency = LocalCurrency.current
 	
 	Column(
 		modifier = Modifier
@@ -75,7 +77,13 @@ fun FinancialLineChart(
 			},
 			update = { lineChart ->
 				lineChart.data = LineData(incomeLineDataset, expenseLineDataset)
-				lineChart.marker = MultiLineChartMarkerView(context, incomeLineDataset.entries, expenseLineDataset.entries)
+				lineChart.marker = MultiLineChartMarkerView(
+					context,
+					localCurrency,
+					incomeLineDataset.entries,
+					expenseLineDataset.entries
+				)
+				
 				lineChart.invalidate()
 			},
 			modifier = Modifier

@@ -35,10 +35,11 @@
     <string name="your_expenses">Pengeluaran kamu</string>
     <string name="bio_auth_title">Verifikasi</string>
     <string name="session_time_out">Waktu sesi habis</string>
+    <string name="currency_summary">Pilih mata uang yang kamu gunakan</string>
     <string name="category_summary">Tambah atau hapus kategori</string>
     <string name="language_summary">Pilih bahasa yang kamu gunakan</string>
     <string name="available_balance">Saldo tersedia</string>
-    <string name="choose_your_language">Pilih bahasa mu</string>
+    <string name="select_your_language">Pilih bahasa mu</string>
     <string name="bio_auth_description">Verifikasi bahwa ini adalah Anda</string>
     <string name="no_fp_sensor_detected">Sensor sidik jari tidak terdeteksi</string>
     <string name="title_cannot_be_empty">Judul tidak boleh kosong</string>

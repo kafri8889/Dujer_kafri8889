@@ -3,7 +3,6 @@ package com.anafthdev.dujer.ui
 import android.os.Bundle
 import android.telephony.TelephonyManager
 import androidx.activity.compose.setContent
-import androidx.appcompat.app.AppCompatActivity
 import androidx.biometric.BiometricPrompt
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.gestures.LocalOverScrollConfiguration
@@ -45,9 +44,7 @@ class MainActivity : LocalizedActivity() {
 		WindowCompat.setDecorFitsSystemWindows(window, false)
 		
 		telephonyManager = getSystemService(TELEPHONY_SERVICE) as TelephonyManager
-		appDatastore.setCurrentCurrency(telephonyManager.networkCountryIso) {
-			Timber.i("user country id: ${telephonyManager.networkCountryIso}")
-		}
+//		appDatastore.setCurrentCurrency(Currency.getInstance(AppUtil.deviceLocale).currencyCode) {}
 		
 		lifecycleScope.launch(Dispatchers.Main) {
 			val isUseBioAuthSecurity = appDatastore.isUseBioAuth.first()

@@ -17,7 +17,7 @@ import androidx.compose.ui.unit.dp
 import com.anafthdev.dujer.R
 import com.anafthdev.dujer.foundation.extension.horizontalScroll
 import com.anafthdev.dujer.foundation.window.dpScaled
-import com.anafthdev.dujer.model.Currency
+import com.anafthdev.dujer.model.LocalCurrency
 import com.anafthdev.dujer.ui.theme.Typography
 import com.anafthdev.dujer.ui.theme.balance_card_background
 import com.anafthdev.dujer.ui.theme.large_shape
@@ -28,7 +28,6 @@ import com.anafthdev.dujer.util.CurrencyFormatter
 @Composable
 fun BalanceCard(
 	balance: Double,
-	currency: Currency
 ) {
 	
 	val density = LocalDensity.current
@@ -71,7 +70,12 @@ fun BalanceCard(
 			)
 			
 			Text(
-				text = CurrencyFormatter.format(AppUtil.deviceLocale, balance),
+				text = CurrencyFormatter.format(
+					locale = AppUtil.deviceLocale,
+					amount = balance,
+					useSymbol = true,
+					currencyCode = LocalCurrency.current.countryCode
+				),
 				style = Typography.headlineMedium.copy(
 					color = Color.White,
 					fontWeight = FontWeight.SemiBold

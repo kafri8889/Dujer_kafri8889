@@ -1,13 +1,9 @@
 package com.anafthdev.dujer.ui.financial.environment
 
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.asFlow
 import com.anafthdev.dujer.data.db.model.Category
 import com.anafthdev.dujer.data.db.model.Financial
 import com.anafthdev.dujer.data.repository.app.IAppRepository
 import com.anafthdev.dujer.foundation.di.DiName
-import com.anafthdev.dujer.model.Currency
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject
@@ -39,7 +35,4 @@ class FinancialEnvironment @Inject constructor(
 		action()
 	}
 	
-	override suspend fun getCurrentCurrency(): Flow<Currency> {
-		return appRepository.appDatastore.getCurrentCurrency
-	}
 }

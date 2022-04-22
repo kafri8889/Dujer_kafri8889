@@ -19,6 +19,7 @@ import com.anafthdev.dujer.foundation.extension.horizontalScroll
 import com.anafthdev.dujer.foundation.extension.toColor
 import com.anafthdev.dujer.foundation.window.dpScaled
 import com.anafthdev.dujer.foundation.window.spScaled
+import com.anafthdev.dujer.model.LocalCurrency
 import com.anafthdev.dujer.ui.theme.Typography
 import com.anafthdev.dujer.ui.theme.large_shape
 import com.anafthdev.dujer.ui.theme.medium_shape
@@ -102,7 +103,11 @@ fun FinancialCard(
 				) {
 					Text(
 						text = (if (financial.type == FinancialType.INCOME) "+" else "-") +
-								CurrencyFormatter.format(AppUtil.deviceLocale, financial.amount),
+								CurrencyFormatter.format(
+									locale = AppUtil.deviceLocale,
+									amount = financial.amount,
+									currencyCode = LocalCurrency.current.countryCode
+								),
 						style = Typography.bodyMedium.copy(
 							fontWeight = FontWeight.SemiBold,
 							fontSize = Typography.bodyMedium.fontSize.spScaled

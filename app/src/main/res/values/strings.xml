@@ -35,10 +35,11 @@
     <string name="your_expenses">Your expenses</string>
     <string name="bio_auth_title">Verification</string>
     <string name="session_time_out">Session time out</string>
+    <string name="currency_summary">Select the currency to be used</string>
     <string name="category_summary">Add or remove category</string>
-    <string name="language_summary">Choose the language you use</string>
+    <string name="language_summary">Select the language you use</string>
     <string name="available_balance">Available balance</string>
-    <string name="choose_your_language">Choose your language</string>
+    <string name="select_your_language">Select your language</string>
     <string name="bio_auth_description">Verify that this is you</string>
     <string name="no_fp_sensor_detected">Fingerprint sensor not detected</string>
     <string name="title_cannot_be_empty">Title cannot be empty</string>

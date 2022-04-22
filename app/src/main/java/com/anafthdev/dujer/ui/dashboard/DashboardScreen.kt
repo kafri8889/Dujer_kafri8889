@@ -35,9 +35,11 @@ import com.anafthdev.dujer.foundation.extension.combine
 import com.anafthdev.dujer.foundation.extension.getBy
 import com.anafthdev.dujer.foundation.window.dpScaled
 import com.anafthdev.dujer.foundation.window.spScaled
-import com.anafthdev.dujer.model.Currency
 import com.anafthdev.dujer.ui.app.DujerViewModel
-import com.anafthdev.dujer.ui.dashboard.component.*
+import com.anafthdev.dujer.ui.dashboard.component.BalanceCard
+import com.anafthdev.dujer.ui.dashboard.component.ExpenseCard
+import com.anafthdev.dujer.ui.dashboard.component.FinancialLineChart
+import com.anafthdev.dujer.ui.dashboard.component.IncomeCard
 import com.anafthdev.dujer.ui.financial.FinancialScreen
 import com.anafthdev.dujer.ui.financial.data.FinancialAction
 import com.anafthdev.dujer.ui.search.SearchScreen
@@ -71,7 +73,6 @@ fun DashboardScreen(
 	
 	val state by dashboardViewModel.state.collectAsState()
 	val userBalance = state.userBalance
-	val currentCurrency = state.currentCurrency
 	val incomeFinancialList = state.incomeFinancialList
 	val expenseFinancialList = state.expenseFinancialList
 	val incomeLineDataSetEntry = state.incomeLineDataSetEntry
@@ -179,7 +180,6 @@ fun DashboardScreen(
 			content = {
 				DashboardContent(
 					userBalance = userBalance,
-					currentCurrency = currentCurrency,
 					incomeFinancialList = incomeFinancialList,
 					expenseFinancialList = expenseFinancialList,
 					incomeLineDataset = incomeLineDataset,
@@ -206,7 +206,6 @@ fun DashboardScreen(
 @Composable
 private fun DashboardContent(
 	userBalance: Double,
-	currentCurrency: Currency,
 	incomeFinancialList: List<Financial>,
 	expenseFinancialList: List<Financial>,
 	incomeLineDataset: LineDataSet,
@@ -280,8 +279,7 @@ private fun DashboardContent(
 							.padding(horizontal = 16.dpScaled)
 					) {
 						BalanceCard(
-							balance = userBalance,
-							currency = currentCurrency
+							balance = userBalance
 						)
 						
 						Row(
@@ -294,7 +292,6 @@ private fun DashboardContent(
 						) {
 							IncomeCard(
 								income = incomeFinancialList.getBy { it.amount }.sum(),
-								currency = currentCurrency,
 								onClick = {
 									navController.navigate(
 										DujerDestination.IncomeExpense.createRoute(FinancialType.INCOME)
@@ -309,7 +306,6 @@ private fun DashboardContent(
 							
 							ExpenseCard(
 								expense = expenseFinancialList.getBy { it.amount }.sum(),
-								currency = currentCurrency,
 								onClick = {
 									navController.navigate(
 										DujerDestination.IncomeExpense.createRoute(FinancialType.EXPENSE)

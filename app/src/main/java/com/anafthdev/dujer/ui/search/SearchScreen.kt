@@ -38,6 +38,7 @@ import com.anafthdev.dujer.ui.category.component.CategoryCard
 import com.anafthdev.dujer.ui.category.data.CategoryAction
 import com.anafthdev.dujer.ui.theme.Inter
 import com.anafthdev.dujer.ui.theme.Typography
+import com.anafthdev.dujer.ui.theme.semi_large_shape
 import com.anafthdev.dujer.ui.theme.shapes
 import com.anafthdev.dujer.uicomponent.FinancialCard
 import com.anafthdev.dujer.uicomponent.SwipeSearch
@@ -136,7 +137,7 @@ internal fun SearchSection(
 			.statusBarsPadding()
 	) {
 		OutlinedTextField(
-			shape = shapes.large,
+			shape = semi_large_shape,
 			singleLine = true,
 			value = value,
 			onValueChange = onTextChanged,

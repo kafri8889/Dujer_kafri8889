@@ -8,7 +8,6 @@ import com.anafthdev.dujer.data.repository.app.IAppRepository
 import com.anafthdev.dujer.foundation.di.DiName
 import com.anafthdev.dujer.foundation.extension.forEachMap
 import com.anafthdev.dujer.foundation.extension.indexOf
-import com.anafthdev.dujer.model.Currency
 import com.anafthdev.dujer.ui.financial.data.FinancialAction
 import com.anafthdev.dujer.util.AppUtil
 import com.github.mikephil.charting.data.Entry
@@ -43,10 +42,6 @@ class DashboardEnvironment @Inject constructor(
 	
 	override suspend fun getUserBalance(): Flow<Double> {
 		return appRepository.appDatastore.getUserBalance
-	}
-	
-	override suspend fun getCurrentCurrency(): Flow<Currency> {
-		return appRepository.appDatastore.getCurrentCurrency
 	}
 	
 	override suspend fun getIncomeFinancialList(): Flow<List<Financial>> {

@@ -1,8 +1,7 @@
 package com.anafthdev.dujer.ui.app
 
-import com.anafthdev.dujer.data.db.model.Financial
-import com.anafthdev.dujer.ui.financial.FinancialViewModel
+import com.anafthdev.dujer.model.Currency
 
 data class DujerState(
-	val empty: Any = ""
+	val currentCurrency: Currency = Currency.DOLLAR
 )

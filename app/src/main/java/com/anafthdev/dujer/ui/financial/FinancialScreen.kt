@@ -18,7 +18,10 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.rotate
-import androidx.compose.ui.focus.*
+import androidx.compose.ui.focus.FocusDirection
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
+import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.painterResource
@@ -39,6 +42,7 @@ import com.anafthdev.dujer.foundation.extension.showDatePicker
 import com.anafthdev.dujer.foundation.extension.startsWith
 import com.anafthdev.dujer.foundation.window.dpScaled
 import com.anafthdev.dujer.foundation.window.spScaled
+import com.anafthdev.dujer.model.LocalCurrency
 import com.anafthdev.dujer.ui.financial.component.CategoryList
 import com.anafthdev.dujer.ui.financial.data.FinancialAction
 import com.anafthdev.dujer.ui.theme.Inter
@@ -64,12 +68,12 @@ fun FinancialScreen(
 	
 	val context = LocalContext.current
 	val focusManager = LocalFocusManager.current
+	val localCurrency = LocalCurrency.current
 	
 	val financialViewModel = hiltViewModel<FinancialViewModel>()
 	
 	val state by financialViewModel.state.collectAsState()
 	
-	val currentCurrency = state.currentCurrency
 	val categories = state.categories
 	
 	val textFieldDateFocusRequester = remember { FocusRequester() }
@@ -98,7 +102,8 @@ fun FinancialScreen(
 			text = CurrencyFormatter.format(
 				locale = AppUtil.deviceLocale,
 				amount = 0.0,
-				useSymbol = false
+				useSymbol = false,
+				currencyCode = localCurrency.countryCode
 			)
 		)
 	}
@@ -119,7 +124,8 @@ fun FinancialScreen(
 				CurrencyFormatter.format(
 					locale = AppUtil.deviceLocale,
 					amount = financial.amount,
-					useSymbol = false
+					useSymbol = false,
+					currencyCode = localCurrency.countryCode
 				)
 			)
 		}
@@ -262,7 +268,8 @@ fun FinancialScreen(
 						
 						financialAmountDouble = CurrencyFormatter.parse(
 							locale = AppUtil.deviceLocale,
-							amount = "${financialViewModel.deviceCurrency.symbol}$amount"
+							amount = "${localCurrency.symbol}$amount",
+							currencyCode = localCurrency.countryCode,
 						)
 						
 						Timber.i("amont format from: ${financialViewModel.deviceCurrency.symbol}$amount")
@@ -273,7 +280,8 @@ fun FinancialScreen(
 							text = CurrencyFormatter.format(
 								locale = AppUtil.deviceLocale,
 								amount = financialAmountDouble,
-								useSymbol = false
+								useSymbol = false,
+								currencyCode = localCurrency.countryCode
 							),
 							selection = selectionIndex
 						)
@@ -284,7 +292,10 @@ fun FinancialScreen(
 						Text(
 							text = if (financialAction == FinancialAction.EDIT) {
 								financialNew.currency.symbol
-							} else currentCurrency.symbol,
+							} else CurrencyFormatter.getSymbol(
+								locale = AppUtil.deviceLocale,
+								currencyCode = localCurrency.countryCode
+							),
 							style = Typography.bodyMedium.copy(
 								fontWeight = FontWeight.Medium,
 								fontSize = Typography.bodyMedium.fontSize.spScaled
@@ -459,7 +470,7 @@ fun FinancialScreen(
 											amount = financialAmountDouble,
 											type = financialType,
 											category = financialCategory,
-											currency = currentCurrency,
+											currency = localCurrency,
 											dateCreated = financialDate
 										),
 										action = saveFinancial

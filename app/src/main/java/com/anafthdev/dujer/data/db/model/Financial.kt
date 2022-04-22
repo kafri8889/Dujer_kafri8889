@@ -23,7 +23,7 @@ data class Financial(
 			amount = 0.0,
 			type = FinancialType.INCOME,
 			category = Category.default,
-			currency = Currency.INDONESIAN,
+			currency = Currency.DOLLAR,
 			dateCreated = System.currentTimeMillis()
 		)
 	}
