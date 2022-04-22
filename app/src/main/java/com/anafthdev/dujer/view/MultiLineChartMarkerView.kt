@@ -4,6 +4,7 @@ import android.annotation.SuppressLint
 import android.content.Context
 import android.widget.TextView
 import com.anafthdev.dujer.R
+import com.anafthdev.dujer.model.Currency
 import com.anafthdev.dujer.util.AppUtil
 import com.anafthdev.dujer.util.CurrencyFormatter
 import com.github.mikephil.charting.components.MarkerView
@@ -15,6 +16,7 @@ import timber.log.Timber
 @SuppressLint("ViewConstructor")
 class MultiLineChartMarkerView(
 	context: Context,
+	private val currency: Currency,
 	private val incomeLineDataSetEntry: List<Entry>,
 	private val expenseLineDataSetEntry: List<Entry>
 ): MarkerView(context, R.layout.multi_line_chart_marker) {
@@ -33,21 +35,25 @@ class MultiLineChartMarkerView(
 			tvIncomeAmount.text = CurrencyFormatter.format(
 				locale = AppUtil.deviceLocale,
 				amount = incomeEntry.y.toDouble(),
+				currencyCode = currency.countryCode
 			)
 			
 			tvExpenseAmount.text = CurrencyFormatter.format(
 				locale = AppUtil.deviceLocale,
 				amount = expenseEntry.y.toDouble(),
+				currencyCode = currency.countryCode
 			)
 		} else {
 			tvIncomeAmount.text = CurrencyFormatter.format(
 				locale = AppUtil.deviceLocale,
 				amount = 0.0,
+				currencyCode = currency.countryCode
 			)
 			
 			tvExpenseAmount.text = CurrencyFormatter.format(
 				locale = AppUtil.deviceLocale,
 				amount = 0.0,
+				currencyCode = currency.countryCode
 			)
 		}
 		

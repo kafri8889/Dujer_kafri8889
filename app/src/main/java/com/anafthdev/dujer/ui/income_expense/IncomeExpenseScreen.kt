@@ -8,9 +8,12 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CornerSize
-import androidx.compose.material.*
+import androidx.compose.material.ExperimentalMaterialApi
+import androidx.compose.material.ModalBottomSheetLayout
+import androidx.compose.material.ModalBottomSheetValue
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.ArrowBack
+import androidx.compose.material.rememberModalBottomSheetState
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -25,7 +28,6 @@ import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.testTag
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.viewinterop.AndroidView
@@ -38,11 +40,11 @@ import com.anafthdev.dujer.foundation.extension.getBy
 import com.anafthdev.dujer.foundation.extension.horizontalScroll
 import com.anafthdev.dujer.foundation.window.dpScaled
 import com.anafthdev.dujer.foundation.window.spScaled
+import com.anafthdev.dujer.model.LocalCurrency
 import com.anafthdev.dujer.ui.app.DujerViewModel
 import com.anafthdev.dujer.ui.financial.FinancialScreen
 import com.anafthdev.dujer.ui.financial.data.FinancialAction
 import com.anafthdev.dujer.ui.theme.*
-import com.anafthdev.dujer.uicomponent.FinancialCard
 import com.anafthdev.dujer.uicomponent.SwipeableFinancialCard
 import com.anafthdev.dujer.uicomponent.TopAppBar
 import com.anafthdev.dujer.util.AppUtil
@@ -57,7 +59,6 @@ import com.github.mikephil.charting.data.LineDataSet
 import com.github.mikephil.charting.formatter.IndexAxisValueFormatter
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import timber.log.Timber
 import java.util.*
 
 @OptIn(ExperimentalMaterialApi::class)
@@ -70,6 +71,7 @@ fun IncomeExpenseScreen(
 	
 	val context = LocalContext.current
 	val config = LocalConfiguration.current
+	val localCurrency = LocalCurrency.current
 	val density = LocalDensity.current
 	
 	val incomeExpenseViewModel = hiltViewModel<IncomeExpenseViewModel>()
@@ -252,7 +254,7 @@ fun IncomeExpenseScreen(
 								}
 							},
 							update = { lineChart ->
-								lineChart.marker = SingleLineChartMarkerView(context)
+								lineChart.marker = SingleLineChartMarkerView(context, localCurrency)
 								lineChart.data = LineData(incomeExpenseLineDataset)
 								lineChart.invalidate()
 							},
@@ -319,7 +321,8 @@ fun IncomeExpenseScreen(
 								Text(
 									text = CurrencyFormatter.format(
 										locale = AppUtil.deviceLocale,
-										amount = if (type == FinancialType.INCOME) incomeBalance else expenseBalance
+										amount = if (type == FinancialType.INCOME) incomeBalance else expenseBalance,
+										currencyCode = LocalCurrency.current.countryCode
 									),
 									style = Typography.titleMedium.copy(
 										color = Color.White,

@@ -8,7 +8,6 @@ import androidx.datastore.preferences.core.*
 import androidx.datastore.preferences.preferencesDataStore
 import com.anafthdev.dujer.data.preference.Language
 import com.anafthdev.dujer.data.preference.Preference
-import com.anafthdev.dujer.foundation.extension.get
 import com.anafthdev.dujer.model.Currency
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -16,6 +15,7 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
+import timber.log.Timber
 import javax.inject.Inject
 
 class AppDatastore @Inject constructor(private val context: Context) {
@@ -60,9 +60,15 @@ class AppDatastore @Inject constructor(private val context: Context) {
 	}
 	
 	val getCurrentCurrency: Flow<Currency> = context.datastore.data.map { preferences ->
-		Currency.values.get {
-			it.countryCode == (preferences[currentCurrency] ?: Currency.INDONESIAN.countryCode)
-		}?: Currency.INDONESIAN
+		Timber.i("cur: ${preferences[currentCurrency]}")
+		with(java.util.Currency.getInstance((preferences[currentCurrency] ?: Currency.DOLLAR.countryCode))) {
+			Currency(
+				name = "",
+				country = displayName,
+				countryCode = currencyCode,
+				symbol = symbol
+			)
+		}
 	}
 	
 	val isUseBioAuth: Flow<Boolean> = context.datastore.data.map { preferences ->

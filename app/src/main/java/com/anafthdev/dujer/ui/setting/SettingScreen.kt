@@ -58,16 +58,29 @@ fun SettingScreen(
 	val languageUsed = localizedState.language
 	
 	val scope = rememberCoroutineScope()
-	val sheetState = rememberModalBottomSheetState(initialValue = ModalBottomSheetValue.Hidden)
+	val sheetStateChangeLanguage = rememberModalBottomSheetState(initialValue = ModalBottomSheetValue.Hidden)
 	
-	val hideSheet = { scope.launch { sheetState.hide() } }
-	val showSheet = { scope.launch { sheetState.show() } }
+	val hideSheet = {
+		scope.launch { sheetStateChangeLanguage.hide() }
+		Unit
+	}
+	val showSheet = {
+		scope.launch { sheetStateChangeLanguage.show() }
+		Unit
+	}
 	
 	val settingPreferences = listOf(
 		SettingPreference(
 			title = stringResource(id = R.string.category),
 			summary = stringResource(id = R.string.category_summary),
 			iconResId = R.drawable.ic_category_2,
+			value = "",
+			category = stringResource(id = R.string.configuration)
+		),
+		SettingPreference(
+			title = stringResource(id = R.string.currency),
+			summary = stringResource(id = R.string.currency_summary),
+			iconResId = R.drawable.ic_dollar_circle,
 			value = "",
 			category = stringResource(id = R.string.configuration)
 		),
@@ -93,7 +106,7 @@ fun SettingScreen(
 	}
 	
 	ModalBottomSheetLayout(
-		sheetState = sheetState,
+		sheetState = sheetStateChangeLanguage,
 		sheetShape = RoundedCornerShape(
 			topStart = shapes.medium.topStart,
 			topEnd = shapes.medium.topEnd,
@@ -106,9 +119,7 @@ fun SettingScreen(
 					.fillMaxWidth()
 			) {
 				IconButton(
-					onClick = {
-						hideSheet()
-					},
+					onClick = hideSheet,
 					modifier = Modifier
 						.align(Alignment.CenterStart)
 				) {
@@ -119,7 +130,7 @@ fun SettingScreen(
 				}
 				
 				Text(
-					text = stringResource(id = R.string.choose_your_language),
+					text = stringResource(id = R.string.select_your_language),
 					style = Typography.bodyLarge.copy(
 						fontWeight = FontWeight.Medium,
 						fontSize = Typography.bodyLarge.fontSize.spScaled
@@ -153,8 +164,7 @@ fun SettingScreen(
 						style = Typography.bodyMedium.copy(
 							fontWeight = FontWeight.Normal,
 							fontSize = Typography.bodyMedium.fontSize.spScaled
-						),
-						modifier = Modifier
+						)
 					)
 				}
 			}
@@ -206,8 +216,9 @@ fun SettingScreen(
 					
 					when (indexSettingPreference) {
 						0 -> navController.navigate(DujerDestination.Category.createRoute())
-						1 -> showSheet()
-						2 -> {
+						1 -> navController.navigate(DujerDestination.Currency.route)
+						2 -> showSheet()
+						3 -> {
 							settingViewModel.setUseBioAuth(preference.value as Boolean)
 						}
 					}

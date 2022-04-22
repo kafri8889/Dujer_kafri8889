@@ -17,7 +17,8 @@ import com.anafthdev.dujer.R
 import com.anafthdev.dujer.data.db.model.Category
 import com.anafthdev.dujer.foundation.window.dpScaled
 import com.anafthdev.dujer.ui.theme.large_shape
-import timber.log.Timber
+import com.anafthdev.dujer.ui.theme.swipe_dismiss_delete_background
+import com.anafthdev.dujer.ui.theme.swipe_dismiss_edit_background
 
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
@@ -67,8 +68,8 @@ fun SwipeableCategory(
 			
 			val color by animateColorAsState(
 				targetValue = when (direction) {
-					DismissDirection.StartToEnd -> Color(0xFFFFA1A1)
-					DismissDirection.EndToStart -> Color(0xFFABFF9C)
+					DismissDirection.StartToEnd -> swipe_dismiss_delete_background
+					DismissDirection.EndToStart -> swipe_dismiss_edit_background
 					else -> Color.Transparent
 				}
 			)

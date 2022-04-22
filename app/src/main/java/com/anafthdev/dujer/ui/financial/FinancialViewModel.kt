@@ -30,14 +30,6 @@ class FinancialViewModel @Inject constructor(
 					)
 				}
 			}
-			
-			environment.getCurrentCurrency().collect { currency ->
-				setState {
-					copy(
-						currentCurrency = currency
-					)
-				}
-			}
 		}
 	}
 	

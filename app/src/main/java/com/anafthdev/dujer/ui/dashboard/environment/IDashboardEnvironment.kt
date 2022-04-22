@@ -1,7 +1,6 @@
 package com.anafthdev.dujer.ui.dashboard.environment
 
 import com.anafthdev.dujer.data.db.model.Financial
-import com.anafthdev.dujer.model.Currency
 import com.github.mikephil.charting.data.Entry
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.Flow
@@ -17,8 +16,6 @@ interface IDashboardEnvironment {
 	suspend fun getFinancialAction(): Flow<String>
 	
 	suspend fun getUserBalance(): Flow<Double>
-	
-	suspend fun getCurrentCurrency(): Flow<Currency>
 	
 	suspend fun getIncomeFinancialList(): Flow<List<Financial>>
 	

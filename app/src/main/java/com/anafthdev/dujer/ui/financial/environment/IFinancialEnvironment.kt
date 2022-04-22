@@ -2,7 +2,6 @@ package com.anafthdev.dujer.ui.financial.environment
 
 import com.anafthdev.dujer.data.db.model.Category
 import com.anafthdev.dujer.data.db.model.Financial
-import com.anafthdev.dujer.model.Currency
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.Flow
 
@@ -18,5 +17,4 @@ interface IFinancialEnvironment {
 	
 	suspend fun getCategories(): Flow<List<Category>>
 	
-	suspend fun getCurrentCurrency(): Flow<Currency>
 }

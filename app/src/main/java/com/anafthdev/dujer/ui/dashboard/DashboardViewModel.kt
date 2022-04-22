@@ -15,7 +15,7 @@ class DashboardViewModel @Inject constructor(
 ): StatefulViewModel<DashboardState, Unit, IDashboardEnvironment>(DashboardState(), dashboardEnvironment) {
 	
 	init {
-		getUserBalanceAndCurrentCurrency()
+		getUserBalance()
 		getFinancialListAndCalculateEntry()
 		getFinancialID()
 		getFinancialAction()
@@ -45,16 +45,12 @@ class DashboardViewModel @Inject constructor(
 		}
 	}
 	
-	private fun getUserBalanceAndCurrentCurrency() {
+	private fun getUserBalance() {
 		viewModelScope.launch(environment.dispatcher) {
-			environment.getUserBalance()
-				.combine(environment.getCurrentCurrency()) { userBalance, currentCurrency ->
-					userBalance to currentCurrency
-				}.collect { pair ->
+			environment.getUserBalance().collect { balance ->
 					setState {
 						copy(
-							userBalance = pair.first,
-							currentCurrency = pair.second
+							userBalance = balance
 						)
 					}
 				}

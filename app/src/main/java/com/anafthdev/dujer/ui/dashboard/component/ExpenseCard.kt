@@ -18,7 +18,7 @@ import com.anafthdev.dujer.R
 import com.anafthdev.dujer.foundation.extension.horizontalScroll
 import com.anafthdev.dujer.foundation.extension.sizeBasedWidth
 import com.anafthdev.dujer.foundation.window.dpScaled
-import com.anafthdev.dujer.model.Currency
+import com.anafthdev.dujer.model.LocalCurrency
 import com.anafthdev.dujer.ui.theme.*
 import com.anafthdev.dujer.util.AppUtil
 import com.anafthdev.dujer.util.CurrencyFormatter
@@ -27,7 +27,6 @@ import com.anafthdev.dujer.util.CurrencyFormatter
 @Composable
 fun ExpenseCard(
 	expense: Double,
-	currency: Currency,
 	modifier: Modifier = Modifier,
 	onClick: () -> Unit
 ) {
@@ -75,7 +74,12 @@ fun ExpenseCard(
 			)
 			
 			Text(
-				text = CurrencyFormatter.format(AppUtil.deviceLocale, expense),
+				text = CurrencyFormatter.format(
+					locale = AppUtil.deviceLocale,
+					amount = expense,
+					useSymbol = true,
+					currencyCode = LocalCurrency.current.countryCode
+				),
 				style = Typography.bodyMedium.copy(
 					color = black01,
 					fontWeight = FontWeight.Bold

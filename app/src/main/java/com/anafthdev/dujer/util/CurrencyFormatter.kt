@@ -7,10 +7,30 @@ import java.util.*
 
 
 object CurrencyFormatter {
+	
+	fun getSymbol(
+		locale: Locale,
+		currencyCode: String
+	): String {
+		return NumberFormat.getCurrencyInstance(locale).apply{
+			currency = Currency.getInstance(currencyCode)
+		}.format(1.0).replace("[0-9.,]".toRegex(), "")
+	}
 
-	fun format(locale: Locale, amount: Double, useSymbol: Boolean = true): String {
+	fun format(
+		locale: Locale,
+		amount: Double,
+		useSymbol: Boolean = true,
+		currencyCode: String = ""
+	): String {
 		var firstDigitIndex = -1
-		val formattedAmount = NumberFormat.getCurrencyInstance(locale).format(amount)
+		val numberFormat = NumberFormat.getCurrencyInstance(locale).apply {
+			if (currencyCode.isNotBlank()) {
+				currency = Currency.getInstance(currencyCode)
+			}
+		}
+		
+		val formattedAmount = numberFormat.format(amount)
 		
 		formattedAmount.forEachIndexed { i, c ->
 			if (c.isDigit() and firstDigitIndex.isMinus()) firstDigitIndex = i
@@ -19,9 +39,19 @@ object CurrencyFormatter {
 		return "${if (useSymbol) "${formattedAmount.substring(0, firstDigitIndex)} " else ""}${formattedAmount.subSequence(firstDigitIndex, formattedAmount.length)}"
 	}
 	
-	fun parse(locale: Locale, amount: String): Double {
+	fun parse(
+		locale: Locale,
+		amount: String,
+		currencyCode: String = ""
+	): Double {
+		val numberFormat = NumberFormat.getCurrencyInstance(locale).apply {
+			if (currencyCode.isNotBlank()) {
+				currency = Currency.getInstance(currencyCode)
+			}
+		}
+		
 		return try {
-			NumberFormat.getCurrencyInstance(locale).parse(amount)?.toDouble() ?: 0.0
+			numberFormat.parse(amount)?.toDouble() ?: 0.0
 		} catch (e: ParseException) {
 			0.0
 		}

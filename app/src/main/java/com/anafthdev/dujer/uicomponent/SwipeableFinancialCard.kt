@@ -11,13 +11,12 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import com.anafthdev.dujer.R
 import com.anafthdev.dujer.data.db.model.Financial
 import com.anafthdev.dujer.foundation.window.dpScaled
 import com.anafthdev.dujer.ui.theme.large_shape
-import com.anafthdev.dujer.uicomponent.FinancialCard
+import com.anafthdev.dujer.ui.theme.swipe_dismiss_delete_background
 
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
@@ -65,7 +64,7 @@ fun SwipeableFinancialCard(
 					)
 					.fillMaxSize()
 					.clip(large_shape)
-					.background(Color(0xFFF38B8B))
+					.background(swipe_dismiss_delete_background)
 					.align(Alignment.CenterVertically)
 			) {
 				Icon(
