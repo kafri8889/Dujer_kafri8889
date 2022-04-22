@@ -101,9 +101,9 @@ class DashboardViewModel @Inject constructor(
 		}
 	}
 	
-	fun deleteRecord(financial: Financial) {
+	fun delete(financial: Financial) {
 		viewModelScope.launch {
-			environment.deleteRecord(financial)
+			environment.deleteFinancial(financial)
 		}
 	}
 	

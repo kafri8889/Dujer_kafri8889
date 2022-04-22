@@ -16,7 +16,7 @@ class CategoryViewModel @Inject constructor(
 	
 	init {
 		viewModelScope.launch(environment.dispatcher) {
-			environment.getAllCategory().collect { categories ->
+			environment.getAll().collect { categories ->
 				setState {
 					copy(
 						categories = categories
@@ -29,21 +29,27 @@ class CategoryViewModel @Inject constructor(
 		}
 	}
 	
+	fun get(id: Int, action: (Category) -> Unit) {
+		viewModelScope.launch(environment.dispatcher) {
+			environment.get(id, action)
+		}
+	}
+	
 	fun updateCategory(category: Category) {
 		viewModelScope.launch(environment.dispatcher) {
-			environment.updateCategory(category)
+			environment.update(category)
 		}
 	}
 	
 	fun deleteCategory(category: Category) {
 		viewModelScope.launch(environment.dispatcher) {
-			environment.deleteCategory(category)
+			environment.delete(category)
 		}
 	}
 	
 	fun insertCategory(category: Category) {
 		viewModelScope.launch(environment.dispatcher) {
-			environment.insertCategory(category)
+			environment.insert(category)
 		}
 	}
 }

@@ -10,6 +10,7 @@ import com.anafthdev.dujer.data.repository.expense.ExpenseRepository
 import com.anafthdev.dujer.data.repository.expense.IExpenseRepository
 import com.anafthdev.dujer.data.repository.income.IIncomeRepository
 import com.anafthdev.dujer.data.repository.income.IncomeRepository
+import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject
 
 class AppRepository @Inject constructor(
@@ -27,6 +28,10 @@ class AppRepository @Inject constructor(
 	
 	override val expenseRepository: IExpenseRepository by lazy {
 		ExpenseRepository(appDatabase)
+	}
+	
+	override suspend fun getAllFinancial(): Flow<List<Financial>> {
+		return appDatabase.financialDao().getAll()
 	}
 	
 	override suspend fun get(id: Int): Financial? {

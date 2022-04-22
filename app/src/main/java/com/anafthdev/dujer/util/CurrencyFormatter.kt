@@ -21,7 +21,7 @@ object CurrencyFormatter {
 	
 	fun parse(locale: Locale, amount: String): Double {
 		return try {
-			NumberFormat.getCurrencyInstance().parse(amount)?.toDouble() ?: 0.0
+			NumberFormat.getCurrencyInstance(locale).parse(amount)?.toDouble() ?: 0.0
 		} catch (e: ParseException) {
 			0.0
 		}

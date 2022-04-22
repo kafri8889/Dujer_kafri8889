@@ -59,9 +59,4 @@ class FinancialViewModel @Inject constructor(
 		}
 	}
 	
-	companion object {
-		const val FINANCIAL_ACTION_NEW = "new"
-		const val FINANCIAL_ACTION_EDIT = "edit"
-	}
-	
 }

@@ -1,4 +1,4 @@
-package com.anafthdev.dujer.ui.dashboard.component
+package com.anafthdev.dujer.uicomponent
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box

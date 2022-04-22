@@ -24,6 +24,7 @@ import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -39,9 +40,10 @@ import com.anafthdev.dujer.foundation.window.dpScaled
 import com.anafthdev.dujer.foundation.window.spScaled
 import com.anafthdev.dujer.ui.app.DujerViewModel
 import com.anafthdev.dujer.ui.financial.FinancialScreen
-import com.anafthdev.dujer.ui.financial.FinancialViewModel
+import com.anafthdev.dujer.ui.financial.data.FinancialAction
 import com.anafthdev.dujer.ui.theme.*
 import com.anafthdev.dujer.uicomponent.FinancialCard
+import com.anafthdev.dujer.uicomponent.SwipeableFinancialCard
 import com.anafthdev.dujer.uicomponent.TopAppBar
 import com.anafthdev.dujer.util.AppUtil
 import com.anafthdev.dujer.util.CurrencyFormatter
@@ -90,6 +92,16 @@ fun IncomeExpenseScreen(
 	val expenseBalance by rememberUpdatedState(
 		newValue = expenseFinancialList.getBy { it.amount }.sum()
 	)
+	
+	val hideSheet = {
+		scope.launch { financialScreenSheetState.hide() }
+		Unit
+	}
+	
+	val showSheet = {
+		scope.launch { financialScreenSheetState.show() }
+		Unit
+	}
 	
 	val incomeExpenseLineDataSetEntry by rememberUpdatedState(
 		newValue = arrayListOf<Entry>().apply {
@@ -141,11 +153,10 @@ fun IncomeExpenseScreen(
 		}
 	)
 	
-	BackHandler(enabled = financialScreenSheetState.isVisible) {
-		scope.launch {
-			financialScreenSheetState.hide()
-		}
-	}
+	BackHandler(
+		enabled = financialScreenSheetState.isVisible,
+		onBack = hideSheet
+	)
 	
 	ModalBottomSheetLayout(
 		scrimColor = Color.Unspecified,
@@ -153,17 +164,9 @@ fun IncomeExpenseScreen(
 		sheetContent = {
 			FinancialScreen(
 				financial = financial,
-				financialAction = FinancialViewModel.FINANCIAL_ACTION_EDIT,
-				onBack = {
-					scope.launch {
-						financialScreenSheetState.hide()
-					}
-				},
-				onSave = {
-					scope.launch {
-						financialScreenSheetState.hide()
-					}
-				}
+				financialAction = FinancialAction.EDIT,
+				onBack = hideSheet,
+				onSave = hideSheet
 			)
 		}
 	) {
@@ -368,84 +371,21 @@ fun IncomeExpenseScreen(
 				items = if (type == FinancialType.INCOME) incomeFinancialList else expenseFinancialList,
 				key = { item: Financial -> item.id }
 			) { financial ->
-				var hasVibrate by remember { mutableStateOf(false) }
-				
-				val dismissState = rememberDismissState(
-					confirmStateChange = {
-						if (it == DismissValue.DismissedToEnd) {
-							incomeExpenseViewModel.delete(financial)
-						} else {
-							hasVibrate = false
-						}
-						
-						true
-					}
+				SwipeableFinancialCard(
+					financial = financial,
+					onDismissToEnd = {
+						incomeExpenseViewModel.delete(financial)
+					},
+					onCanDelete = {
+						dujerViewModel.vibrate(100)
+					},
+					onClick = {
+						incomeExpenseViewModel.setFinancialID(financial.id)
+						showSheet()
+					},
+					modifier = Modifier
+						.testTag("SwipeableFinancialCard")
 				)
-				
-				if (
-					((2 * dismissState.progress.fraction) >= 1f) and
-					(dismissState.targetValue == DismissValue.DismissedToEnd) and
-					!hasVibrate
-				) {
-//				incomeExpenseViewModel.vibratorManager.vibrate(100)
-					hasVibrate = true
-				}
-				
-				SwipeToDismiss(
-					state = dismissState,
-					directions = setOf(DismissDirection.StartToEnd),
-					dismissThresholds = { FractionalThreshold(.6f) },
-					background = {
-						
-						Timber.i("swipe fraction: ${(2 * dismissState.progress.fraction)}")
-						
-						Box(
-							modifier = Modifier
-								.padding(
-									horizontal = 14.dpScaled,
-									vertical = 8.dpScaled
-								)
-								.fillMaxSize()
-								.clip(large_shape)
-								.background(
-									Color(0xFFff4444).copy(
-										alpha = (.3f + dismissState.progress.fraction).coerceIn(
-											maximumValue = 1f,
-											minimumValue = 0f
-										)
-									)
-								)
-								.align(Alignment.CenterVertically)
-						) {
-							Icon(
-								painter = painterResource(id = R.drawable.ic_trash),
-								contentDescription = null,
-								modifier = Modifier
-									.padding(
-										horizontal = 24.dpScaled
-									)
-									.size(
-										if (hasVibrate) 28.dpScaled
-										else 28.dpScaled * (2 * dismissState.progress.fraction)
-									)
-									.align(Alignment.CenterStart)
-							)
-						}
-					}
-				) {
-					FinancialCard(
-						financial = financial,
-						onClick = {
-							incomeExpenseViewModel.setFinancialID(financial.id)
-							scope.launch {
-								financialScreenSheetState.show()
-							}
-						},
-						modifier = Modifier
-							.padding(8.dpScaled)
-							.fillMaxWidth()
-					)
-				}
 			}
 		}
 	}

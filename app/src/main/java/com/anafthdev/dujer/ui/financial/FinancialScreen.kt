@@ -39,8 +39,8 @@ import com.anafthdev.dujer.foundation.extension.showDatePicker
 import com.anafthdev.dujer.foundation.extension.startsWith
 import com.anafthdev.dujer.foundation.window.dpScaled
 import com.anafthdev.dujer.foundation.window.spScaled
-import com.anafthdev.dujer.ui.app.DujerViewModel
 import com.anafthdev.dujer.ui.financial.component.CategoryList
+import com.anafthdev.dujer.ui.financial.data.FinancialAction
 import com.anafthdev.dujer.ui.theme.Inter
 import com.anafthdev.dujer.ui.theme.Typography
 import com.anafthdev.dujer.ui.theme.black04
@@ -86,10 +86,30 @@ fun FinancialScreen(
 	var financialType: FinancialType by remember { mutableStateOf(FinancialType.INCOME) }
 	
 	var isCategoryListShowed by remember { mutableStateOf(false) }
-	var isDatePickerShowed by remember { mutableStateOf(false) }
+	
+	val resetFinancial = {
+		financialNew = Financial.default
+		financialTitle = ""
+		financialDate = System.currentTimeMillis()
+		financialCategory = Category.default
+		financialType = FinancialType.INCOME
+		financialAmountDouble = 0.0
+		financialAmount = TextFieldValue(
+			text = CurrencyFormatter.format(
+				locale = AppUtil.deviceLocale,
+				amount = 0.0,
+				useSymbol = false
+			)
+		)
+	}
+	
+	val saveFinancial = {
+		onSave()
+		resetFinancial()
+	}
 	
 	when {
-		(financialAction == FinancialViewModel.FINANCIAL_ACTION_EDIT) and (financial.id != financialNew.id) -> {
+		(financialAction == FinancialAction.EDIT) and (financial.id != financialNew.id) -> {
 			financialNew = financial
 			financialTitle = financial.name
 			financialDate = financial.dateCreated
@@ -109,20 +129,7 @@ fun FinancialScreen(
 	
 	DisposableEffect(financialAction) {
 		onDispose {
-			financialNew = Financial.default
-			financialTitle = ""
-			financialDate = System.currentTimeMillis()
-			financialCategory = Category.default
-			financialType = FinancialType.INCOME
-			financialAmountDouble = 0.0
-			financialAmount = TextFieldValue(
-				text = CurrencyFormatter.format(
-					locale = AppUtil.deviceLocale,
-					amount = 0.0,
-					useSymbol = false
-				)
-			)
-
+			resetFinancial()
 			focusManager.clearFocus(force = true)
 		}
 	}
@@ -137,7 +144,6 @@ fun FinancialScreen(
 						focusManager.moveFocus(FocusDirection.Next)
 					},
 					onCancel = {
-						isDatePickerShowed = false
 						focusManager.moveFocus(FocusDirection.Next)
 					}
 				)
@@ -180,7 +186,7 @@ fun FinancialScreen(
 		) {
 			Text(
 				text = stringResource(
-					id = if (financialAction == FinancialViewModel.FINANCIAL_ACTION_NEW) R.string._new
+					id = if (financialAction == FinancialAction.NEW) R.string._new
 					else R.string.edit
 				),
 				style = Typography.headlineSmall.copy(
@@ -258,8 +264,11 @@ fun FinancialScreen(
 							locale = AppUtil.deviceLocale,
 							amount = "${financialViewModel.deviceCurrency.symbol}$amount"
 						)
+						
+						Timber.i("amont format from: ${financialViewModel.deviceCurrency.symbol}$amount")
 						Timber.i("amont: $financialAmountDouble")
 						Timber.i("amont s: $amount")
+						
 						financialAmount = s.copy(
 							text = CurrencyFormatter.format(
 								locale = AppUtil.deviceLocale,
@@ -268,10 +277,12 @@ fun FinancialScreen(
 							),
 							selection = selectionIndex
 						)
+						
+						Timber.i("financial amont: ${financialAmount.text}")
 					},
 					leadingIcon = {
 						Text(
-							text = if (financialAction == FinancialViewModel.FINANCIAL_ACTION_EDIT) {
+							text = if (financialAction == FinancialAction.EDIT) {
 								financialNew.currency.symbol
 							} else currentCurrency.symbol,
 							style = Typography.bodyMedium.copy(
@@ -312,7 +323,6 @@ fun FinancialScreen(
 					trailingIcon = {
 						IconButton(
 							onClick = {
-								isDatePickerShowed = true
 								textFieldDateFocusRequester.requestFocus()
 							}
 						) {
@@ -420,7 +430,7 @@ fun FinancialScreen(
 				
 				FilledTonalButton(
 					onClick = {
-						if (financialAction == FinancialViewModel.FINANCIAL_ACTION_EDIT) {
+						if (financialAction == FinancialAction.EDIT) {
 							financialViewModel.updateFinancial(
 								financial = financialNew.copy(
 									name = financialTitle,
@@ -428,7 +438,7 @@ fun FinancialScreen(
 									dateCreated = financialDate,
 									category = financialCategory
 								),
-								action = onSave
+								action = saveFinancial
 							)
 						} else {
 							when {
@@ -452,7 +462,7 @@ fun FinancialScreen(
 											currency = currentCurrency,
 											dateCreated = financialDate
 										),
-										action = onSave
+										action = saveFinancial
 									)
 								}
 							}

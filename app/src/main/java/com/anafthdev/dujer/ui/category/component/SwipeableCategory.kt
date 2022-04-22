@@ -23,9 +23,10 @@ fun SwipeableCategory(
 	category: Category,
 	modifier: Modifier = Modifier,
 	onCanDelete: () -> Unit,
-	onDismissToEnd: () -> Unit
+	onDismissToEnd: () -> Unit,
+	onDismissToStart: () -> Unit
 ) {
-	
+	// TODO: Swipe kiri buat edit
 	var canDelete by remember { mutableStateOf(false) }
 	
 	val dismissState = rememberDismissState(
@@ -41,9 +42,7 @@ fun SwipeableCategory(
 	)
 	
 	if (
-		((2 * dismissState.progress.fraction) >= 1f) and
-		(dismissState.targetValue == DismissValue.DismissedToEnd) and
-		!canDelete
+		((2 * dismissState.progress.fraction) >= 1f) and !canDelete
 	) {
 		onCanDelete()
 		canDelete = true

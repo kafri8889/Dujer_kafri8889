@@ -6,4 +6,6 @@ interface IDujerEnvironment {
 	
 	val dispatcher: CoroutineDispatcher
 	
+	fun vibrate(millis: Long)
+	
 }

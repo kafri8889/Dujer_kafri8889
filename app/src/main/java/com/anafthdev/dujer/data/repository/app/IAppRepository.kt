@@ -5,12 +5,15 @@ import com.anafthdev.dujer.data.db.model.Financial
 import com.anafthdev.dujer.data.repository.category.ICategoryRepository
 import com.anafthdev.dujer.data.repository.expense.IExpenseRepository
 import com.anafthdev.dujer.data.repository.income.IIncomeRepository
+import kotlinx.coroutines.flow.Flow
 
 interface IAppRepository {
 	val appDatastore: AppDatastore
 	val categoryRepository: ICategoryRepository
 	val incomeRepository: IIncomeRepository
 	val expenseRepository: IExpenseRepository
+	
+	suspend fun getAllFinancial(): Flow<List<Financial>>
 	
 	suspend fun get(id: Int): Financial?
 	

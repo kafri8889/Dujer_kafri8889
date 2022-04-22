@@ -26,7 +26,7 @@ import com.anafthdev.dujer.foundation.window.spScaled
 import com.anafthdev.dujer.ui.theme.Typography
 
 @Composable
-fun OutlinedTextFieldCounter(
+fun OutlinedTextField(
 	value: String,
 	maxCounter: Int,
 	onValueChange: (String) -> Unit,
@@ -45,11 +45,11 @@ fun OutlinedTextFieldCounter(
 	singleLine: Boolean = false,
 	maxLines: Int = Int.MAX_VALUE,
 	interactionSource: MutableInteractionSource = remember { MutableInteractionSource() },
-	shape: Shape = OutlinedTextFieldCounterTokens.ContainerShape.toShape(),
+	shape: Shape = OutlinedTextFieldTokens.ContainerShape.toShape(),
 	colors: TextFieldColors = TextFieldDefaults.outlinedTextFieldColors()
 ) {
 	
-	var textLength by remember { mutableStateOf(0) }
+	val textLength by rememberUpdatedState(newValue = value.length)
 	
 	Column(
 		modifier = modifier
@@ -58,7 +58,6 @@ fun OutlinedTextFieldCounter(
 			value = value,
 			onValueChange = { s ->
 				if (textLength < maxCounter) {
-					textLength = s.length
 					onValueChange(s)
 				}
 			},
@@ -95,7 +94,7 @@ fun OutlinedTextFieldCounter(
 	}
 }
 
-object OutlinedTextFieldCounterTokens {
+object OutlinedTextFieldTokens {
 	val CaretColor = ColorSchemeKeyTokens.Primary
 	val ContainerHeight = 56.0.dp
 	val ContainerShape = ShapeKeyTokens.CornerExtraSmall

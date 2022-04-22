@@ -6,7 +6,6 @@ import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.CornerSize
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -29,10 +28,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
-import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.painterResource
@@ -45,21 +42,18 @@ import androidx.navigation.NavController
 import com.anafthdev.dujer.R
 import com.anafthdev.dujer.data.CategoryIcons
 import com.anafthdev.dujer.data.db.model.Category
-import com.anafthdev.dujer.foundation.common.keyboard.isHide
-import com.anafthdev.dujer.foundation.common.keyboard.isShowed
-import com.anafthdev.dujer.foundation.common.keyboard.keyboardAsState
 import com.anafthdev.dujer.foundation.extension.lastIndexOf
 import com.anafthdev.dujer.foundation.extension.removeFirstAndLastWhitespace
-import com.anafthdev.dujer.foundation.extension.toDp
 import com.anafthdev.dujer.foundation.window.dpScaled
 import com.anafthdev.dujer.foundation.window.spScaled
 import com.anafthdev.dujer.model.CategoryTint
 import com.anafthdev.dujer.ui.category.component.SwipeableCategory
+import com.anafthdev.dujer.ui.category.data.CategoryAction
 import com.anafthdev.dujer.ui.theme.Inter
 import com.anafthdev.dujer.ui.theme.Typography
 import com.anafthdev.dujer.ui.theme.black04
 import com.anafthdev.dujer.ui.theme.shapes
-import com.anafthdev.dujer.uicomponent.OutlinedTextFieldCounter
+import com.anafthdev.dujer.uicomponent.OutlinedTextField
 import com.anafthdev.dujer.uicomponent.TopAppBar
 import com.anafthdev.dujer.util.AppUtil.toast
 import com.google.accompanist.flowlayout.FlowCrossAxisAlignment
@@ -72,6 +66,8 @@ import kotlin.random.Random
 @OptIn(ExperimentalMaterialApi::class, ExperimentalComposeUiApi::class)
 @Composable
 fun CategoryScreen(
+	id: Int = Category.default.id,
+	action: String = CategoryAction.NOTHING,
 	navController: NavController
 ) {
 	
@@ -90,9 +86,37 @@ fun CategoryScreen(
 	
 	val categories = state.categories
 	
+	var category by remember { mutableStateOf(Category.default) }
+	var hasNavigate by remember { mutableStateOf(false) }
+	var categoryAction by remember { mutableStateOf(action) }
 	var newCategoryName by remember { mutableStateOf("") }
 	var selectedCategoryIcon by remember { mutableStateOf(CategoryIcons.other) }
 	val categoryNameFocusRequester by remember { mutableStateOf(FocusRequester()) }
+	
+	val hideSheet = {
+		scope.launch { sheetState.hide() }
+		Unit
+	}
+	val showSheet = {
+		scope.launch { sheetState.show() }
+		Unit
+	}
+	
+	if (!hasNavigate) {
+		if ((id != Category.default.id) and (categoryAction == CategoryAction.EDIT)) {
+			categoryViewModel.get(id) { mCategory ->
+				category = mCategory
+				newCategoryName = category.name
+				selectedCategoryIcon = category.iconID
+				
+				showSheet()
+				
+				true.also {
+					hasNavigate = it
+				}
+			}
+		}
+	}
 	
 	DisposableEffect(
 		key1 = sheetState.isVisible,
@@ -104,13 +128,17 @@ fun CategoryScreen(
 			} else {
 				focusManager.clearFocus()
 				keyboardController?.hide()
+				newCategoryName = ""
+				selectedCategoryIcon = CategoryIcons.other
+				categoryAction = CategoryAction.NOTHING
 			}
 		}
 	}
 	
-	BackHandler(enabled = sheetState.isVisible) {
-		scope.launch {
-			sheetState.hide()
+	BackHandler {
+		when {
+			sheetState.isVisible -> hideSheet()
+			else -> navController.popBackStack()
 		}
 	}
 	
@@ -133,11 +161,7 @@ fun CategoryScreen(
 						.fillMaxWidth()
 				) {
 					IconButton(
-						onClick = {
-							scope.launch {
-								sheetState.hide()
-							}
-						},
+						onClick = hideSheet,
 						modifier = Modifier
 							.align(Alignment.CenterStart)
 					) {
@@ -148,7 +172,8 @@ fun CategoryScreen(
 					}
 					
 					Text(
-						text = stringResource(id = R.string.new_category),
+						text = if (categoryAction == CategoryAction.EDIT) stringResource(id = R.string.edit_category)
+						else stringResource(id = R.string.new_category),
 						style = Typography.bodyLarge.copy(
 							fontWeight = FontWeight.Medium,
 							fontSize = Typography.bodyLarge.fontSize.spScaled
@@ -164,18 +189,25 @@ fun CategoryScreen(
 									R.string.category_name_cannot_be_empty
 								).toast(context)
 								else -> {
-									categoryViewModel.insertCategory(
-										Category(
-											id = Random.nextInt(),
-											name = newCategoryName.removeFirstAndLastWhitespace(),
-											iconID = selectedCategoryIcon,
-											tint = CategoryTint.getRandomTint()
+									if (categoryAction == CategoryAction.EDIT) {
+										categoryViewModel.updateCategory(
+											category.copy(
+												name = newCategoryName.removeFirstAndLastWhitespace(),
+												iconID = selectedCategoryIcon
+											)
 										)
-									)
-									
-									scope.launch {
-										sheetState.hide()
+									} else {
+										categoryViewModel.insertCategory(
+											Category(
+												id = Random.nextInt(),
+												name = newCategoryName.removeFirstAndLastWhitespace(),
+												iconID = selectedCategoryIcon,
+												tint = CategoryTint.getRandomTint()
+											)
+										)
 									}
+									
+									hideSheet()
 								}
 							}
 						},
@@ -189,7 +221,7 @@ fun CategoryScreen(
 					}
 				}
 				
-				OutlinedTextFieldCounter(
+				OutlinedTextField(
 					singleLine = true,
 					maxCounter = 30,
 					value = newCategoryName,
@@ -204,9 +236,7 @@ fun CategoryScreen(
 					),
 					keyboardActions = KeyboardActions(
 						onDone = {
-							scope.launch {
-								sheetState.hide()
-							}
+							hideSheet()
 						}
 					),
 					placeholder = {
@@ -273,11 +303,7 @@ fun CategoryScreen(
 				.systemBarsPadding()
 		) {
 			FloatingActionButton(
-				onClick = {
-					scope.launch {
-						sheetState.show()
-					}
-				},
+				onClick = showSheet,
 				modifier = Modifier
 					.padding(32.dpScaled)
 					.align(Alignment.BottomEnd)
@@ -324,6 +350,7 @@ fun CategoryScreen(
 					SwipeableCategory(
 						category = category,
 						onCanDelete = {},
+						onDismissToStart = {},
 						onDismissToEnd = {
 							categoryViewModel.deleteCategory(category)
 						},

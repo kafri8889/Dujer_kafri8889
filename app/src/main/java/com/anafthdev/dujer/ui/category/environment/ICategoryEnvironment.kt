@@ -8,11 +8,13 @@ interface ICategoryEnvironment {
 	
 	val dispatcher: CoroutineDispatcher
 	
-	suspend fun getAllCategory(): Flow<List<Category>>
+	suspend fun get(id: Int, action: (Category) -> Unit)
 	
-	suspend fun updateCategory(category: Category)
+	suspend fun getAll(): Flow<List<Category>>
 	
-	suspend fun deleteCategory(category: Category)
+	suspend fun update(category: Category)
 	
-	suspend fun insertCategory(category: Category)
+	suspend fun delete(category: Category)
+	
+	suspend fun insert(category: Category)
 }

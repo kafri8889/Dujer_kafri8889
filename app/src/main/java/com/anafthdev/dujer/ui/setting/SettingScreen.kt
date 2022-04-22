@@ -60,6 +60,9 @@ fun SettingScreen(
 	val scope = rememberCoroutineScope()
 	val sheetState = rememberModalBottomSheetState(initialValue = ModalBottomSheetValue.Hidden)
 	
+	val hideSheet = { scope.launch { sheetState.hide() } }
+	val showSheet = { scope.launch { sheetState.show() } }
+	
 	val settingPreferences = listOf(
 		SettingPreference(
 			title = stringResource(id = R.string.category),
@@ -104,9 +107,7 @@ fun SettingScreen(
 			) {
 				IconButton(
 					onClick = {
-						scope.launch {
-							sheetState.hide()
-						}
+						hideSheet()
 					},
 					modifier = Modifier
 						.align(Alignment.CenterStart)
@@ -135,9 +136,7 @@ fun SettingScreen(
 						.fillMaxWidth()
 						.clickable {
 							localizedViewModel.setLanguage(lang)
-							scope.launch {
-								sheetState.hide()
-							}
+							hideSheet()
 						}
 						.padding(4.dpScaled)
 				) {
@@ -145,9 +144,7 @@ fun SettingScreen(
 						selected = languageUsed == lang,
 						onClick = {
 							localizedViewModel.setLanguage(lang)
-							scope.launch {
-								sheetState.hide()
-							}
+							hideSheet()
 						}
 					)
 					
@@ -208,16 +205,8 @@ fun SettingScreen(
 					}
 					
 					when (indexSettingPreference) {
-						0 -> {
-							navController.navigate(DujerDestination.Category.route) {
-								launchSingleTop = true
-							}
-						}
-						1 -> {
-							scope.launch {
-								sheetState.show()
-							}
-						}
+						0 -> navController.navigate(DujerDestination.Category.createRoute())
+						1 -> showSheet()
 						2 -> {
 							settingViewModel.setUseBioAuth(preference.value as Boolean)
 						}
