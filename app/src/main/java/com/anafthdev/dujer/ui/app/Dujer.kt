@@ -1,16 +1,12 @@
 package com.anafthdev.dujer.ui.app
 
-import androidx.activity.compose.BackHandler
-import androidx.compose.foundation.background
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material.ExperimentalMaterialApi
-import androidx.compose.material.ModalBottomSheetLayout
-import androidx.compose.material.ModalBottomSheetValue
-import androidx.compose.material.rememberModalBottomSheetState
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Surface
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.SideEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
@@ -26,13 +22,9 @@ import com.anafthdev.dujer.data.db.model.Category
 import com.anafthdev.dujer.ui.category.CategoryScreen
 import com.anafthdev.dujer.ui.category.data.CategoryAction
 import com.anafthdev.dujer.ui.dashboard.DashboardScreen
-import com.anafthdev.dujer.ui.financial.FinancialScreen
 import com.anafthdev.dujer.ui.income_expense.IncomeExpenseScreen
 import com.anafthdev.dujer.ui.setting.SettingScreen
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
-import timber.log.Timber
 
 
 @OptIn(ExperimentalMaterialApi::class)
@@ -57,11 +49,6 @@ fun DujerApp() {
 		)
 	}
 	
-	Surface(
-		color = MaterialTheme.colorScheme.background
-	) {
-	
-	}
 	NavHost(
 		navController = navController,
 		startDestination = DujerDestination.Dashboard.route,

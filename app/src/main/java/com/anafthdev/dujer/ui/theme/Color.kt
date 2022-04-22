@@ -68,6 +68,8 @@ val error = Color(0xFFba1b1b)
 val Custom0 = Color(0xFFc1d34d)
 val incomeColor = Color(0xFF82DD55)
 val expenseColor = Color(0xFFE23636)
+val swipe_dismiss_delete_background = Color(0xFFFFA1A1)
+val swipe_dismiss_edit_background = Color(0xFFABFF9C)
 
 val balance_card_background = Color(0xFF37474F)
 val income_card_background = Color(0xFFD9E7E5)
