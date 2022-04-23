@@ -29,7 +29,7 @@ import com.google.accompanist.systemuicontroller.rememberSystemUiController
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun DujerApp() {
-	
+	-
 	val context = LocalContext.current
 	
 	val isSystemInDarkTheme = isSystemInDarkTheme()
