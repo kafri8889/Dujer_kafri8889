@@ -29,7 +29,7 @@ import com.google.accompanist.systemuicontroller.rememberSystemUiController
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun DujerApp() {
-	
+	// TODO: ganti currency ke currency sekarang di financial
 	val context = LocalContext.current
 	
 	val isSystemInDarkTheme = isSystemInDarkTheme()
