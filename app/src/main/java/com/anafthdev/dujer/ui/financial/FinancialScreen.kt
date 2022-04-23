@@ -268,7 +268,7 @@ fun FinancialScreen(
 						
 						financialAmountDouble = CurrencyFormatter.parse(
 							locale = AppUtil.deviceLocale,
-							amount = "${localCurrency.symbol}$amount",
+							amount = "${CurrencyFormatter.getSymbol(AppUtil.deviceLocale, financial.currency.countryCode)}$amount",
 							currencyCode = financial.currency.countryCode,
 						)
 						
