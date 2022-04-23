@@ -8,6 +8,7 @@ import androidx.datastore.preferences.core.*
 import androidx.datastore.preferences.preferencesDataStore
 import com.anafthdev.dujer.data.preference.Language
 import com.anafthdev.dujer.data.preference.Preference
+import com.anafthdev.dujer.foundation.uimode.data.UiMode
 import com.anafthdev.dujer.model.Currency
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -55,6 +56,14 @@ class AppDatastore @Inject constructor(private val context: Context) {
 		}.invokeOnCompletion { postAction(action) }
 	}
 	
+	fun setUiMode(mUiMode: UiMode, action: () -> Unit) {
+		scope.launch {
+			context.datastore.edit { preferences ->
+				preferences[uiMode] = mUiMode.ordinal
+			}
+		}.invokeOnCompletion { postAction(action) }
+	}
+	
 	val getUserBalance: Flow<Double> = context.datastore.data.map { preferences ->
 		preferences[userBalance] ?: 0.0
 	}
@@ -79,6 +88,10 @@ class AppDatastore @Inject constructor(private val context: Context) {
 		Language.values()[preferences[language] ?: Language.ENGLISH.ordinal]
 	}
 	
+	val getUiMode: Flow<UiMode> = context.datastore.data.map { preferences ->
+		UiMode.values()[preferences[uiMode] ?: UiMode.LIGHT.ordinal]
+	}
+	
 	companion object {
 		val Context.datastore: DataStore<Preferences> by preferencesDataStore("app_datastore")
 		
@@ -86,5 +99,7 @@ class AppDatastore @Inject constructor(private val context: Context) {
 		val currentCurrency = stringPreferencesKey(Preference.CURRENT_CURRENCY)
 		val useBioAuth = booleanPreferencesKey(Preference.USE_BIO_AUTH)
 		val language = intPreferencesKey(Preference.LANGUAGE)
+		val uiMode = intPreferencesKey(Preference.UI_MODE)
+		
 	}
 }

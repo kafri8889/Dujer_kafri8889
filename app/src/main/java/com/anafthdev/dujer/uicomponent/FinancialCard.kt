@@ -1,6 +1,7 @@
 package com.anafthdev.dujer.uicomponent
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.material3.*
@@ -15,8 +16,8 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.anafthdev.dujer.data.FinancialType
 import com.anafthdev.dujer.data.db.model.Financial
-import com.anafthdev.dujer.foundation.extension.horizontalScroll
 import com.anafthdev.dujer.foundation.extension.toColor
+import com.anafthdev.dujer.foundation.uiextension.horizontalScroll
 import com.anafthdev.dujer.foundation.window.dpScaled
 import com.anafthdev.dujer.foundation.window.spScaled
 import com.anafthdev.dujer.model.LocalCurrency
@@ -43,7 +44,8 @@ fun FinancialCard(
 			defaultElevation = 1.dp
 		),
 		colors = CardDefaults.cardColors(
-			containerColor = Color.White
+			containerColor = if (isSystemInDarkTheme()) CardDefaults.cardColors().containerColor(true).value
+			else Color.White
 		),
 		modifier = modifier
 	) {

@@ -29,7 +29,10 @@ import com.anafthdev.dujer.R
 import com.anafthdev.dujer.data.DujerDestination
 import com.anafthdev.dujer.data.preference.Language
 import com.anafthdev.dujer.foundation.extension.indexOf
+import com.anafthdev.dujer.foundation.extension.isDarkTheme
 import com.anafthdev.dujer.foundation.localized.LocalizedViewModel
+import com.anafthdev.dujer.foundation.uimode.UiModeViewModel
+import com.anafthdev.dujer.foundation.uimode.data.UiMode
 import com.anafthdev.dujer.foundation.window.dpScaled
 import com.anafthdev.dujer.foundation.window.spScaled
 import com.anafthdev.dujer.model.SettingPreference
@@ -48,14 +51,17 @@ fun SettingScreen(
 	
 	val context = LocalContext.current
 	
+	val uiModeViewModel = hiltViewModel<UiModeViewModel>()
 	val settingViewModel = hiltViewModel<SettingViewModel>()
 	val localizedViewModel = hiltViewModel<LocalizedViewModel>()
 	
+	val uiModeState by uiModeViewModel.state.collectAsState()
 	val settingState by settingViewModel.state.collectAsState()
 	val localizedState by localizedViewModel.state.collectAsState()
 	
-	val isUseBioAuth = settingState.isUseBioAuth
+	val uiMode = uiModeState.uiMode
 	val languageUsed = localizedState.language
+	val isUseBioAuth = settingState.isUseBioAuth
 	
 	val scope = rememberCoroutineScope()
 	val sheetStateChangeLanguage = rememberModalBottomSheetState(initialValue = ModalBottomSheetValue.Hidden)
@@ -75,21 +81,29 @@ fun SettingScreen(
 			summary = stringResource(id = R.string.category_summary),
 			iconResId = R.drawable.ic_category_2,
 			value = "",
-			category = stringResource(id = R.string.configuration)
+			category = stringResource(id = R.string.display_and_configuration)
 		),
 		SettingPreference(
 			title = stringResource(id = R.string.currency),
 			summary = stringResource(id = R.string.currency_summary),
 			iconResId = R.drawable.ic_dollar_circle,
 			value = "",
-			category = stringResource(id = R.string.configuration)
+			category = stringResource(id = R.string.display_and_configuration)
 		),
 		SettingPreference(
 			title = stringResource(id = R.string.language),
 			summary = stringResource(id = R.string.language_summary),
 			iconResId = R.drawable.ic_language,
 			value = "",
-			category = stringResource(id = R.string.configuration)
+			category = stringResource(id = R.string.display_and_configuration)
+		),
+		SettingPreference(
+			title = stringResource(id = R.string.dark_theme),
+			summary = "",
+			iconResId = if (uiMode.isDarkTheme()) R.drawable.ic_moon else R.drawable.ic_sun,
+			value = uiMode.isDarkTheme(),
+			category = stringResource(id = R.string.display_and_configuration),
+			type = SettingPreference.PreferenceType.SWITCH
 		),
 		SettingPreference(
 			title = stringResource(id = R.string.biometric_authentication),
@@ -218,7 +232,10 @@ fun SettingScreen(
 						0 -> navController.navigate(DujerDestination.Category.createRoute())
 						1 -> navController.navigate(DujerDestination.Currency.route)
 						2 -> showSheet()
-						3 -> {
+						3 -> uiModeViewModel.setUiMode(
+							if (preference.value as Boolean) UiMode.DARK else UiMode.LIGHT
+						)
+						4 -> {
 							settingViewModel.setUseBioAuth(preference.value as Boolean)
 						}
 					}

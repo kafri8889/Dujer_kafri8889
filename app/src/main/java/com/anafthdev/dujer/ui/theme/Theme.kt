@@ -1,5 +1,6 @@
 package com.anafthdev.dujer.ui.theme
 
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.darkColorScheme
 import androidx.compose.material3.lightColorScheme
@@ -64,10 +65,9 @@ private val DarkThemeColors = darkColorScheme(
 )
 
 @Composable
-fun DujerTheme(content: @Composable () -> Unit) {
+fun DujerTheme(isSystemInDarkTheme: Boolean = isSystemInDarkTheme(), content: @Composable () -> Unit) {
 	MaterialTheme(
-//		colorScheme = if (isSystemInDarkTheme()) DarkThemeColors else LightThemeColors,
-		colorScheme = LightThemeColors,
+		colorScheme = if (isSystemInDarkTheme) DarkThemeColors else LightThemeColors,
 		typography = Typography,
 		shapes = shapes,
 		content = content

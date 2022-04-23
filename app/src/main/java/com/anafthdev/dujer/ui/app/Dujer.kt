@@ -1,5 +1,7 @@
 package com.anafthdev.dujer.ui.app
 
+import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.gestures.LocalOverScrollConfiguration
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material.ExperimentalMaterialApi
@@ -23,10 +25,11 @@ import com.anafthdev.dujer.ui.change_currency.ChangeCurrencyScreen
 import com.anafthdev.dujer.ui.dashboard.DashboardScreen
 import com.anafthdev.dujer.ui.income_expense.IncomeExpenseScreen
 import com.anafthdev.dujer.ui.setting.SettingScreen
+import com.anafthdev.dujer.ui.theme.DujerTheme
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
 
 
-@OptIn(ExperimentalMaterialApi::class)
+@OptIn(ExperimentalMaterialApi::class, ExperimentalFoundationApi::class)
 @Composable
 fun DujerApp() {
 	
@@ -50,73 +53,75 @@ fun DujerApp() {
 		)
 	}
 	
-	CompositionLocalProvider(
-		LocalCurrency provides currentCurrency
-	) {
-		NavHost(
-			navController = navController,
-			startDestination = DujerDestination.Dashboard.route,
-			modifier = Modifier
-				.fillMaxSize()
+	DujerTheme {
+		CompositionLocalProvider(
+			LocalCurrency provides currentCurrency,
+			LocalOverScrollConfiguration provides null
 		) {
-			composable(DujerDestination.Dashboard.route) {
-				DashboardScreen(
-					navController = navController,
-					dujerViewModel = dujerViewModel
-				)
-			}
-			
-			composable(
-				route = DujerDestination.IncomeExpense.route,
-				arguments = listOf(
-					navArgument("type") {
-						type = NavType.IntType
-					}
-				)
-			) { entry ->
-				val type = entry.arguments?.getInt("type") ?: 0
+			NavHost(
+				navController = navController,
+				startDestination = DujerDestination.Dashboard.route,
+				modifier = Modifier
+					.fillMaxSize()
+			) {
+				composable(DujerDestination.Dashboard.route) {
+					DashboardScreen(
+						navController = navController,
+						dujerViewModel = dujerViewModel
+					)
+				}
 				
-				IncomeExpenseScreen(
-					navController = navController,
-					type = FinancialType.values()[type],
-					dujerViewModel = dujerViewModel
-				)
-			}
-			
-			composable(
-				route = DujerDestination.Category.route,
-				arguments = listOf(
-					navArgument("id") {
-						type = NavType.IntType
-					},
-					navArgument("action") {
-						type = NavType.StringType
-					}
-				)
-			) { entry ->
-				val id = entry.arguments?.getInt("id") ?: Category.default.id
-				val action = entry.arguments?.getString("action") ?: CategoryAction.NOTHING
+				composable(
+					route = DujerDestination.IncomeExpense.route,
+					arguments = listOf(
+						navArgument("type") {
+							type = NavType.IntType
+						}
+					)
+				) { entry ->
+					val type = entry.arguments?.getInt("type") ?: 0
+					
+					IncomeExpenseScreen(
+						navController = navController,
+						type = FinancialType.values()[type],
+						dujerViewModel = dujerViewModel
+					)
+				}
 				
-				CategoryScreen(
-					id = id,
-					action = action,
-					navController = navController,
-					dujerViewModel = dujerViewModel
-				)
+				composable(
+					route = DujerDestination.Category.route,
+					arguments = listOf(
+						navArgument("id") {
+							type = NavType.IntType
+						},
+						navArgument("action") {
+							type = NavType.StringType
+						}
+					)
+				) { entry ->
+					val id = entry.arguments?.getInt("id") ?: Category.default.id
+					val action = entry.arguments?.getString("action") ?: CategoryAction.NOTHING
+					
+					CategoryScreen(
+						id = id,
+						action = action,
+						navController = navController,
+						dujerViewModel = dujerViewModel
+					)
+				}
+				
+				composable(DujerDestination.Setting.route) {
+					SettingScreen(
+						navController = navController
+					)
+				}
+				
+				composable(DujerDestination.Currency.route) {
+					ChangeCurrencyScreen(
+						navController = navController
+					)
+				}
 			}
-			
-			composable(DujerDestination.Setting.route) {
-				SettingScreen(
-					navController = navController
-				)
-			}
-			
-			composable(DujerDestination.Currency.route) {
-				ChangeCurrencyScreen(
-					navController = navController
-				)
-			}
-			
 		}
 	}
 }
