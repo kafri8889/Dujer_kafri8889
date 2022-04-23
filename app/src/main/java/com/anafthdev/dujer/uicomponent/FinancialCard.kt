@@ -1,7 +1,6 @@
 package com.anafthdev.dujer.uicomponent
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.material3.*
@@ -16,8 +15,10 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.anafthdev.dujer.data.FinancialType
 import com.anafthdev.dujer.data.db.model.Financial
+import com.anafthdev.dujer.foundation.extension.isDarkTheme
 import com.anafthdev.dujer.foundation.extension.toColor
 import com.anafthdev.dujer.foundation.uiextension.horizontalScroll
+import com.anafthdev.dujer.foundation.uimode.data.LocalUiMode
 import com.anafthdev.dujer.foundation.window.dpScaled
 import com.anafthdev.dujer.foundation.window.spScaled
 import com.anafthdev.dujer.model.LocalCurrency
@@ -44,7 +45,7 @@ fun FinancialCard(
 			defaultElevation = 1.dp
 		),
 		colors = CardDefaults.cardColors(
-			containerColor = if (isSystemInDarkTheme()) CardDefaults.cardColors().containerColor(true).value
+			containerColor = if (LocalUiMode.current.isDarkTheme()) CardDefaults.cardColors().containerColor(true).value
 			else Color.White
 		),
 		modifier = modifier
@@ -77,10 +78,11 @@ fun FinancialCard(
 			) {
 				Column(
 					modifier = Modifier
-						.weight(0.4f)
+						.weight(0.45f)
 				) {
 					Text(
 						text = financial.name,
+						maxLines = 2,
 						style = Typography.bodyMedium.copy(
 							fontWeight = FontWeight.SemiBold,
 							fontSize = Typography.bodyMedium.fontSize.spScaled
@@ -101,7 +103,7 @@ fun FinancialCard(
 				Column(
 					horizontalAlignment = Alignment.End,
 					modifier = Modifier
-						.weight(0.6f)
+						.weight(0.55f)
 				) {
 					Text(
 						text = (if (financial.type == FinancialType.INCOME) "+" else "-") +
@@ -126,8 +128,7 @@ fun FinancialCard(
 						maxLines = 1,
 						overflow = TextOverflow.Ellipsis,
 						style = Typography.labelSmall.copy(
-							color = Color(0xFF4A5568),
-							fontWeight = FontWeight.Medium,
+							fontWeight = FontWeight.Normal,
 							fontSize = Typography.labelSmall.fontSize.spScaled
 						),
 						modifier = Modifier

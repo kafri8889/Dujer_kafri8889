@@ -14,17 +14,14 @@ class UiModeViewModel @Inject constructor(
 	uiModeEnvironment: IUiModeEnvironment
 ): StatefulViewModel<UiModeState, Unit, IUiModeEnvironment>(UiModeState(), uiModeEnvironment) {
 	
-	private var listener: UiModeListener? = null
-	
 	init {
 		viewModelScope.launch {
 			environment.getUiMode()
 				.flowOn(environment.dispatcher)
-				.collect { uiMode ->
-					listener?.onChange()
+				.collect { mUiMode ->
 					setState {
 						copy(
-							uiMode = uiMode
+							uiMode = mUiMode
 						)
 					}
 				}
@@ -37,11 +34,4 @@ class UiModeViewModel @Inject constructor(
 		}
 	}
 	
-	fun setUiModeChangeListener(listener: UiModeListener) {
-		this.listener = listener
-	}
-	
-	interface UiModeListener {
-		fun onChange()
-	}
 }

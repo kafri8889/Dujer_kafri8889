@@ -14,6 +14,7 @@ import androidx.compose.material3.LocalTextStyle
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.text.input.ImeAction
@@ -80,6 +81,14 @@ fun ChangeCurrencyScreen(
 				.padding(8.dpScaled)
 				.fillMaxWidth()
 		)
+		
+		Row(
+			verticalAlignment = Alignment.CenterVertically,
+			modifier = Modifier
+				.padding(horizontal = 8.dpScaled)
+		) {
+		
+		}
 		
 		LazyColumn {
 			items(

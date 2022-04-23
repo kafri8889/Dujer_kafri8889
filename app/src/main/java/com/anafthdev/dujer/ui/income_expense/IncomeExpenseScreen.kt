@@ -14,10 +14,7 @@ import androidx.compose.material.ModalBottomSheetValue
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.ArrowBack
 import androidx.compose.material.rememberModalBottomSheetState
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Text
+import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -34,10 +31,13 @@ import androidx.compose.ui.viewinterop.AndroidView
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.anafthdev.dujer.R
+import com.anafthdev.dujer.data.FinancialLineChartValueFormatter
 import com.anafthdev.dujer.data.FinancialType
 import com.anafthdev.dujer.data.db.model.Financial
 import com.anafthdev.dujer.foundation.extension.getBy
+import com.anafthdev.dujer.foundation.extension.isDarkTheme
 import com.anafthdev.dujer.foundation.uiextension.horizontalScroll
+import com.anafthdev.dujer.foundation.uimode.data.LocalUiMode
 import com.anafthdev.dujer.foundation.window.dpScaled
 import com.anafthdev.dujer.foundation.window.spScaled
 import com.anafthdev.dujer.model.LocalCurrency
@@ -69,10 +69,12 @@ fun IncomeExpenseScreen(
 	dujerViewModel: DujerViewModel
 ) {
 	
+	val uiMode = LocalUiMode.current
 	val context = LocalContext.current
+	val density = LocalDensity.current
 	val config = LocalConfiguration.current
 	val localCurrency = LocalCurrency.current
-	val density = LocalDensity.current
+	val contentColor = LocalContentColor.current
 	
 	val incomeExpenseViewModel = hiltViewModel<IncomeExpenseViewModel>()
 	
@@ -222,7 +224,7 @@ fun IncomeExpenseScreen(
 						AndroidView(
 							factory = { context ->
 								LineChart(context).apply {
-									extraBottomOffset = 8f
+									extraBottomOffset = 16f
 									isDragEnabled = false
 									description.isEnabled = false
 									axisRight.isEnabled = false
@@ -234,18 +236,17 @@ fun IncomeExpenseScreen(
 									val yAxisLeft = axisLeft
 									yAxisLeft.textSize = 14f
 									yAxisLeft.axisMinimum = 0f
-									yAxisLeft.textColor = android.graphics.Color.BLACK
 									yAxisLeft.axisLineColor = android.graphics.Color.TRANSPARENT
+									yAxisLeft.valueFormatter = FinancialLineChartValueFormatter(localCurrency.countryCode)
 									yAxisLeft.setDrawGridLines(true)
 									yAxisLeft.setPosition(YAxis.YAxisLabelPosition.OUTSIDE_CHART)
 									yAxisLeft.enableGridDashedLine(12f, 12f, 0f)
 									
-									val xAxis = xAxis
-									xAxis.position = XAxis.XAxisPosition.BOTTOM
-									xAxis.textColor = android.graphics.Color.BLACK
+									xAxis.yOffset = 16f
 									xAxis.textSize = 14f
+									xAxis.position = XAxis.XAxisPosition.BOTTOM
 									xAxis.setLabelCount(AppUtil.shortMonths.size, true)
-									xAxis.axisLineColor = black09.toArgb()
+									xAxis.axisLineColor = android.graphics.Color.TRANSPARENT
 									xAxis.valueFormatter = IndexAxisValueFormatter(AppUtil.shortMonths)
 									xAxis.setDrawGridLines(false)
 									xAxis.setCenterAxisLabels(false)
@@ -254,6 +255,13 @@ fun IncomeExpenseScreen(
 								}
 							},
 							update = { lineChart ->
+								val xAxis = lineChart.xAxis
+								xAxis.textColor = contentColor.toArgb()
+								
+								val yAxisLeft = lineChart.axisLeft
+								yAxisLeft.textColor = contentColor.toArgb()
+								yAxisLeft.gridColor = if (uiMode.isDarkTheme()) black09.toArgb() else black04.toArgb()
+								
 								lineChart.marker = SingleLineChartMarkerView(context, localCurrency)
 								lineChart.data = LineData(incomeExpenseLineDataset)
 								lineChart.invalidate()

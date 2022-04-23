@@ -214,7 +214,7 @@ fun SettingScreen(
 				
 				Text(
 					text = stringResource(id = R.string.setting),
-					style = Typography.titleLarge.copy(
+					style = MaterialTheme.typography.titleLarge.copy(
 						fontWeight = FontWeight.Bold,
 						fontSize = Typography.titleLarge.fontSize.spScaled
 					)

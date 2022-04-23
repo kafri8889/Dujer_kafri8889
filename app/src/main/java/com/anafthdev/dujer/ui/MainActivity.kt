@@ -3,7 +3,6 @@ package com.anafthdev.dujer.ui
 import android.os.Bundle
 import android.telephony.TelephonyManager
 import androidx.activity.compose.setContent
-import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.biometric.BiometricPrompt
 import androidx.compose.foundation.ExperimentalFoundationApi
@@ -13,14 +12,12 @@ import com.anafthdev.dujer.BuildConfig
 import com.anafthdev.dujer.data.datastore.AppDatastore
 import com.anafthdev.dujer.foundation.extension.isDarkTheme
 import com.anafthdev.dujer.foundation.localized.LocalizedActivity
-import com.anafthdev.dujer.foundation.uimode.UiModeViewModel
 import com.anafthdev.dujer.foundation.uimode.data.UiMode
 import com.anafthdev.dujer.ui.app.DujerApp
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -32,14 +29,9 @@ class MainActivity : LocalizedActivity() {
 	private lateinit var telephonyManager: TelephonyManager
 	private lateinit var biometricManager: com.anafthdev.dujer.common.BiometricManager
 	
-	private val uiModeViewModel: UiModeViewModel by viewModels()
-	
 	@OptIn(ExperimentalFoundationApi::class)
 	override fun onCreate(savedInstanceState: Bundle?) {
 		super.onCreate(savedInstanceState)
-		val uiMode = runBlocking { appDatastore.getUiMode.first() }
-		AppCompatDelegate.setDefaultNightMode(getUiMode(uiMode))
-		
 		if (BuildConfig.DEBUG) {
 			Timber.plant(object : Timber.DebugTree() {
 				override fun log(priority: Int, tag: String?, message: String, t: Throwable?) {
@@ -94,12 +86,6 @@ class MainActivity : LocalizedActivity() {
 		setContent {
 			DujerApp()
 		}
-		
-		uiModeViewModel.setUiModeChangeListener(object : UiModeViewModel.UiModeListener {
-			override fun onChange() {
-				recreate()
-			}
-		})
 	}
 	
 	private fun getUiMode(uiMode: UiMode): Int {

@@ -39,6 +39,7 @@
     <string name="category_summary">Tambah atau hapus kategori</string>
     <string name="language_summary">Pilih bahasa yang kamu gunakan</string>
     <string name="available_balance">Saldo tersedia</string>
+    <string name="currency_format_note">Kami memformat mata uang menggunakan Locale perangkat Anda, beberapa format mungkin tidak sesuai.</string>
     <string name="select_your_language">Pilih bahasa mu</string>
     <string name="bio_auth_description">Verifikasi bahwa ini adalah Anda</string>
     <string name="no_fp_sensor_detected">Sensor sidik jari tidak terdeteksi</string>
