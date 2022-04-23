@@ -1,9 +1,7 @@
 package com.anafthdev.dujer.ui.category.environment
 
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.asFlow
 import com.anafthdev.dujer.data.db.model.Category
+import com.anafthdev.dujer.data.db.model.Financial
 import com.anafthdev.dujer.data.repository.app.IAppRepository
 import com.anafthdev.dujer.foundation.di.DiName
 import kotlinx.coroutines.CoroutineDispatcher
@@ -21,6 +19,14 @@ class CategoryEnvironment @Inject constructor(
 			val category = appRepository.categoryRepository.get(id)
 			action(category)
 		}
+	}
+	
+	override suspend fun updateFinancial(vararg financial: Financial) {
+		appRepository.update(*financial)
+	}
+	
+	override suspend fun getAllFinancial(): Flow<List<Financial>> {
+		return appRepository.getAllFinancial()
 	}
 	
 	override suspend fun getAll(): Flow<List<Category>> {

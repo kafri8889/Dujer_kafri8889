@@ -364,6 +364,8 @@ fun CategoryScreen(
 								newCategoryName = category.name
 								selectedCategoryIcon = category.iconID
 								
+								categoryAction = CategoryAction.EDIT
+								
 								showSheet()
 							}
 						},
