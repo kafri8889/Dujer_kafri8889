@@ -81,7 +81,8 @@ fun CategoryScreen(
 	
 	val scope = rememberCoroutineScope()
 	val sheetState = rememberModalBottomSheetState(
-		initialValue = ModalBottomSheetValue.Hidden
+		initialValue = ModalBottomSheetValue.Hidden,
+		skipHalfExpanded = true
 	)
 	
 	val state by categoryViewModel.state.collectAsState()
@@ -159,8 +160,8 @@ fun CategoryScreen(
 		sheetContent = {
 			Column(
 				modifier = Modifier
-					.fillMaxWidth()
 					.imePadding()
+					.fillMaxWidth()
 			) {
 				Box(
 					modifier = Modifier
@@ -246,7 +247,7 @@ fun CategoryScreen(
 						}
 					),
 					placeholder = {
-						Text(stringResource(id = R.string.new_category))
+						Text(stringResource(id = R.string.category_name))
 					},
 					modifier = Modifier
 						.padding(
@@ -265,7 +266,6 @@ fun CategoryScreen(
 					mainAxisAlignment = MainAxisAlignment.Center,
 					modifier = Modifier
 						.padding(
-							top = 8.dpScaled,
 							end = 16.dpScaled,
 							start = 16.dpScaled,
 							bottom = 16.dpScaled

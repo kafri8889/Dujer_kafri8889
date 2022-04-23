@@ -4,6 +4,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.asFlow
 import com.anafthdev.dujer.data.datastore.AppDatastore
+import com.anafthdev.dujer.data.repository.app.AppRepository
 import com.anafthdev.dujer.foundation.di.DiName
 import com.anafthdev.dujer.model.Currency
 import kotlinx.coroutines.CoroutineDispatcher
@@ -13,6 +14,7 @@ import javax.inject.Named
 
 class ChangeCurrencyEnvironment @Inject constructor(
 	@Named(DiName.DISPATCHER_IO) override val dispatcher: CoroutineDispatcher,
+	private val appRepository: AppRepository,
 	private val appDatastore: AppDatastore
 ): IChangeCurrencyEnvironment {
 	
@@ -42,6 +44,5 @@ class ChangeCurrencyEnvironment @Inject constructor(
 	override fun changeCurrency(currency: Currency, action: () -> Unit) {
 		appDatastore.setCurrentCurrency(currency.countryCode, action)
 	}
-	
 	
 }

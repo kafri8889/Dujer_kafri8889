@@ -103,7 +103,7 @@ fun FinancialScreen(
 				locale = AppUtil.deviceLocale,
 				amount = 0.0,
 				useSymbol = false,
-				currencyCode = localCurrency.countryCode
+				currencyCode = financial.currency.countryCode
 			)
 		)
 	}
@@ -125,7 +125,7 @@ fun FinancialScreen(
 					locale = AppUtil.deviceLocale,
 					amount = financial.amount,
 					useSymbol = false,
-					currencyCode = localCurrency.countryCode
+					currencyCode = financial.currency.countryCode
 				)
 			)
 		}
@@ -269,7 +269,7 @@ fun FinancialScreen(
 						financialAmountDouble = CurrencyFormatter.parse(
 							locale = AppUtil.deviceLocale,
 							amount = "${localCurrency.symbol}$amount",
-							currencyCode = localCurrency.countryCode,
+							currencyCode = financial.currency.countryCode,
 						)
 						
 						Timber.i("amont format from: ${financialViewModel.deviceCurrency.symbol}$amount")
@@ -281,7 +281,7 @@ fun FinancialScreen(
 								locale = AppUtil.deviceLocale,
 								amount = financialAmountDouble,
 								useSymbol = false,
-								currencyCode = localCurrency.countryCode
+								currencyCode = financial.currency.countryCode
 							),
 							selection = selectionIndex
 						)
