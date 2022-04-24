@@ -52,7 +52,6 @@ import com.anafthdev.dujer.ui.category.component.SwipeableCategory
 import com.anafthdev.dujer.ui.category.data.CategoryAction
 import com.anafthdev.dujer.ui.theme.Inter
 import com.anafthdev.dujer.ui.theme.Typography
-import com.anafthdev.dujer.ui.theme.black04
 import com.anafthdev.dujer.ui.theme.shapes
 import com.anafthdev.dujer.uicomponent.OutlinedTextField
 import com.anafthdev.dujer.uicomponent.TopAppBar
@@ -162,6 +161,7 @@ fun CategoryScreen(
 				modifier = Modifier
 					.imePadding()
 					.fillMaxWidth()
+					.background(MaterialTheme.colorScheme.background)
 			) {
 				Box(
 					modifier = Modifier
@@ -334,7 +334,6 @@ fun CategoryScreen(
 						) {
 							Icon(
 								imageVector = Icons.Rounded.ArrowBack,
-								tint = black04,
 								contentDescription = null
 							)
 						}

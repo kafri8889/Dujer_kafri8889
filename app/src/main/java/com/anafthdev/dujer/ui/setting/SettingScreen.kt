@@ -37,7 +37,6 @@ import com.anafthdev.dujer.foundation.window.dpScaled
 import com.anafthdev.dujer.foundation.window.spScaled
 import com.anafthdev.dujer.model.SettingPreference
 import com.anafthdev.dujer.ui.theme.Typography
-import com.anafthdev.dujer.ui.theme.black04
 import com.anafthdev.dujer.ui.theme.shapes
 import com.anafthdev.dujer.uicomponent.SettingPreferences
 import com.anafthdev.dujer.uicomponent.TopAppBar
@@ -128,66 +127,71 @@ fun SettingScreen(
 			bottomStart = CornerSize(0.dpScaled)
 		),
 		sheetContent = {
-			Box(
+			Column(
 				modifier = Modifier
-					.fillMaxWidth()
+					.background(MaterialTheme.colorScheme.background)
 			) {
-				IconButton(
-					onClick = hideSheet,
+				Box(
 					modifier = Modifier
-						.align(Alignment.CenterStart)
+						.fillMaxWidth()
 				) {
-					Icon(
-						imageVector = Icons.Rounded.Close,
-						contentDescription = null
+					IconButton(
+						onClick = hideSheet,
+						modifier = Modifier
+							.align(Alignment.CenterStart)
+					) {
+						Icon(
+							imageVector = Icons.Rounded.Close,
+							contentDescription = null
+						)
+					}
+					
+					Text(
+						text = stringResource(id = R.string.select_your_language),
+						style = Typography.bodyLarge.copy(
+							fontWeight = FontWeight.Medium,
+							fontSize = Typography.bodyLarge.fontSize.spScaled
+						),
+						modifier = Modifier
+							.align(Alignment.Center)
 					)
 				}
 				
-				Text(
-					text = stringResource(id = R.string.select_your_language),
-					style = Typography.bodyLarge.copy(
-						fontWeight = FontWeight.Medium,
-						fontSize = Typography.bodyLarge.fontSize.spScaled
-					),
-					modifier = Modifier
-						.align(Alignment.Center)
-				)
-			}
-			
-			for (lang in Language.values()) {
-				Row(
-					verticalAlignment = Alignment.CenterVertically,
+				for (lang in Language.values()) {
+					Row(
+						verticalAlignment = Alignment.CenterVertically,
+						modifier = Modifier
+							.fillMaxWidth()
+							.clickable {
+								localizedViewModel.setLanguage(lang)
+								hideSheet()
+							}
+							.padding(4.dpScaled)
+					) {
+						RadioButton(
+							selected = languageUsed == lang,
+							onClick = {
+								localizedViewModel.setLanguage(lang)
+								hideSheet()
+							}
+						)
+						
+						Text(
+							text = lang.name,
+							style = Typography.bodyMedium.copy(
+								fontWeight = FontWeight.Normal,
+								fontSize = Typography.bodyMedium.fontSize.spScaled
+							)
+						)
+					}
+				}
+				
+				Spacer(
 					modifier = Modifier
 						.fillMaxWidth()
-						.clickable {
-							localizedViewModel.setLanguage(lang)
-							hideSheet()
-						}
-						.padding(4.dpScaled)
-				) {
-					RadioButton(
-						selected = languageUsed == lang,
-						onClick = {
-							localizedViewModel.setLanguage(lang)
-							hideSheet()
-						}
-					)
-					
-					Text(
-						text = lang.name,
-						style = Typography.bodyMedium.copy(
-							fontWeight = FontWeight.Normal,
-							fontSize = Typography.bodyMedium.fontSize.spScaled
-						)
-					)
-				}
+						.height(16.dpScaled)
+				)
 			}
-			
-			Spacer(
-				modifier = Modifier
-					.fillMaxWidth()
-					.height(16.dpScaled)
-			)
 		}
 	) {
 		Column(
@@ -207,7 +211,6 @@ fun SettingScreen(
 				) {
 					Icon(
 						imageVector = Icons.Rounded.ArrowBack,
-						tint = black04,
 						contentDescription = null
 					)
 				}
