@@ -4,14 +4,19 @@ import android.graphics.Color
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.material3.LocalContentColor
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.viewinterop.AndroidView
+import com.anafthdev.dujer.data.FinancialLineChartValueFormatter
+import com.anafthdev.dujer.foundation.extension.isDarkTheme
+import com.anafthdev.dujer.foundation.uimode.data.LocalUiMode
 import com.anafthdev.dujer.foundation.window.dpScaled
 import com.anafthdev.dujer.model.LocalCurrency
+import com.anafthdev.dujer.ui.theme.black04
 import com.anafthdev.dujer.ui.theme.black09
 import com.anafthdev.dujer.util.AppUtil
 import com.anafthdev.dujer.view.MultiLineChartMarkerView
@@ -28,9 +33,11 @@ fun FinancialLineChart(
 	expenseLineDataset: LineDataSet
 ) {
 	
+	val uiMode = LocalUiMode.current
 	val context = LocalContext.current
 	val config = LocalConfiguration.current
 	val localCurrency = LocalCurrency.current
+	val contentColor = LocalContentColor.current
 	
 	Column(
 		modifier = Modifier
@@ -43,7 +50,7 @@ fun FinancialLineChart(
 		AndroidView(
 			factory = { context ->
 				LineChart(context).apply {
-					extraBottomOffset = 8f
+					extraBottomOffset = 16f
 					isDragEnabled = false
 					description.isEnabled = false
 					axisRight.isEnabled = false
@@ -55,18 +62,18 @@ fun FinancialLineChart(
 					val yAxisLeft = axisLeft
 					yAxisLeft.textSize = 14f
 					yAxisLeft.axisMinimum = 0f
-					yAxisLeft.textColor = Color.BLACK
 					yAxisLeft.axisLineColor = Color.TRANSPARENT
+					yAxisLeft.valueFormatter = FinancialLineChartValueFormatter(localCurrency.countryCode)
 					yAxisLeft.setDrawGridLines(true)
 					yAxisLeft.setPosition(YAxis.YAxisLabelPosition.OUTSIDE_CHART)
 					yAxisLeft.enableGridDashedLine(12f, 12f, 0f)
 					
 					val xAxis = xAxis
+					xAxis.yOffset = 16f
 					xAxis.position = XAxis.XAxisPosition.BOTTOM
-					xAxis.textColor = Color.BLACK
 					xAxis.textSize = 14f
 					xAxis.setLabelCount(AppUtil.shortMonths.size, true)
-					xAxis.axisLineColor = black09.toArgb()
+					xAxis.axisLineColor = Color.TRANSPARENT
 					xAxis.valueFormatter = IndexAxisValueFormatter(AppUtil.shortMonths)
 					xAxis.setDrawGridLines(false)
 					xAxis.setCenterAxisLabels(false)
@@ -76,6 +83,13 @@ fun FinancialLineChart(
 				}
 			},
 			update = { lineChart ->
+				val xAxis = lineChart.xAxis
+				xAxis.textColor = contentColor.toArgb()
+				
+				val yAxisLeft = lineChart.axisLeft
+				yAxisLeft.textColor = contentColor.toArgb()
+				yAxisLeft.gridColor = if (uiMode.isDarkTheme()) black09.toArgb() else black04.toArgb()
+				
 				lineChart.data = LineData(incomeLineDataset, expenseLineDataset)
 				lineChart.marker = MultiLineChartMarkerView(
 					context,

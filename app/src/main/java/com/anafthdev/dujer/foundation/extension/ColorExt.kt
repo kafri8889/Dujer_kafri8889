@@ -15,13 +15,14 @@ fun Int.toColor(): Color = Color(this)
  * @author kafri8889
  */
 fun Color.darkenColor(
-	@FloatRange(from = 0.0, to = 1.0) factor: Float
+	@FloatRange(from = 0.0, to = 1.0) factor: Float,
+	apply: Boolean = true
 ): Color {
-	return Color(
+	return if (apply) Color(
 		red = this.red * (1 - factor),
 		green = this.green * (1 - factor),
 		blue = this.blue * (1 - factor)
-	)
+	) else this
 }
 
 /**
@@ -30,13 +31,14 @@ fun Color.darkenColor(
  * @author kafri8889
  */
 fun Color.lightenColor(
-	@FloatRange(from = 0.0, to = 1.0) factor: Float
+	@FloatRange(from = 0.0, to = 1.0) factor: Float,
+	apply: Boolean = true
 ): Color {
-	return Color(
+	return if (apply) Color(
 		red = this.red + (1 - this.red) * factor,
 		green = this.green + (1 - this.green) * factor,
 		blue = this.blue + (1 - this.blue) * factor
-	)
+	) else this
 }
 
 enum class ColorSchemeKeyTokens {

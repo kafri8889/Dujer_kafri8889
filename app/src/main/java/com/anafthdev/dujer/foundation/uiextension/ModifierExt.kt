@@ -1,4 +1,4 @@
-package com.anafthdev.dujer.foundation.extension
+package com.anafthdev.dujer.foundation.uiextension
 
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.ScrollState

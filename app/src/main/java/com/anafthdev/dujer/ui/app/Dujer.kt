@@ -1,8 +1,10 @@
 package com.anafthdev.dujer.ui.app
 
-import androidx.compose.foundation.isSystemInDarkTheme
+import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.gestures.LocalOverScrollConfiguration
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material.ExperimentalMaterialApi
+import androidx.compose.material3.LocalContentColor
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -16,6 +18,9 @@ import androidx.navigation.navArgument
 import com.anafthdev.dujer.data.DujerDestination
 import com.anafthdev.dujer.data.FinancialType
 import com.anafthdev.dujer.data.db.model.Category
+import com.anafthdev.dujer.foundation.extension.isDarkTheme
+import com.anafthdev.dujer.foundation.uimode.UiModeViewModel
+import com.anafthdev.dujer.foundation.uimode.data.LocalUiMode
 import com.anafthdev.dujer.model.LocalCurrency
 import com.anafthdev.dujer.ui.category.CategoryScreen
 import com.anafthdev.dujer.ui.category.data.CategoryAction
@@ -23,22 +28,28 @@ import com.anafthdev.dujer.ui.change_currency.ChangeCurrencyScreen
 import com.anafthdev.dujer.ui.dashboard.DashboardScreen
 import com.anafthdev.dujer.ui.income_expense.IncomeExpenseScreen
 import com.anafthdev.dujer.ui.setting.SettingScreen
+import com.anafthdev.dujer.ui.theme.DujerTheme
+import com.anafthdev.dujer.ui.theme.black01
+import com.anafthdev.dujer.ui.theme.black10
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
 
 
-@OptIn(ExperimentalMaterialApi::class)
+@OptIn(ExperimentalMaterialApi::class, ExperimentalFoundationApi::class)
 @Composable
 fun DujerApp() {
 	
 	val context = LocalContext.current
 	
-	val isSystemInDarkTheme = isSystemInDarkTheme()
-	
 	val dujerViewModel = hiltViewModel<DujerViewModel>()
+	val uiModeViewModel = hiltViewModel<UiModeViewModel>()
 	
 	val state by dujerViewModel.state.collectAsState()
+	val uiModeState by uiModeViewModel.state.collectAsState()
 	
+	val uiMode = uiModeState.uiMode
 	val currentCurrency = state.currentCurrency
+	
+	val isSystemInDarkTheme = uiMode.isDarkTheme()
 	
 	val navController = rememberNavController()
 	val systemUiController = rememberSystemUiController()
@@ -46,77 +57,83 @@ fun DujerApp() {
 	SideEffect {
 		systemUiController.setSystemBarsColor(
 			color = Color.Transparent,
-			darkIcons = isSystemInDarkTheme
+			darkIcons = !isSystemInDarkTheme
 		)
 	}
 	
-	CompositionLocalProvider(
-		LocalCurrency provides currentCurrency
+	DujerTheme(
+		isSystemInDarkTheme = isSystemInDarkTheme
 	) {
-		NavHost(
-			navController = navController,
-			startDestination = DujerDestination.Dashboard.route,
-			modifier = Modifier
-				.fillMaxSize()
+		CompositionLocalProvider(
+			LocalUiMode provides uiMode,
+			LocalCurrency provides currentCurrency,
+			LocalContentColor provides if (isSystemInDarkTheme) black10 else black01,
+			LocalOverScrollConfiguration provides null
 		) {
-			composable(DujerDestination.Dashboard.route) {
-				DashboardScreen(
-					navController = navController,
-					dujerViewModel = dujerViewModel
-				)
-			}
-			
-			composable(
-				route = DujerDestination.IncomeExpense.route,
-				arguments = listOf(
-					navArgument("type") {
-						type = NavType.IntType
-					}
-				)
-			) { entry ->
-				val type = entry.arguments?.getInt("type") ?: 0
+			NavHost(
+				navController = navController,
+				startDestination = DujerDestination.Dashboard.route,
+				modifier = Modifier
+					.fillMaxSize()
+			) {
+				composable(DujerDestination.Dashboard.route) {
+					DashboardScreen(
+						navController = navController,
+						dujerViewModel = dujerViewModel
+					)
+				}
 				
-				IncomeExpenseScreen(
-					navController = navController,
-					type = FinancialType.values()[type],
-					dujerViewModel = dujerViewModel
-				)
-			}
-			
-			composable(
-				route = DujerDestination.Category.route,
-				arguments = listOf(
-					navArgument("id") {
-						type = NavType.IntType
-					},
-					navArgument("action") {
-						type = NavType.StringType
-					}
-				)
-			) { entry ->
-				val id = entry.arguments?.getInt("id") ?: Category.default.id
-				val action = entry.arguments?.getString("action") ?: CategoryAction.NOTHING
+				composable(
+					route = DujerDestination.IncomeExpense.route,
+					arguments = listOf(
+						navArgument("type") {
+							type = NavType.IntType
+						}
+					)
+				) { entry ->
+					val type = entry.arguments?.getInt("type") ?: 0
+					
+					IncomeExpenseScreen(
+						navController = navController,
+						type = FinancialType.values()[type],
+						dujerViewModel = dujerViewModel
+					)
+				}
 				
-				CategoryScreen(
-					id = id,
-					action = action,
-					navController = navController,
-					dujerViewModel = dujerViewModel
-				)
+				composable(
+					route = DujerDestination.Category.route,
+					arguments = listOf(
+						navArgument("id") {
+							type = NavType.IntType
+						},
+						navArgument("action") {
+							type = NavType.StringType
+						}
+					)
+				) { entry ->
+					val id = entry.arguments?.getInt("id") ?: Category.default.id
+					val action = entry.arguments?.getString("action") ?: CategoryAction.NOTHING
+					
+					CategoryScreen(
+						id = id,
+						action = action,
+						navController = navController,
+						dujerViewModel = dujerViewModel
+					)
+				}
+				
+				composable(DujerDestination.Setting.route) {
+					SettingScreen(
+						navController = navController
+					)
+				}
+				
+				composable(DujerDestination.Currency.route) {
+					ChangeCurrencyScreen(
+						navController = navController
+					)
+				}
 			}
-			
-			composable(DujerDestination.Setting.route) {
-				SettingScreen(
-					navController = navController
-				)
-			}
-			
-			composable(DujerDestination.Currency.route) {
-				ChangeCurrencyScreen(
-					navController = navController
-				)
-			}
-			
 		}
 	}
 }

@@ -3,18 +3,17 @@ package com.anafthdev.dujer.ui
 import android.os.Bundle
 import android.telephony.TelephonyManager
 import androidx.activity.compose.setContent
+import androidx.appcompat.app.AppCompatDelegate
 import androidx.biometric.BiometricPrompt
 import androidx.compose.foundation.ExperimentalFoundationApi
-import androidx.compose.foundation.gestures.LocalOverScrollConfiguration
-import androidx.compose.material3.Surface
-import androidx.compose.runtime.CompositionLocalProvider
 import androidx.core.view.WindowCompat
 import androidx.lifecycle.lifecycleScope
 import com.anafthdev.dujer.BuildConfig
 import com.anafthdev.dujer.data.datastore.AppDatastore
+import com.anafthdev.dujer.foundation.extension.isDarkTheme
 import com.anafthdev.dujer.foundation.localized.LocalizedActivity
+import com.anafthdev.dujer.foundation.uimode.data.UiMode
 import com.anafthdev.dujer.ui.app.DujerApp
-import com.anafthdev.dujer.ui.theme.DujerTheme
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.first
@@ -85,15 +84,12 @@ class MainActivity : LocalizedActivity() {
 		}
 		
 		setContent {
-			DujerTheme {
-				Surface {
-					CompositionLocalProvider(
-						LocalOverScrollConfiguration provides null
-					) {
-						DujerApp()
-					}
-				}
-			}
+			DujerApp()
 		}
 	}
+	
+	private fun getUiMode(uiMode: UiMode): Int {
+		return if (uiMode.isDarkTheme()) AppCompatDelegate.MODE_NIGHT_YES else AppCompatDelegate.MODE_NIGHT_NO
+	}
+	
 }

@@ -20,6 +20,7 @@
     <string name="dashboard">Dasbor</string>
     <string name="my_income">Pemasukan saya</string>
     <string name="no_result">Tidak ada hasil</string>
+    <string name="dark_theme">Tema gelap</string>
     <string name="income_for">Pemasukan untuk %1$s</string>
     <string name="add_income">Tambah pemasukan</string>
     <string name="auth_failed">Otentikasi gagal</string>
@@ -31,7 +32,6 @@
     <string name="expenses_for">Pengeluaran untuk %1$s</string>
     <string name="edit_category">Edit Category</string>
     <string name="category_name">Nama kategori</string>
-    <string name="configuration">Konfigurasi</string>
     <string name="your_expenses">Pengeluaran kamu</string>
     <string name="bio_auth_title">Verifikasi</string>
     <string name="session_time_out">Waktu sesi habis</string>
@@ -39,6 +39,7 @@
     <string name="category_summary">Tambah atau hapus kategori</string>
     <string name="language_summary">Pilih bahasa yang kamu gunakan</string>
     <string name="available_balance">Saldo tersedia</string>
+    <string name="currency_format_note">Kami memformat mata uang menggunakan Locale perangkat Anda, beberapa format mungkin tidak sesuai.</string>
     <string name="select_your_language">Pilih bahasa mu</string>
     <string name="bio_auth_description">Verifikasi bahwa ini adalah Anda</string>
     <string name="no_fp_sensor_detected">Sensor sidik jari tidak terdeteksi</string>
@@ -47,6 +48,7 @@
     <string name="amount_cannot_be_empty">Jumlah tidak boleh kosong</string>
     <string name="category_cannot_be_empty">Kategori tidak boleh kosong</string>
     <string name="biometric_authentication">Otentikasi biometrik</string>
+    <string name="display_and_configuration">Tampilan dan Konfigurasi</string>
     <string name="category_name_cannot_be_empty">Nama kategori tidak boleh kosong</string>
     <string name="biometric_authentication_summary">Gunakan otentikasi biometrik</string>
 

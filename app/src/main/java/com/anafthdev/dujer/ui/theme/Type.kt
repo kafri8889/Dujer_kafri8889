@@ -335,3 +335,21 @@ object TypefaceTokens {
 	val WeightMedium = FontWeight.Medium
 	val WeightRegular = FontWeight.Normal
 }
+
+enum class TypographyKeyTokens {
+	BodyLarge,
+	BodyMedium,
+	BodySmall,
+	DisplayLarge,
+	DisplayMedium,
+	DisplaySmall,
+	HeadlineLarge,
+	HeadlineMedium,
+	HeadlineSmall,
+	LabelLarge,
+	LabelMedium,
+	LabelSmall,
+	TitleLarge,
+	TitleMedium,
+	TitleSmall,
+}
