@@ -9,8 +9,6 @@ interface IDashboardEnvironment {
 	
 	val dispatcher: CoroutineDispatcher
 	
-	suspend fun deleteFinancial(financial: Financial)
-	
 	suspend fun getFinancial(): Flow<Financial>
 	
 	suspend fun getFinancialAction(): Flow<String>

@@ -12,13 +12,26 @@ import javax.inject.Inject
 @HiltViewModel
 class DashboardViewModel @Inject constructor(
 	dashboardEnvironment: IDashboardEnvironment
-): StatefulViewModel<DashboardState, Unit, IDashboardEnvironment>(DashboardState(), dashboardEnvironment) {
+): StatefulViewModel<DashboardState, Unit, DashboardAction, IDashboardEnvironment>(DashboardState(), dashboardEnvironment) {
 	
 	init {
 		getUserBalance()
 		getFinancialListAndCalculateEntry()
 		getFinancialID()
 		getFinancialAction()
+	}
+	
+	override fun dispatch(action: DashboardAction) {
+		when (action) {
+			is DashboardAction.SetFinancialID -> {
+				viewModelScope.launch(environment.dispatcher) {
+					environment.setFinancialID(action.id)
+				}
+			}
+			is DashboardAction.SetFinancialAction -> {
+				environment.setFinancialAction(action.action)
+			}
+		}
 	}
 	
 	private fun getFinancialAction() {
@@ -97,19 +110,4 @@ class DashboardViewModel @Inject constructor(
 		}
 	}
 	
-	fun delete(financial: Financial) {
-		viewModelScope.launch {
-			environment.deleteFinancial(financial)
-		}
-	}
-	
-	fun setFinancialID(id: Int) {
-		viewModelScope.launch(environment.dispatcher) {
-			environment.setFinancialID(id)
-		}
-	}
-	
-	fun setFinancialAction(action: String) {
-		environment.setFinancialAction(action)
-	}
 }

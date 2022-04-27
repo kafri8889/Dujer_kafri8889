@@ -10,6 +10,6 @@ interface IUiModeEnvironment {
 	
 	suspend fun getUiMode(): Flow<UiMode>
 	
-	fun setUiMode(uiMode: UiMode, action: () -> Unit = {})
+	suspend fun setUiMode(uiMode: UiMode)
 	
 }

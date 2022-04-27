@@ -1,7 +1,6 @@
 package com.anafthdev.dujer.foundation.uimode
 
 import androidx.lifecycle.viewModelScope
-import com.anafthdev.dujer.foundation.uimode.data.UiMode
 import com.anafthdev.dujer.foundation.uimode.environment.IUiModeEnvironment
 import com.anafthdev.dujer.foundation.viewmodel.StatefulViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -12,7 +11,7 @@ import javax.inject.Inject
 @HiltViewModel
 class UiModeViewModel @Inject constructor(
 	uiModeEnvironment: IUiModeEnvironment
-): StatefulViewModel<UiModeState, Unit, IUiModeEnvironment>(UiModeState(), uiModeEnvironment) {
+): StatefulViewModel<UiModeState, Unit, UiModeAction, IUiModeEnvironment>(UiModeState(), uiModeEnvironment) {
 	
 	init {
 		viewModelScope.launch {
@@ -28,9 +27,13 @@ class UiModeViewModel @Inject constructor(
 		}
 	}
 	
-	fun setUiMode(uiMode: UiMode, action: () -> Unit = {}) {
-		viewModelScope.launch(environment.dispatcher) {
-			environment.setUiMode(uiMode, action)
+	override fun dispatch(action: UiModeAction) {
+		when (action) {
+			is UiModeAction.SetUiMode -> {
+				viewModelScope.launch(environment.dispatcher) {
+					environment.setUiMode(action.uiMode)
+				}
+			}
 		}
 	}
 	

@@ -10,8 +10,8 @@ interface IChangeCurrencyEnvironment {
 	
 	suspend fun getSearchedCurrency(): Flow<List<Currency>>
 	
-	fun searchCurrency(query: String)
+	suspend fun changeCurrency(currency: Currency)
 	
-	fun changeCurrency(currency: Currency, action: () -> Unit = {})
+	fun searchCurrency(query: String)
 	
 }

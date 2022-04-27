@@ -1,8 +1,6 @@
 package com.anafthdev.dujer.data.datastore
 
 import android.content.Context
-import android.os.Handler
-import android.os.Looper
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.*
 import androidx.datastore.preferences.preferencesDataStore
@@ -10,58 +8,41 @@ import com.anafthdev.dujer.data.preference.Language
 import com.anafthdev.dujer.data.preference.Preference
 import com.anafthdev.dujer.foundation.uimode.data.UiMode
 import com.anafthdev.dujer.model.Currency
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.launch
 import timber.log.Timber
 import javax.inject.Inject
 
 class AppDatastore @Inject constructor(private val context: Context) {
 	
-	private val scope = CoroutineScope(Job() + Dispatchers.IO)
-	private fun postAction(action: () -> Unit) = Handler(Looper.getMainLooper()).post { action() }
-	
-	fun setUserBalance(balance: Double, action: () -> Unit) {
-		scope.launch {
-			context.datastore.edit { preferences ->
-				preferences[userBalance] = balance
-			}
-		}.invokeOnCompletion { postAction(action) }
+	suspend fun setUserBalance(balance: Double) {
+		context.datastore.edit { preferences ->
+			preferences[userBalance] = balance
+		}
 	}
 	
-	fun setCurrentCurrency(countryID: String, action: () -> Unit) {
-		scope.launch {
-			context.datastore.edit { preferences ->
-				preferences[currentCurrency] = countryID
-			}
-		}.invokeOnCompletion { postAction(action) }
+	suspend fun setCurrentCurrency(countryID: String) {
+		context.datastore.edit { preferences ->
+			preferences[currentCurrency] = countryID
+		}
 	}
 	
-	fun setUseBioAuth(use: Boolean, action: () -> Unit) {
-		scope.launch {
-			context.datastore.edit { preferences ->
-				preferences[useBioAuth] = use
-			}
-		}.invokeOnCompletion { postAction(action) }
+	suspend fun setUseBioAuth(use: Boolean) {
+		context.datastore.edit { preferences ->
+			preferences[useBioAuth] = use
+		}
 	}
 	
-	fun setLanguage(lang: Language, action: () -> Unit) {
-		scope.launch {
-			context.datastore.edit { preferences ->
-				preferences[language] = lang.ordinal
-			}
-		}.invokeOnCompletion { postAction(action) }
+	suspend fun setLanguage(lang: Language) {
+		context.datastore.edit { preferences ->
+			preferences[language] = lang.ordinal
+		}
 	}
 	
-	fun setUiMode(mUiMode: UiMode, action: () -> Unit) {
-		scope.launch {
-			context.datastore.edit { preferences ->
-				preferences[uiMode] = mUiMode.ordinal
-			}
-		}.invokeOnCompletion { postAction(action) }
+	suspend fun setUiMode(mUiMode: UiMode) {
+		context.datastore.edit { preferences ->
+			preferences[uiMode] = mUiMode.ordinal
+		}
 	}
 	
 	val getUserBalance: Flow<Double> = context.datastore.data.map { preferences ->

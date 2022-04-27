@@ -33,8 +33,10 @@ import com.anafthdev.dujer.data.FinancialType
 import com.anafthdev.dujer.data.db.model.Financial
 import com.anafthdev.dujer.foundation.extension.combine
 import com.anafthdev.dujer.foundation.extension.getBy
+import com.anafthdev.dujer.foundation.extension.toArray
 import com.anafthdev.dujer.foundation.window.dpScaled
 import com.anafthdev.dujer.foundation.window.spScaled
+import com.anafthdev.dujer.ui.app.DujerAction
 import com.anafthdev.dujer.ui.app.DujerViewModel
 import com.anafthdev.dujer.ui.dashboard.component.BalanceCard
 import com.anafthdev.dujer.ui.dashboard.component.ExpenseCard
@@ -192,8 +194,14 @@ fun DashboardScreen(
 				)
 			},
 			onFinancialClicked = { clickedFinancial ->
-				dashboardViewModel.setFinancialAction(FinancialAction.EDIT)
-				dashboardViewModel.setFinancialID(clickedFinancial.id)
+				dashboardViewModel.dispatch(
+					DashboardAction.SetFinancialAction(FinancialAction.EDIT)
+				)
+				
+				dashboardViewModel.dispatch(
+					DashboardAction.SetFinancialID(clickedFinancial.id)
+				)
+				
 				scope.launch {
 					financialScreenSheetState.show()
 				}
@@ -222,7 +230,10 @@ private fun DashboardContent(
 	) {
 		FloatingActionButton(
 			onClick = {
-				dashboardViewModel.setFinancialAction(FinancialAction.NEW)
+				dashboardViewModel.dispatch(
+					DashboardAction.SetFinancialAction(FinancialAction.NEW)
+				)
+				
 				scope.launch {
 					financialScreenSheetState.show()
 				}
@@ -334,14 +345,26 @@ private fun DashboardContent(
 				SwipeableFinancialCard(
 					financial = financial,
 					onDismissToEnd = {
-						dashboardViewModel.delete(financial)
+						dujerViewModel.dispatch(
+							DujerAction.DeleteFinancial(
+								financial.toArray()
+							)
+						)
 					},
 					onCanDelete = {
-						dujerViewModel.vibrate(100)
+						dujerViewModel.dispatch(
+							DujerAction.Vibrate(100)
+						)
 					},
 					onClick = {
-						dashboardViewModel.setFinancialAction(FinancialAction.EDIT)
-						dashboardViewModel.setFinancialID(financial.id)
+						dashboardViewModel.dispatch(
+							DashboardAction.SetFinancialAction(FinancialAction.EDIT)
+						)
+						
+						dashboardViewModel.dispatch(
+							DashboardAction.SetFinancialID(financial.id)
+						)
+						
 						scope.launch {
 							financialScreenSheetState.show()
 						}

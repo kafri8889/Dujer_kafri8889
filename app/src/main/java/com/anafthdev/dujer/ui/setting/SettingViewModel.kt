@@ -10,7 +10,7 @@ import javax.inject.Inject
 @HiltViewModel
 class SettingViewModel @Inject constructor(
 	settingEnvironment: ISettingEnvironment
-): StatefulViewModel<SettingState, Unit, ISettingEnvironment>(SettingState(), settingEnvironment) {
+): StatefulViewModel<SettingState, Unit, SettingAction, ISettingEnvironment>(SettingState(), settingEnvironment) {
 	
 	init {
 		viewModelScope.launch(environment.dispatcher) {
@@ -24,9 +24,13 @@ class SettingViewModel @Inject constructor(
 		}
 	}
 	
-	fun setUseBioAuth(useBioAuth: Boolean, action: () -> Unit = {}) {
-		viewModelScope.launch(environment.dispatcher) {
-			environment.setIsUseBioAuth(useBioAuth, action)
+	override fun dispatch(action: SettingAction) {
+		when (action) {
+			is SettingAction.SetUseBioAuth -> {
+				viewModelScope.launch(environment.dispatcher) {
+					environment.setIsUseBioAuth(action.isUseBioAuth)
+				}
+			}
 		}
 	}
 	

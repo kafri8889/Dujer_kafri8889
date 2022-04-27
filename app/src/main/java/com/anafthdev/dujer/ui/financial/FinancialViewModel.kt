@@ -2,7 +2,6 @@ package com.anafthdev.dujer.ui.financial
 
 import androidx.lifecycle.viewModelScope
 import com.anafthdev.dujer.data.db.model.Category
-import com.anafthdev.dujer.data.db.model.Financial
 import com.anafthdev.dujer.foundation.extension.combine
 import com.anafthdev.dujer.foundation.viewmodel.StatefulViewModel
 import com.anafthdev.dujer.ui.financial.environment.IFinancialEnvironment
@@ -15,7 +14,7 @@ import javax.inject.Inject
 @HiltViewModel
 class FinancialViewModel @Inject constructor(
 	financialEnvironment: IFinancialEnvironment
-): StatefulViewModel<FinancialState, Unit, IFinancialEnvironment>(FinancialState(), financialEnvironment) {
+): StatefulViewModel<FinancialState, Unit, FinancialAction, IFinancialEnvironment>(FinancialState(), financialEnvironment) {
 	
 	val deviceCurrency: Currency = Currency.getInstance(AppUtil.deviceLocale)
 	
@@ -33,21 +32,18 @@ class FinancialViewModel @Inject constructor(
 		}
 	}
 	
-	fun getFinancial(id: Int, action: (Financial) -> Unit) {
-		viewModelScope.launch(environment.dispatcher) {
-			environment.getFinancial(id, action)
-		}
-	}
-	
-	fun updateFinancial(financial: Financial, action: () -> Unit) {
-		viewModelScope.launch(environment.dispatcher) {
-			environment.updateFinancial(financial, action)
-		}
-	}
-	
-	fun insertFinancial(financial: Financial, action: () -> Unit) {
-		viewModelScope.launch(environment.dispatcher) {
-			environment.insertFinancial(financial, action)
+	override fun dispatch(action: FinancialAction) {
+		when (action) {
+			is FinancialAction.Update -> {
+				viewModelScope.launch(environment.dispatcher) {
+					environment.updateFinancial(action.financial)
+				}
+			}
+			is FinancialAction.Insert -> {
+				viewModelScope.launch(environment.dispatcher) {
+					environment.insertFinancial(action.financial)
+				}
+			}
 		}
 	}
 	

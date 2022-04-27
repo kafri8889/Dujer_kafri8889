@@ -33,16 +33,16 @@ class ChangeCurrencyEnvironment @Inject constructor(
 		return resultCurrency.asFlow()
 	}
 	
+	override suspend fun changeCurrency(currency: Currency) {
+		appDatastore.setCurrentCurrency(currency.countryCode)
+	}
+	
 	override fun searchCurrency(query: String) {
 		_resultCurrency.postValue(
 			availableCurrency
 				.filter { it.country.contains(query, true) }
 				.distinctBy { it.countryCode }
 		)
-	}
-	
-	override fun changeCurrency(currency: Currency, action: () -> Unit) {
-		appDatastore.setCurrentCurrency(currency.countryCode, action)
 	}
 	
 }

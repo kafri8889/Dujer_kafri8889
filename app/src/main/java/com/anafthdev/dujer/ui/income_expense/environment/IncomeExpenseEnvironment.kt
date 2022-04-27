@@ -19,8 +19,8 @@ class IncomeExpenseEnvironment @Inject constructor(
 	private val _financial = MutableLiveData(Financial.default)
 	private val financial: LiveData<Financial> = _financial
 	
-	override suspend fun deleteFinancial(financial: Financial) {
-		appRepository.delete(financial)
+	override suspend fun deleteFinancial(vararg financial: Financial) {
+		appRepository.delete(*financial)
 	}
 	
 	override suspend fun getIncomeFinancialList(): Flow<List<Financial>> {

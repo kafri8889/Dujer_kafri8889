@@ -30,7 +30,9 @@ import com.anafthdev.dujer.data.DujerDestination
 import com.anafthdev.dujer.data.preference.Language
 import com.anafthdev.dujer.foundation.extension.indexOf
 import com.anafthdev.dujer.foundation.extension.isDarkTheme
+import com.anafthdev.dujer.foundation.localized.LocalizedAction
 import com.anafthdev.dujer.foundation.localized.LocalizedViewModel
+import com.anafthdev.dujer.foundation.uimode.UiModeAction
 import com.anafthdev.dujer.foundation.uimode.UiModeViewModel
 import com.anafthdev.dujer.foundation.uimode.data.UiMode
 import com.anafthdev.dujer.foundation.window.dpScaled
@@ -163,7 +165,10 @@ fun SettingScreen(
 						modifier = Modifier
 							.fillMaxWidth()
 							.clickable {
-								localizedViewModel.setLanguage(lang)
+								localizedViewModel.dispatch(
+									LocalizedAction.SetLanguage(lang)
+								)
+								
 								hideSheet()
 							}
 							.padding(4.dpScaled)
@@ -171,7 +176,10 @@ fun SettingScreen(
 						RadioButton(
 							selected = languageUsed == lang,
 							onClick = {
-								localizedViewModel.setLanguage(lang)
+								localizedViewModel.dispatch(
+									LocalizedAction.SetLanguage(lang)
+								)
+								
 								hideSheet()
 							}
 						)
@@ -235,11 +243,16 @@ fun SettingScreen(
 						0 -> navController.navigate(DujerDestination.Category.createRoute())
 						1 -> navController.navigate(DujerDestination.Currency.route)
 						2 -> showSheet()
-						3 -> uiModeViewModel.setUiMode(
-							if (preference.value as Boolean) UiMode.DARK else UiMode.LIGHT
+						3 -> uiModeViewModel.dispatch(
+							UiModeAction.SetUiMode(
+								if (preference.value as Boolean) UiMode.DARK
+								else UiMode.LIGHT
+							)
 						)
 						4 -> {
-							settingViewModel.setUseBioAuth(preference.value as Boolean)
+							settingViewModel.dispatch(
+								SettingAction.SetUseBioAuth(preference.value as Boolean)
+							)
 						}
 					}
 				}

@@ -35,7 +35,7 @@ import com.anafthdev.dujer.data.db.model.Financial
 import com.anafthdev.dujer.foundation.window.dpScaled
 import com.anafthdev.dujer.foundation.window.spScaled
 import com.anafthdev.dujer.ui.category.component.CategoryCard
-import com.anafthdev.dujer.ui.category.data.CategoryAction
+import com.anafthdev.dujer.ui.category.data.CategorySwipeAction
 import com.anafthdev.dujer.ui.theme.Inter
 import com.anafthdev.dujer.ui.theme.Typography
 import com.anafthdev.dujer.ui.theme.semi_large_shape
@@ -99,7 +99,9 @@ fun SearchScreen(
 				value = searchTextQuery,
 				focusRequester = searchFocusRequester,
 				onTextChanged = { s ->
-					searchViewModel.search(s)
+					searchViewModel.dispatch(
+						SearchAction.Search(s)
+					)
 				},
 				onCancel = closeSearch
 			)
@@ -256,7 +258,7 @@ internal fun SearchBody(
 							navController.navigate(
 								DujerDestination.Category.createRoute(
 									id = category.id,
-									action = CategoryAction.EDIT
+									action = CategorySwipeAction.EDIT
 								)
 							)
 						}

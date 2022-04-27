@@ -8,7 +8,7 @@ interface IIncomeExpenseEnvironment {
 	
 	val dispatcher: CoroutineDispatcher
 	
-	suspend fun deleteFinancial(financial: Financial)
+	suspend fun deleteFinancial(vararg financial: Financial)
 	
 	suspend fun getIncomeFinancialList(): Flow<List<Financial>>
 	

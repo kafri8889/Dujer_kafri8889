@@ -33,16 +33,12 @@ class CategoryEnvironment @Inject constructor(
 		return appRepository.categoryRepository.getAllCategory()
 	}
 	
-	override suspend fun update(category: Category) {
-		appRepository.categoryRepository.update(category)
+	override suspend fun update(vararg category: Category) {
+		appRepository.categoryRepository.update(*category)
 	}
 	
-	override suspend fun delete(category: Category) {
-		appRepository.categoryRepository.delete(category)
-	}
-	
-	override suspend fun insert(category: Category) {
-		appRepository.categoryRepository.insert(category)
+	override suspend fun insert(vararg category: Category) {
+		appRepository.categoryRepository.insert(*category)
 	}
 	
 }

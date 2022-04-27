@@ -44,12 +44,14 @@ import com.anafthdev.dujer.data.CategoryIcons
 import com.anafthdev.dujer.data.db.model.Category
 import com.anafthdev.dujer.foundation.extension.lastIndexOf
 import com.anafthdev.dujer.foundation.extension.removeFirstAndLastWhitespace
+import com.anafthdev.dujer.foundation.extension.toArray
 import com.anafthdev.dujer.foundation.window.dpScaled
 import com.anafthdev.dujer.foundation.window.spScaled
 import com.anafthdev.dujer.model.CategoryTint
+import com.anafthdev.dujer.ui.app.DujerAction
 import com.anafthdev.dujer.ui.app.DujerViewModel
 import com.anafthdev.dujer.ui.category.component.SwipeableCategory
-import com.anafthdev.dujer.ui.category.data.CategoryAction
+import com.anafthdev.dujer.ui.category.data.CategorySwipeAction
 import com.anafthdev.dujer.ui.theme.Inter
 import com.anafthdev.dujer.ui.theme.Typography
 import com.anafthdev.dujer.ui.theme.shapes
@@ -67,7 +69,7 @@ import kotlin.random.Random
 @Composable
 fun CategoryScreen(
 	id: Int = Category.default.id,
-	action: String = CategoryAction.NOTHING,
+	action: String = CategorySwipeAction.NOTHING,
 	navController: NavController,
 	dujerViewModel: DujerViewModel
 ) {
@@ -105,21 +107,26 @@ fun CategoryScreen(
 	}
 	
 	val getCategory = {
-		categoryViewModel.get(id) { mCategory ->
-			category = mCategory
-			newCategoryName = category.name
-			selectedCategoryIcon = category.iconID
-			
-			showSheet()
-			
-			true.also {
-				hasNavigate = it
-			}
-		}
+		categoryViewModel.dispatch(
+			CategoryAction.Get(
+				id = id,
+				action = { mCategory ->
+					category = mCategory
+					newCategoryName = category.name
+					selectedCategoryIcon = category.iconID
+					
+					showSheet()
+					
+					true.also {
+						hasNavigate = it
+					}
+				}
+			)
+		)
 	}
 	
 	if (!hasNavigate) {
-		if ((id != Category.default.id) and (categoryAction == CategoryAction.EDIT)) {
+		if ((id != Category.default.id) and (categoryAction == CategorySwipeAction.EDIT)) {
 			getCategory()
 		}
 	}
@@ -136,7 +143,7 @@ fun CategoryScreen(
 				keyboardController?.hide()
 				newCategoryName = ""
 				selectedCategoryIcon = CategoryIcons.other
-				categoryAction = CategoryAction.NOTHING
+				categoryAction = CategorySwipeAction.NOTHING
 			}
 		}
 	}
@@ -179,7 +186,7 @@ fun CategoryScreen(
 					}
 					
 					Text(
-						text = if (categoryAction == CategoryAction.EDIT) stringResource(id = R.string.edit_category)
+						text = if (categoryAction == CategorySwipeAction.EDIT) stringResource(id = R.string.edit_category)
 						else stringResource(id = R.string.new_category),
 						style = Typography.bodyLarge.copy(
 							fontWeight = FontWeight.Medium,
@@ -196,20 +203,24 @@ fun CategoryScreen(
 									R.string.category_name_cannot_be_empty
 								).toast(context)
 								else -> {
-									if (categoryAction == CategoryAction.EDIT) {
-										categoryViewModel.updateCategory(
-											category.copy(
-												name = newCategoryName.removeFirstAndLastWhitespace(),
-												iconID = selectedCategoryIcon
+									if (categoryAction == CategorySwipeAction.EDIT) {
+										categoryViewModel.dispatch(
+											CategoryAction.Update(
+												category.copy(
+													name = newCategoryName.removeFirstAndLastWhitespace(),
+													iconID = selectedCategoryIcon
+												).toArray()
 											)
 										)
 									} else {
-										categoryViewModel.insertCategory(
-											Category(
-												id = Random.nextInt(),
-												name = newCategoryName.removeFirstAndLastWhitespace(),
-												iconID = selectedCategoryIcon,
-												tint = CategoryTint.getRandomTint()
+										categoryViewModel.dispatch(
+											CategoryAction.Insert(
+												Category(
+													id = Random.nextInt(),
+													name = newCategoryName.removeFirstAndLastWhitespace(),
+													iconID = selectedCategoryIcon,
+													tint = CategoryTint.getRandomTint()
+												).toArray()
 											)
 										)
 									}
@@ -355,21 +366,32 @@ fun CategoryScreen(
 					SwipeableCategory(
 						category = item,
 						onCanDelete = {
-							dujerViewModel.vibrate(100)
+							dujerViewModel.dispatch(
+								DujerAction.Vibrate(100)
+							)
 						},
 						onDismissToStart = {
-							categoryViewModel.get(item.id) { mCategory ->
-								category = mCategory
-								newCategoryName = category.name
-								selectedCategoryIcon = category.iconID
-								
-								categoryAction = CategoryAction.EDIT
-								
-								showSheet()
-							}
+							categoryViewModel.dispatch(
+								CategoryAction.Get(
+									id = item.id,
+									action = { mCategory ->
+										category = mCategory
+										newCategoryName = category.name
+										selectedCategoryIcon = category.iconID
+										
+										categoryAction = CategorySwipeAction.EDIT
+										
+										showSheet()
+									}
+								)
+							)
 						},
 						onDismissToEnd = {
-							categoryViewModel.deleteCategory(item)
+							dujerViewModel.dispatch(
+								DujerAction.DeleteCategory(
+									item.toArray()
+								)
+							)
 						},
 						modifier = Modifier
 							.padding(

@@ -18,7 +18,7 @@ import javax.inject.Inject
 @HiltViewModel
 class CategoryViewModel @Inject constructor(
 	categoryEnvironment: ICategoryEnvironment
-): StatefulViewModel<CategoryState, Unit, ICategoryEnvironment>(CategoryState(), categoryEnvironment) {
+): StatefulViewModel<CategoryState, Unit, CategoryAction, ICategoryEnvironment>(CategoryState(), categoryEnvironment) {
 	
 	init {
 		viewModelScope.launch(environment.dispatcher) {
@@ -36,6 +36,26 @@ class CategoryViewModel @Inject constructor(
 							.distinctBy { it.id }
 							.sortedBy { it.name }
 					)
+				}
+			}
+		}
+	}
+	
+	override fun dispatch(action: CategoryAction) {
+		when (action) {
+			is CategoryAction.Get -> {
+				viewModelScope.launch(environment.dispatcher) {
+					environment.get(action.id, action.action)
+				}
+			}
+			is CategoryAction.Update -> {
+				viewModelScope.launch(environment.dispatcher) {
+					environment.update(*action.categories)
+				}
+			}
+			is CategoryAction.Insert -> {
+				viewModelScope.launch(environment.dispatcher) {
+					environment.insert(*action.categories)
 				}
 			}
 		}
@@ -73,27 +93,4 @@ class CategoryViewModel @Inject constructor(
 		)
 	}
 	
-	fun get(id: Int, action: (Category) -> Unit) {
-		viewModelScope.launch(environment.dispatcher) {
-			environment.get(id, action)
-		}
-	}
-	
-	fun updateCategory(category: Category) {
-		viewModelScope.launch(environment.dispatcher) {
-			environment.update(category)
-		}
-	}
-	
-	fun deleteCategory(category: Category) {
-		viewModelScope.launch(environment.dispatcher) {
-			environment.delete(category)
-		}
-	}
-	
-	fun insertCategory(category: Category) {
-		viewModelScope.launch(environment.dispatcher) {
-			environment.insert(category)
-		}
-	}
 }
