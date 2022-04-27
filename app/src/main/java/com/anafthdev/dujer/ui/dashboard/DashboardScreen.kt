@@ -272,6 +272,11 @@ private fun DashboardContent(
 						IconButton(
 							onClick = {
 								navController.navigate(DujerDestination.Setting.route) {
+									popUpTo(popUpToId) {
+										saveState = true
+									}
+									
+									restoreState = true
 									launchSingleTop = true
 								}
 							},
@@ -340,7 +345,7 @@ private fun DashboardContent(
 			
 			items(
 				items = incomeFinancialList.combine(expenseFinancialList).sortedBy { it.dateCreated },
-				key = { item: Financial -> item.id }
+				key = { item: Financial -> item.hashCode() }
 			) { financial ->
 				SwipeableFinancialCard(
 					financial = financial,
