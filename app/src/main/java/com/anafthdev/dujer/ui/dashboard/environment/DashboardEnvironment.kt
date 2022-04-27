@@ -28,10 +28,6 @@ class DashboardEnvironment @Inject constructor(
 	private val _financialAction = MutableLiveData(FinancialAction.NEW)
 	private val financialAction: LiveData<String> = _financialAction
 	
-	override suspend fun deleteFinancial(financial: Financial) {
-		appRepository.delete(financial)
-	}
-	
 	override suspend fun getFinancial(): Flow<Financial> {
 		return financial.asFlow()
 	}

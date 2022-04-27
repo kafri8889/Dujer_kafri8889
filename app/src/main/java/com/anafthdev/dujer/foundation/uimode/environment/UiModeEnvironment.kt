@@ -17,8 +17,8 @@ class UiModeEnvironment @Inject constructor(
 		return appDatastore.getUiMode
 	}
 	
-	override fun setUiMode(uiMode: UiMode, action: () -> Unit) {
-		appDatastore.setUiMode(uiMode, action)
+	override suspend fun setUiMode(uiMode: UiMode) {
+		appDatastore.setUiMode(uiMode)
 	}
 	
 }

@@ -34,6 +34,8 @@
     <string name="category_name">Nama kategori</string>
     <string name="your_expenses">Pengeluaran kamu</string>
     <string name="bio_auth_title">Verifikasi</string>
+    <string name="finance_removed">Keuangan dihapus</string>
+    <string name="category_removed">Kategori dihapus</string>
     <string name="session_time_out">Waktu sesi habis</string>
     <string name="currency_summary">Pilih mata uang yang kamu gunakan</string>
     <string name="category_summary">Tambah atau hapus kategori</string>

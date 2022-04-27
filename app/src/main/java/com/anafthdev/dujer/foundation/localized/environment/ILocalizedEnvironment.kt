@@ -8,7 +8,7 @@ interface ILocalizedEnvironment {
 	
 	val dispatcher: CoroutineDispatcher
 	
-	suspend fun setLanguage(lang: Language, action: () -> Unit = {})
+	suspend fun setLanguage(lang: Language)
 	
 	fun getLanguage(): Flow<Language>
 	

@@ -18,21 +18,12 @@ class FinancialEnvironment @Inject constructor(
 		return appRepository.categoryRepository.getAllCategory()
 	}
 	
-	override suspend fun getFinancial(id: Int, action: (Financial) -> Unit) {
-		if (id != Financial.default.id) {
-			val financial = appRepository.get(id) ?: Financial.default
-			action(financial)
-		}
-	}
-	
-	override suspend fun updateFinancial(financial: Financial, action: () -> Unit) {
+	override suspend fun updateFinancial(financial: Financial) {
 		appRepository.update(financial)
-		action()
 	}
 	
-	override suspend fun insertFinancial(financial: Financial, action: () -> Unit) {
+	override suspend fun insertFinancial(financial: Financial) {
 		appRepository.insert(financial)
-		action()
 	}
 	
 }

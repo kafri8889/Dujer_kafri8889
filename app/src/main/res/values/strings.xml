@@ -34,6 +34,8 @@
     <string name="category_name">Category name</string>
     <string name="your_expenses">Your expenses</string>
     <string name="bio_auth_title">Verification</string>
+    <string name="finance_removed">Finance removed</string>
+    <string name="category_removed">Category removed</string>
     <string name="session_time_out">Session time out</string>
     <string name="currency_summary">Select the currency to be used</string>
     <string name="category_summary">Add or remove category</string>

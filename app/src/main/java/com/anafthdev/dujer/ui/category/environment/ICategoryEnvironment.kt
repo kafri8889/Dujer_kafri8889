@@ -17,9 +17,7 @@ interface ICategoryEnvironment {
 	
 	suspend fun updateFinancial(vararg financial: Financial)
 	
-	suspend fun update(category: Category)
+	suspend fun update(vararg category: Category)
 	
-	suspend fun delete(category: Category)
-	
-	suspend fun insert(category: Category)
+	suspend fun insert(vararg category: Category)
 }

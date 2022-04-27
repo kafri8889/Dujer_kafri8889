@@ -3,16 +3,14 @@ package com.anafthdev.dujer.ui.search
 import androidx.lifecycle.viewModelScope
 import com.anafthdev.dujer.foundation.viewmodel.StatefulViewModel
 import com.anafthdev.dujer.ui.search.environment.ISearchEnvironment
-import com.anafthdev.dujer.ui.search.environment.SearchEnvironment
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
 class SearchViewModel @Inject constructor(
 	searchEnvironment: ISearchEnvironment
-): StatefulViewModel<SearchState, Unit, ISearchEnvironment>(SearchState(), searchEnvironment) {
+): StatefulViewModel<SearchState, Unit, SearchAction, ISearchEnvironment>(SearchState(), searchEnvironment) {
 	
 	init {
 		viewModelScope.launch(environment.dispatcher) {
@@ -44,13 +42,17 @@ class SearchViewModel @Inject constructor(
 		}
 	}
 	
-	fun search(s: String) {
-		viewModelScope.launch(environment.dispatcher) {
-			environment.search(s)
-			setState {
-				copy(
-					textQuery = s
-				)
+	override fun dispatch(action: SearchAction) {
+		when (action) {
+			is SearchAction.Search -> {
+				viewModelScope.launch(environment.dispatcher) {
+					environment.search(action.query)
+					setState {
+						copy(
+							textQuery = action.query
+						)
+					}
+				}
 			}
 		}
 	}

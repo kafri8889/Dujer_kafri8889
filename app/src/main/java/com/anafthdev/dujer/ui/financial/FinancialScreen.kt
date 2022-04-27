@@ -442,15 +442,18 @@ fun FinancialScreen(
 				FilledTonalButton(
 					onClick = {
 						if (financialAction == FinancialAction.EDIT) {
-							financialViewModel.updateFinancial(
-								financial = financialNew.copy(
-									name = financialTitle,
-									amount = financialAmountDouble,
-									dateCreated = financialDate,
-									category = financialCategory
-								),
-								action = saveFinancial
+							financialViewModel.dispatch(
+								com.anafthdev.dujer.ui.financial.FinancialAction.Update(
+									financialNew.copy(
+										name = financialTitle,
+										amount = financialAmountDouble,
+										dateCreated = financialDate,
+										category = financialCategory
+									)
+								)
 							)
+							
+							saveFinancial()
 						} else {
 							when {
 								financialTitle.isBlank() -> context.getString(
@@ -463,18 +466,21 @@ fun FinancialScreen(
 									R.string.category_cannot_be_empty
 								).toast(context)
 								else -> {
-									financialViewModel.insertFinancial(
-										financial = Financial(
-											id = Random.nextInt(),
-											name = financialTitle,
-											amount = financialAmountDouble,
-											type = financialType,
-											category = financialCategory,
-											currency = localCurrency,
-											dateCreated = financialDate
-										),
-										action = saveFinancial
+									financialViewModel.dispatch(
+										com.anafthdev.dujer.ui.financial.FinancialAction.Insert(
+											Financial(
+												id = Random.nextInt(),
+												name = financialTitle,
+												amount = financialAmountDouble,
+												type = financialType,
+												category = financialCategory,
+												currency = localCurrency,
+												dateCreated = financialDate
+											)
+										)
 									)
+									
+									saveFinancial()
 								}
 							}
 						}

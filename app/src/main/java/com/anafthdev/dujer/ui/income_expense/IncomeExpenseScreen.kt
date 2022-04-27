@@ -23,7 +23,6 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -36,11 +35,13 @@ import com.anafthdev.dujer.data.FinancialType
 import com.anafthdev.dujer.data.db.model.Financial
 import com.anafthdev.dujer.foundation.extension.getBy
 import com.anafthdev.dujer.foundation.extension.isDarkTheme
+import com.anafthdev.dujer.foundation.extension.toArray
 import com.anafthdev.dujer.foundation.uiextension.horizontalScroll
 import com.anafthdev.dujer.foundation.uimode.data.LocalUiMode
 import com.anafthdev.dujer.foundation.window.dpScaled
 import com.anafthdev.dujer.foundation.window.spScaled
 import com.anafthdev.dujer.model.LocalCurrency
+import com.anafthdev.dujer.ui.app.DujerAction
 import com.anafthdev.dujer.ui.app.DujerViewModel
 import com.anafthdev.dujer.ui.financial.FinancialScreen
 import com.anafthdev.dujer.ui.financial.data.FinancialAction
@@ -71,7 +72,6 @@ fun IncomeExpenseScreen(
 	
 	val uiMode = LocalUiMode.current
 	val context = LocalContext.current
-	val density = LocalDensity.current
 	val config = LocalConfiguration.current
 	val localCurrency = LocalCurrency.current
 	val contentColor = LocalContentColor.current
@@ -385,13 +385,20 @@ fun IncomeExpenseScreen(
 				SwipeableFinancialCard(
 					financial = financial,
 					onDismissToEnd = {
-						incomeExpenseViewModel.delete(financial)
+						incomeExpenseViewModel.dispatch(
+							IncomeExpenseAction.DeleteFinancial(financial.toArray())
+						)
 					},
 					onCanDelete = {
-						dujerViewModel.vibrate(100)
+						dujerViewModel.dispatch(
+							DujerAction.Vibrate(100)
+						)
 					},
 					onClick = {
-						incomeExpenseViewModel.setFinancialID(financial.id)
+						incomeExpenseViewModel.dispatch(
+							IncomeExpenseAction.SetFinancialID(financial.id)
+						)
+						
 						showSheet()
 					},
 					modifier = Modifier

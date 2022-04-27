@@ -12,8 +12,8 @@ class SettingEnvironment @Inject constructor(
 	private val appDatastore: AppDatastore
 ): ISettingEnvironment {
 	
-	override suspend fun setIsUseBioAuth(useBioAuth: Boolean, action: () -> Unit) {
-		appDatastore.setUseBioAuth(useBioAuth, action)
+	override suspend fun setIsUseBioAuth(useBioAuth: Boolean) {
+		appDatastore.setUseBioAuth(useBioAuth)
 	}
 	
 	override fun getIsUseBioAuth(): Flow<Boolean> {

@@ -13,8 +13,8 @@ class LocalizedEnvironment @Inject constructor(
 	private val appDatastore: AppDatastore
 ): ILocalizedEnvironment {
 	
-	override suspend fun setLanguage(lang: Language, action: () -> Unit) {
-		appDatastore.setLanguage(lang, action)
+	override suspend fun setLanguage(lang: Language) {
+		appDatastore.setLanguage(lang)
 	}
 	
 	override fun getLanguage(): Flow<Language> {

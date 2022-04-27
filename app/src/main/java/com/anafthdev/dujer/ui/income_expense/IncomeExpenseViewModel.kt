@@ -1,7 +1,6 @@
 package com.anafthdev.dujer.ui.income_expense
 
 import androidx.lifecycle.viewModelScope
-import com.anafthdev.dujer.data.db.model.Financial
 import com.anafthdev.dujer.foundation.viewmodel.StatefulViewModel
 import com.anafthdev.dujer.ui.income_expense.environment.IIncomeExpenseEnvironment
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -12,7 +11,7 @@ import javax.inject.Inject
 @HiltViewModel
 class IncomeExpenseViewModel @Inject constructor(
 	incomeExpenseEnvironment: IIncomeExpenseEnvironment
-): StatefulViewModel<IncomeExpenseState, Unit, IIncomeExpenseEnvironment>(IncomeExpenseState(), incomeExpenseEnvironment) {
+): StatefulViewModel<IncomeExpenseState, Unit, IncomeExpenseAction, IIncomeExpenseEnvironment>(IncomeExpenseState(), incomeExpenseEnvironment) {
 	
 	init {
 		viewModelScope.launch(environment.dispatcher) {
@@ -40,15 +39,18 @@ class IncomeExpenseViewModel @Inject constructor(
 		}
 	}
 	
-	fun delete(financial: Financial) {
-		viewModelScope.launch(environment.dispatcher) {
-			environment.deleteFinancial(financial)
-		}
-	}
-	
-	fun setFinancialID(id: Int) {
-		viewModelScope.launch(environment.dispatcher) {
-			environment.setFinancialID(id)
+	override fun dispatch(action: IncomeExpenseAction) {
+		when (action) {
+			is IncomeExpenseAction.SetFinancialID -> {
+				viewModelScope.launch(environment.dispatcher) {
+					environment.setFinancialID(action.id)
+				}
+			}
+			is IncomeExpenseAction.DeleteFinancial -> {
+				viewModelScope.launch(environment.dispatcher) {
+					environment.deleteFinancial(*action.financials)
+				}
+			}
 		}
 	}
 	

@@ -40,7 +40,7 @@ fun Modifier.horizontalScroll(
 	val eventCountdownTimer by remember { mutableStateOf(EventCountdownTimer()) }
 	
 	if (autoRestart) {
-		DisposableEffect(state.isScrollInProgress) {
+		DisposableEffect(state.isScrollInProgress and (state.value != 0)) {
 			if (!eventCountdownTimer.isTimerRunning) {
 				eventCountdownTimer.startTimer(
 					millisInFuture = autoRestartDelay,

@@ -9,11 +9,9 @@ interface IFinancialEnvironment {
 	
 	val dispatcher: CoroutineDispatcher
 	
-	suspend fun getFinancial(id: Int, action: (Financial) -> Unit)
+	suspend fun updateFinancial(financial: Financial)
 	
-	suspend fun updateFinancial(financial: Financial, action: () -> Unit)
-	
-	suspend fun insertFinancial(financial: Financial, action: () -> Unit)
+	suspend fun insertFinancial(financial: Financial)
 	
 	suspend fun getCategories(): Flow<List<Category>>
 	

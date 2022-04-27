@@ -58,7 +58,9 @@ fun ChangeCurrencyScreen(
 			value = searchText,
 			onValueChange = { s ->
 				searchText = s
-				changeCurrencyViewModel.searchCurrency(searchText)
+				changeCurrencyViewModel.dispatch(
+					ChangeCurrencyAction.Search(searchText)
+				)
 			},
 			textStyle = LocalTextStyle.current.copy(
 				fontFamily = Inter
@@ -99,7 +101,9 @@ fun ChangeCurrencyScreen(
 					selected = LocalCurrency.current.countryCode == currency.countryCode,
 					currency = currency,
 					onSelected = {
-						changeCurrencyViewModel.changeCurrency(currency)
+						changeCurrencyViewModel.dispatch(
+							ChangeCurrencyAction.ChangeCurrency(currency)
+						)
 					}
 				)
 			}

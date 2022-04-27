@@ -1,6 +1,6 @@
 package com.anafthdev.dujer.ui.category.data
 
-object CategoryAction {
+object CategorySwipeAction {
 	
 	const val EDIT = "edit"
 	const val NOTHING = "nothing"

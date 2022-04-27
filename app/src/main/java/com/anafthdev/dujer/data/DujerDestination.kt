@@ -1,6 +1,6 @@
 package com.anafthdev.dujer.data
 
-import com.anafthdev.dujer.ui.category.data.CategoryAction
+import com.anafthdev.dujer.ui.category.data.CategorySwipeAction
 
 sealed class DujerDestination(val route: String) {
 	
@@ -12,7 +12,7 @@ sealed class DujerDestination(val route: String) {
 	
 	object Category: DujerDestination("category/{action}/{id}") {
 		fun createRoute(
-			action: String = CategoryAction.NOTHING,
+			action: String = CategorySwipeAction.NOTHING,
 			id: Int = com.anafthdev.dujer.data.db.model.Category.default.id
 		): String {
 			return "category/$action/$id"
