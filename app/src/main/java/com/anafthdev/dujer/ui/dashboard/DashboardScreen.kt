@@ -1,6 +1,8 @@
 package com.anafthdev.dujer.ui.dashboard
 
 import androidx.activity.compose.BackHandler
+import androidx.compose.animation.core.animateDpAsState
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -252,6 +254,11 @@ private fun DashboardContent(
 	var showNavRail by remember { mutableStateOf(false) }
 	var selectedNavRailItem by remember { mutableStateOf(navigationRailItem[0]) }
 	
+	val menuIconPadding by animateDpAsState(
+		targetValue = if (showNavRail) 16.dpScaled else 0.dpScaled,
+		animationSpec = tween(400)
+	)
+	
 	Box(
 		modifier = Modifier
 			.fillMaxSize()
@@ -287,6 +294,7 @@ private fun DashboardContent(
 						showNavRail = !showNavRail
 					},
 					modifier = Modifier
+						.padding(menuIconPadding)
 						.align(Alignment.CenterStart)
 				) {
 					Icon(
