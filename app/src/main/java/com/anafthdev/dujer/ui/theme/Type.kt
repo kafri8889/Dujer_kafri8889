@@ -22,7 +22,6 @@ val Inter = FontFamily(
 val Typography = Typography(
 	displayLarge = TextStyle(
 		fontFamily = Inter,
-//		color = on_primary_container_background,
 		fontWeight = FontWeight.W400,
 		fontSize = 57.sp,
 		lineHeight = 64.sp,
@@ -30,7 +29,6 @@ val Typography = Typography(
 	),
 	displayMedium = TextStyle(
 		fontFamily = Inter,
-//		color = on_primary_container_background,
 		fontWeight = FontWeight.W400,
 		fontSize = 45.sp,
 		lineHeight = 52.sp,
@@ -38,7 +36,6 @@ val Typography = Typography(
 	),
 	displaySmall = TextStyle(
 		fontFamily = Inter,
-//		color = on_primary_container_background,
 		fontWeight = FontWeight.W400,
 		fontSize = 36.sp,
 		lineHeight = 44.sp,
@@ -46,7 +43,6 @@ val Typography = Typography(
 	),
 	headlineLarge = TextStyle(
 		fontFamily = Inter,
-//		color = on_primary_container_background,
 		fontWeight = FontWeight.W400,
 		fontSize = 32.sp,
 		lineHeight = 40.sp,
@@ -54,7 +50,6 @@ val Typography = Typography(
 	),
 	headlineMedium = TextStyle(
 		fontFamily = Inter,
-//		color = on_primary_container_background,
 		fontWeight = FontWeight.W400,
 		fontSize = 28.sp,
 		lineHeight = 36.sp,
@@ -62,7 +57,6 @@ val Typography = Typography(
 	),
 	headlineSmall = TextStyle(
 		fontFamily = Inter,
-//		color = on_primary_container_background,
 		fontWeight = FontWeight.W400,
 		fontSize = 24.sp,
 		lineHeight = 32.sp,
@@ -70,7 +64,6 @@ val Typography = Typography(
 	),
 	titleLarge = TextStyle(
 		fontFamily = Inter,
-//		color = on_primary_container_background,
 		fontWeight = FontWeight.W400,
 		fontSize = 22.sp,
 		lineHeight = 28.sp,
@@ -78,7 +71,6 @@ val Typography = Typography(
 	),
 	titleMedium = TextStyle(
 		fontFamily = Inter,
-//		color = on_primary_container_background,
 		fontWeight = FontWeight.Medium,
 		fontSize = 16.sp,
 		lineHeight = 24.sp,
@@ -86,7 +78,6 @@ val Typography = Typography(
 	),
 	titleSmall = TextStyle(
 		fontFamily = Inter,
-//		color = on_primary_container_background,
 		fontWeight = FontWeight.Medium,
 		fontSize = 14.sp,
 		lineHeight = 20.sp,
@@ -94,7 +85,6 @@ val Typography = Typography(
 	),
 	labelLarge = TextStyle(
 		fontFamily = Inter,
-//		color = on_primary_container_background,
 		fontWeight = FontWeight.Medium,
 		fontSize = 14.sp,
 		lineHeight = 20.sp,
@@ -102,7 +92,6 @@ val Typography = Typography(
 	),
 	bodyLarge = TextStyle(
 		fontFamily = Inter,
-//		color = on_primary_container_background,
 		fontWeight = FontWeight.W400,
 		fontSize = 16.sp,
 		lineHeight = 24.sp,
@@ -110,7 +99,6 @@ val Typography = Typography(
 	),
 	bodyMedium = TextStyle(
 		fontFamily = Inter,
-//		color = on_primary_container_background,
 		fontWeight = FontWeight.W400,
 		fontSize = 14.sp,
 		lineHeight = 20.sp,
@@ -118,7 +106,6 @@ val Typography = Typography(
 	),
 	bodySmall = TextStyle(
 		fontFamily = Inter,
-//		color = on_primary_container_background,
 		fontWeight = FontWeight.W400,
 		fontSize = 12.sp,
 		lineHeight = 16.sp,
@@ -126,7 +113,6 @@ val Typography = Typography(
 	),
 	labelMedium = TextStyle(
 		fontFamily = Inter,
-//		color = on_primary_container_background,
 		fontWeight = FontWeight.Medium,
 		fontSize = 12.sp,
 		lineHeight = 16.sp,
@@ -134,7 +120,6 @@ val Typography = Typography(
 	),
 	labelSmall = TextStyle(
 		fontFamily = Inter,
-//		color = on_primary_container_background,
 		fontWeight = FontWeight.Medium,
 		fontSize = 11.sp,
 		lineHeight = 16.sp,

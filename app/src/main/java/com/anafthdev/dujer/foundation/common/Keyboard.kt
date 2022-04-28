@@ -1,4 +1,4 @@
-package com.anafthdev.dujer.foundation.common.keyboard
+package com.anafthdev.dujer.foundation.common
 
 import android.graphics.Rect
 import android.view.ViewTreeObserver

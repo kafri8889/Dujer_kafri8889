@@ -10,7 +10,7 @@ import androidx.compose.ui.composed
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.dp
-import com.anafthdev.dujer.common.EventCountdownTimer
+import com.anafthdev.dujer.foundation.common.EventCountdownTimer
 import kotlinx.coroutines.launch
 
 fun Modifier.sizeBasedWidth(

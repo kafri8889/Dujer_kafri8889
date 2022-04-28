@@ -107,9 +107,7 @@ dependencies {
     kapt 'androidx.room:room-compiler:2.4.2'
 
     // Accompanist
-    implementation "com.google.accompanist:accompanist-navigation-animation:$accompanist_version"
     implementation "com.google.accompanist:accompanist-flowlayout:$accompanist_version"
-    implementation "com.google.accompanist:accompanist-pager:$accompanist_version"
     implementation "com.google.accompanist:accompanist-systemuicontroller:$accompanist_version"
 
     // Scalable Unit
@@ -118,6 +116,7 @@ dependencies {
 
     // Other
     implementation 'de.hdodenhof:circleimageview:3.1.0'
+    implementation 'de.siegmar:fastcsv:2.1.0'
     implementation "com.github.AppDevNext:MPAndroidChart:3.1.0.7"
     implementation "com.google.code.gson:gson:2.8.6"
     implementation 'com.jakewharton.timber:timber:5.0.1'

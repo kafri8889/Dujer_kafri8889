@@ -10,6 +10,7 @@ import androidx.core.view.WindowCompat
 import androidx.lifecycle.lifecycleScope
 import com.anafthdev.dujer.BuildConfig
 import com.anafthdev.dujer.data.datastore.AppDatastore
+import com.anafthdev.dujer.foundation.common.BiometricManager
 import com.anafthdev.dujer.foundation.extension.isDarkTheme
 import com.anafthdev.dujer.foundation.localized.LocalizedActivity
 import com.anafthdev.dujer.foundation.uimode.data.UiMode
@@ -27,7 +28,7 @@ class MainActivity : LocalizedActivity() {
 	@Inject lateinit var appDatastore: AppDatastore
 	
 	private lateinit var telephonyManager: TelephonyManager
-	private lateinit var biometricManager: com.anafthdev.dujer.common.BiometricManager
+	private lateinit var biometricManager: BiometricManager
 	
 	@OptIn(ExperimentalFoundationApi::class)
 	override fun onCreate(savedInstanceState: Bundle?) {
@@ -49,7 +50,7 @@ class MainActivity : LocalizedActivity() {
 			val isUseBioAuthSecurity = appDatastore.isUseBioAuth.first()
 			
 			if (isUseBioAuthSecurity) {
-				biometricManager = com.anafthdev.dujer.common.BiometricManager(this@MainActivity)
+				biometricManager = BiometricManager(this@MainActivity)
 				biometricManager.createBiometricPrompt(
 					actionSuccess = { result ->
 						when (result.authenticationType) {
