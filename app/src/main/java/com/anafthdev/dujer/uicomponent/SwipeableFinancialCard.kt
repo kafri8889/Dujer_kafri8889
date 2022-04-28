@@ -15,6 +15,7 @@ import androidx.compose.ui.res.painterResource
 import com.anafthdev.dujer.R
 import com.anafthdev.dujer.data.db.model.Financial
 import com.anafthdev.dujer.foundation.window.dpScaled
+import com.anafthdev.dujer.ui.theme.black01
 import com.anafthdev.dujer.ui.theme.large_shape
 import com.anafthdev.dujer.ui.theme.swipe_dismiss_delete_background
 
@@ -69,6 +70,7 @@ fun SwipeableFinancialCard(
 			) {
 				Icon(
 					painter = painterResource(id = R.drawable.ic_trash),
+					tint = black01,
 					contentDescription = null,
 					modifier = Modifier
 						.padding(
