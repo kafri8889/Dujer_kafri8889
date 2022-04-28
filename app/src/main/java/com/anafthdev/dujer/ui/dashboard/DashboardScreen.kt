@@ -3,8 +3,8 @@ package com.anafthdev.dujer.ui.dashboard
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.verticalScroll
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.Add
@@ -33,9 +33,9 @@ import androidx.navigation.NavController
 import com.anafthdev.dujer.R
 import com.anafthdev.dujer.data.DujerDestination
 import com.anafthdev.dujer.data.FinancialType
+import com.anafthdev.dujer.data.db.model.Financial
 import com.anafthdev.dujer.foundation.extension.combine
 import com.anafthdev.dujer.foundation.extension.getBy
-import com.anafthdev.dujer.foundation.extension.lastIndexOf
 import com.anafthdev.dujer.foundation.extension.toArray
 import com.anafthdev.dujer.foundation.window.dpScaled
 import com.anafthdev.dujer.foundation.window.spScaled
@@ -99,7 +99,7 @@ fun DashboardScreen(
 //			add(Entry(11f, 3500f))
 //		}
 //	)
-	
+
 //	val expenseLineDataSetEntry by rememberUpdatedState(
 //		newValue = arrayListOf<Entry>().apply {
 //			add(Entry(0f, 1200f))
@@ -280,7 +280,6 @@ private fun DashboardContent(
 				.fillMaxSize()
 				.background(MaterialTheme.colorScheme.background)
 				.systemBarsPadding()
-				.verticalScroll(rememberScrollState())
 		) {
 			TopAppBar {
 				IconButton(
@@ -324,151 +323,109 @@ private fun DashboardContent(
 					visible = showNavRail,
 					selectedItem = selectedNavRailItem,
 					items = navigationRailItem,
-					onDismissRequest = {
-						showNavRail = false
-					},
 					onItemSelected = { pair ->
 						selectedNavRailItem = pair
 					}
 				)
 				
-				Column(
-					modifier = Modifier
-						.padding(horizontal = 12.dpScaled)
-				) {
-					BalanceCard(
-						balance = userBalance
-					)
+				LazyColumn {
 					
-					Row(
-						verticalAlignment = Alignment.CenterVertically,
-						modifier = Modifier
-							.fillMaxWidth()
-							.padding(
-								vertical = 16.dpScaled
-							)
-					) {
-						IncomeCard(
-							income = incomeFinancialList.getBy { it.amount }.sum(),
-							onClick = {
-								navController.navigate(
-									DujerDestination.IncomeExpense.createRoute(FinancialType.INCOME)
-								) {
-									launchSingleTop = true
-								}
-							},
+					item {
+						Column(
 							modifier = Modifier
-								.padding(end = 4.dpScaled)
-								.weight(1f)
-						)
-						
-						ExpenseCard(
-							expense = expenseFinancialList.getBy { it.amount }.sum(),
-							onClick = {
-								navController.navigate(
-									DujerDestination.IncomeExpense.createRoute(FinancialType.EXPENSE)
-								) {
-									launchSingleTop = true
-								}
-							},
-							modifier = Modifier
-								.padding(start = 4.dpScaled)
-								.weight(1f)
-						)
-					}
-					
-					FinancialLineChart(
-						incomeLineDataset = incomeLineDataset,
-						expenseLineDataset = expenseLineDataset
-					)
-					
-					mixedFinancialList.forEachIndexed { i, financial ->
-						key(financial.hashCode(), i) {
-							SwipeableFinancialCard(
-								financial = financial,
-								onDismissToEnd = {
-									dujerViewModel.dispatch(
-										DujerAction.DeleteFinancial(
-											financial.toArray()
-										)
-									)
-								},
-								onCanDelete = {
-									dujerViewModel.dispatch(
-										DujerAction.Vibrate(100)
-									)
-								},
-								onClick = {
-									dashboardViewModel.dispatch(
-										DashboardAction.SetFinancialAction(FinancialAction.EDIT)
-									)
-
-									dashboardViewModel.dispatch(
-										DashboardAction.SetFinancialID(financial.id)
-									)
-
-									openFinancialSheet()
-								},
-								modifier = Modifier
-									.testTag("SwipeableFinancialCard")
+								.padding(horizontal = 12.dpScaled)
+						) {
+							BalanceCard(
+								balance = userBalance
 							)
-						}
-
-						if (i.lastIndexOf(mixedFinancialList)) {
-							// fab size: 56 dp, fab bottom padding: 24 dp, card to fab padding: 16 dp = 96 dp
-							Spacer(
+							
+							Row(
+								verticalAlignment = Alignment.CenterVertically,
 								modifier = Modifier
 									.fillMaxWidth()
-									.height(96.dpScaled)
+									.padding(
+										vertical = 16.dpScaled
+									)
+							) {
+								IncomeCard(
+									income = incomeFinancialList.getBy { it.amount }.sum(),
+									onClick = {
+										navController.navigate(
+											DujerDestination.IncomeExpense.createRoute(FinancialType.INCOME)
+										) {
+											launchSingleTop = true
+										}
+									},
+									modifier = Modifier
+										.padding(end = 4.dpScaled)
+										.weight(1f)
+								)
+								
+								ExpenseCard(
+									expense = expenseFinancialList.getBy { it.amount }.sum(),
+									onClick = {
+										navController.navigate(
+											DujerDestination.IncomeExpense.createRoute(FinancialType.EXPENSE)
+										) {
+											launchSingleTop = true
+										}
+									},
+									modifier = Modifier
+										.padding(start = 4.dpScaled)
+										.weight(1f)
+								)
+							}
+							
+							FinancialLineChart(
+								incomeLineDataset = incomeLineDataset,
+								expenseLineDataset = expenseLineDataset
 							)
 						}
 					}
 					
-//					LazyColumn {
-//
-//						items(
-//							items = incomeFinancialList.combine(expenseFinancialList).sortedBy { it.dateCreated },
-//							key = { item: Financial -> item.hashCode() }
-//						) { financial ->
-//							SwipeableFinancialCard(
-//								financial = financial,
-//								onDismissToEnd = {
-//									dujerViewModel.dispatch(
-//										DujerAction.DeleteFinancial(
-//											financial.toArray()
-//										)
-//									)
-//								},
-//								onCanDelete = {
-//									dujerViewModel.dispatch(
-//										DujerAction.Vibrate(100)
-//									)
-//								},
-//								onClick = {
-//									dashboardViewModel.dispatch(
-//										DashboardAction.SetFinancialAction(FinancialAction.EDIT)
-//									)
-//
-//									dashboardViewModel.dispatch(
-//										DashboardAction.SetFinancialID(financial.id)
-//									)
-//
-//									openFinancialSheet()
-//								},
-//								modifier = Modifier
-//									.testTag("SwipeableFinancialCard")
-//							)
-//						}
-//
-//						item {
-//							// fab size: 56 dp, fab bottom padding: 24 dp, card to fab padding: 16 dp = 96 dp
-//							Spacer(
-//								modifier = Modifier
-//									.fillMaxWidth()
-//									.height(96.dpScaled)
-//							)
-//						}
-//					}
+					items(
+						items = mixedFinancialList,
+						key = { item: Financial -> item.hashCode() }
+					) { financial ->
+						SwipeableFinancialCard(
+							financial = financial,
+							onDismissToEnd = {
+								dujerViewModel.dispatch(
+									DujerAction.DeleteFinancial(
+										financial.toArray()
+									)
+								)
+							},
+							onCanDelete = {
+								dujerViewModel.dispatch(
+									DujerAction.Vibrate(100)
+								)
+							},
+							onClick = {
+								dashboardViewModel.dispatch(
+									DashboardAction.SetFinancialAction(FinancialAction.EDIT)
+								)
+								
+								dashboardViewModel.dispatch(
+									DashboardAction.SetFinancialID(financial.id)
+								)
+								
+								openFinancialSheet()
+							},
+							modifier = Modifier
+								.padding(horizontal = 12.dpScaled)
+								.testTag("SwipeableFinancialCard")
+						)
+					}
+					
+					item {
+						// fab size: 56 dp, fab bottom padding: 24 dp, card to fab padding: 16 dp = 96 dp
+						Spacer(
+							modifier = Modifier
+								.fillMaxWidth()
+								.height(96.dpScaled)
+						)
+					}
 				}
 			}
 		}
