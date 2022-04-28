@@ -1,4 +1,4 @@
-package com.anafthdev.dujer.common
+package com.anafthdev.dujer.foundation.common
 
 import android.widget.Toast
 import androidx.biometric.BiometricManager

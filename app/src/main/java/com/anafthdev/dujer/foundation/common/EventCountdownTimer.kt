@@ -1,4 +1,4 @@
-package com.anafthdev.dujer.common
+package com.anafthdev.dujer.foundation.common
 
 import android.os.CountDownTimer
 import timber.log.Timber
