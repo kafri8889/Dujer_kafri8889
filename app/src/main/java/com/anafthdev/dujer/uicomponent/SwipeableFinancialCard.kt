@@ -59,7 +59,7 @@ fun SwipeableFinancialCard(
 			Box(
 				modifier = Modifier
 					.padding(
-						horizontal = 14.dpScaled,
+						horizontal = 6.dpScaled,
 						vertical = 8.dpScaled
 					)
 					.fillMaxSize()
@@ -84,7 +84,9 @@ fun SwipeableFinancialCard(
 			financial = financial,
 			onClick = onClick,
 			modifier = Modifier
-				.padding(8.dpScaled)
+				.padding(
+					vertical = 8.dpScaled
+				)
 				.fillMaxWidth()
 		)
 	}
