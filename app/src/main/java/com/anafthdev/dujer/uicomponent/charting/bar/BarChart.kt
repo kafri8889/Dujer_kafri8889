@@ -2,23 +2,25 @@ package com.anafthdev.dujer.uicomponent.charting.bar
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyRow
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.composed
 import androidx.compose.ui.draw.clip
 import com.anafthdev.dujer.foundation.extension.get
 import com.anafthdev.dujer.foundation.window.dpScaled
-import com.anafthdev.dujer.uicomponent.charting.bar.data.BarAlignment
+import com.anafthdev.dujer.uicomponent.charting.bar.components.BarAlignment
+import com.anafthdev.dujer.uicomponent.charting.bar.components.XAxisPosition
 import com.anafthdev.dujer.uicomponent.charting.bar.data.BarChartDefault
-import com.anafthdev.dujer.uicomponent.charting.bar.data.BarColors
+import com.anafthdev.dujer.uicomponent.charting.bar.data.DefaultBarChartFormatter
+import com.anafthdev.dujer.uicomponent.charting.bar.interfaces.BarColors
+import com.anafthdev.dujer.uicomponent.charting.bar.interfaces.BarStyle
 import com.anafthdev.dujer.uicomponent.charting.bar.model.BarData
+import com.anafthdev.dujer.uicomponent.charting.formatter.ChartFormatter
 
 @Composable
 fun BarChart(
@@ -26,49 +28,97 @@ fun BarChart(
 	modifier: Modifier = Modifier,
 	state: BarChartState = rememberBarChartState(),
 	colors: BarColors = BarChartDefault.barColor(),
-	barAlignment: BarAlignment = BarAlignment.Start
+	style: BarStyle = BarChartDefault.barStyle(),
+	formatter: ChartFormatter<BarData> = DefaultBarChartFormatter(),
+	barAlignment: BarAlignment = BarAlignment.Start,
+	xAxisPosition: XAxisPosition = XAxisPosition.INSIDE
 ) {
 	
 	val selectedBarData = remember(state.observableSelectedBarDataState) { state.observableSelectedBarDataState }
 	
-	LazyRow(
-		modifier = modifier
+	Box(
+		modifier = Modifier
 			.fillMaxWidth()
-			.height(DEFAULT_BAR_HEIGHT)
-			.composed {
-				if (barAlignment == BarAlignment.Start) horizontalScroll(rememberScrollState())
-				else this // TODO: center row pake weight ?
-			}
+			.then(modifier)
 	) {
-		items(
-			count = barData.size,
-			key = { i -> barData.get(i).hashCode() }
-		) { index ->
-			
-			val bar = barData.get(index)
-			
-			val isSelected = selectedBarData.x == bar.x
-			
-			val barColor by colors.barColor(selected = isSelected)
-			
-			Column(
-				modifier = Modifier
-					.fillMaxHeight()
-					.width(24.dpScaled)
-					.clip(MaterialTheme.shapes.small)
-					.clickable {
-						state.update(
-							selectedBarData = bar
-						)
+		LazyRow(
+			modifier = Modifier
+				.height(DEFAULT_BAR_HEIGHT)
+				.align(
+					alignment = when (barAlignment) {
+						BarAlignment.Start -> Alignment.CenterStart
+						BarAlignment.Center -> Alignment.Center
 					}
-			) {
-				Box(
-					modifier = Modifier
-						.width(16.dpScaled)
-						.height(100.dpScaled) // TODO: kalkulasi tingginya
-						.clip(MaterialTheme.shapes.small)
-						.background(barColor)
 				)
+		) {
+			items(
+				count = barData.size,
+				key = { i -> barData.get(i).hashCode() }
+			) { index ->
+				
+				val bar = barData.get(index)
+				
+				val isSelected = selectedBarData.x == bar.x
+				
+				val barColor by colors.barColor(selected = isSelected)
+				
+				val barWidth by style.barWidth(selected = isSelected)
+				val barShape by style.barShape(selected = isSelected)
+				val barContainerWidth by style.barContainerWidth(selected = isSelected)
+				val horizontalBarPadding by style.horizontalBarContainerPadding(selected = isSelected)
+				val xAxisTextStyle by style.xAxisTextStyle(selected = isSelected)
+				val yAxisTextStyle by style.yAxisTextStyle(selected = isSelected)
+				
+				Column(
+					horizontalAlignment = Alignment.CenterHorizontally,
+					verticalArrangement = Arrangement.Bottom,
+					modifier = Modifier
+						.padding(
+							horizontal = horizontalBarPadding
+						)
+						.fillMaxHeight()
+						.width(barContainerWidth)
+						.clip(barShape)
+						.clickable {
+							state.update(
+								selectedBarData = bar
+							)
+						}
+				) {
+					
+					Box(
+						contentAlignment = Alignment.BottomCenter,
+						modifier = Modifier
+							.weight(1f)
+					) {
+						Box(
+							contentAlignment = Alignment.TopCenter,
+							modifier = Modifier
+								.defaultMinSize(
+									minHeight = 18.dpScaled
+								)
+//								.height() Todo: kalkulasi heightnya
+								.width(barWidth)
+								.clip(barShape)
+								.background(barColor)
+						) {
+							Text(
+								text = formatter.formatY(bar.y),
+								style = yAxisTextStyle
+							)
+						}
+					}
+					
+					Spacer(
+						modifier = Modifier
+							.padding(8.dpScaled)
+					)
+					
+					Text(
+						text = formatter.formatX(bar.x),
+						style = xAxisTextStyle
+					)
+				}
 			}
 		}
 	}

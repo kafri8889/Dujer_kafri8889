@@ -1,6 +1,9 @@
 package com.anafthdev.dujer.uicomponent.charting.bar.data
 
-import com.anafthdev.dujer.uicomponent.charting.ChartingColorSchemeKeyTokens
+import androidx.compose.ui.unit.dp
+import com.anafthdev.dujer.uicomponent.charting.tokens.ChartingColorSchemeKeyTokens
+import com.anafthdev.dujer.uicomponent.charting.tokens.ChartingShapeTokens
+import com.anafthdev.dujer.uicomponent.charting.tokens.ChartingTypographyTokens
 
 object BarChartTokens {
 	
@@ -9,5 +12,22 @@ object BarChartTokens {
 	val UnSelectedBarColor = ChartingColorSchemeKeyTokens.OnSurface
 	
 	const val UnSelectedBarColorAlpha = 0.12f
+	
+	val SelectedBarWidth = 24.dp
+	val UnSelectedBarWidth = 24.dp
+	
+	val SelectedBarContainerWidth = 36.dp
+	val UnSelectedBarContainerWidth = 36.dp
+	
+	val SelectedHorizontalBarContainerPadding = 4.dp
+	val UnSelectedHorizontalBarContainerPadding = 4.dp
+	
+	val SelectedBarShape = ChartingShapeTokens.Small
+	val UnSelectedBarShape = ChartingShapeTokens.Small
+	
+	val SelectedXAxisTextStyle = ChartingTypographyTokens.BodySmall
+	val UnSelectedXAxisTextStyle = ChartingTypographyTokens.BodySmall
+	val SelectedYAxisTextStyle = ChartingTypographyTokens.BodySmall
+	val UnSelectedYAxisTextStyle = ChartingTypographyTokens.BodySmall
 
 }
