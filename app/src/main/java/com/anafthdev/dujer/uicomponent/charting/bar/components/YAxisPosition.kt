@@ -1,5 +1,6 @@
 package com.anafthdev.dujer.uicomponent.charting.bar.components
 
-enum class XAxisPosition {
-	INSIDE
+enum class YAxisPosition {
+	INSIDE,
+	OUTSIDE
 }
