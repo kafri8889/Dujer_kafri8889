@@ -1,4 +1,4 @@
-package com.anafthdev.dujer.uicomponent.charting.bar.data
+package com.anafthdev.dujer.uicomponent.charting.bar.interfaces
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.State
