@@ -13,6 +13,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.unit.Dp
 import com.anafthdev.dujer.foundation.extension.getBy
 import com.anafthdev.dujer.foundation.extension.join
 import com.anafthdev.dujer.foundation.extension.toDp
@@ -27,13 +28,14 @@ import com.anafthdev.dujer.uicomponent.charting.bar.ext.isInside
 import com.anafthdev.dujer.uicomponent.charting.bar.interfaces.BarStyle
 import com.anafthdev.dujer.uicomponent.charting.bar.model.BarData
 import com.anafthdev.dujer.uicomponent.charting.formatter.ChartFormatter
+import timber.log.Timber
 
 @Composable
 fun BarChart(
 	barDataSets: Collection<BarDataSet>,
 	modifier: Modifier = Modifier,
 	state: BarChartState = rememberBarChartState(),
-	style: BarStyle = BarChartDefault.barStyle(),
+	style: List<BarStyle> = listOf(BarChartDefault.barStyle()),
 	formatter: ChartFormatter<BarData> = DefaultBarChartFormatter(),
 	barAlignment: BarAlignment = BarAlignment.Start,
 	yAxisPosition: YAxisPosition = YAxisPosition.INSIDE,
@@ -50,7 +52,7 @@ fun BarChart(
 	val maxDataPoints = (yDataPoints.maxOrNull() ?: 1f)
 	val minDataPoints = (yDataPoints.minOrNull() ?: 0f)
 	
-	val groupBarData = barDataSets.groupBarData()
+	val barDataGroup = barDataSets.groupBarData()
 	
 	val selectedBarDataSet = remember(state.observableSelectedBarDataGroup) {
 		state.observableSelectedBarDataGroup
@@ -72,25 +74,35 @@ fun BarChart(
 				)
 		) {
 			items(
-				count = groupBarData.size,
-				key = { i -> groupBarData[i].hashCode() }
+				count = barDataGroup.size,
+				key = { i -> barDataGroup[i].hashCode() }
 			) { index ->
 				
-				val barDataSet = groupBarData[index]
+				val dataGroup = barDataGroup[index]
 				
-				val isSelected = selectedBarDataSet == barDataSet.first
+				val isSelected = selectedBarDataSet == dataGroup.first
+				Timber.i("i: ${dataGroup.first}, group: ${dataGroup.second}")
 				
-				Row(
-					modifier = Modifier
-				) {
-					for (barData in barDataSet.second) {
+				Row {
+					dataGroup.second.forEachIndexed { j, barData ->
+						Timber.i("j: $j")
+
+						val height = barData.y
+							.minus(minDataPoints)
+							.div(maxDataPoints.minus(minDataPoints))
+							.times(256)
+							.minus(24)
+							.coerceIn(
+								minimumValue = 18f,
+								maximumValue = 232f
+							).dpScaled
+
 						BarItem(
 							isSelected = isSelected,
-							style = style,
-							groupID = barDataSet.first,
+							style = style[j],
+							groupID = dataGroup.first,
 							barData = barData,
-							minDataPoints = minDataPoints,
-							maxDataPoints = maxDataPoints,
+							height = height,
 							showXAxis = showXAxis,
 							showYAxis = showYAxis,
 							yAxisPosition = yAxisPosition,
@@ -98,13 +110,113 @@ fun BarChart(
 							state = state
 						)
 					}
+					
 				}
-				
-				
 			}
 		}
 	}
 }
+
+//@Composable
+//fun MultipleBarItem(
+//	styles: List<BarStyle>,
+//	barDataList: List<BarData>,
+//	groupID: Int,
+//	minDataPoints: Float,
+//	maxDataPoints: Float,
+//	isSelected: Boolean,
+//	showXAxis: Boolean,
+//	showYAxis: Boolean,
+//	yAxisPosition: YAxisPosition,
+//	formatter: ChartFormatter<BarData>,
+//	state: BarChartState
+//) {
+//	Row {
+//		for (i in barDataList.indices) {
+//			val height = barDataList[i].y
+//				.minus(minDataPoints)
+//				.div(maxDataPoints.minus(minDataPoints))
+//				.times(256)
+//				.minus(24)
+//				.coerceIn(
+//					minimumValue = 18f,
+//					maximumValue = 232f
+//				).dpScaled
+//
+//			BarItem(
+//				isSelected = isSelected,
+//				style = styles[i],
+//				groupID = groupID,
+//				barData = barDataList[i],
+//				height = height,
+//				showXAxis = showXAxis,
+//				showYAxis = showYAxis,
+//				yAxisPosition = yAxisPosition,
+//				formatter = formatter,
+//				state = state
+//			)
+//		}
+//	}
+//}
+
+//@Composable
+//fun MultipleBarItem(
+//	styles: List<BarStyle>,
+//	barDataSets: List<BarDataSet>,
+//	groupID: Int,
+//	minDataPoints: Float,
+//	maxDataPoints: Float,
+//	isSelected: Boolean,
+//	showXAxis: Boolean,
+//	showYAxis: Boolean,
+//	yAxisPosition: YAxisPosition,
+//	formatter: ChartFormatter<BarData>,
+//	state: BarChartState
+//) {
+//	Row {
+//		for (iDataSet in barDataSets.indices) {
+//			val barDataSet = barDataSets[iDataSet]
+//			for (iBarData in barDataSet.barData.indices) {
+//				val barData = barDataSet.barData[iBarData]
+//				val height = barData.y
+//					.minus(minDataPoints)
+//					.div(maxDataPoints.minus(minDataPoints))
+//					.times(256)
+//					.minus(24)
+//					.coerceIn(
+//						minimumValue = 18f,
+//						maximumValue = 232f
+//					).dpScaled
+//
+//				BarItem(
+//					isSelected = isSelected,
+//					style = styles[iDataSet],
+//					groupID = groupID,
+//					barData = barData,
+//					height = height,
+//					showXAxis = showXAxis,
+//					showYAxis = showYAxis,
+//					yAxisPosition = yAxisPosition,
+//					formatter = formatter,
+//					state = state
+//				)
+//
+//				BarItem(
+//					isSelected = isSelected,
+//					style = styles[iDataSet],
+//					groupID = groupID,
+//					barData = barDataSet.barData[],
+//					height = height,
+//					showXAxis = showXAxis,
+//					showYAxis = showYAxis,
+//					yAxisPosition = yAxisPosition,
+//					formatter = formatter,
+//					state = state
+//				)
+//			}
+//		}
+//	}
+//}
 
 @Composable
 fun BarItem(
@@ -112,8 +224,7 @@ fun BarItem(
 	style: BarStyle,
 	groupID: Int,
 	barData: BarData,
-	minDataPoints: Float,
-	maxDataPoints: Float,
+	height: Dp,
 	showXAxis: Boolean,
 	showYAxis: Boolean,
 	yAxisPosition: YAxisPosition,
@@ -136,16 +247,6 @@ fun BarItem(
 	val animatedContainerWidth by animateDpAsState(targetValue = barContainerWidth)
 	val animatedHorizontalBarPadding by animateDpAsState(targetValue = horizontalBarPadding)
 	var barHeight by remember { mutableStateOf(DEFAULT_BAR_HEIGHT) }
-	
-	val height = barData.y
-		.minus(minDataPoints)
-		.div(maxDataPoints.minus(minDataPoints))
-		.times(256)
-		.minus(24)
-		.coerceIn(
-			minimumValue = 18f,
-			maximumValue = 232f
-		)
 	
 	Column(
 		horizontalAlignment = Alignment.CenterHorizontally,
@@ -175,7 +276,7 @@ fun BarItem(
 					.defaultMinSize(
 						minHeight = DEFAULT_BAR_HEIGHT
 					)
-					.height(height.dpScaled)
+					.height(height)
 					.width(animatedBarWidth)
 					.clip(barShape)
 					.background(animatedBarColor)
