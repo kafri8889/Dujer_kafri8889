@@ -11,7 +11,6 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.Dp
 import com.anafthdev.dujer.foundation.window.spScaled
-import com.anafthdev.dujer.uicomponent.charting.bar.interfaces.BarColors
 import com.anafthdev.dujer.uicomponent.charting.bar.interfaces.BarStyle
 import com.anafthdev.dujer.uicomponent.charting.tokens.extension.toColor
 import com.anafthdev.dujer.uicomponent.charting.tokens.extension.toShape
@@ -19,21 +18,21 @@ import com.anafthdev.dujer.uicomponent.charting.tokens.extension.toTextStyle
 
 object BarChartDefault {
 	
-	@Composable
-	fun barColor(
-		selectedBarColor: Color = BarChartTokens.SelectedBarColor.toColor(),
-		unSelectedBarColor: Color = BarChartTokens.UnSelectedBarColor
-			.toColor()
-			.copy(alpha = BarChartTokens.UnSelectedBarColorAlpha)
-	): BarColors {
-		return DefaultBarColor(
-			selectedBarColor = selectedBarColor,
-			unSelectedBarColor = unSelectedBarColor
-		)
-	}
+//	@Composable
+//	fun barColor(
+//
+//	): BarColors {
+//		return DefaultBarColor(
+//
+//		)
+//	}
 	
 	@Composable
 	fun barStyle(
+		selectedBarColor: Color = BarChartTokens.SelectedBarColor.toColor(),
+		unSelectedBarColor: Color = BarChartTokens.UnSelectedBarColor
+			.toColor()
+			.copy(alpha = BarChartTokens.UnSelectedBarColorAlpha),
 		selectedBarWidth: Dp = BarChartTokens.SelectedBarWidth,
 		unSelectedBarWidth: Dp = BarChartTokens.UnSelectedBarWidth,
 		selectedBarContainerWidth: Dp = BarChartTokens.SelectedBarContainerWidth,
@@ -61,6 +60,8 @@ object BarChartDefault {
 		)
 	): BarStyle {
 		return DefaultBarStyle(
+			selectedBarColor = selectedBarColor,
+			unSelectedBarColor = unSelectedBarColor,
 			selectedBarWidth = selectedBarWidth,
 			unSelectedBarWidth = unSelectedBarWidth,
 			selectedBarContainerWidth = selectedBarContainerWidth,
@@ -76,22 +77,19 @@ object BarChartDefault {
 		)
 	}
 	
-	@Immutable
-	private class DefaultBarColor(
-		private val selectedBarColor: Color,
-		private val unSelectedBarColor: Color,
-	): BarColors {
-		
-		@Composable
-		override fun barColor(selected: Boolean): State<Color> {
-			return rememberUpdatedState(
-				newValue = if (selected) selectedBarColor else unSelectedBarColor
-			)
-		}
-	}
+//	@Immutable
+//	private class DefaultBarColor(
+//		private val selectedBarColor: Color,
+//		private val unSelectedBarColor: Color,
+//	): BarColors {
+//
+//
+//	}
 	
 	@Immutable
 	private class DefaultBarStyle(
+		private val selectedBarColor: Color,
+		private val unSelectedBarColor: Color,
 		private val selectedBarWidth: Dp,
 		private val unSelectedBarWidth: Dp,
 		private val selectedBarContainerWidth: Dp,
@@ -105,6 +103,13 @@ object BarChartDefault {
 		private val selectedYAxisTextStyle: TextStyle,
 		private val unSelectedYAxisTextStyle: TextStyle
 	): BarStyle {
+		
+		@Composable
+		override fun barColor(selected: Boolean): State<Color> {
+			return rememberUpdatedState(
+				newValue = if (selected) selectedBarColor else unSelectedBarColor
+			)
+		}
 		
 		@Composable
 		override fun barWidth(selected: Boolean): State<Dp> {
