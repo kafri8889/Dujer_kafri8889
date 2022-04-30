@@ -13,11 +13,11 @@ object BarChartTokens {
 	
 	const val UnSelectedBarColorAlpha = 0.12f
 	
-	val SelectedBarWidth = 24.dp
-	val UnSelectedBarWidth = 24.dp
+	val SelectedBarWidth = 36.dp
+	val UnSelectedBarWidth = 36.dp
 	
-	val SelectedBarContainerWidth = 36.dp
-	val UnSelectedBarContainerWidth = 36.dp
+	val SelectedBarContainerWidth = 40.dp
+	val UnSelectedBarContainerWidth = 40.dp
 	
 	val SelectedHorizontalBarContainerPadding = 4.dp
 	val UnSelectedHorizontalBarContainerPadding = 4.dp

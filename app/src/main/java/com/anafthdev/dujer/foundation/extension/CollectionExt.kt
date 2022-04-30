@@ -3,11 +3,70 @@ package com.anafthdev.dujer.foundation.extension
 fun <T> Int.lastIndexOf(list: Collection<T>) = this == list.size - 1
 
 /**
- * combine two lists
+ * list = [[1, 2, 3], [1, 2, 3]]
+ * group -> [[1, 1], [2, 2], [3, 3]]
+ */
+fun <T> Collection<Collection<T>>.groupByIndex(): List<List<T>> {
+	val result = arrayListOf<List<T>>()
+	
+	val size = this.size
+	val length = this[0].size
+	
+	require(this.all { it.size == length }) {
+		"the size of each element must be the same"
+	}
+	
+	for (i in 0 until length) {
+		val inner = arrayListOf<T>()
+		for (j in 0 until size) {
+			inner.add(this[j][i])
+		}
+		
+		result.add(inner)
+	}
+	
+	return result
+}
+
+/**
+ * get element from collection
+ */
+operator fun <T> Collection<T>.get(index: Int): T {
+	this.forEachIndexed { i, t -> if (i == index) return t }
+	
+	throw IndexOutOfBoundsException("no matching index -> size: ${this.size}, index: $index")
+}
+
+/**
+ *
+ */
+fun <T> Collection<Collection<T>>.join(): List<T> {
+	val result = arrayListOf<T>()
+	this.forEach { collection ->
+		collection.forEach { result.add(it) }
+	}
+	
+	return result
+}
+
+/**
+ *
+ */
+fun <T> Collection<Array<out T>>.joinArray(): List<T> {
+	val result = arrayListOf<T>()
+	this.forEach { collection ->
+		collection.forEach { result.add(it) }
+	}
+	
+	return result
+}
+
+/**
+ * merge two lists
  * @param other another list
  */
-fun <T> Collection<T>.combine(other: List<T>): List<T> {
-	return this.toMutableList().apply { addAll(other) }
+fun <T> Collection<T>.merge(vararg other: List<T>): List<T> {
+	return this.toMutableList().apply { other.forEach { addAll(it) } }
 }
 
 /**
