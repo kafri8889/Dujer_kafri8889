@@ -2,14 +2,12 @@ package com.anafthdev.dujer.util
 
 import android.content.Context
 import android.content.res.Resources
-import android.os.Build
 import android.widget.Toast
 import java.text.DateFormatSymbols
 
 object AppUtil {
 	
-	val deviceLocale = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) Resources.getSystem().configuration.locales[0]
-	else Resources.getSystem().configuration.locale
+	val deviceLocale = Resources.getSystem().configuration.locales[0]
 	
 	val shortMonths: Array<String> = DateFormatSymbols(deviceLocale).shortMonths
 	
