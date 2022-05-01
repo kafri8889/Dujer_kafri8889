@@ -4,9 +4,9 @@ import androidx.lifecycle.viewModelScope
 import com.anafthdev.dujer.data.db.model.Category
 import com.anafthdev.dujer.data.db.model.Financial
 import com.anafthdev.dujer.foundation.extension.applyElement
-import com.anafthdev.dujer.foundation.extension.combine
 import com.anafthdev.dujer.foundation.extension.get
 import com.anafthdev.dujer.foundation.extension.getBy
+import com.anafthdev.dujer.foundation.extension.merge
 import com.anafthdev.dujer.foundation.viewmodel.StatefulViewModel
 import com.anafthdev.dujer.ui.category.environment.ICategoryEnvironment
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -23,7 +23,7 @@ class CategoryViewModel @Inject constructor(
 	init {
 		viewModelScope.launch(environment.dispatcher) {
 			environment.getAll().collect { categories ->
-				val categoryIDs = categories.combine(Category.values).getBy { it.id }
+				val categoryIDs = categories.merge(Category.values).getBy { it.id }
 				val financialList = environment.getAllFinancial().first()
 				
 				listenDeletedCategory(financialList, categoryIDs)
@@ -32,7 +32,7 @@ class CategoryViewModel @Inject constructor(
 				setState {
 					copy(
 						categories = categories
-							.combine(Category.values)
+							.merge(Category.values)
 							.distinctBy { it.id }
 							.sortedBy { it.name }
 					)
