@@ -140,13 +140,13 @@ fun BarChart(
 								isSelected = isSelected,
 								style = style[j],
 								groupID = dataGroup.first,
-								barData = barData,
 								height = height,
 								interactionSource = if (xAxisVisibility.isJoined()) interactionSource else MutableInteractionSource(),
 								showXAxis = showXAxis and xAxisVisibility.isSeparated(),
 								showYAxis = showYAxis and yAxisPosition.isInside(),
 								xAxisVisibility = xAxisVisibility,
-								formatter = formatter,
+								formatX = formatter.formatX(barData.x, dataGroup.second),
+								formatY = formatter.formatY(barData.y, dataGroup.second),
 								onBarClicked = {
 									state.update(
 										selectedBarDataGroup = dataGroup.first
@@ -160,7 +160,7 @@ fun BarChart(
 						val xAxisTextStyle by style[0].xAxisTextStyle(selected = isSelected)
 
 						Text(
-							text = formatter.formatX(dataGroup.second[0].x),
+							text = formatter.formatX(dataGroup.second[0].x, dataGroup.second),
 							textAlign = TextAlign.Center,
 							style = xAxisTextStyle,
 							modifier = Modifier
@@ -180,13 +180,13 @@ fun BarItem(
 	isSelected: Boolean,
 	style: BarStyle,
 	groupID: Int,
-	barData: BarData,
 	height: Dp,
 	interactionSource: MutableInteractionSource,
 	showXAxis: Boolean,
 	showYAxis: Boolean,
 	xAxisVisibility: XAxisVisibility,
-	formatter: ChartFormatter<BarData>,
+	formatX: String,
+	formatY: String,
 	onBarClicked: () -> Unit
 ) {
 	
@@ -271,7 +271,7 @@ fun BarItem(
 				) {
 					if (showYAxis) {
 						Text(
-							text = formatter.formatY(barData.y),
+							text = formatY,
 							style = yAxisTextStyle,
 							modifier = Modifier
 								.padding(
@@ -299,7 +299,7 @@ fun BarItem(
 		
 		if (showXAxis) {
 			Text(
-				text = formatter.formatX(barData.x),
+				text = formatX,
 				textAlign = TextAlign.Center,
 				style = xAxisTextStyle,
 				modifier = Modifier
