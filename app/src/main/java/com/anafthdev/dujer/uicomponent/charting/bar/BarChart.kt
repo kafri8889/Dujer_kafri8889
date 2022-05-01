@@ -1,11 +1,18 @@
 package com.anafthdev.dujer.uicomponent.charting.bar
 
 import androidx.compose.animation.animateColorAsState
+import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.animateDpAsState
+import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.spring
+import androidx.compose.foundation.LocalIndication
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.material.ripple.rememberRipple
+import androidx.compose.material3.Divider
 import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -13,18 +20,22 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.Dp
 import com.anafthdev.dujer.foundation.extension.getBy
 import com.anafthdev.dujer.foundation.extension.join
 import com.anafthdev.dujer.foundation.extension.toDp
 import com.anafthdev.dujer.foundation.window.dpScaled
 import com.anafthdev.dujer.uicomponent.charting.bar.components.BarAlignment
-import com.anafthdev.dujer.uicomponent.charting.bar.components.YAxisPosition
+import com.anafthdev.dujer.uicomponent.charting.bar.components.XAxisVisibility
 import com.anafthdev.dujer.uicomponent.charting.bar.data.BarChartDefault
 import com.anafthdev.dujer.uicomponent.charting.bar.data.BarDataSet
 import com.anafthdev.dujer.uicomponent.charting.bar.data.DefaultBarChartFormatter
 import com.anafthdev.dujer.uicomponent.charting.bar.ext.groupBarData
 import com.anafthdev.dujer.uicomponent.charting.bar.ext.isInside
+import com.anafthdev.dujer.uicomponent.charting.bar.ext.isJoined
+import com.anafthdev.dujer.uicomponent.charting.bar.ext.isSeparated
+import com.anafthdev.dujer.uicomponent.charting.bar.interfaces.BarChartStyle
 import com.anafthdev.dujer.uicomponent.charting.bar.interfaces.BarStyle
 import com.anafthdev.dujer.uicomponent.charting.bar.model.BarData
 import com.anafthdev.dujer.uicomponent.charting.formatter.ChartFormatter
@@ -37,13 +48,8 @@ fun BarChart(
 	state: BarChartState = rememberBarChartState(),
 	style: List<BarStyle> = listOf(BarChartDefault.barStyle()),
 	formatter: ChartFormatter<BarData> = DefaultBarChartFormatter(),
-	barAlignment: BarAlignment = BarAlignment.Start,
-	yAxisPosition: YAxisPosition = YAxisPosition.INSIDE,
-	showXAxis: Boolean = true,
-	showYAxis: Boolean = true
+	chartStyle: BarChartStyle = BarChartDefault.barChartStyle()
 ) {
-	
-	// TODO: kasih style ke bar (masing2)
 	
 	val density = LocalDensity.current
 	
@@ -57,6 +63,12 @@ fun BarChart(
 	val selectedBarDataSet = remember(state.observableSelectedBarDataGroup) {
 		state.observableSelectedBarDataGroup
 	}
+	
+	val showXAxis by chartStyle.showXAxis()
+	val showYAxis by chartStyle.showYAxis()
+	val xAxisVisibility by chartStyle.xAxisVisibility()
+	val yAxisPosition by chartStyle.yAxisPosition()
+	val barAlignment by chartStyle.barAlignment()
 	
 	Box(
 		modifier = Modifier
@@ -83,140 +95,85 @@ fun BarChart(
 				val isSelected = selectedBarDataSet == dataGroup.first
 				Timber.i("i: ${dataGroup.first}, group: ${dataGroup.second}")
 				
-				Row {
-					dataGroup.second.forEachIndexed { j, barData ->
-						Timber.i("j: $j")
-
-						val height = barData.y
-							.minus(minDataPoints)
-							.div(maxDataPoints.minus(minDataPoints))
-							.times(256)
-							.minus(24)
-							.coerceIn(
-								minimumValue = 18f,
-								maximumValue = 232f
-							).dpScaled
-
-						BarItem(
-							isSelected = isSelected,
-							style = style[j],
-							groupID = dataGroup.first,
-							barData = barData,
-							height = height,
-							showXAxis = showXAxis,
-							showYAxis = showYAxis,
-							yAxisPosition = yAxisPosition,
-							formatter = formatter,
-							state = state
+				val interactionSource = remember { MutableInteractionSource() }
+				
+				val barShape by style[0].barShape(selected = isSelected)
+				
+				Column(
+					horizontalAlignment = Alignment.CenterHorizontally,
+					modifier = Modifier
+						.defaultMinSize(
+							minHeight = DEFAULT_BAR_CHART_HEIGHT + DEFAULT_X_AXIS_HEIGHT
 						)
+						.clip(barShape)
+						.fillMaxHeight()
+						.clickable(
+							enabled = false,
+							indication = LocalIndication.current,
+							interactionSource = interactionSource,
+							onClick = {
+								state.update(
+									selectedBarDataGroup = dataGroup.first
+								)
+							}
+						)
+				) {
+					Row(
+						horizontalArrangement = Arrangement.Center,
+						modifier = Modifier
+							.weight(1f)
+					) {
+						dataGroup.second.forEachIndexed { j, barData ->
+							Timber.i("j: $j")
+							
+							val height = barData.y
+								.minus(minDataPoints)
+								.div(maxDataPoints.minus(minDataPoints))
+								.times(256)
+								.minus(24)
+								.coerceIn(
+									minimumValue = 18f,
+									maximumValue = 232f
+								).dpScaled
+							
+							BarItem(
+								isSelected = isSelected,
+								style = style[j],
+								groupID = dataGroup.first,
+								barData = barData,
+								height = height,
+								interactionSource = if (xAxisVisibility.isJoined()) interactionSource else MutableInteractionSource(),
+								showXAxis = showXAxis and xAxisVisibility.isSeparated(),
+								showYAxis = showYAxis and yAxisPosition.isInside(),
+								xAxisVisibility = xAxisVisibility,
+								formatter = formatter,
+								onBarClicked = {
+									state.update(
+										selectedBarDataGroup = dataGroup.first
+									)
+								}
+							)
+						}
 					}
 					
+					if (showXAxis and xAxisVisibility.isJoined()) {
+						val xAxisTextStyle by style[0].xAxisTextStyle(selected = isSelected)
+
+						Text(
+							text = formatter.formatX(dataGroup.second[0].x),
+							textAlign = TextAlign.Center,
+							style = xAxisTextStyle,
+							modifier = Modifier
+								.defaultMinSize(
+									minHeight = DEFAULT_X_AXIS_HEIGHT
+								)
+						)
+					}
 				}
 			}
 		}
 	}
 }
-
-//@Composable
-//fun MultipleBarItem(
-//	styles: List<BarStyle>,
-//	barDataList: List<BarData>,
-//	groupID: Int,
-//	minDataPoints: Float,
-//	maxDataPoints: Float,
-//	isSelected: Boolean,
-//	showXAxis: Boolean,
-//	showYAxis: Boolean,
-//	yAxisPosition: YAxisPosition,
-//	formatter: ChartFormatter<BarData>,
-//	state: BarChartState
-//) {
-//	Row {
-//		for (i in barDataList.indices) {
-//			val height = barDataList[i].y
-//				.minus(minDataPoints)
-//				.div(maxDataPoints.minus(minDataPoints))
-//				.times(256)
-//				.minus(24)
-//				.coerceIn(
-//					minimumValue = 18f,
-//					maximumValue = 232f
-//				).dpScaled
-//
-//			BarItem(
-//				isSelected = isSelected,
-//				style = styles[i],
-//				groupID = groupID,
-//				barData = barDataList[i],
-//				height = height,
-//				showXAxis = showXAxis,
-//				showYAxis = showYAxis,
-//				yAxisPosition = yAxisPosition,
-//				formatter = formatter,
-//				state = state
-//			)
-//		}
-//	}
-//}
-
-//@Composable
-//fun MultipleBarItem(
-//	styles: List<BarStyle>,
-//	barDataSets: List<BarDataSet>,
-//	groupID: Int,
-//	minDataPoints: Float,
-//	maxDataPoints: Float,
-//	isSelected: Boolean,
-//	showXAxis: Boolean,
-//	showYAxis: Boolean,
-//	yAxisPosition: YAxisPosition,
-//	formatter: ChartFormatter<BarData>,
-//	state: BarChartState
-//) {
-//	Row {
-//		for (iDataSet in barDataSets.indices) {
-//			val barDataSet = barDataSets[iDataSet]
-//			for (iBarData in barDataSet.barData.indices) {
-//				val barData = barDataSet.barData[iBarData]
-//				val height = barData.y
-//					.minus(minDataPoints)
-//					.div(maxDataPoints.minus(minDataPoints))
-//					.times(256)
-//					.minus(24)
-//					.coerceIn(
-//						minimumValue = 18f,
-//						maximumValue = 232f
-//					).dpScaled
-//
-//				BarItem(
-//					isSelected = isSelected,
-//					style = styles[iDataSet],
-//					groupID = groupID,
-//					barData = barData,
-//					height = height,
-//					showXAxis = showXAxis,
-//					showYAxis = showYAxis,
-//					yAxisPosition = yAxisPosition,
-//					formatter = formatter,
-//					state = state
-//				)
-//
-//				BarItem(
-//					isSelected = isSelected,
-//					style = styles[iDataSet],
-//					groupID = groupID,
-//					barData = barDataSet.barData[],
-//					height = height,
-//					showXAxis = showXAxis,
-//					showYAxis = showYAxis,
-//					yAxisPosition = yAxisPosition,
-//					formatter = formatter,
-//					state = state
-//				)
-//			}
-//		}
-//	}
-//}
 
 @Composable
 fun BarItem(
@@ -225,11 +182,12 @@ fun BarItem(
 	groupID: Int,
 	barData: BarData,
 	height: Dp,
+	interactionSource: MutableInteractionSource,
 	showXAxis: Boolean,
 	showYAxis: Boolean,
-	yAxisPosition: YAxisPosition,
+	xAxisVisibility: XAxisVisibility,
 	formatter: ChartFormatter<BarData>,
-	state: BarChartState
+	onBarClicked: () -> Unit
 ) {
 	
 	val density = LocalDensity.current
@@ -238,84 +196,116 @@ fun BarItem(
 	val barWidth by style.barWidth(selected = isSelected)
 	val barShape by style.barShape(selected = isSelected)
 	val barContainerWidth by style.barContainerWidth(selected = isSelected)
-	val horizontalBarPadding by style.horizontalBarContainerPadding(selected = isSelected)
+	val startPadding by style.startPaddingBarContainer(selected = isSelected)
+	val endPadding by style.endPaddingBarContainer(selected = isSelected)
+	val showXAxisLine by style.showXAxisLine(selected = isSelected)
+	val showYAxisLine by style.showYAxisLine(selected = isSelected)
+	val xAxisLineColor by style.xAxisLineColor(selected = isSelected)
+	val xAxisLineAnimationSpec by style.xAxisLineAnimationSpec(selected = isSelected)
+	val yAxisLineColor by style.yAxisLineColor(selected = isSelected)
 	val xAxisTextStyle by style.xAxisTextStyle(selected = isSelected)
 	val yAxisTextStyle by style.yAxisTextStyle(selected = isSelected)
 	
-	val animatedBarColor by animateColorAsState(targetValue = barColor)
+	val animatedBarColor by animateColorAsState(
+		targetValue = barColor,
+		animationSpec = spring(
+			stiffness = Spring.StiffnessMedium
+		)
+	)
 	val animatedBarWidth by animateDpAsState(targetValue = barWidth)
 	val animatedContainerWidth by animateDpAsState(targetValue = barContainerWidth)
-	val animatedHorizontalBarPadding by animateDpAsState(targetValue = horizontalBarPadding)
+	val animatedStartPaddingBarContainer by animateDpAsState(targetValue = startPadding)
+	val animatedEndPaddingBarContainer by animateDpAsState(targetValue = endPadding)
+	val animatedXAxisLineWidth by animateFloatAsState(
+		targetValue = if (showXAxisLine) 1f else 0f,
+		animationSpec = xAxisLineAnimationSpec
+	)
+	
 	var barHeight by remember { mutableStateOf(DEFAULT_BAR_HEIGHT) }
 	
 	Column(
 		horizontalAlignment = Alignment.CenterHorizontally,
 		verticalArrangement = Arrangement.Bottom,
 		modifier = Modifier
-			.padding(
-				horizontal = animatedHorizontalBarPadding
+			.width(animatedContainerWidth +
+					animatedStartPaddingBarContainer +
+					animatedEndPaddingBarContainer
 			)
-			.fillMaxHeight()
-			.width(animatedContainerWidth)
-			.clip(barShape)
-			.clickable {
-				state.update(
-					selectedBarDataGroup = groupID
-				)
-			}
 	) {
-		
-		Box(
-			contentAlignment = Alignment.BottomCenter,
+		Column(
+			horizontalAlignment = Alignment.CenterHorizontally,
+			verticalArrangement = Arrangement.Bottom,
 			modifier = Modifier
+				.padding(
+					start = animatedStartPaddingBarContainer,
+					end = animatedEndPaddingBarContainer
+				)
 				.weight(1f)
+				.clip(barShape)
+				.clickable(
+					enabled = true,
+					indication = if (xAxisVisibility.isSeparated()) rememberRipple() else null,
+					interactionSource = interactionSource,
+					onClick = onBarClicked
+				)
 		) {
+			
 			Box(
-				contentAlignment = Alignment.TopCenter,
+				contentAlignment = Alignment.BottomCenter,
 				modifier = Modifier
-					.defaultMinSize(
-						minHeight = DEFAULT_BAR_HEIGHT
-					)
-					.height(height)
-					.width(animatedBarWidth)
-					.clip(barShape)
-					.background(animatedBarColor)
-					.onGloballyPositioned {
-						barHeight = it.size.height.toDp(density)
-					}
+					.weight(1f)
 			) {
-				if (showYAxis and yAxisPosition.isInside()) {
-					Text(
-						text = formatter.formatY(barData.y),
-						style = yAxisTextStyle,
-						modifier = Modifier
-							.padding(
-								top = if (barHeight <= DEFAULT_BAR_HEIGHT.plus(4.dpScaled)) 0.dpScaled
-								else 4.dpScaled
-							)
-					)
+				Box(
+					contentAlignment = Alignment.TopCenter,
+					modifier = Modifier
+						.defaultMinSize(
+							minHeight = DEFAULT_BAR_HEIGHT
+						)
+						.height(height)
+						.width(animatedBarWidth)
+						.clip(barShape)
+						.background(animatedBarColor)
+						.onGloballyPositioned {
+							barHeight = it.size.height.toDp(density)
+						}
+				) {
+					if (showYAxis) {
+						Text(
+							text = formatter.formatY(barData.y),
+							style = yAxisTextStyle,
+							modifier = Modifier
+								.padding(
+									top = if (barHeight <= DEFAULT_BAR_HEIGHT.plus(4.dpScaled)) 0.dpScaled
+									else 4.dpScaled
+								)
+						)
+					}
 				}
 			}
 		}
 		
-		Spacer(
+		Divider(
+			color = xAxisLineColor,
+			thickness = 1.dpScaled,
 			modifier = Modifier
-				.padding(8.dpScaled)
+				.padding(
+					top = 6.dpScaled,
+					bottom = 6.dpScaled
+				)
+				.fillMaxWidth(
+					fraction = animatedXAxisLineWidth
+				)
 		)
 		
 		if (showXAxis) {
 			Text(
 				text = formatter.formatX(barData.x),
+				textAlign = TextAlign.Center,
 				style = xAxisTextStyle,
 				modifier = Modifier
 					.defaultMinSize(
-						minHeight = 24.dpScaled
+						minHeight = DEFAULT_X_AXIS_HEIGHT
 					)
-			)
-		} else {
-			Spacer(
-				modifier = Modifier
-					.height(24.dpScaled)
 			)
 		}
 	}
@@ -323,3 +313,4 @@ fun BarItem(
 
 internal val DEFAULT_BAR_CHART_HEIGHT = 256.dpScaled
 internal val DEFAULT_BAR_HEIGHT = 18.dpScaled
+internal val DEFAULT_X_AXIS_HEIGHT = 24.dpScaled
