@@ -10,9 +10,12 @@ import kotlinx.coroutines.flow.receiveAsFlow
 /**
  * State: A type that describes the data your feature needs to perform its logic and render its UI.
  *      The state is persistence during feature lifetime.
+ *
  * Effect: Similar to state but it is not persistence such as navigation, show toast, show snackbar.
+ 
  * Action: A type that represents all of the actions that cause the state of the application to
  *      change such as user actions, notifications, event sources and more.
+ 
  * Environment: A type that holds any dependencies the feature needs, such as
  *      API clients, analytics clients, etc to decouple between UI layer and Data layer.
  */
