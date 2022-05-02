@@ -1,33 +1,17 @@
 package com.anafthdev.dujer.uicomponent.charting.bar.data
 
-import androidx.compose.ui.unit.dp
-import com.anafthdev.dujer.uicomponent.charting.tokens.ChartingColorSchemeKeyTokens
-import com.anafthdev.dujer.uicomponent.charting.tokens.ChartingShapeTokens
-import com.anafthdev.dujer.uicomponent.charting.tokens.ChartingTypographyTokens
+import com.anafthdev.dujer.uicomponent.charting.bar.components.BarAlignment
+import com.anafthdev.dujer.uicomponent.charting.bar.components.XAxisVisibility
+import com.anafthdev.dujer.uicomponent.charting.bar.components.YAxisPosition
 
 object BarChartTokens {
 	
-	val SelectedBarColor = ChartingColorSchemeKeyTokens.Primary
+	const val ShowXAxis = true
+	const val ShowYAxis = true
 	
-	val UnSelectedBarColor = ChartingColorSchemeKeyTokens.OnSurface
+	val XAxisVisibility_ = XAxisVisibility.Separated
 	
-	const val UnSelectedBarColorAlpha = 0.12f
+	val YAxisPosition_ = YAxisPosition.Inside
 	
-	val SelectedBarWidth = 36.dp
-	val UnSelectedBarWidth = 36.dp
-	
-	val SelectedBarContainerWidth = 40.dp
-	val UnSelectedBarContainerWidth = 40.dp
-	
-	val SelectedHorizontalBarContainerPadding = 4.dp
-	val UnSelectedHorizontalBarContainerPadding = 4.dp
-	
-	val SelectedBarShape = ChartingShapeTokens.Small
-	val UnSelectedBarShape = ChartingShapeTokens.Small
-	
-	val SelectedXAxisTextStyle = ChartingTypographyTokens.BodySmall
-	val UnSelectedXAxisTextStyle = ChartingTypographyTokens.BodySmall
-	val SelectedYAxisTextStyle = ChartingTypographyTokens.BodySmall
-	val UnSelectedYAxisTextStyle = ChartingTypographyTokens.BodySmall
-
+	val BarAlignment_ = BarAlignment.Start
 }

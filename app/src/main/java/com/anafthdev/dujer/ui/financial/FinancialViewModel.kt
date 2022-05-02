@@ -2,7 +2,7 @@ package com.anafthdev.dujer.ui.financial
 
 import androidx.lifecycle.viewModelScope
 import com.anafthdev.dujer.data.db.model.Category
-import com.anafthdev.dujer.foundation.extension.combine
+import com.anafthdev.dujer.foundation.extension.merge
 import com.anafthdev.dujer.foundation.viewmodel.StatefulViewModel
 import com.anafthdev.dujer.ui.financial.environment.IFinancialEnvironment
 import com.anafthdev.dujer.util.AppUtil
@@ -23,7 +23,7 @@ class FinancialViewModel @Inject constructor(
 			environment.getCategories().collect { categories ->
 				setState {
 					copy(
-						categories = categories.combine(Category.values)
+						categories = categories.merge(Category.values)
 							.sortedBy { it.name }
 							.distinctBy { it.id }
 					)

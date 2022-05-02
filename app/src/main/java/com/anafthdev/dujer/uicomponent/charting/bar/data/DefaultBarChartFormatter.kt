@@ -10,25 +10,25 @@ class DefaultBarChartFormatter: ChartFormatter<BarData>() {
 	private val defaultXAxisFormatter = DefaultXAxisFormatter()
 	private val defaultYAxisFormatter = DefaultYAxisFormatter()
 	
-	override fun formatX(x: Float): String {
-		return defaultXAxisFormatter.format(x)
+	override fun formatX(x: Float, data: List<BarData>): String {
+		return defaultXAxisFormatter.format(x, data)
 	}
 	
-	override fun formatY(y: Float): String {
-		return defaultYAxisFormatter.format(y)
+	override fun formatY(y: Float, data: List<BarData>): String {
+		return defaultYAxisFormatter.format(y, data)
 	}
 }
 
 class DefaultXAxisFormatter: XAxisFormatter {
 	
-	override fun format(x: Float): String {
+	override fun format(x: Float, data: List<BarData>): String {
 		return "$x"
 	}
 }
 
 class DefaultYAxisFormatter: YAxisFormatter {
 	
-	override fun format(y: Float): String {
+	override fun format(y: Float, data: List<BarData>): String {
 		return "$y"
 	}
 }

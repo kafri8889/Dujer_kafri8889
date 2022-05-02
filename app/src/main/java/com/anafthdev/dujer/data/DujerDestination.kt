@@ -19,7 +19,13 @@ sealed class DujerDestination(val route: String) {
 		}
 	}
 	
-	object Dashboard: DujerDestination("dashboard")
+	object Dashboard: DujerDestination("dashboard") {
+		object Home: DujerDestination("${Dashboard.route}/home")
+		
+		object Export: DujerDestination("${Dashboard.route}/export")
+		
+		object Chart: DujerDestination("${Dashboard.route}/chart")
+	}
 	
 	object Setting: DujerDestination("setting")
 	

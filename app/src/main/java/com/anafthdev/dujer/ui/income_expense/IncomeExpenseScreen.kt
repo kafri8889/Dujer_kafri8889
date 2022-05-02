@@ -43,7 +43,6 @@ import com.anafthdev.dujer.ui.financial.FinancialScreen
 import com.anafthdev.dujer.ui.financial.data.FinancialAction
 import com.anafthdev.dujer.ui.income_expense.component.IncomeExpenseLineChart
 import com.anafthdev.dujer.ui.theme.Typography
-import com.anafthdev.dujer.ui.theme.black01
 import com.anafthdev.dujer.ui.theme.black04
 import com.anafthdev.dujer.ui.theme.extra_large_shape
 import com.anafthdev.dujer.uicomponent.SwipeableFinancialCard
@@ -243,9 +242,10 @@ fun IncomeExpenseScreen(
 							}
 						}
 						
-						Column(
+						Box(
 							modifier = Modifier
-								.fillMaxSize()
+								.fillMaxWidth()
+								.height(24.dpScaled)
 								.clip(
 									extra_large_shape.copy(
 										bottomStart = CornerSize(0.dpScaled),
@@ -253,23 +253,7 @@ fun IncomeExpenseScreen(
 									)
 								)
 								.background(MaterialTheme.colorScheme.background)
-						) {
-							Text(
-								text = stringResource(
-									id = if (type == FinancialType.INCOME) R.string.your_income else R.string.your_expenses
-								),
-								style = Typography.bodyMedium.copy(
-									color = black01,
-									fontWeight = FontWeight.SemiBold,
-									fontSize = Typography.bodyMedium.fontSize.spScaled
-								),
-								modifier = Modifier
-									.padding(
-										horizontal = 16.dpScaled,
-										vertical = 14.dpScaled
-									)
-							)
-						}
+						)
 					}
 				}
 			}
@@ -298,6 +282,7 @@ fun IncomeExpenseScreen(
 						showSheet()
 					},
 					modifier = Modifier
+						.padding(horizontal = 8.dpScaled)
 						.testTag("SwipeableFinancialCard")
 				)
 			}

@@ -6,25 +6,25 @@ fun <T> Int.lastIndexOf(list: Collection<T>) = this == list.size - 1
  * list = [[1, 2, 3], [1, 2, 3]]
  * group -> [[1, 1], [2, 2], [3, 3]]
  */
-fun <T> Collection<Collection<T>>.groupByIndex(): List<List<T>> {
+fun <T> Collection<Collection<T>>.transpose(): List<List<T>> {
 	val result = arrayListOf<List<T>>()
-	
+
 	val size = this.size
 	val length = this[0].size
-	
+
 	require(this.all { it.size == length }) {
 		"the size of each element must be the same"
 	}
-	
+
 	for (i in 0 until length) {
 		val inner = arrayListOf<T>()
 		for (j in 0 until size) {
 			inner.add(this[j][i])
 		}
-		
+
 		result.add(inner)
 	}
-	
+
 	return result
 }
 
@@ -137,7 +137,7 @@ fun <T> Collection<T>.get(predicate: (T) -> Boolean): T? {
  * Returns a list element from given collection
  * @author kafri8889
  */
-fun <T, U> Collection<T>.getBy(selector: (T) -> U): List<U> {
+inline fun <T, U> Collection<T>.getBy(selector: (T) -> U): List<U> {
 	val result = ArrayList<U>()
 	for (v in this) { result.add(selector(v)) }
 	return result

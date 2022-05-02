@@ -28,7 +28,6 @@ import com.anafthdev.dujer.ui.theme.medium_shape
 import com.anafthdev.dujer.util.AppUtil
 import com.anafthdev.dujer.util.CurrencyFormatter
 import java.text.SimpleDateFormat
-import java.util.*
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -90,7 +89,7 @@ fun FinancialCard(
 					)
 					
 					Text(
-						text = SimpleDateFormat("dd MMM yyyy", Locale.getDefault()).format(financial.dateCreated),
+						text = SimpleDateFormat("dd MMM yyyy", AppUtil.deviceLocale).format(financial.dateCreated),
 						style = Typography.labelSmall.copy(
 							fontWeight = FontWeight.Normal,
 							fontSize = Typography.labelSmall.fontSize.spScaled

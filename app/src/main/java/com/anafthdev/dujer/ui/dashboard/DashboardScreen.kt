@@ -1,6 +1,9 @@
 package com.anafthdev.dujer.ui.dashboard
 
+import android.app.Activity
 import androidx.activity.compose.BackHandler
+import androidx.compose.animation.AnimatedContentScope
+import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
@@ -24,7 +27,6 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -36,13 +38,14 @@ import com.anafthdev.dujer.R
 import com.anafthdev.dujer.data.DujerDestination
 import com.anafthdev.dujer.data.FinancialType
 import com.anafthdev.dujer.data.db.model.Financial
-import com.anafthdev.dujer.foundation.extension.combine
 import com.anafthdev.dujer.foundation.extension.getBy
+import com.anafthdev.dujer.foundation.extension.merge
 import com.anafthdev.dujer.foundation.extension.toArray
 import com.anafthdev.dujer.foundation.window.dpScaled
 import com.anafthdev.dujer.foundation.window.spScaled
 import com.anafthdev.dujer.ui.app.DujerAction
 import com.anafthdev.dujer.ui.app.DujerViewModel
+import com.anafthdev.dujer.ui.chart.ChartScreen
 import com.anafthdev.dujer.ui.dashboard.component.*
 import com.anafthdev.dujer.ui.financial.FinancialScreen
 import com.anafthdev.dujer.ui.financial.data.FinancialAction
@@ -53,11 +56,15 @@ import com.anafthdev.dujer.ui.theme.incomeColor
 import com.anafthdev.dujer.uicomponent.SwipeableFinancialCard
 import com.anafthdev.dujer.uicomponent.TopAppBar
 import com.github.mikephil.charting.data.LineDataSet
+import com.google.accompanist.navigation.animation.AnimatedNavHost
+import com.google.accompanist.navigation.animation.composable
+import com.google.accompanist.navigation.animation.rememberAnimatedNavController
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
 private val navigationRailItem = listOf(
 	"Dashboard" to R.drawable.ic_dashboard,
+	"Chart" to R.drawable.ic_chart,
 	"Export" to R.drawable.ic_export
 )
 
@@ -84,40 +91,6 @@ fun DashboardScreen(
 	val expenseLineDataSetEntry = state.expenseLineDataSetEntry
 	val financial = state.financial
 	val financialAction = state.financialAction
-
-//	val incomeLineDataSetEntry by rememberUpdatedState(
-//		newValue = arrayListOf<Entry>().apply {
-//			add(Entry(0f, 2200f))
-//			add(Entry(1f, 1000f))
-//			add(Entry(2f, 3500f))
-//			add(Entry(3f, 0f))
-//			add(Entry(4f, 9500f))
-//			add(Entry(5f, 4000f))
-//			add(Entry(6f, 10000f))
-//			add(Entry(7f, 12000f))
-//			add(Entry(8f, 6400f))
-//			add(Entry(9f, 15200f))
-//			add(Entry(10f, 7000f))
-//			add(Entry(11f, 3500f))
-//		}
-//	)
-
-//	val expenseLineDataSetEntry by rememberUpdatedState(
-//		newValue = arrayListOf<Entry>().apply {
-//			add(Entry(0f, 1200f))
-//			add(Entry(1f, 2800f))
-//			add(Entry(2f, 7500f))
-//			add(Entry(3f, 6256f))
-//			add(Entry(4f, 2400f))
-//			add(Entry(5f, 0f))
-//			add(Entry(6f, 12200f))
-//			add(Entry(7f, 1300f))
-//			add(Entry(8f, 5000f))
-//			add(Entry(9f, 11200f))
-//			add(Entry(10f, 4900f))
-//			add(Entry(11f, 6300f))
-//		}
-//	)
 	
 	val incomeLineDataset by rememberUpdatedState(
 		newValue = LineDataSet(
@@ -221,7 +194,9 @@ fun DashboardScreen(
 	
 }
 
-@OptIn(ExperimentalMaterialApi::class, ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalMaterialApi::class, ExperimentalMaterial3Api::class,
+	ExperimentalAnimationApi::class
+)
 @Composable
 private fun DashboardContent(
 	dashboardState: DashboardState,
@@ -233,22 +208,28 @@ private fun DashboardContent(
 	navController: NavController,
 	onSettingClicked: () -> Unit
 ) {
+	// TODO: animatedNavController reset pas ke setting screen terus back
 	
-	val density = LocalDensity.current
+	val context = LocalContext.current
 	
 	val userBalance = dashboardState.userBalance
 	val incomeFinancialList = dashboardState.incomeFinancialList
 	val expenseFinancialList = dashboardState.expenseFinancialList
 	
-	val mixedFinancialList = incomeFinancialList
-		.combine(expenseFinancialList)
-		.sortedBy { it.dateCreated }
-	
 	val scope = rememberCoroutineScope { Dispatchers.Main }
+	val dashboardNavController = rememberAnimatedNavController()
+	
+	val currentRoute = dashboardNavController.currentDestination?.route
 	
 	val openFinancialSheet = {
 		scope.launch { financialScreenSheetState.show() }
 		Unit
+	}
+	
+	val vibrate = {
+		dujerViewModel.dispatch(
+			DujerAction.Vibrate(100)
+		)
 	}
 	
 	var showNavRail by remember { mutableStateOf(false) }
@@ -258,6 +239,20 @@ private fun DashboardContent(
 		targetValue = if (showNavRail) 16.dpScaled else 0.dpScaled,
 		animationSpec = tween(400)
 	)
+	
+	BackHandler {
+		when {
+			showNavRail -> showNavRail = false
+			currentRoute != DujerDestination.Dashboard.Home.route -> {
+				selectedNavRailItem = navigationRailItem[0]
+				popupDashboardNavigation(
+					toRoute = DujerDestination.Dashboard.Home.route,
+					dashboardNavController = dashboardNavController
+				)
+			}
+			else -> (context as Activity).finish()
+		}
+	}
 	
 	Box(
 		modifier = Modifier
@@ -333,83 +328,53 @@ private fun DashboardContent(
 					items = navigationRailItem,
 					onItemSelected = { pair ->
 						selectedNavRailItem = pair
+						
+						when (pair.first) {
+							navigationRailItem[0].first -> {
+								popupDashboardNavigation(
+									toRoute = DujerDestination.Dashboard.Home.route,
+									dashboardNavController = dashboardNavController
+								)
+							}
+							navigationRailItem[1].first -> {
+								popupDashboardNavigation(
+									toRoute = DujerDestination.Dashboard.Chart.route,
+									dashboardNavController = dashboardNavController
+								)
+							}
+							navigationRailItem[2].first -> {
+								popupDashboardNavigation(
+									toRoute = DujerDestination.Dashboard.Export.route,
+									dashboardNavController = dashboardNavController
+								)
+							}
+						}
 					}
 				)
 				
-				LazyColumn {
-					
-					item {
-						Column(
-							modifier = Modifier
-								.padding(horizontal = 12.dpScaled)
-						) {
-							BalanceCard(
-								balance = userBalance
-							)
-							
-							Row(
-								verticalAlignment = Alignment.CenterVertically,
-								modifier = Modifier
-									.fillMaxWidth()
-									.padding(
-										vertical = 16.dpScaled
-									)
-							) {
-								IncomeCard(
-									income = incomeFinancialList.getBy { it.amount }.sum(),
-									onClick = {
-										navController.navigate(
-											DujerDestination.IncomeExpense.createRoute(FinancialType.INCOME)
-										) {
-											launchSingleTop = true
-										}
-									},
-									modifier = Modifier
-										.padding(end = 4.dpScaled)
-										.weight(1f)
-								)
-								
-								ExpenseCard(
-									expense = expenseFinancialList.getBy { it.amount }.sum(),
-									onClick = {
-										navController.navigate(
-											DujerDestination.IncomeExpense.createRoute(FinancialType.EXPENSE)
-										) {
-											launchSingleTop = true
-										}
-									},
-									modifier = Modifier
-										.padding(start = 4.dpScaled)
-										.weight(1f)
-								)
-							}
-							
-							FinancialLineChart(
-								incomeLineDataset = incomeLineDataset,
-								expenseLineDataset = expenseLineDataset
-							)
-						}
+				AnimatedNavHost(
+					navController = dashboardNavController,
+					startDestination = DujerDestination.Dashboard.Home.route,
+					enterTransition = {
+						slideIntoContainer(
+							towards = AnimatedContentScope.SlideDirection.Down
+						)
+					},
+					popEnterTransition = {
+						slideIntoContainer(
+							towards = AnimatedContentScope.SlideDirection.Up
+						)
 					}
-					
-					items(
-						items = mixedFinancialList,
-						key = { item: Financial -> item.hashCode() }
-					) { financial ->
-						SwipeableFinancialCard(
-							financial = financial,
-							onDismissToEnd = {
-								dujerViewModel.dispatch(
-									DujerAction.DeleteFinancial(
-										financial.toArray()
-									)
-								)
-							},
-							onCanDelete = {
-								dujerViewModel.dispatch(
-									DujerAction.Vibrate(100)
-								)
-							},
-							onClick = {
+				) {
+					composable(DujerDestination.Dashboard.Home.route) {
+						DashboardHomeScreen(
+							userBalance = userBalance,
+							incomeFinancialList = incomeFinancialList,
+							incomeLineDataset = incomeLineDataset,
+							expenseFinancialList = expenseFinancialList,
+							expenseLineDataset = expenseLineDataset,
+							navController = navController,
+							onFinancialCardClicked = { financial ->
 								dashboardViewModel.dispatch(
 									DashboardAction.SetFinancialAction(FinancialAction.EDIT)
 								)
@@ -420,22 +385,160 @@ private fun DashboardContent(
 								
 								openFinancialSheet()
 							},
-							modifier = Modifier
-								.padding(horizontal = 12.dpScaled)
-								.testTag("SwipeableFinancialCard")
+							onFinancialCardDismissToEnd = { financial ->
+								dujerViewModel.dispatch(
+									DujerAction.DeleteFinancial(financial.toArray())
+								)
+							},
+							onFinancialCardCanDelete = {
+								vibrate()
+							}
 						)
 					}
 					
-					item {
-						// fab size: 56 dp, fab bottom padding: 24 dp, card to fab padding: 16 dp = 96 dp
-						Spacer(
-							modifier = Modifier
-								.fillMaxWidth()
-								.height(96.dpScaled)
+					composable(DujerDestination.Dashboard.Chart.route) {
+						ChartScreen(
+							dashboardNavController = dashboardNavController,
+							onFinancialCardClicked = { financial ->
+								dashboardViewModel.dispatch(
+									DashboardAction.SetFinancialAction(FinancialAction.EDIT)
+								)
+								
+								dashboardViewModel.dispatch(
+									DashboardAction.SetFinancialID(financial.id)
+								)
+								
+								openFinancialSheet()
+							},
+							onFinancialCardDismissToEnd = { financial ->
+								dujerViewModel.dispatch(
+									DujerAction.DeleteFinancial(financial.toArray())
+								)
+							},
+							onFinancialCardCanDelete = {
+								vibrate()
+							}
 						)
 					}
+
+					composable(DujerDestination.Dashboard.Export.route) {
+
+					}
 				}
+				
 			}
 		}
+	}
+}
+
+@Composable
+private fun DashboardHomeScreen(
+	userBalance: Double,
+	incomeFinancialList: List<Financial>,
+	incomeLineDataset: LineDataSet,
+	expenseFinancialList: List<Financial>,
+	expenseLineDataset: LineDataSet,
+	navController: NavController,
+	onFinancialCardDismissToEnd: (Financial) -> Unit,
+	onFinancialCardCanDelete: (Financial) -> Unit,
+	onFinancialCardClicked: (Financial) -> Unit
+) {
+	
+	val mixedFinancialList = incomeFinancialList.merge(expenseFinancialList).sortedBy { it.dateCreated }
+	
+	LazyColumn {
+		
+		item {
+			Column(
+				modifier = Modifier
+					.padding(horizontal = 12.dpScaled)
+			) {
+				BalanceCard(
+					balance = userBalance
+				)
+				
+				Row(
+					verticalAlignment = Alignment.CenterVertically,
+					modifier = Modifier
+						.fillMaxWidth()
+						.padding(
+							vertical = 16.dpScaled
+						)
+				) {
+					IncomeCard(
+						income = incomeFinancialList.getBy { it.amount }.sum(),
+						onClick = {
+							navController.navigate(
+								DujerDestination.IncomeExpense.createRoute(FinancialType.INCOME)
+							) {
+								launchSingleTop = true
+							}
+						},
+						modifier = Modifier
+							.padding(end = 4.dpScaled)
+							.weight(1f)
+					)
+					
+					ExpenseCard(
+						expense = expenseFinancialList.getBy { it.amount }.sum(),
+						onClick = {
+							navController.navigate(
+								DujerDestination.IncomeExpense.createRoute(FinancialType.EXPENSE)
+							) {
+								launchSingleTop = true
+							}
+						},
+						modifier = Modifier
+							.padding(start = 4.dpScaled)
+							.weight(1f)
+					)
+				}
+				
+				FinancialLineChart(
+					incomeLineDataset = incomeLineDataset,
+					expenseLineDataset = expenseLineDataset
+				)
+			}
+		}
+		
+		items(
+			items = mixedFinancialList,
+			key = { item: Financial -> item.hashCode() }
+		) { financial ->
+			SwipeableFinancialCard(
+				financial = financial,
+				onDismissToEnd = { onFinancialCardDismissToEnd(financial) },
+				onCanDelete = { onFinancialCardCanDelete(financial) },
+				onClick = { onFinancialCardClicked(financial) },
+				modifier = Modifier
+					.padding(horizontal = 12.dpScaled)
+					.testTag("SwipeableFinancialCard")
+			)
+		}
+		
+		item {
+			// fab size: 56 dp, fab bottom padding: 24 dp, card to fab padding: 16 dp = 96 dp
+			Spacer(
+				modifier = Modifier
+					.fillMaxWidth()
+					.height(96.dpScaled)
+			)
+		}
+	}
+}
+
+internal fun popupDashboardNavigation(
+	toRoute: String,
+	dashboardNavController: NavController
+) {
+	dashboardNavController.navigate(toRoute) {
+		dashboardNavController.graph.startDestinationRoute?.let { route ->
+			popUpTo(route) {
+				saveState = true
+			}
+		}
+		
+		restoreState = true
+		launchSingleTop = true
 	}
 }

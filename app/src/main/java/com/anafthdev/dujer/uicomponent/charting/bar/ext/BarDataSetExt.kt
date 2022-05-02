@@ -1,7 +1,7 @@
 package com.anafthdev.dujer.uicomponent.charting.bar.ext
 
 import com.anafthdev.dujer.foundation.extension.getBy
-import com.anafthdev.dujer.foundation.extension.groupByIndex
+import com.anafthdev.dujer.foundation.extension.transpose
 import com.anafthdev.dujer.uicomponent.charting.bar.data.BarDataSet
 import com.anafthdev.dujer.uicomponent.charting.bar.model.BarData
 import timber.log.Timber
@@ -20,7 +20,7 @@ fun Collection<BarDataSet>.groupBarData(): List<Pair<Int, List<BarData>>> {
 	}
 	
 	for (i in 0 until innerListSize) {
-		result.add(i to barDataList.groupByIndex()[i])
+		result.add(i to barDataList.transpose()[i])
 	}
 	
 	Timber.i("result: $result")
