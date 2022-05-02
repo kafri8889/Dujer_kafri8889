@@ -1,5 +1,6 @@
 package com.anafthdev.dujer.ui.dashboard
 
+import android.app.Activity
 import androidx.activity.compose.BackHandler
 import androidx.compose.animation.AnimatedContentScope
 import androidx.compose.animation.ExperimentalAnimationApi
@@ -207,6 +208,9 @@ private fun DashboardContent(
 	navController: NavController,
 	onSettingClicked: () -> Unit
 ) {
+	// TODO: animatedNavController reset pas ke setting screen terus back
+	
+	val context = LocalContext.current
 	
 	val userBalance = dashboardState.userBalance
 	val incomeFinancialList = dashboardState.incomeFinancialList
@@ -236,14 +240,18 @@ private fun DashboardContent(
 		animationSpec = tween(400)
 	)
 	
-	BackHandler(
-		enabled = dashboardNavController.backQueue.isNotEmpty() and (currentRoute != DujerDestination.Dashboard.Home.route)
-	) {
-		selectedNavRailItem = navigationRailItem[0]
-		popupDashboardNavigation(
-			toRoute = DujerDestination.Dashboard.Home.route,
-			dashboardNavController = dashboardNavController
-		)
+	BackHandler {
+		when {
+			showNavRail -> showNavRail = false
+			dashboardNavController.backQueue.isNotEmpty() and (currentRoute != DujerDestination.Dashboard.Home.route) -> {
+				selectedNavRailItem = navigationRailItem[0]
+				popupDashboardNavigation(
+					toRoute = DujerDestination.Dashboard.Home.route,
+					dashboardNavController = dashboardNavController
+				)
+			}
+			else -> (context as Activity).finish()
+		}
 	}
 	
 	Box(
