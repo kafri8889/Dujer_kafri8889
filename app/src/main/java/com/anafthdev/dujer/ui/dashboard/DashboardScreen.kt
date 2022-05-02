@@ -21,6 +21,7 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.*
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -166,8 +167,10 @@ fun DashboardScreen(
 					navController = navController,
 					onSettingClicked = {
 						navController.navigate(DujerDestination.Setting.route) {
-							popUpTo(popUpToId) {
-								saveState = true
+							navController.graph.startDestinationRoute?.let { startRoute ->
+								popUpTo(startRoute) {
+									saveState = true
+								}
 							}
 							
 							restoreState = true
@@ -208,7 +211,6 @@ private fun DashboardContent(
 	navController: NavController,
 	onSettingClicked: () -> Unit
 ) {
-	// TODO: animatedNavController reset pas ke setting screen terus back
 	
 	val context = LocalContext.current
 	
@@ -232,8 +234,8 @@ private fun DashboardContent(
 		)
 	}
 	
-	var showNavRail by remember { mutableStateOf(false) }
-	var selectedNavRailItem by remember { mutableStateOf(navigationRailItem[0]) }
+	var showNavRail by rememberSaveable { mutableStateOf(false) }
+	var selectedNavRailItem by rememberSaveable { mutableStateOf(navigationRailItem[0]) }
 	
 	val menuIconPadding by animateDpAsState(
 		targetValue = if (showNavRail) 16.dpScaled else 0.dpScaled,
