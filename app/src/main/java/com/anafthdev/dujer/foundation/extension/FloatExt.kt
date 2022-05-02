@@ -9,12 +9,14 @@ import kotlin.math.roundToInt
  *
  * 14.6 percentOf 4.2 = 28.7671%
  */
-fun Float.percentOf(value: Float): Float {
-	return value.div(this).times(100)
+fun Float.percentOf(value: Float, ifNaN: (() -> Float)? = null): Float {
+	val percent = value.div(this).times(100)
+	return if ((ifNaN != null) and percent.isNaN()) ifNaN!!() else percent
 }
 
-fun Float.percentOf(value: Int): Float {
-	return value.div(this).times(100)
+fun Float.percentOf(value: Int, ifNaN: (() -> Float)? = null): Float {
+	val percent = value.div(this).times(100)
+	return if ((ifNaN != null) and percent.isNaN()) ifNaN!!() else percent
 }
 
 fun Float.roundPercentOf(value: Float): Int {
