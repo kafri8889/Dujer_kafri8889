@@ -243,7 +243,7 @@ private fun DashboardContent(
 	BackHandler {
 		when {
 			showNavRail -> showNavRail = false
-			dashboardNavController.backQueue.isNotEmpty() and (currentRoute != DujerDestination.Dashboard.Home.route) -> {
+			currentRoute != DujerDestination.Dashboard.Home.route -> {
 				selectedNavRailItem = navigationRailItem[0]
 				popupDashboardNavigation(
 					toRoute = DujerDestination.Dashboard.Home.route,
