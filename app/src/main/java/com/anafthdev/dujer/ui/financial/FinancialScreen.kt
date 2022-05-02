@@ -55,7 +55,6 @@ import com.anafthdev.dujer.util.AppUtil.toast
 import com.anafthdev.dujer.util.CurrencyFormatter
 import timber.log.Timber
 import java.text.SimpleDateFormat
-import java.util.*
 import kotlin.random.Random
 
 @Composable
@@ -321,7 +320,7 @@ fun FinancialScreen(
 				)
 				
 				OutlinedTextField(
-					value = SimpleDateFormat("dd MMM yyyy", Locale.getDefault()).format(
+					value = SimpleDateFormat("dd MMM yyyy", AppUtil.deviceLocale).format(
 						financialDate
 					),
 					singleLine = true,
