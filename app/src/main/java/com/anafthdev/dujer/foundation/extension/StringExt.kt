@@ -1,6 +1,20 @@
 package com.anafthdev.dujer.foundation.extension
 
 /**
+ * if this string not equals s return default
+ */
+fun String.notEquals(s: String, ignoreCase: Boolean = false, default: () -> String): String {
+	return if (!this.equals(s, ignoreCase)) default() else this
+}
+
+/**
+ * if this string equals s return default
+ */
+fun String.equals(s: String, ignoreCase: Boolean = false, default: () -> String): String {
+	return if (this.equals(s, ignoreCase)) default() else this
+}
+
+/**
  * Returns a new string with all occurrences of oldValue replaced with newValue.
  */
 fun String.replace(
