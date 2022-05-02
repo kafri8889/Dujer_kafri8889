@@ -10,9 +10,7 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CornerSize
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -24,6 +22,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.anafthdev.dujer.R
 import com.anafthdev.dujer.data.db.model.Financial
+import com.anafthdev.dujer.foundation.extension.merge
 import com.anafthdev.dujer.foundation.uiextension.horizontalScroll
 import com.anafthdev.dujer.foundation.window.dpScaled
 import com.anafthdev.dujer.foundation.window.spScaled
@@ -39,6 +38,7 @@ import com.anafthdev.dujer.uicomponent.charting.bar.components.XAxisVisibility
 import com.anafthdev.dujer.uicomponent.charting.bar.data.BarChartDefault
 import com.anafthdev.dujer.uicomponent.charting.bar.data.BarDataSet
 import com.anafthdev.dujer.uicomponent.charting.bar.model.BarData
+import com.anafthdev.dujer.uicomponent.charting.bar.rememberBarChartState
 import com.anafthdev.dujer.util.AppUtil
 import com.anafthdev.dujer.util.CurrencyFormatter
 import java.util.*
@@ -65,6 +65,38 @@ fun ChartScreen(
 	val incomeBarDataList = state.incomeBarDataList
 	val expenseBarDataList = state.expenseBarDataList
 	
+	var selectedBarDataGroup by remember { mutableStateOf(Calendar.getInstance()[Calendar.MONTH]) }
+	val lazyListValue = remember { mutableStateListOf<Financial>() }
+	
+	val barChartState = rememberBarChartState(
+		initialSelectedBarDataGroup = Calendar.getInstance()[Calendar.MONTH]
+	) { barDataGroupID ->
+		selectedBarDataGroup = barDataGroupID
+	}
+	
+	val getLazyListValue = {
+		lazyListValue.apply {
+			clear()
+			addAll(
+				incomeFinancialList.merge(
+					expenseFinancialList
+				).filter {
+					chartViewModel.monthFormatter.format(
+						it.dateCreated
+					) == chartViewModel.monthFormatter.format(chartViewModel.getTimeInMillis(selectedBarDataGroup))
+				}
+			)
+		}
+	}
+	
+	LaunchedEffect(
+		key1 = selectedBarDataGroup,
+		key2 = incomeFinancialList,
+		key3 = expenseFinancialList
+	) {
+		getLazyListValue()
+	}
+	
 	LazyColumn(
 		modifier = Modifier
 			.fillMaxSize()
@@ -77,12 +109,13 @@ fun ChartScreen(
 					.fillMaxSize()
 			) {
 				BarChart(
+					state = barChartState,
 					formatter = MonthBarChartFormatter(),
-					barDataSets = barDataSets,
-//					barDataSets = listOf(
-//						BarDataSet(incomeBarDataList),
-//						BarDataSet(expenseBarDataList)
-//					),
+//					barDataSets = barDataSets,
+					barDataSets = listOf(
+						BarDataSet(incomeBarDataList),
+						BarDataSet(expenseBarDataList)
+					),
 					style = listOf(
 						BarChartDefault.barStyle(
 							selectedBarColor = incomeColor,
@@ -142,7 +175,7 @@ fun ChartScreen(
 							Text(
 								text = stringResource(
 									id = R.string.income_for,
-									AppUtil.longMonths[Calendar.getInstance()[Calendar.MONTH]]
+									AppUtil.longMonths[selectedBarDataGroup]
 								),
 								style = Typography.bodyMedium.copy(
 									color = Color.White,
@@ -159,7 +192,13 @@ fun ChartScreen(
 							Text(
 								text = CurrencyFormatter.format(
 									locale = AppUtil.deviceLocale,
-									amount = 0.0,
+									amount = incomeFinancialList.filter {
+										chartViewModel.monthFormatter.format(
+											it.dateCreated
+										) == chartViewModel.monthFormatter.format(
+											chartViewModel.getTimeInMillis(selectedBarDataGroup)
+										)
+									}.sumOf { it.amount },
 									currencyCode = LocalCurrency.current.countryCode
 								),
 								style = Typography.titleMedium.copy(
@@ -185,7 +224,7 @@ fun ChartScreen(
 							Text(
 								text = stringResource(
 									id = R.string.expenses_for,
-									AppUtil.longMonths[Calendar.getInstance()[Calendar.MONTH]]
+									AppUtil.longMonths[selectedBarDataGroup]
 								),
 								style = Typography.bodyMedium.copy(
 									color = Color.White,
@@ -202,7 +241,13 @@ fun ChartScreen(
 							Text(
 								text = CurrencyFormatter.format(
 									locale = AppUtil.deviceLocale,
-									amount = 0.0,
+									amount = expenseFinancialList.filter {
+										chartViewModel.monthFormatter.format(
+											it.dateCreated
+										) == chartViewModel.monthFormatter.format(
+											chartViewModel.getTimeInMillis(selectedBarDataGroup)
+										)
+									}.sumOf { it.amount },
 									currencyCode = LocalCurrency.current.countryCode
 								),
 								style = Typography.titleMedium.copy(
@@ -237,7 +282,7 @@ fun ChartScreen(
 		}
 		
 		items(
-			items = incomeFinancialList + expenseFinancialList,
+			items = lazyListValue,
 			key = { item: Financial -> item.hashCode() }
 		) { financial ->
 			SwipeableFinancialCard(

@@ -17,7 +17,10 @@ class MonthBarChartFormatter: ChartFormatter<BarData>() {
 	override fun formatY(y: Float, data: List<BarData>): String {
 		val percent = data.getBy { it.y }
 			.sum()
-			.percentOf(y)
+			.percentOf(
+				value = y,
+				ifNaN = { 0f }
+			)
 		
 		return "${
 			DecimalFormat("#").apply {

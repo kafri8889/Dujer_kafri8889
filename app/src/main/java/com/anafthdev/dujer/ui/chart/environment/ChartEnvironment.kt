@@ -3,10 +3,10 @@ package com.anafthdev.dujer.ui.chart.environment
 import com.anafthdev.dujer.data.db.model.Financial
 import com.anafthdev.dujer.data.repository.app.IAppRepository
 import com.anafthdev.dujer.foundation.di.DiName
+import com.anafthdev.dujer.util.AppUtil
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.Flow
 import java.text.SimpleDateFormat
-import java.util.*
 import javax.inject.Inject
 import javax.inject.Named
 
@@ -15,7 +15,7 @@ class ChartEnvironment @Inject constructor(
 	private val appRepository: IAppRepository
 ): IChartEnvironment {
 	
-	private val monthYearFormatter = SimpleDateFormat("MMyyyy", Locale.getDefault())
+	private val monthYearFormatter = SimpleDateFormat("MMyyyy", AppUtil.deviceLocale)
 	
 	override suspend fun getIncomeFinancialList(): Flow<List<Financial>> {
 		return appRepository.expenseRepository.getExpense()
