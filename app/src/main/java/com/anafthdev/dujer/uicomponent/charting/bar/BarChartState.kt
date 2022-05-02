@@ -3,28 +3,32 @@ package com.anafthdev.dujer.uicomponent.charting.bar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.Saver
-import androidx.compose.runtime.saveable.listSaver
 import androidx.compose.runtime.saveable.rememberSaveable
-import com.anafthdev.dujer.uicomponent.charting.bar.data.BarDataSet
-import com.anafthdev.dujer.uicomponent.charting.bar.model.BarData
 
 class BarChartState constructor(
-	initialSelectedBarDataGroup: Int = -1
+	initialSelectedBarDataGroup: Int = -1,
+	private val onBarDataGroupChange: (id: Int) -> Unit = {}
 ) {
 	
 	private val selectedBarDataState = mutableStateOf(initialSelectedBarDataGroup)
 	val observableSelectedBarDataGroup get() = selectedBarDataState.value
 	
+	init {
+		onBarDataGroupChange(initialSelectedBarDataGroup)
+	}
+	
 	fun update(selectedBarDataGroup: Int) {
 		selectedBarDataState.value = selectedBarDataGroup
+		onBarDataGroupChange(selectedBarDataGroup)
 	}
 	
 	companion object {
-		val Saver: Saver<BarChartState, *> = listSaver(
-			save = { listOf(it.observableSelectedBarDataGroup) },
-			restore = { listSave ->
+		fun Saver(onBarDataGroupChange: (id: Int) -> Unit): Saver<BarChartState, *> = Saver(
+			save = { it.observableSelectedBarDataGroup },
+			restore = {
 				BarChartState(
-					initialSelectedBarDataGroup = listSave[0]
+					initialSelectedBarDataGroup = it,
+					onBarDataGroupChange = onBarDataGroupChange
 				)
 			}
 		)
@@ -33,10 +37,18 @@ class BarChartState constructor(
 }
 
 @Composable
-fun rememberBarChartState(selectedBarDataSet: BarDataSet = BarDataSet(listOf(BarData.default))): BarChartState {
-	return rememberSaveable(saver = BarChartState.Saver) {
+fun rememberBarChartState(
+	initialSelectedBarDataGroup: Int = -1,
+	onBarDataGroupChange: (id: Int) -> Unit = {}
+): BarChartState {
+	return rememberSaveable(
+		saver = BarChartState.Saver(
+			onBarDataGroupChange = onBarDataGroupChange
+		)
+	) {
 		BarChartState(
-			initialSelectedBarDataGroup = selectedBarDataSet.id
+			initialSelectedBarDataGroup = initialSelectedBarDataGroup,
+			onBarDataGroupChange = onBarDataGroupChange
 		)
 	}
 }
