@@ -1,11 +1,14 @@
 package com.anafthdev.dujer.ui.chart
 
+import androidx.compose.animation.*
 import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.spring
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CornerSize
 import androidx.compose.material3.MaterialTheme
@@ -15,6 +18,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -33,6 +38,7 @@ import com.anafthdev.dujer.ui.theme.expenseColor
 import com.anafthdev.dujer.ui.theme.extra_large_shape
 import com.anafthdev.dujer.ui.theme.incomeColor
 import com.anafthdev.dujer.uicomponent.SwipeableFinancialCard
+import com.anafthdev.dujer.uicomponent.YearSelector
 import com.anafthdev.dujer.uicomponent.charting.bar.BarChart
 import com.anafthdev.dujer.uicomponent.charting.bar.components.XAxisVisibility
 import com.anafthdev.dujer.uicomponent.charting.bar.data.BarChartDefault
@@ -41,8 +47,10 @@ import com.anafthdev.dujer.uicomponent.charting.bar.model.BarData
 import com.anafthdev.dujer.uicomponent.charting.bar.rememberBarChartState
 import com.anafthdev.dujer.util.AppUtil
 import com.anafthdev.dujer.util.CurrencyFormatter
+import kotlinx.coroutines.delay
 import java.util.*
 
+@OptIn(ExperimentalAnimationApi::class)
 @Composable
 fun ChartScreen(
 	dashboardNavController: NavController,
@@ -50,6 +58,9 @@ fun ChartScreen(
 	onFinancialCardCanDelete: (Financial) -> Unit,
 	onFinancialCardClicked: (Financial) -> Unit
 ) {
+	
+	val config = LocalConfiguration.current
+	val density = LocalDensity.current
 	
 	val barDataSets = listOf(
 		BarDataSet(BarData.sample1),
@@ -65,10 +76,21 @@ fun ChartScreen(
 	val incomeBarDataList = state.incomeBarDataList
 	val expenseBarDataList = state.expenseBarDataList
 	
+	val scope = rememberCoroutineScope()
+	
+	var selectedYear by remember { mutableStateOf(System.currentTimeMillis()) }
 	var selectedBarDataGroup by remember { mutableStateOf(Calendar.getInstance()[Calendar.MONTH]) }
 	val lazyListValue = remember { mutableStateListOf<Financial>() }
 	
+	var enterBarChartAnimOffset by remember {
+		mutableStateOf(with(density) { config.screenWidthDp.dpScaled.roundToPx() })
+	}
+	var exitBarChartAnimOffset by remember {
+		mutableStateOf(with(density) { -config.screenWidthDp.dpScaled.roundToPx() })
+	}
+	
 	val barChartState = rememberBarChartState(
+		lazyListState = rememberLazyListState(),
 		initialSelectedBarDataGroup = Calendar.getInstance()[Calendar.MONTH]
 	) { barDataGroupID ->
 		selectedBarDataGroup = barDataGroupID
@@ -90,11 +112,17 @@ fun ChartScreen(
 	}
 	
 	LaunchedEffect(
-		key1 = selectedBarDataGroup,
-		key2 = incomeFinancialList,
-		key3 = expenseFinancialList
+		selectedBarDataGroup,
+		incomeFinancialList,
+		expenseFinancialList,
+		selectedYear
 	) {
 		getLazyListValue()
+	}
+	
+	LaunchedEffect(selectedYear) {
+		delay(600)
+		barChartState.lazyListState.animateScrollToItem(selectedBarDataGroup)
 	}
 	
 	LazyColumn(
@@ -105,47 +133,84 @@ fun ChartScreen(
 	) {
 		item {
 			Column(
+				horizontalAlignment = Alignment.CenterHorizontally,
 				modifier = Modifier
 					.fillMaxSize()
 			) {
-				BarChart(
-					state = barChartState,
-					formatter = MonthBarChartFormatter(),
-//					barDataSets = barDataSets,
-					barDataSets = listOf(
-						BarDataSet(incomeBarDataList),
-						BarDataSet(expenseBarDataList)
-					),
-					style = listOf(
-						BarChartDefault.barStyle(
-							selectedBarColor = incomeColor,
-							selectedStartPaddingBarContainer = 16.dpScaled,
-							selectedShowXAxisLine = false,
-							unSelectedShowXAxisLine = true,
-							selectedXAxisLineAnimationSpec = spring(
-								stiffness = Spring.StiffnessVeryLow,
-								dampingRatio = Spring.DampingRatioHighBouncy
+				
+				YearSelector(
+					initialTimeInMillis = System.currentTimeMillis(),
+					maxYear = chartViewModel.yearFormatter.format(System.currentTimeMillis()),
+					onYearSelected = { year ->
+						if (selectedYear < year) {
+							enterBarChartAnimOffset = with(density) { config.screenWidthDp.dpScaled.roundToPx() }
+							exitBarChartAnimOffset = with(density) { -config.screenWidthDp.dpScaled.roundToPx() }
+						} else {
+							enterBarChartAnimOffset = with(density) { -config.screenWidthDp.dpScaled.roundToPx() }
+							exitBarChartAnimOffset = with(density) { config.screenWidthDp.dpScaled.roundToPx() }
+						}
+						
+						selectedYear = year
+						
+						chartViewModel.dispatch(
+							ChartAction.GetData(
+								yearInMillis = selectedYear
+							)
+						)
+					}
+				)
+				
+				AnimatedContent(
+					targetState = selectedYear,
+					transitionSpec = {
+						slideInHorizontally(
+							initialOffsetX = { enterBarChartAnimOffset },
+							animationSpec = tween(600)
+						) with slideOutHorizontally(
+							targetOffsetX = { exitBarChartAnimOffset },
+							animationSpec = tween(600)
+						)
+					}
+				) {
+					BarChart(
+						state = barChartState,
+						formatter = MonthBarChartFormatter(),
+//						barDataSets = barDataSets,
+						barDataSets = listOf(
+							BarDataSet(incomeBarDataList),
+							BarDataSet(expenseBarDataList)
+						),
+						style = listOf(
+							BarChartDefault.barStyle(
+								selectedBarColor = incomeColor,
+								selectedStartPaddingBarContainer = 16.dpScaled,
+								selectedShowXAxisLine = false,
+								unSelectedShowXAxisLine = true,
+								selectedXAxisLineAnimationSpec = spring(
+									stiffness = Spring.StiffnessVeryLow,
+									dampingRatio = Spring.DampingRatioHighBouncy
+								)
+							),
+							BarChartDefault.barStyle(
+								selectedBarColor = expenseColor,
+								selectedEndPaddingBarContainer = 16.dpScaled,
+								selectedShowXAxisLine = false,
+								unSelectedShowXAxisLine = true,
+								selectedXAxisLineAnimationSpec = spring(
+									stiffness = Spring.StiffnessVeryLow,
+									dampingRatio = Spring.DampingRatioHighBouncy
+								)
 							)
 						),
-						BarChartDefault.barStyle(
-							selectedBarColor = expenseColor,
-							selectedEndPaddingBarContainer = 16.dpScaled,
-							selectedShowXAxisLine = false,
-							unSelectedShowXAxisLine = true,
-							selectedXAxisLineAnimationSpec = spring(
-								stiffness = Spring.StiffnessVeryLow,
-								dampingRatio = Spring.DampingRatioHighBouncy
+						chartStyle = BarChartDefault.barChartStyle(
+							xAxisVisibility = XAxisVisibility.Joined
+						),
+						modifier = Modifier
+							.padding(
+								horizontal = 12.dpScaled
 							)
-						)
-					),
-					chartStyle = BarChartDefault.barChartStyle(
-						xAxisVisibility = XAxisVisibility.Joined
-					),
-					modifier = Modifier
-						.padding(
-							horizontal = 12.dpScaled
-						)
-				)
+					)
+				}
 				
 				Column(
 					modifier = Modifier
