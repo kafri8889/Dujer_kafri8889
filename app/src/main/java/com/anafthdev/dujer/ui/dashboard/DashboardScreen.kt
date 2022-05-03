@@ -21,11 +21,11 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.*
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
-import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
@@ -76,7 +76,6 @@ fun DashboardScreen(
 ) {
 	
 	val context = LocalContext.current
-	val config = LocalConfiguration.current
 	
 	val dashboardViewModel = hiltViewModel<DashboardViewModel>()
 	
@@ -166,8 +165,10 @@ fun DashboardScreen(
 					navController = navController,
 					onSettingClicked = {
 						navController.navigate(DujerDestination.Setting.route) {
-							popUpTo(popUpToId) {
-								saveState = true
+							navController.graph.startDestinationRoute?.let { startRoute ->
+								popUpTo(startRoute) {
+									saveState = true
+								}
 							}
 							
 							restoreState = true
@@ -208,7 +209,6 @@ private fun DashboardContent(
 	navController: NavController,
 	onSettingClicked: () -> Unit
 ) {
-	// TODO: animatedNavController reset pas ke setting screen terus back
 	
 	val context = LocalContext.current
 	
@@ -216,13 +216,18 @@ private fun DashboardContent(
 	val incomeFinancialList = dashboardState.incomeFinancialList
 	val expenseFinancialList = dashboardState.expenseFinancialList
 	
-	val scope = rememberCoroutineScope { Dispatchers.Main }
+	val scope = rememberCoroutineScope()
 	val dashboardNavController = rememberAnimatedNavController()
 	
 	val currentRoute = dashboardNavController.currentDestination?.route
 	
-	val openFinancialSheet = {
+	val showFinancialSheet = {
 		scope.launch { financialScreenSheetState.show() }
+		Unit
+	}
+	
+	val hideFinancialSheet = {
+		scope.launch { financialScreenSheetState.hide() }
 		Unit
 	}
 	
@@ -232,8 +237,8 @@ private fun DashboardContent(
 		)
 	}
 	
-	var showNavRail by remember { mutableStateOf(false) }
-	var selectedNavRailItem by remember { mutableStateOf(navigationRailItem[0]) }
+	var showNavRail by rememberSaveable { mutableStateOf(false) }
+	var selectedNavRailItem by rememberSaveable { mutableStateOf(navigationRailItem[0]) }
 	
 	val menuIconPadding by animateDpAsState(
 		targetValue = if (showNavRail) 16.dpScaled else 0.dpScaled,
@@ -242,6 +247,7 @@ private fun DashboardContent(
 	
 	BackHandler {
 		when {
+			financialScreenSheetState.isVisible -> hideFinancialSheet()
 			showNavRail -> showNavRail = false
 			currentRoute != DujerDestination.Dashboard.Home.route -> {
 				selectedNavRailItem = navigationRailItem[0]
@@ -264,7 +270,7 @@ private fun DashboardContent(
 					DashboardAction.SetFinancialAction(FinancialAction.NEW)
 				)
 				
-				openFinancialSheet()
+				showFinancialSheet()
 			},
 			modifier = Modifier
 				.padding(32.dpScaled)
@@ -383,7 +389,7 @@ private fun DashboardContent(
 									DashboardAction.SetFinancialID(financial.id)
 								)
 								
-								openFinancialSheet()
+								showFinancialSheet()
 							},
 							onFinancialCardDismissToEnd = { financial ->
 								dujerViewModel.dispatch(
@@ -408,7 +414,7 @@ private fun DashboardContent(
 									DashboardAction.SetFinancialID(financial.id)
 								)
 								
-								openFinancialSheet()
+								showFinancialSheet()
 							},
 							onFinancialCardDismissToEnd = { financial ->
 								dujerViewModel.dispatch(

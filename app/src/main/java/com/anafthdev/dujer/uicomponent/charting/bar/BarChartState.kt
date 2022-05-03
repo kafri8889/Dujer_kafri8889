@@ -1,5 +1,7 @@
 package com.anafthdev.dujer.uicomponent.charting.bar
 
+import androidx.compose.foundation.lazy.LazyListState
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.Saver
@@ -7,6 +9,7 @@ import androidx.compose.runtime.saveable.rememberSaveable
 
 class BarChartState constructor(
 	initialSelectedBarDataGroup: Int = -1,
+	val lazyListState: LazyListState,
 	private val onBarDataGroupChange: (id: Int) -> Unit = {}
 ) {
 	
@@ -23,10 +26,14 @@ class BarChartState constructor(
 	}
 	
 	companion object {
-		fun Saver(onBarDataGroupChange: (id: Int) -> Unit): Saver<BarChartState, *> = Saver(
+		fun Saver(
+			lazyListState: LazyListState,
+			onBarDataGroupChange: (id: Int) -> Unit
+		): Saver<BarChartState, *> = Saver(
 			save = { it.observableSelectedBarDataGroup },
 			restore = {
 				BarChartState(
+					lazyListState = lazyListState,
 					initialSelectedBarDataGroup = it,
 					onBarDataGroupChange = onBarDataGroupChange
 				)
@@ -38,15 +45,18 @@ class BarChartState constructor(
 
 @Composable
 fun rememberBarChartState(
+	lazyListState: LazyListState = rememberLazyListState(),
 	initialSelectedBarDataGroup: Int = -1,
 	onBarDataGroupChange: (id: Int) -> Unit = {}
 ): BarChartState {
 	return rememberSaveable(
 		saver = BarChartState.Saver(
-			onBarDataGroupChange = onBarDataGroupChange
+			onBarDataGroupChange = onBarDataGroupChange,
+			lazyListState = lazyListState
 		)
 	) {
 		BarChartState(
+			lazyListState = lazyListState,
 			initialSelectedBarDataGroup = initialSelectedBarDataGroup,
 			onBarDataGroupChange = onBarDataGroupChange
 		)

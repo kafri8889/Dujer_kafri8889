@@ -26,13 +26,14 @@ class ChartViewModel @Inject constructor(
 ) {
 	
 	val monthFormatter = SimpleDateFormat("MMM", AppUtil.deviceLocale)
+	val yearFormatter = SimpleDateFormat("yyyy", AppUtil.deviceLocale)
 	
 	private val calendar = Calendar.getInstance()
 	
 	init {
 		viewModelScope.launch(environment.dispatcher) {
-			environment.getIncomeFinancialList()
-				.combine(environment.getExpenseFinancialList()) { income, expense ->
+			environment.getFilteredIncomeList()
+				.combine(environment.getFilteredExpenseList()) { income, expense ->
 					income to expense
 				}.collect { pair ->
 				setState {
@@ -41,14 +42,26 @@ class ChartViewModel @Inject constructor(
 						expenseFinancialList = pair.second
 					)
 				}
-				
+
 				calculateBarData(pair.first, pair.second)
 			}
 		}
 	}
 	
 	override fun dispatch(action: ChartAction) {
-	
+		when (action) {
+			is ChartAction.GetData -> {
+				viewModelScope.launch(environment.dispatcher) {
+					environment.getFilteredIncomeList(
+						yearInMillis = action.yearInMillis
+					)
+					
+					environment.getFilteredExpenseList(
+						yearInMillis = action.yearInMillis
+					)
+				}
+			}
+		}
 	}
 	
 	private fun calculateBarData(incomeList: List<Financial>, expenseList: List<Financial>) {
