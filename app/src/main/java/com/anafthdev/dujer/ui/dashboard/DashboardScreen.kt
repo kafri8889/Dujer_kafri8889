@@ -26,7 +26,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
-import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
@@ -77,7 +76,6 @@ fun DashboardScreen(
 ) {
 	
 	val context = LocalContext.current
-	val config = LocalConfiguration.current
 	
 	val dashboardViewModel = hiltViewModel<DashboardViewModel>()
 	
@@ -218,13 +216,18 @@ private fun DashboardContent(
 	val incomeFinancialList = dashboardState.incomeFinancialList
 	val expenseFinancialList = dashboardState.expenseFinancialList
 	
-	val scope = rememberCoroutineScope { Dispatchers.Main }
+	val scope = rememberCoroutineScope()
 	val dashboardNavController = rememberAnimatedNavController()
 	
 	val currentRoute = dashboardNavController.currentDestination?.route
 	
-	val openFinancialSheet = {
+	val showFinancialSheet = {
 		scope.launch { financialScreenSheetState.show() }
+		Unit
+	}
+	
+	val hideFinancialSheet = {
+		scope.launch { financialScreenSheetState.hide() }
 		Unit
 	}
 	
@@ -244,6 +247,7 @@ private fun DashboardContent(
 	
 	BackHandler {
 		when {
+			financialScreenSheetState.isVisible -> hideFinancialSheet()
 			showNavRail -> showNavRail = false
 			currentRoute != DujerDestination.Dashboard.Home.route -> {
 				selectedNavRailItem = navigationRailItem[0]
@@ -266,7 +270,7 @@ private fun DashboardContent(
 					DashboardAction.SetFinancialAction(FinancialAction.NEW)
 				)
 				
-				openFinancialSheet()
+				showFinancialSheet()
 			},
 			modifier = Modifier
 				.padding(32.dpScaled)
@@ -385,7 +389,7 @@ private fun DashboardContent(
 									DashboardAction.SetFinancialID(financial.id)
 								)
 								
-								openFinancialSheet()
+								showFinancialSheet()
 							},
 							onFinancialCardDismissToEnd = { financial ->
 								dujerViewModel.dispatch(
@@ -410,7 +414,7 @@ private fun DashboardContent(
 									DashboardAction.SetFinancialID(financial.id)
 								)
 								
-								openFinancialSheet()
+								showFinancialSheet()
 							},
 							onFinancialCardDismissToEnd = { financial ->
 								dujerViewModel.dispatch(
