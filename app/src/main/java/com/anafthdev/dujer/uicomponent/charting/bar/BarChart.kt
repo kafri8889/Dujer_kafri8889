@@ -76,6 +76,7 @@ fun BarChart(
 			.then(modifier)
 	) {
 		LazyRow(
+			state = state.lazyListState,
 			modifier = Modifier
 				.height(DEFAULT_BAR_CHART_HEIGHT)
 				.align(
