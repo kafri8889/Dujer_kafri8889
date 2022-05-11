@@ -459,8 +459,10 @@ private fun DashboardHomeScreen(
 				modifier = Modifier
 					.padding(horizontal = 12.dpScaled)
 			) {
-				BalanceCard(
-					balance = userBalance
+				
+				BudgetCard(
+					totalExpense = expenseFinancialList.sumOf { it.amount },
+					totalIncome = incomeFinancialList.sumOf { it.amount }
 				)
 				
 				Row(
