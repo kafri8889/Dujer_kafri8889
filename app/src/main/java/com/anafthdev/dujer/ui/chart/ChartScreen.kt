@@ -76,8 +76,6 @@ fun ChartScreen(
 	val incomeBarDataList = state.incomeBarDataList
 	val expenseBarDataList = state.expenseBarDataList
 	
-	val scope = rememberCoroutineScope()
-	
 	var selectedYear by remember { mutableStateOf(System.currentTimeMillis()) }
 	var selectedBarDataGroup by remember { mutableStateOf(Calendar.getInstance()[Calendar.MONTH]) }
 	val lazyListValue = remember { mutableStateListOf<Financial>() }
@@ -121,7 +119,7 @@ fun ChartScreen(
 	}
 	
 	LaunchedEffect(selectedYear) {
-		delay(600)
+		delay(400)
 		barChartState.lazyListState.animateScrollToItem(selectedBarDataGroup)
 	}
 	
@@ -183,7 +181,7 @@ fun ChartScreen(
 						style = listOf(
 							BarChartDefault.barStyle(
 								selectedBarColor = incomeColor,
-								selectedStartPaddingBarContainer = 16.dpScaled,
+								selectedStartPaddingBarContainer = 24.dpScaled,
 								selectedShowXAxisLine = false,
 								unSelectedShowXAxisLine = true,
 								selectedXAxisLineAnimationSpec = spring(
@@ -193,7 +191,7 @@ fun ChartScreen(
 							),
 							BarChartDefault.barStyle(
 								selectedBarColor = expenseColor,
-								selectedEndPaddingBarContainer = 16.dpScaled,
+								selectedEndPaddingBarContainer = 24.dpScaled,
 								selectedShowXAxisLine = false,
 								unSelectedShowXAxisLine = true,
 								selectedXAxisLineAnimationSpec = spring(
