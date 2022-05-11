@@ -62,7 +62,7 @@ fun IncomeCard(
 					.background(Color(0xFF48827C))
 			) {
 				Icon(
-					painter = painterResource(id = R.drawable.ic_bxs_bank),
+					painter = painterResource(id = R.drawable.ic_bank),
 					tint = Color.White,
 					contentDescription = null
 				)
