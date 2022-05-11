@@ -22,6 +22,7 @@
     <string name="no_result">Tidak ada hasil</string>
     <string name="dark_theme">Tema gelap</string>
     <string name="income_for">Pemasukan untuk %1$s</string>
+    <string name="budget_for">Anggaran bulan %1$s</string>
     <string name="add_income">Tambah pemasukan</string>
     <string name="auth_failed">Otentikasi gagal</string>
     <string name="your_income">Pemasukan kamu</string>
