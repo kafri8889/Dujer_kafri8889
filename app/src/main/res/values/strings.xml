@@ -22,6 +22,7 @@
     <string name="no_result">No result</string>
     <string name="dark_theme">Dark theme</string>
     <string name="income_for">Income for %1$s</string>
+    <string name="budget_for">Budget for %1$s</string>
     <string name="add_income">Add income</string>
     <string name="auth_failed">Authentication Failed</string>
     <string name="your_income">Your income</string>

@@ -23,6 +23,7 @@ import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.anafthdev.dujer.R
@@ -76,17 +77,15 @@ fun ChartScreen(
 	val incomeBarDataList = state.incomeBarDataList
 	val expenseBarDataList = state.expenseBarDataList
 	
-	val scope = rememberCoroutineScope()
-	
 	var selectedYear by remember { mutableStateOf(System.currentTimeMillis()) }
 	var selectedBarDataGroup by remember { mutableStateOf(Calendar.getInstance()[Calendar.MONTH]) }
 	val lazyListValue = remember { mutableStateListOf<Financial>() }
 	
 	var enterBarChartAnimOffset by remember {
-		mutableStateOf(with(density) { config.screenWidthDp.dpScaled.roundToPx() })
+		mutableStateOf(with(density) { config.screenWidthDp.dp.roundToPx() })
 	}
 	var exitBarChartAnimOffset by remember {
-		mutableStateOf(with(density) { -config.screenWidthDp.dpScaled.roundToPx() })
+		mutableStateOf(with(density) { -config.screenWidthDp.dp.roundToPx() })
 	}
 	
 	val barChartState = rememberBarChartState(
@@ -121,7 +120,7 @@ fun ChartScreen(
 	}
 	
 	LaunchedEffect(selectedYear) {
-		delay(600)
+		delay(400)
 		barChartState.lazyListState.animateScrollToItem(selectedBarDataGroup)
 	}
 	
@@ -143,11 +142,11 @@ fun ChartScreen(
 					maxYear = chartViewModel.yearFormatter.format(System.currentTimeMillis()),
 					onYearSelected = { year ->
 						if (selectedYear < year) {
-							enterBarChartAnimOffset = with(density) { config.screenWidthDp.dpScaled.roundToPx() }
-							exitBarChartAnimOffset = with(density) { -config.screenWidthDp.dpScaled.roundToPx() }
+							enterBarChartAnimOffset = with(density) { config.screenWidthDp.dp.roundToPx() }
+							exitBarChartAnimOffset = with(density) { -config.screenWidthDp.dp.roundToPx() }
 						} else {
-							enterBarChartAnimOffset = with(density) { -config.screenWidthDp.dpScaled.roundToPx() }
-							exitBarChartAnimOffset = with(density) { config.screenWidthDp.dpScaled.roundToPx() }
+							enterBarChartAnimOffset = with(density) { -config.screenWidthDp.dp.roundToPx() }
+							exitBarChartAnimOffset = with(density) { config.screenWidthDp.dp.roundToPx() }
 						}
 						
 						selectedYear = year
@@ -183,7 +182,7 @@ fun ChartScreen(
 						style = listOf(
 							BarChartDefault.barStyle(
 								selectedBarColor = incomeColor,
-								selectedStartPaddingBarContainer = 16.dpScaled,
+								selectedStartPaddingBarContainer = 24.dpScaled,
 								selectedShowXAxisLine = false,
 								unSelectedShowXAxisLine = true,
 								selectedXAxisLineAnimationSpec = spring(
@@ -193,7 +192,7 @@ fun ChartScreen(
 							),
 							BarChartDefault.barStyle(
 								selectedBarColor = expenseColor,
-								selectedEndPaddingBarContainer = 16.dpScaled,
+								selectedEndPaddingBarContainer = 24.dpScaled,
 								selectedShowXAxisLine = false,
 								unSelectedShowXAxisLine = true,
 								selectedXAxisLineAnimationSpec = spring(

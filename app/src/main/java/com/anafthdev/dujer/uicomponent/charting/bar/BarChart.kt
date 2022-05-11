@@ -130,8 +130,8 @@ fun BarChart(
 							val height = barData.y
 								.minus(minDataPoints)
 								.div(maxDataPoints.minus(minDataPoints))
-								.times(256)
-								.minus(24)
+								.times(DEFAULT_BAR_CHART_HEIGHT.value)
+								.minus(DEFAULT_X_AXIS_HEIGHT.value)
 								.coerceIn(
 									minimumValue = 18f,
 									maximumValue = 232f
