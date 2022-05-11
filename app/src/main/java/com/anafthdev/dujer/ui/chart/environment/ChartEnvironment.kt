@@ -54,11 +54,11 @@ class ChartEnvironment @Inject constructor(
 	}
 	
 	override suspend fun getIncomeFinancialList(): Flow<List<Financial>> {
-		return appRepository.expenseRepository.getExpense()
+		return appRepository.incomeRepository.getIncome()
 	}
 	
 	override suspend fun getExpenseFinancialList(): Flow<List<Financial>> {
-		return appRepository.incomeRepository.getIncome()
+		return appRepository.expenseRepository.getExpense()
 	}
 	
 	override suspend fun getFilteredIncomeList(yearInMillis: Long) {
