@@ -23,6 +23,7 @@ import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.anafthdev.dujer.R
@@ -81,10 +82,10 @@ fun ChartScreen(
 	val lazyListValue = remember { mutableStateListOf<Financial>() }
 	
 	var enterBarChartAnimOffset by remember {
-		mutableStateOf(with(density) { config.screenWidthDp.dpScaled.roundToPx() })
+		mutableStateOf(with(density) { config.screenWidthDp.dp.roundToPx() })
 	}
 	var exitBarChartAnimOffset by remember {
-		mutableStateOf(with(density) { -config.screenWidthDp.dpScaled.roundToPx() })
+		mutableStateOf(with(density) { -config.screenWidthDp.dp.roundToPx() })
 	}
 	
 	val barChartState = rememberBarChartState(
@@ -141,11 +142,11 @@ fun ChartScreen(
 					maxYear = chartViewModel.yearFormatter.format(System.currentTimeMillis()),
 					onYearSelected = { year ->
 						if (selectedYear < year) {
-							enterBarChartAnimOffset = with(density) { config.screenWidthDp.dpScaled.roundToPx() }
-							exitBarChartAnimOffset = with(density) { -config.screenWidthDp.dpScaled.roundToPx() }
+							enterBarChartAnimOffset = with(density) { config.screenWidthDp.dp.roundToPx() }
+							exitBarChartAnimOffset = with(density) { -config.screenWidthDp.dp.roundToPx() }
 						} else {
-							enterBarChartAnimOffset = with(density) { -config.screenWidthDp.dpScaled.roundToPx() }
-							exitBarChartAnimOffset = with(density) { config.screenWidthDp.dpScaled.roundToPx() }
+							enterBarChartAnimOffset = with(density) { -config.screenWidthDp.dp.roundToPx() }
+							exitBarChartAnimOffset = with(density) { config.screenWidthDp.dp.roundToPx() }
 						}
 						
 						selectedYear = year
