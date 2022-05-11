@@ -62,7 +62,7 @@ fun IncomeExpenseLineChart(
 					yAxisLeft.textSize = 14f
 					yAxisLeft.axisMinimum = 0f
 					yAxisLeft.axisLineColor = Color.TRANSPARENT
-					yAxisLeft.valueFormatter = FinancialLineChartValueFormatter(localCurrency.countryCode)
+					yAxisLeft.valueFormatter = FinancialLineChartValueFormatter()
 					yAxisLeft.setDrawGridLines(true)
 					yAxisLeft.setPosition(YAxis.YAxisLabelPosition.OUTSIDE_CHART)
 					yAxisLeft.enableGridDashedLine(12f, 12f, 0f)
