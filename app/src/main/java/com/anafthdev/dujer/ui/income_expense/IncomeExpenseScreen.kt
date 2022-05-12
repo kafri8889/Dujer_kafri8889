@@ -31,6 +31,7 @@ import androidx.navigation.NavController
 import com.anafthdev.dujer.R
 import com.anafthdev.dujer.data.FinancialType
 import com.anafthdev.dujer.data.db.model.Financial
+import com.anafthdev.dujer.foundation.extension.deviceLocale
 import com.anafthdev.dujer.foundation.extension.getBy
 import com.anafthdev.dujer.foundation.extension.toArray
 import com.anafthdev.dujer.foundation.uiextension.horizontalScroll
@@ -223,7 +224,7 @@ fun IncomeExpenseScreen(
 								
 								Text(
 									text = CurrencyFormatter.format(
-										locale = AppUtil.deviceLocale,
+										locale = deviceLocale,
 										amount = if (type == FinancialType.INCOME) incomeBalance else expenseBalance,
 										currencyCode = LocalCurrency.current.countryCode
 									),

@@ -1,38 +1,39 @@
 package com.anafthdev.dujer.ui.dashboard.component
 
-import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.Text
-import androidx.compose.runtime.*
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.rounded.Add
+import androidx.compose.material3.*
+import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.anafthdev.dujer.R
-import com.anafthdev.dujer.foundation.uiextension.horizontalScroll
+import com.anafthdev.dujer.data.db.model.Wallet
 import com.anafthdev.dujer.foundation.window.dpScaled
-import com.anafthdev.dujer.model.LocalCurrency
-import com.anafthdev.dujer.ui.theme.Typography
-import com.anafthdev.dujer.ui.theme.balance_card_background
-import com.anafthdev.dujer.ui.theme.large_shape
-import com.anafthdev.dujer.util.AppUtil
-import com.anafthdev.dujer.util.CurrencyFormatter
+import com.anafthdev.dujer.ui.theme.*
+import com.anafthdev.dujer.uicomponent.WalletCard
+import com.anafthdev.dujer.uicomponent.WormHorizontalPagerIndicator
+import com.google.accompanist.pager.ExperimentalPagerApi
+import com.google.accompanist.pager.HorizontalPager
+import com.google.accompanist.pager.rememberPagerState
 
-@OptIn(ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalPagerApi::class)
 @Composable
 fun BalanceCard(
-	balance: Double,
+
 ) {
 	
 	val density = LocalDensity.current
 	
-	var cardHeight by remember { mutableStateOf(0.dpScaled) }
+	val walletPagerState = rememberPagerState()
 	
 	Card(
 		shape = large_shape,
@@ -44,14 +45,6 @@ fun BalanceCard(
 		),
 		modifier = Modifier
 			.fillMaxWidth()
-			.onGloballyPositioned {
-				cardHeight = with(density) {
-					it.size.width
-						.div(2f)
-						.toDp()
-				}
-			}
-			.height(cardHeight)
 	) {
 		Column(
 			modifier = Modifier
@@ -62,44 +55,66 @@ fun BalanceCard(
 				)
 		) {
 			Text(
-				text = stringResource(id = R.string.available_balance),
+				text = stringResource(id = R.string.wallet),
 				style = Typography.bodyMedium.copy(
 					color = Color.White,
-					fontWeight = FontWeight.Normal
+					fontWeight = FontWeight.SemiBold
 				)
 			)
 			
-			Text(
-				text = CurrencyFormatter.format(
-					locale = AppUtil.deviceLocale,
-					amount = balance,
-					useSymbol = true,
-					currencyCode = LocalCurrency.current.countryCode
-				),
-				style = Typography.headlineMedium.copy(
-					color = Color.White,
-					fontWeight = FontWeight.SemiBold
-				),
+			HorizontalPager(
+				count = 2,
+				state = walletPagerState,
 				modifier = Modifier
-					.padding(top = 16.dpScaled)
-					.horizontalScroll(
-						state = rememberScrollState(),
-						autoRestart = true
+					.padding(
+						top = 8.dpScaled
 					)
-			)
+					.fillMaxWidth()
+			) { page ->
+				when (page) {
+					0 -> WalletCard(
+						wallet = Wallet.cash,
+						modifier = Modifier
+							.padding(4.dpScaled)
+							.fillMaxWidth()
+					)
+					1 -> WalletCard(
+						wallet = Wallet.cash,
+						modifier = Modifier
+							.padding(4.dpScaled)
+							.fillMaxWidth()
+					)
+				}
+			}
 			
-			Spacer(
+			WormHorizontalPagerIndicator(
+				pagerState = walletPagerState,
+				activeColor = md_theme_light_tertiaryContainer,
+				inactiveColor = md_theme_light_onTertiary,
 				modifier = Modifier
-					.weight(1f)
+					.padding(top = 8.dpScaled)
+					.align(Alignment.CenterHorizontally)
 			)
 			
-			Text(
-				text = stringResource(id = R.string.see_details),
-				style = Typography.bodyMedium.copy(
-					color = Color.White,
-					fontWeight = FontWeight.SemiBold
+			TextButton(
+				onClick = {
+				
+				}
+			) {
+				Icon(
+					imageVector = Icons.Rounded.Add,
+					tint = md_theme_light_primaryContainer,
+					contentDescription = stringResource(id = R.string.add_wallet)
 				)
-			)
+				
+				Text(
+					text = stringResource(id = R.string.add_wallet),
+					style = Typography.bodyMedium.copy(
+						color = Color.White,
+						fontWeight = FontWeight.Normal
+					)
+				)
+			}
 		}
 	}
 }

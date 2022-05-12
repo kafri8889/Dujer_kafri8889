@@ -37,10 +37,7 @@ import com.anafthdev.dujer.R
 import com.anafthdev.dujer.data.FinancialType
 import com.anafthdev.dujer.data.db.model.Category
 import com.anafthdev.dujer.data.db.model.Financial
-import com.anafthdev.dujer.foundation.extension.replace
-import com.anafthdev.dujer.foundation.extension.replaceFirstChar
-import com.anafthdev.dujer.foundation.extension.showDatePicker
-import com.anafthdev.dujer.foundation.extension.startsWith
+import com.anafthdev.dujer.foundation.extension.*
 import com.anafthdev.dujer.foundation.window.dpScaled
 import com.anafthdev.dujer.foundation.window.spScaled
 import com.anafthdev.dujer.model.LocalCurrency
@@ -48,7 +45,6 @@ import com.anafthdev.dujer.ui.financial.component.CategoryList
 import com.anafthdev.dujer.ui.financial.data.FinancialAction
 import com.anafthdev.dujer.ui.theme.*
 import com.anafthdev.dujer.uicomponent.TopAppBar
-import com.anafthdev.dujer.util.AppUtil
 import com.anafthdev.dujer.util.AppUtil.toast
 import com.anafthdev.dujer.util.CurrencyFormatter
 import timber.log.Timber
@@ -98,7 +94,7 @@ fun FinancialScreen(
 		financialAmountDouble = 0.0
 		financialAmount = TextFieldValue(
 			text = CurrencyFormatter.format(
-				locale = AppUtil.deviceLocale,
+				locale = deviceLocale,
 				amount = 0.0,
 				useSymbol = false,
 				currencyCode = financial.currency.countryCode
@@ -121,7 +117,7 @@ fun FinancialScreen(
 			financialAmountDouble = financial.amount
 			financialAmount = financialAmount.copy(
 				CurrencyFormatter.format(
-					locale = AppUtil.deviceLocale,
+					locale = deviceLocale,
 					amount = financial.amount,
 					useSymbol = false,
 					currencyCode = financial.currency.countryCode
@@ -266,8 +262,8 @@ fun FinancialScreen(
 						}
 						
 						financialAmountDouble = CurrencyFormatter.parse(
-							locale = AppUtil.deviceLocale,
-							amount = "${CurrencyFormatter.getSymbol(AppUtil.deviceLocale, financial.currency.countryCode)}$amount",
+							locale = deviceLocale,
+							amount = "${CurrencyFormatter.getSymbol(deviceLocale, financial.currency.countryCode)}$amount",
 							currencyCode = financial.currency.countryCode,
 						)
 						
@@ -277,7 +273,7 @@ fun FinancialScreen(
 						
 						financialAmount = s.copy(
 							text = CurrencyFormatter.format(
-								locale = AppUtil.deviceLocale,
+								locale = deviceLocale,
 								amount = financialAmountDouble,
 								useSymbol = false,
 								currencyCode = financial.currency.countryCode
@@ -292,7 +288,7 @@ fun FinancialScreen(
 							text = if (financialAction == FinancialAction.EDIT) {
 								financialNew.currency.symbol
 							} else CurrencyFormatter.getSymbol(
-								locale = AppUtil.deviceLocale,
+								locale = deviceLocale,
 								currencyCode = localCurrency.countryCode
 							),
 							style = Typography.bodyMedium.copy(
@@ -320,7 +316,7 @@ fun FinancialScreen(
 				)
 				
 				OutlinedTextField(
-					value = SimpleDateFormat("dd MMM yyyy", AppUtil.deviceLocale).format(
+					value = SimpleDateFormat("dd MMM yyyy", deviceLocale).format(
 						financialDate
 					),
 					singleLine = true,

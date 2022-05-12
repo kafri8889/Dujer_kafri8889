@@ -1,5 +1,6 @@
 package com.anafthdev.dujer.ui.app
 
+import android.annotation.SuppressLint
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.gestures.LocalOverScrollConfiguration
 import androidx.compose.foundation.layout.fillMaxSize
@@ -42,6 +43,7 @@ import kotlinx.coroutines.launch
 import timber.log.Timber
 
 
+@SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @OptIn(ExperimentalMaterialApi::class, ExperimentalFoundationApi::class,
 	ExperimentalMaterial3Api::class
 )

@@ -15,6 +15,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.anafthdev.dujer.data.FinancialType
 import com.anafthdev.dujer.data.db.model.Financial
+import com.anafthdev.dujer.foundation.extension.deviceLocale
 import com.anafthdev.dujer.foundation.extension.isDarkTheme
 import com.anafthdev.dujer.foundation.extension.toColor
 import com.anafthdev.dujer.foundation.uiextension.horizontalScroll
@@ -25,7 +26,6 @@ import com.anafthdev.dujer.model.LocalCurrency
 import com.anafthdev.dujer.ui.theme.Typography
 import com.anafthdev.dujer.ui.theme.large_shape
 import com.anafthdev.dujer.ui.theme.medium_shape
-import com.anafthdev.dujer.util.AppUtil
 import com.anafthdev.dujer.util.CurrencyFormatter
 import java.text.SimpleDateFormat
 
@@ -89,7 +89,7 @@ fun FinancialCard(
 					)
 					
 					Text(
-						text = SimpleDateFormat("dd MMM yyyy", AppUtil.deviceLocale).format(financial.dateCreated),
+						text = SimpleDateFormat("dd MMM yyyy", deviceLocale).format(financial.dateCreated),
 						style = Typography.labelSmall.copy(
 							fontWeight = FontWeight.Normal,
 							fontSize = Typography.labelSmall.fontSize.spScaled
@@ -107,7 +107,7 @@ fun FinancialCard(
 					Text(
 						text = (if (financial.type == FinancialType.INCOME) "+" else "-") +
 								CurrencyFormatter.format(
-									locale = AppUtil.deviceLocale,
+									locale = deviceLocale,
 									amount = financial.amount,
 									currencyCode = LocalCurrency.current.countryCode
 								),

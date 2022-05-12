@@ -2,6 +2,7 @@ package com.anafthdev.dujer.ui.income_expense
 
 import androidx.lifecycle.viewModelScope
 import com.anafthdev.dujer.data.db.model.Financial
+import com.anafthdev.dujer.foundation.extension.deviceLocale
 import com.anafthdev.dujer.foundation.extension.forEachMap
 import com.anafthdev.dujer.foundation.extension.indexOf
 import com.anafthdev.dujer.foundation.viewmodel.StatefulViewModel
@@ -75,7 +76,7 @@ class IncomeExpenseViewModel @Inject constructor(
 	
 	private fun calculateEntry(incomeList: List<Financial>, expenseList: List<Financial>) {
 		viewModelScope.launch(Dispatchers.Main) {
-			val monthFormatter = SimpleDateFormat("MMM", AppUtil.deviceLocale)
+			val monthFormatter = SimpleDateFormat("MMM", deviceLocale)
 			
 			val incomeListEntry = arrayListOf<Entry>().apply {
 				add(Entry(0f, 0f))
