@@ -1,4 +1,4 @@
-package com.anafthdev.dujer.ui.dashboard.component
+package com.anafthdev.dujer.uicomponent
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -23,6 +23,7 @@ import com.anafthdev.dujer.foundation.uiextension.horizontalScroll
 import com.anafthdev.dujer.foundation.window.dpScaled
 import com.anafthdev.dujer.foundation.window.spScaled
 import com.anafthdev.dujer.model.LocalCurrency
+import com.anafthdev.dujer.ui.dashboard.component.BudgetProgressIndicator
 import com.anafthdev.dujer.ui.theme.Typography
 import com.anafthdev.dujer.ui.theme.balance_card_background
 import com.anafthdev.dujer.ui.theme.full_shape
@@ -35,7 +36,8 @@ import java.util.*
 @Composable
 fun BudgetCard(
 	totalExpense: Double,
-	totalIncome: Double
+	totalIncome: Double,
+	modifier: Modifier = Modifier
 ) {
 	
 	val indicatorProgress = try {
@@ -51,7 +53,7 @@ fun BudgetCard(
 			containerColor = balance_card_background
 		),
 		onClick = {},
-		modifier = Modifier
+		modifier = modifier
 			.fillMaxWidth()
 	) {
 		Column(
