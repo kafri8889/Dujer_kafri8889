@@ -46,13 +46,17 @@ import com.anafthdev.dujer.foundation.window.spScaled
 import com.anafthdev.dujer.ui.app.DujerAction
 import com.anafthdev.dujer.ui.app.DujerViewModel
 import com.anafthdev.dujer.ui.chart.ChartScreen
-import com.anafthdev.dujer.ui.dashboard.component.*
+import com.anafthdev.dujer.ui.dashboard.component.DashboardNavigationRail
+import com.anafthdev.dujer.ui.dashboard.component.ExpenseCard
+import com.anafthdev.dujer.ui.dashboard.component.FinancialLineChart
+import com.anafthdev.dujer.ui.dashboard.component.IncomeCard
 import com.anafthdev.dujer.ui.financial.FinancialScreen
 import com.anafthdev.dujer.ui.financial.data.FinancialAction
 import com.anafthdev.dujer.ui.search.SearchScreen
 import com.anafthdev.dujer.ui.theme.Typography
 import com.anafthdev.dujer.ui.theme.expenseColor
 import com.anafthdev.dujer.ui.theme.incomeColor
+import com.anafthdev.dujer.uicomponent.BudgetCard
 import com.anafthdev.dujer.uicomponent.SwipeableFinancialCard
 import com.anafthdev.dujer.uicomponent.TopAppBar
 import com.github.mikephil.charting.data.LineDataSet
@@ -450,7 +454,12 @@ private fun DashboardHomeScreen(
 	onFinancialCardClicked: (Financial) -> Unit
 ) {
 	
-	val mixedFinancialList = incomeFinancialList.merge(expenseFinancialList).sortedBy { it.dateCreated }
+	val mixedFinancialList = remember(incomeFinancialList, expenseFinancialList) {
+		incomeFinancialList.merge(expenseFinancialList).sortedBy { it.dateCreated }
+	}
+	
+	val totalAmountIncomeList = remember(incomeFinancialList) { incomeFinancialList.sumOf { it.amount } }
+	val totalAmountExpenseList = remember(expenseFinancialList) { expenseFinancialList.sumOf { it.amount } }
 	
 	LazyColumn {
 		
@@ -461,8 +470,8 @@ private fun DashboardHomeScreen(
 			) {
 				
 				BudgetCard(
-					totalExpense = expenseFinancialList.sumOf { it.amount },
-					totalIncome = incomeFinancialList.sumOf { it.amount }
+					totalExpense = totalAmountExpenseList,
+					totalIncome = totalAmountIncomeList
 				)
 				
 				Row(
