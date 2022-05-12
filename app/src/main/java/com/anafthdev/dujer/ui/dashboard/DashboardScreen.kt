@@ -67,9 +67,9 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
 private val navigationRailItem = listOf(
-	"Dashboard" to R.drawable.ic_dashboard,
-	"Chart" to R.drawable.ic_chart,
-	"Export" to R.drawable.ic_export
+	R.string.dashboard to R.drawable.ic_dashboard,
+	R.string.chart to R.drawable.ic_chart,
+	R.string.export to R.drawable.ic_export
 )
 
 @OptIn(ExperimentalMaterialApi::class, ExperimentalMaterial3Api::class)
