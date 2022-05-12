@@ -129,6 +129,16 @@ fun DashboardScreen(
 		}
 	)
 	
+	DisposableEffect(financialScreenSheetState.isVisible) {
+		onDispose {
+			if (!financialScreenSheetState.isVisible) {
+				dashboardViewModel.dispatch(
+					DashboardAction.SetFinancialID(Financial.default.id)
+				)
+			}
+		}
+	}
+	
 	BackHandler(enabled = financialScreenSheetState.isVisible) {
 		scope.launch {
 			financialScreenSheetState.hide()
