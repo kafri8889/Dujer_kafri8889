@@ -32,7 +32,7 @@ fun BudgetProgressIndicator(
 			if (uiMode.isLightTheme()) 0.14f else 0f
 		)
 		progress <= 0.8f -> warningColor.darkenColor(
-			if (uiMode.isLightTheme()) 0.1f else 0f
+			if (uiMode.isLightTheme()) 0.14f else 0f
 		)
 		progress <= 1f -> dangerColor.darkenColor(
 			if (uiMode.isLightTheme()) 0.1f else 0f
