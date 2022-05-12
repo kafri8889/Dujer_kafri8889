@@ -107,6 +107,7 @@ dependencies {
     kapt 'androidx.room:room-compiler:2.4.2'
 
     // Accompanist
+    implementation "com.google.accompanist:accompanist-pager:$accompanist_version"
     implementation "com.google.accompanist:accompanist-navigation-animation:$accompanist_version"
     implementation "com.google.accompanist:accompanist-flowlayout:$accompanist_version"
     implementation "com.google.accompanist:accompanist-systemuicontroller:$accompanist_version"
