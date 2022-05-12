@@ -46,10 +46,7 @@ import com.anafthdev.dujer.foundation.window.spScaled
 import com.anafthdev.dujer.ui.app.DujerAction
 import com.anafthdev.dujer.ui.app.DujerViewModel
 import com.anafthdev.dujer.ui.chart.ChartScreen
-import com.anafthdev.dujer.ui.dashboard.component.DashboardNavigationRail
-import com.anafthdev.dujer.ui.dashboard.component.ExpenseCard
-import com.anafthdev.dujer.ui.dashboard.component.FinancialLineChart
-import com.anafthdev.dujer.ui.dashboard.component.IncomeCard
+import com.anafthdev.dujer.ui.dashboard.component.*
 import com.anafthdev.dujer.ui.financial.FinancialScreen
 import com.anafthdev.dujer.ui.financial.data.FinancialAction
 import com.anafthdev.dujer.ui.search.SearchScreen
@@ -479,9 +476,15 @@ private fun DashboardHomeScreen(
 					.padding(horizontal = 12.dpScaled)
 			) {
 				
+				BalanceCard(
+				
+				)
+				
 				BudgetCard(
 					totalExpense = totalAmountExpenseList,
-					totalIncome = totalAmountIncomeList
+					totalIncome = totalAmountIncomeList,
+					modifier = Modifier
+						.padding(top = 16.dpScaled)
 				)
 				
 				Row(
