@@ -38,6 +38,7 @@ import com.anafthdev.dujer.ui.theme.Typography
 import com.anafthdev.dujer.ui.theme.expenseColor
 import com.anafthdev.dujer.ui.theme.extra_large_shape
 import com.anafthdev.dujer.ui.theme.incomeColor
+import com.anafthdev.dujer.uicomponent.BudgetCard
 import com.anafthdev.dujer.uicomponent.SwipeableFinancialCard
 import com.anafthdev.dujer.uicomponent.YearSelector
 import com.anafthdev.dujer.uicomponent.charting.bar.BarChart
@@ -79,7 +80,22 @@ fun ChartScreen(
 	
 	var selectedYear by remember { mutableStateOf(System.currentTimeMillis()) }
 	var selectedBarDataGroup by remember { mutableStateOf(Calendar.getInstance()[Calendar.MONTH]) }
-	val lazyListValue = remember { mutableStateListOf<Financial>() }
+	val totalAmountIncomeList = remember(incomeFinancialList) { incomeFinancialList.sumOf { it.amount } }
+	val totalAmountExpenseList = remember(expenseFinancialList) { expenseFinancialList.sumOf { it.amount } }
+	val lazyListValue = remember(
+		selectedYear,
+		selectedBarDataGroup,
+		incomeFinancialList,
+		expenseFinancialList
+	) {
+		incomeFinancialList.merge(
+			expenseFinancialList
+		).filter {
+			chartViewModel.monthFormatter.format(
+				it.dateCreated
+			) == chartViewModel.monthFormatter.format(chartViewModel.getTimeInMillis(selectedBarDataGroup))
+		}
+	}
 	
 	var enterBarChartAnimOffset by remember {
 		mutableStateOf(with(density) { config.screenWidthDp.dp.roundToPx() })
@@ -93,30 +109,6 @@ fun ChartScreen(
 		initialSelectedBarDataGroup = Calendar.getInstance()[Calendar.MONTH]
 	) { barDataGroupID ->
 		selectedBarDataGroup = barDataGroupID
-	}
-	
-	val getLazyListValue = {
-		lazyListValue.apply {
-			clear()
-			addAll(
-				incomeFinancialList.merge(
-					expenseFinancialList
-				).filter {
-					chartViewModel.monthFormatter.format(
-						it.dateCreated
-					) == chartViewModel.monthFormatter.format(chartViewModel.getTimeInMillis(selectedBarDataGroup))
-				}
-			)
-		}
-	}
-	
-	LaunchedEffect(
-		selectedBarDataGroup,
-		incomeFinancialList,
-		expenseFinancialList,
-		selectedYear
-	) {
-		getLazyListValue()
 	}
 	
 	LaunchedEffect(selectedYear) {
@@ -210,6 +202,16 @@ fun ChartScreen(
 							)
 					)
 				}
+				
+				BudgetCard(
+					totalExpense = totalAmountExpenseList,
+					totalIncome = totalAmountIncomeList,
+					modifier = Modifier
+						.padding(
+							vertical = 4.dpScaled,
+							horizontal = 8.dpScaled
+						)
+				)
 				
 				Column(
 					modifier = Modifier

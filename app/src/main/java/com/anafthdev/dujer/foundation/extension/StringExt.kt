@@ -15,6 +15,41 @@ fun String.equals(s: String, ignoreCase: Boolean = false, default: () -> String)
 }
 
 /**
+ * check if this string ends with a number
+ */
+fun String.endsWithNumber(): Boolean = this[this.lastIndex].isDigit()
+
+/**
+ * add a new string before the given index
+ */
+fun String.addStringBefore(s: String, index: Int): String {
+	val result = StringBuilder()
+	forEachIndexed { i, c ->
+		if (i == index) {
+			result.append(s)
+			result.append(c)
+		} else result.append(c)
+	}
+	
+	return result.toString()
+}
+
+/**
+ * add a new string before the given index
+ */
+fun String.addStringAfter(s: String, index: Int): String {
+	val result = StringBuilder()
+	forEachIndexed { i, c ->
+		if (i == index) {
+			result.append(c)
+			result.append(s)
+		} else result.append(c)
+	}
+	
+	return result.toString()
+}
+
+/**
  * Returns a new string with all occurrences of oldValue replaced with newValue.
  */
 fun String.replace(

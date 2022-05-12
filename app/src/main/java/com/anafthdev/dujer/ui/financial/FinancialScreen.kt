@@ -31,6 +31,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.TextFieldValue
+import androidx.compose.ui.text.style.TextAlign
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.anafthdev.dujer.R
 import com.anafthdev.dujer.data.FinancialType
@@ -45,10 +46,7 @@ import com.anafthdev.dujer.foundation.window.spScaled
 import com.anafthdev.dujer.model.LocalCurrency
 import com.anafthdev.dujer.ui.financial.component.CategoryList
 import com.anafthdev.dujer.ui.financial.data.FinancialAction
-import com.anafthdev.dujer.ui.theme.Inter
-import com.anafthdev.dujer.ui.theme.Typography
-import com.anafthdev.dujer.ui.theme.black04
-import com.anafthdev.dujer.ui.theme.small_shape
+import com.anafthdev.dujer.ui.theme.*
 import com.anafthdev.dujer.uicomponent.TopAppBar
 import com.anafthdev.dujer.util.AppUtil
 import com.anafthdev.dujer.util.AppUtil.toast
@@ -57,6 +55,7 @@ import timber.log.Timber
 import java.text.SimpleDateFormat
 import kotlin.random.Random
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun FinancialScreen(
 	financial: Financial,
@@ -80,7 +79,7 @@ fun FinancialScreen(
 	var categoryFocusRequesterHasFocus by remember { mutableStateOf(false) }
 	var dateFocusRequesterHasFocus by remember { mutableStateOf(false) }
 	
-	var financialNew by remember { mutableStateOf(Financial.default) }
+	var financialNew by remember { mutableStateOf(Financial.default.copy(id = -1)) }
 	var financialTitle: String by remember { mutableStateOf("") }
 	var financialAmountDouble: Double by remember { mutableStateOf(0.0) }
 	var financialAmount: TextFieldValue by remember { mutableStateOf(TextFieldValue()) }
@@ -118,6 +117,7 @@ fun FinancialScreen(
 			financialTitle = financial.name
 			financialDate = financial.dateCreated
 			financialCategory = financial.category
+			financialType = financial.type
 			financialAmountDouble = financial.amount
 			financialAmount = financialAmount.copy(
 				CurrencyFormatter.format(
@@ -435,7 +435,71 @@ fun FinancialScreen(
 						.padding(top = 8.dpScaled)
 						.fillMaxWidth()
 				) {
-					// TODO: Pake chip MD3
+					FilterChip(
+						selected = financialType == FinancialType.INCOME,
+						colors = FilterChipDefaults.filterChipColors(
+							selectedContainerColor = income_card_background
+						),
+						label = {
+							Row(
+								verticalAlignment = Alignment.CenterVertically,
+								horizontalArrangement = Arrangement.Center,
+								modifier = Modifier
+									.fillMaxSize()
+							) {
+								Text(
+									text = stringResource(id = R.string.income),
+									style = MaterialTheme.typography.bodyMedium.copy(
+										textAlign = TextAlign.Center,
+										fontSize = MaterialTheme.typography.bodyMedium.fontSize.spScaled
+									)
+								)
+							}
+						},
+						onClick = {
+							financialType = FinancialType.INCOME
+						},
+						modifier = Modifier
+							.padding(
+								start = 4.dpScaled,
+								end = 2.dpScaled
+							)
+							.height(36.dpScaled)
+							.weight(1f)
+					)
+					
+					FilterChip(
+						selected = financialType == FinancialType.EXPENSE,
+						colors = FilterChipDefaults.filterChipColors(
+							selectedContainerColor = expense_card_background
+						),
+						label = {
+							Row(
+								verticalAlignment = Alignment.CenterVertically,
+								horizontalArrangement = Arrangement.Center,
+								modifier = Modifier
+									.fillMaxSize()
+							) {
+								Text(
+									text = stringResource(id = R.string.expenses),
+									style = MaterialTheme.typography.bodyMedium.copy(
+										textAlign = TextAlign.Center,
+										fontSize = MaterialTheme.typography.bodyMedium.fontSize.spScaled
+									)
+								)
+							}
+						},
+						onClick = {
+							financialType = FinancialType.EXPENSE
+						},
+						modifier = Modifier
+							.padding(
+								start = 2.dpScaled,
+								end = 4.dpScaled
+							)
+							.height(36.dpScaled)
+							.weight(1f)
+					)
 				}
 				
 				FilledTonalButton(
@@ -447,7 +511,8 @@ fun FinancialScreen(
 										name = financialTitle,
 										amount = financialAmountDouble,
 										dateCreated = financialDate,
-										category = financialCategory
+										category = financialCategory,
+										type = financialType
 									)
 								)
 							)
@@ -478,7 +543,7 @@ fun FinancialScreen(
 											)
 										)
 									)
-									
+									Timber.i("invoke new financial")
 									saveFinancial()
 								}
 							}
