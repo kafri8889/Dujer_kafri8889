@@ -79,7 +79,20 @@ fun ChartScreen(
 	
 	var selectedYear by remember { mutableStateOf(System.currentTimeMillis()) }
 	var selectedBarDataGroup by remember { mutableStateOf(Calendar.getInstance()[Calendar.MONTH]) }
-	val lazyListValue = remember { mutableStateListOf<Financial>() }
+	val lazyListValue = remember(
+		selectedYear,
+		selectedBarDataGroup,
+		incomeFinancialList,
+		expenseFinancialList
+	) {
+		incomeFinancialList.merge(
+			expenseFinancialList
+		).filter {
+			chartViewModel.monthFormatter.format(
+				it.dateCreated
+			) == chartViewModel.monthFormatter.format(chartViewModel.getTimeInMillis(selectedBarDataGroup))
+		}
+	}
 	
 	var enterBarChartAnimOffset by remember {
 		mutableStateOf(with(density) { config.screenWidthDp.dp.roundToPx() })
@@ -93,30 +106,6 @@ fun ChartScreen(
 		initialSelectedBarDataGroup = Calendar.getInstance()[Calendar.MONTH]
 	) { barDataGroupID ->
 		selectedBarDataGroup = barDataGroupID
-	}
-	
-	val getLazyListValue = {
-		lazyListValue.apply {
-			clear()
-			addAll(
-				incomeFinancialList.merge(
-					expenseFinancialList
-				).filter {
-					chartViewModel.monthFormatter.format(
-						it.dateCreated
-					) == chartViewModel.monthFormatter.format(chartViewModel.getTimeInMillis(selectedBarDataGroup))
-				}
-			)
-		}
-	}
-	
-	LaunchedEffect(
-		selectedBarDataGroup,
-		incomeFinancialList,
-		expenseFinancialList,
-		selectedYear
-	) {
-		getLazyListValue()
 	}
 	
 	LaunchedEffect(selectedYear) {
