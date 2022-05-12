@@ -8,9 +8,12 @@
     <string name="date">Tanggal</string>
     <string name="save">Simpan</string>
     <string name="title">Judul</string>
+    <string name="chart">Grafik</string>
+    <string name="wallet">Dompet</string>
     <string name="cancel">Batalkan</string>
     <string name="income">Pemasukan</string>
     <string name="amount">Jumlah</string>
+    <string name="export">Ekspor</string>
     <string name="setting">Pengaturan</string>
     <string name="security">Keamanan</string>
     <string name="expenses">Pengeluaran</string>
@@ -24,6 +27,7 @@
     <string name="income_for">Pemasukan untuk %1$s</string>
     <string name="budget_for">Anggaran bulan %1$s</string>
     <string name="add_income">Tambah pemasukan</string>
+    <string name="add_wallet">Tambah dompet</string>
     <string name="auth_failed">Otentikasi gagal</string>
     <string name="your_income">Pemasukan kamu</string>
     <string name="my_spending">Pengeluaran saya</string>

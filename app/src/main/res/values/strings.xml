@@ -8,9 +8,12 @@
     <string name="date">Date</string>
     <string name="save">Save</string>
     <string name="title">Title</string>
+    <string name="chart">Chart</string>
+    <string name="wallet">Wallet</string>
     <string name="cancel">Cancel</string>
     <string name="income">Income</string>
     <string name="amount">Amount</string>
+    <string name="export">Export</string>
     <string name="setting">Setting</string>
     <string name="security">Security</string>
     <string name="expenses">Expenses</string>
@@ -24,6 +27,7 @@
     <string name="income_for">Income for %1$s</string>
     <string name="budget_for">Budget for %1$s</string>
     <string name="add_income">Add income</string>
+    <string name="add_wallet">Add wallet</string>
     <string name="auth_failed">Authentication Failed</string>
     <string name="your_income">Your income</string>
     <string name="my_spending">My Spending</string>
