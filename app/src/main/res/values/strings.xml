@@ -28,6 +28,7 @@
     <string name="budget_for">Budget for %1$s</string>
     <string name="add_income">Add income</string>
     <string name="add_wallet">Add wallet</string>
+    <string name="new_wallet">New wallet</string>
     <string name="auth_failed">Authentication Failed</string>
     <string name="your_income">Your income</string>
     <string name="my_spending">My Spending</string>
