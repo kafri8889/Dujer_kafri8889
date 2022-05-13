@@ -58,7 +58,7 @@ fun OutlinedTextField(
 		OutlinedTextField(
 			value = value,
 			onValueChange = { s ->
-				if (textLength < maxCounter) {
+				if (s.length < maxCounter) {
 					onValueChange(s)
 				}
 			},
