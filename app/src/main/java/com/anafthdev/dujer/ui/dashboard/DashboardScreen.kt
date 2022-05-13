@@ -2,14 +2,15 @@ package com.anafthdev.dujer.ui.dashboard
 
 import android.app.Activity
 import androidx.activity.compose.BackHandler
-import androidx.compose.animation.AnimatedContentScope
-import androidx.compose.animation.ExperimentalAnimationApi
+import androidx.compose.animation.*
 import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.CornerSize
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.Add
@@ -23,10 +24,14 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -47,12 +52,14 @@ import com.anafthdev.dujer.ui.app.DujerAction
 import com.anafthdev.dujer.ui.app.DujerViewModel
 import com.anafthdev.dujer.ui.chart.ChartScreen
 import com.anafthdev.dujer.ui.dashboard.component.*
+import com.anafthdev.dujer.ui.dashboard.subscreen.AddWalletScreen
 import com.anafthdev.dujer.ui.financial.FinancialScreen
 import com.anafthdev.dujer.ui.financial.data.FinancialAction
 import com.anafthdev.dujer.ui.search.SearchScreen
 import com.anafthdev.dujer.ui.theme.Typography
 import com.anafthdev.dujer.ui.theme.expenseColor
 import com.anafthdev.dujer.ui.theme.incomeColor
+import com.anafthdev.dujer.ui.theme.shapes
 import com.anafthdev.dujer.uicomponent.BudgetCard
 import com.anafthdev.dujer.uicomponent.SwipeableFinancialCard
 import com.anafthdev.dujer.uicomponent.TopAppBar
@@ -61,6 +68,7 @@ import com.google.accompanist.navigation.animation.AnimatedNavHost
 import com.google.accompanist.navigation.animation.composable
 import com.google.accompanist.navigation.animation.rememberAnimatedNavController
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
 private val navigationRailItem = listOf(
@@ -249,6 +257,7 @@ private fun DashboardContent(
 	}
 	
 	var showNavRail by rememberSaveable { mutableStateOf(false) }
+	var showFABNewTransaction by rememberSaveable { mutableStateOf(true) }
 	var selectedNavRailItem by rememberSaveable { mutableStateOf(navigationRailItem[0]) }
 	
 	val menuIconPadding by animateDpAsState(
@@ -275,23 +284,33 @@ private fun DashboardContent(
 		modifier = Modifier
 			.fillMaxSize()
 	) {
-		FloatingActionButton(
-			onClick = {
-				dashboardViewModel.dispatch(
-					DashboardAction.SetFinancialAction(FinancialAction.NEW)
-				)
-				
-				showFinancialSheet()
-			},
+		AnimatedVisibility(
+			visible = showFABNewTransaction,
+			enter = scaleIn(
+				animationSpec = tween(200)
+			),
+			exit = scaleOut(
+				animationSpec = tween(200)
+			),
 			modifier = Modifier
 				.padding(32.dpScaled)
 				.align(Alignment.BottomEnd)
 				.zIndex(2f)
 		) {
-			Icon(
-				imageVector = Icons.Rounded.Add,
-				contentDescription = null,
-			)
+			FloatingActionButton(
+				onClick = {
+					dashboardViewModel.dispatch(
+						DashboardAction.SetFinancialAction(FinancialAction.NEW)
+					)
+					
+					showFinancialSheet()
+				}
+			) {
+				Icon(
+					imageVector = Icons.Rounded.Add,
+					contentDescription = null,
+				)
+			}
 		}
 		
 		Column(
@@ -409,6 +428,9 @@ private fun DashboardContent(
 							},
 							onFinancialCardCanDelete = {
 								vibrate()
+							},
+							onWalletSheetOpened = { isOpened ->
+								showFABNewTransaction = !isOpened
 							}
 						)
 					}
@@ -437,9 +459,9 @@ private fun DashboardContent(
 							}
 						)
 					}
-
+					
 					composable(DujerDestination.Dashboard.Export.route) {
-
+					
 					}
 				}
 				
@@ -448,6 +470,7 @@ private fun DashboardContent(
 	}
 }
 
+@OptIn(ExperimentalMaterialApi::class, ExperimentalComposeUiApi::class)
 @Composable
 private fun DashboardHomeScreen(
 	userBalance: Double,
@@ -458,8 +481,18 @@ private fun DashboardHomeScreen(
 	navController: NavController,
 	onFinancialCardDismissToEnd: (Financial) -> Unit,
 	onFinancialCardCanDelete: (Financial) -> Unit,
-	onFinancialCardClicked: (Financial) -> Unit
+	onFinancialCardClicked: (Financial) -> Unit,
+	onWalletSheetOpened: (Boolean) -> Unit
 ) {
+	
+	val focusManager = LocalFocusManager.current
+	val keyboardController = LocalSoftwareKeyboardController.current
+	
+	val scope = rememberCoroutineScope()
+	
+	val addWalletSheetState = rememberModalBottomSheetState(
+		initialValue = ModalBottomSheetValue.Hidden
+	)
 	
 	val mixedFinancialList = remember(incomeFinancialList, expenseFinancialList) {
 		incomeFinancialList.merge(expenseFinancialList).sortedBy { it.dateCreated }
@@ -468,91 +501,141 @@ private fun DashboardHomeScreen(
 	val totalAmountIncomeList = remember(incomeFinancialList) { incomeFinancialList.sumOf { it.amount } }
 	val totalAmountExpenseList = remember(expenseFinancialList) { expenseFinancialList.sumOf { it.amount } }
 	
-	LazyColumn {
-		
-		item {
-			Column(
-				modifier = Modifier
-					.padding(horizontal = 12.dpScaled)
-			) {
+	val walletNameFocusRequester by remember { mutableStateOf(FocusRequester()) }
+	
+	val hideAddWalletSheet = {
+		scope.launch { addWalletSheetState.hide() }
+		Unit
+	}
+	
+	val showAddWalletSheet = {
+		scope.launch { addWalletSheetState.show() }
+		Unit
+	}
+	
+	LaunchedEffect(addWalletSheetState.isVisible) {
+		onWalletSheetOpened(addWalletSheetState.isVisible)
+		if (!addWalletSheetState.isVisible) {
+			keyboardController?.hide()
+			focusManager.clearFocus(force = true)
+		}
+		if (addWalletSheetState.isVisible) {
+			delay(200)
+			walletNameFocusRequester.requestFocus()
+		}
+	}
+	
+	BackHandler(enabled = addWalletSheetState.isVisible) {
+		hideAddWalletSheet()
+	}
+	
+	ModalBottomSheetLayout(
+		sheetElevation = 8.dpScaled,
+		scrimColor = Color.Transparent,
+		sheetState = addWalletSheetState,
+		sheetShape = RoundedCornerShape(
+			topStart = shapes.medium.topStart,
+			topEnd = shapes.medium.topEnd,
+			bottomEnd = CornerSize(0.dpScaled),
+			bottomStart = CornerSize(0.dpScaled)
+		),
+		sheetContent = {
+			AddWalletScreen(
+				isScreenVisible = addWalletSheetState.isVisible,
+				walletNameFocusRequester = walletNameFocusRequester,
+				onCancel = hideAddWalletSheet,
+				onSave = { wallet ->
 				
-				BalanceCard(
-				
-				)
-				
-				BudgetCard(
-					totalExpense = totalAmountExpenseList,
-					totalIncome = totalAmountIncomeList,
+				}
+			)
+		}
+	) {
+		LazyColumn {
+			
+			item {
+				Column(
 					modifier = Modifier
-						.padding(top = 16.dpScaled)
-				)
-				
-				Row(
-					verticalAlignment = Alignment.CenterVertically,
-					modifier = Modifier
-						.fillMaxWidth()
-						.padding(
-							vertical = 16.dpScaled
-						)
+						.padding(horizontal = 12.dpScaled)
 				) {
-					IncomeCard(
-						income = incomeFinancialList.getBy { it.amount }.sum(),
-						onClick = {
-							navController.navigate(
-								DujerDestination.IncomeExpense.createRoute(FinancialType.INCOME)
-							) {
-								launchSingleTop = true
-							}
-						},
-						modifier = Modifier
-							.padding(end = 4.dpScaled)
-							.weight(1f)
+					
+					BalanceCard(
+						onAddWallet = showAddWalletSheet
 					)
 					
-					ExpenseCard(
-						expense = expenseFinancialList.getBy { it.amount }.sum(),
-						onClick = {
-							navController.navigate(
-								DujerDestination.IncomeExpense.createRoute(FinancialType.EXPENSE)
-							) {
-								launchSingleTop = true
-							}
-						},
+					BudgetCard(
+						totalExpense = totalAmountExpenseList,
+						totalIncome = totalAmountIncomeList,
 						modifier = Modifier
-							.padding(start = 4.dpScaled)
-							.weight(1f)
+							.padding(top = 16.dpScaled)
+					)
+					
+					Row(
+						verticalAlignment = Alignment.CenterVertically,
+						modifier = Modifier
+							.fillMaxWidth()
+							.padding(
+								vertical = 16.dpScaled
+							)
+					) {
+						IncomeCard(
+							income = incomeFinancialList.getBy { it.amount }.sum(),
+							onClick = {
+								navController.navigate(
+									DujerDestination.IncomeExpense.createRoute(FinancialType.INCOME)
+								) {
+									launchSingleTop = true
+								}
+							},
+							modifier = Modifier
+								.padding(end = 4.dpScaled)
+								.weight(1f)
+						)
+						
+						ExpenseCard(
+							expense = expenseFinancialList.getBy { it.amount }.sum(),
+							onClick = {
+								navController.navigate(
+									DujerDestination.IncomeExpense.createRoute(FinancialType.EXPENSE)
+								) {
+									launchSingleTop = true
+								}
+							},
+							modifier = Modifier
+								.padding(start = 4.dpScaled)
+								.weight(1f)
+						)
+					}
+					
+					FinancialLineChart(
+						incomeLineDataset = incomeLineDataset,
+						expenseLineDataset = expenseLineDataset
 					)
 				}
-				
-				FinancialLineChart(
-					incomeLineDataset = incomeLineDataset,
-					expenseLineDataset = expenseLineDataset
+			}
+			
+			items(
+				items = mixedFinancialList,
+				key = { item: Financial -> item.hashCode() }
+			) { financial ->
+				SwipeableFinancialCard(
+					financial = financial,
+					onDismissToEnd = { onFinancialCardDismissToEnd(financial) },
+					onCanDelete = { onFinancialCardCanDelete(financial) },
+					onClick = { onFinancialCardClicked(financial) },
+					modifier = Modifier
+						.padding(horizontal = 12.dpScaled)
+						.testTag("SwipeableFinancialCard")
 				)
 			}
-		}
-		
-		items(
-			items = mixedFinancialList,
-			key = { item: Financial -> item.hashCode() }
-		) { financial ->
-			SwipeableFinancialCard(
-				financial = financial,
-				onDismissToEnd = { onFinancialCardDismissToEnd(financial) },
-				onCanDelete = { onFinancialCardCanDelete(financial) },
-				onClick = { onFinancialCardClicked(financial) },
-				modifier = Modifier
-					.padding(horizontal = 12.dpScaled)
-					.testTag("SwipeableFinancialCard")
-			)
-		}
-		
-		item {
-			// fab size: 56 dp, fab bottom padding: 24 dp, card to fab padding: 16 dp = 96 dp
-			Spacer(
-				modifier = Modifier
-					.fillMaxWidth()
-					.height(96.dpScaled)
-			)
+			
+			item {
+				// fab size: 56 dp, fab bottom padding: 24 dp, card to fab padding: 16 dp = 96 dp
+				Spacer(
+					modifier = Modifier
+						.fillMaxWidth()
+						.height(96.dpScaled)
+				)
+			}
 		}
 	}
 }
