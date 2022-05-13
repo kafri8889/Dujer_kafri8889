@@ -5,20 +5,19 @@ import com.anafthdev.dujer.data.db.model.Financial
 import com.anafthdev.dujer.foundation.extension.applyElement
 import com.anafthdev.dujer.foundation.viewmodel.StatefulViewModel
 import com.anafthdev.dujer.model.Currency
-import com.anafthdev.dujer.ui.app.data.OnDeleteListener
 import com.anafthdev.dujer.ui.app.data.UndoType
 import com.anafthdev.dujer.ui.app.environment.IDujerEnvironment
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 @HiltViewModel
 class DujerViewModel @Inject constructor(
 	dujerEnvironment: IDujerEnvironment
-): StatefulViewModel<DujerState, Unit, DujerAction, IDujerEnvironment>(DujerState(), dujerEnvironment) {
-	
-	private var deleteListener: OnDeleteListener? = null
+): StatefulViewModel<DujerState, DujerEffect, DujerAction, IDujerEnvironment>(DujerState(), dujerEnvironment) {
 	
 	init {
 		viewModelScope.launch(environment.dispatcher) {
@@ -72,20 +71,24 @@ class DujerViewModel @Inject constructor(
 			is DujerAction.DeleteFinancial -> {
 				viewModelScope.launch(environment.dispatcher) {
 					environment.deleteFinancial(*action.financials)
-					deleteListener?.onDelete(action.financials[0])
+					withContext(Dispatchers.Main) {
+						setEffect(
+							DujerEffect.DeleteFinancial(action.financials[0])
+						)
+					}
 				}
 			}
 			is DujerAction.DeleteCategory -> {
 				viewModelScope.launch(environment.dispatcher) {
 					environment.deleteCategory(*action.categories)
-					deleteListener?.onDelete(action.categories[0])
+					withContext(Dispatchers.Main) {
+						setEffect(
+							DujerEffect.DeleteCategory(action.categories[0])
+						)
+					}
 				}
 			}
 		}
-	}
-	
-	fun setDeleteListener(listener: OnDeleteListener?) {
-		this.deleteListener = listener
 	}
 	
 }

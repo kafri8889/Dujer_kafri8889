@@ -6,7 +6,7 @@ import androidx.lifecycle.asFlow
 import com.anafthdev.dujer.data.db.model.Financial
 import com.anafthdev.dujer.data.repository.app.IAppRepository
 import com.anafthdev.dujer.foundation.di.DiName
-import com.anafthdev.dujer.util.AppUtil
+import com.anafthdev.dujer.foundation.extension.deviceLocale
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
@@ -20,7 +20,7 @@ class ChartEnvironment @Inject constructor(
 	private val appRepository: IAppRepository
 ): IChartEnvironment {
 	
-	private val yearFormatter = SimpleDateFormat("yyyy", AppUtil.deviceLocale)
+	private val yearFormatter = SimpleDateFormat("yyyy", deviceLocale)
 	
 	private var lastYearInMillis = System.currentTimeMillis()
 	

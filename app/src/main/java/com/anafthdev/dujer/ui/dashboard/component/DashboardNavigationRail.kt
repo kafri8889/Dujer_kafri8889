@@ -10,14 +10,15 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import com.anafthdev.dujer.foundation.window.spScaled
 
 @Composable
 fun DashboardNavigationRail(
 	visible: Boolean,
-	selectedItem: Pair<String, Int>,
-	items: List<Pair<String, Int>>,
-	onItemSelected: (Pair<String, Int>) -> Unit
+	selectedItem: Pair<Int, Int>,
+	items: List<Pair<Int, Int>>,
+	onItemSelected: (Pair<Int, Int>) -> Unit
 ) {
 	
 	AnimatedVisibility(
@@ -48,7 +49,7 @@ fun DashboardNavigationRail(
 					},
 					label = {
 						Text(
-							text = pair.first,
+							text = stringResource(id = pair.first),
 							style = LocalTextStyle.current.copy(
 								fontSize = LocalTextStyle.current.fontSize.spScaled
 							)

@@ -28,6 +28,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.anafthdev.dujer.R
 import com.anafthdev.dujer.data.db.model.Financial
+import com.anafthdev.dujer.foundation.extension.deviceLocale
 import com.anafthdev.dujer.foundation.extension.merge
 import com.anafthdev.dujer.foundation.uiextension.horizontalScroll
 import com.anafthdev.dujer.foundation.window.dpScaled
@@ -257,7 +258,7 @@ fun ChartScreen(
 							
 							Text(
 								text = CurrencyFormatter.format(
-									locale = AppUtil.deviceLocale,
+									locale = deviceLocale,
 									amount = incomeFinancialList.filter {
 										chartViewModel.monthFormatter.format(
 											it.dateCreated
@@ -306,7 +307,7 @@ fun ChartScreen(
 							
 							Text(
 								text = CurrencyFormatter.format(
-									locale = AppUtil.deviceLocale,
+									locale = deviceLocale,
 									amount = expenseFinancialList.filter {
 										chartViewModel.monthFormatter.format(
 											it.dateCreated

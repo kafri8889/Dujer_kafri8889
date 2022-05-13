@@ -4,8 +4,8 @@ import android.annotation.SuppressLint
 import android.content.Context
 import android.widget.TextView
 import com.anafthdev.dujer.R
+import com.anafthdev.dujer.foundation.extension.deviceLocale
 import com.anafthdev.dujer.model.Currency
-import com.anafthdev.dujer.util.AppUtil
 import com.anafthdev.dujer.util.CurrencyFormatter
 import com.github.mikephil.charting.components.MarkerView
 import com.github.mikephil.charting.data.Entry
@@ -33,25 +33,25 @@ class MultiLineChartMarkerView(
 			val expenseEntry = expenseLineDataSetEntry[e.x.toInt()]
 			
 			tvIncomeAmount.text = CurrencyFormatter.format(
-				locale = AppUtil.deviceLocale,
+				locale = deviceLocale,
 				amount = incomeEntry.y.toDouble(),
 				currencyCode = currency.countryCode
 			)
 			
 			tvExpenseAmount.text = CurrencyFormatter.format(
-				locale = AppUtil.deviceLocale,
+				locale = deviceLocale,
 				amount = expenseEntry.y.toDouble(),
 				currencyCode = currency.countryCode
 			)
 		} else {
 			tvIncomeAmount.text = CurrencyFormatter.format(
-				locale = AppUtil.deviceLocale,
+				locale = deviceLocale,
 				amount = 0.0,
 				currencyCode = currency.countryCode
 			)
 			
 			tvExpenseAmount.text = CurrencyFormatter.format(
-				locale = AppUtil.deviceLocale,
+				locale = deviceLocale,
 				amount = 0.0,
 				currencyCode = currency.countryCode
 			)

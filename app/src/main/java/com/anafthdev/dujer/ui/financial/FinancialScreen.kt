@@ -37,10 +37,7 @@ import com.anafthdev.dujer.R
 import com.anafthdev.dujer.data.FinancialType
 import com.anafthdev.dujer.data.db.model.Category
 import com.anafthdev.dujer.data.db.model.Financial
-import com.anafthdev.dujer.foundation.extension.replace
-import com.anafthdev.dujer.foundation.extension.replaceFirstChar
-import com.anafthdev.dujer.foundation.extension.showDatePicker
-import com.anafthdev.dujer.foundation.extension.startsWith
+import com.anafthdev.dujer.foundation.extension.*
 import com.anafthdev.dujer.foundation.window.dpScaled
 import com.anafthdev.dujer.foundation.window.spScaled
 import com.anafthdev.dujer.model.LocalCurrency
@@ -48,7 +45,6 @@ import com.anafthdev.dujer.ui.financial.component.CategoryList
 import com.anafthdev.dujer.ui.financial.data.FinancialAction
 import com.anafthdev.dujer.ui.theme.*
 import com.anafthdev.dujer.uicomponent.TopAppBar
-import com.anafthdev.dujer.util.AppUtil
 import com.anafthdev.dujer.util.AppUtil.toast
 import com.anafthdev.dujer.util.CurrencyFormatter
 import timber.log.Timber
@@ -58,6 +54,7 @@ import kotlin.random.Random
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun FinancialScreen(
+	isScreenVisible: Boolean,
 	financial: Financial,
 	financialAction: String,
 	onBack: () -> Unit,
@@ -98,7 +95,7 @@ fun FinancialScreen(
 		financialAmountDouble = 0.0
 		financialAmount = TextFieldValue(
 			text = CurrencyFormatter.format(
-				locale = AppUtil.deviceLocale,
+				locale = deviceLocale,
 				amount = 0.0,
 				useSymbol = false,
 				currencyCode = financial.currency.countryCode
@@ -121,7 +118,7 @@ fun FinancialScreen(
 			financialAmountDouble = financial.amount
 			financialAmount = financialAmount.copy(
 				CurrencyFormatter.format(
-					locale = AppUtil.deviceLocale,
+					locale = deviceLocale,
 					amount = financial.amount,
 					useSymbol = false,
 					currencyCode = financial.currency.countryCode
@@ -132,11 +129,9 @@ fun FinancialScreen(
 	
 	Timber.i("${financial.name} ?= ${financialNew.name}")
 	
-	DisposableEffect(financialAction) {
-		onDispose {
-			resetFinancial()
-			focusManager.clearFocus(force = true)
-		}
+	LaunchedEffect(isScreenVisible) {
+		resetFinancial()
+		focusManager.clearFocus(force = true)
 	}
 	
 	DisposableEffect(dateFocusRequesterHasFocus) {
@@ -195,6 +190,7 @@ fun FinancialScreen(
 					else R.string.edit
 				),
 				style = Typography.headlineSmall.copy(
+					fontWeight = FontWeight.SemiBold,
 					fontSize = Typography.headlineSmall.fontSize.spScaled
 				)
 			)
@@ -207,6 +203,7 @@ fun FinancialScreen(
 				Text(
 					text = stringResource(id = R.string.title),
 					style = Typography.bodyLarge.copy(
+						fontWeight = FontWeight.Medium,
 						fontSize = Typography.bodyLarge.fontSize.spScaled
 					),
 					modifier = Modifier
@@ -235,6 +232,7 @@ fun FinancialScreen(
 				Text(
 					text = stringResource(id = R.string.amount),
 					style = Typography.bodyLarge.copy(
+						fontWeight = FontWeight.Medium,
 						fontSize = Typography.bodyLarge.fontSize.spScaled
 					),
 					modifier = Modifier
@@ -266,8 +264,8 @@ fun FinancialScreen(
 						}
 						
 						financialAmountDouble = CurrencyFormatter.parse(
-							locale = AppUtil.deviceLocale,
-							amount = "${CurrencyFormatter.getSymbol(AppUtil.deviceLocale, financial.currency.countryCode)}$amount",
+							locale = deviceLocale,
+							amount = "${CurrencyFormatter.getSymbol(deviceLocale, financial.currency.countryCode)}$amount",
 							currencyCode = financial.currency.countryCode,
 						)
 						
@@ -277,7 +275,7 @@ fun FinancialScreen(
 						
 						financialAmount = s.copy(
 							text = CurrencyFormatter.format(
-								locale = AppUtil.deviceLocale,
+								locale = deviceLocale,
 								amount = financialAmountDouble,
 								useSymbol = false,
 								currencyCode = financial.currency.countryCode
@@ -292,7 +290,7 @@ fun FinancialScreen(
 							text = if (financialAction == FinancialAction.EDIT) {
 								financialNew.currency.symbol
 							} else CurrencyFormatter.getSymbol(
-								locale = AppUtil.deviceLocale,
+								locale = deviceLocale,
 								currencyCode = localCurrency.countryCode
 							),
 							style = Typography.bodyMedium.copy(
@@ -313,6 +311,7 @@ fun FinancialScreen(
 				Text(
 					text = stringResource(id = R.string.date),
 					style = Typography.bodyLarge.copy(
+						fontWeight = FontWeight.Medium,
 						fontSize = Typography.bodyLarge.fontSize.spScaled
 					),
 					modifier = Modifier
@@ -320,7 +319,7 @@ fun FinancialScreen(
 				)
 				
 				OutlinedTextField(
-					value = SimpleDateFormat("dd MMM yyyy", AppUtil.deviceLocale).format(
+					value = SimpleDateFormat("dd MMM yyyy", deviceLocale).format(
 						financialDate
 					),
 					singleLine = true,
@@ -358,6 +357,7 @@ fun FinancialScreen(
 				Text(
 					text = stringResource(id = R.string.category),
 					style = Typography.bodyLarge.copy(
+						fontWeight = FontWeight.Medium,
 						fontSize = Typography.bodyLarge.fontSize.spScaled
 					),
 					modifier = Modifier
@@ -424,6 +424,7 @@ fun FinancialScreen(
 				Text(
 					text = stringResource(id = R.string.type),
 					style = Typography.bodyLarge.copy(
+						fontWeight = FontWeight.Medium,
 						fontSize = Typography.bodyLarge.fontSize.spScaled
 					),
 					modifier = Modifier

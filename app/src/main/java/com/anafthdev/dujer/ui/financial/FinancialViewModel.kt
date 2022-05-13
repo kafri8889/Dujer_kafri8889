@@ -2,10 +2,10 @@ package com.anafthdev.dujer.ui.financial
 
 import androidx.lifecycle.viewModelScope
 import com.anafthdev.dujer.data.db.model.Category
+import com.anafthdev.dujer.foundation.extension.deviceLocale
 import com.anafthdev.dujer.foundation.extension.merge
 import com.anafthdev.dujer.foundation.viewmodel.StatefulViewModel
 import com.anafthdev.dujer.ui.financial.environment.IFinancialEnvironment
-import com.anafthdev.dujer.util.AppUtil
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
 import java.util.*
@@ -16,7 +16,7 @@ class FinancialViewModel @Inject constructor(
 	financialEnvironment: IFinancialEnvironment
 ): StatefulViewModel<FinancialState, Unit, FinancialAction, IFinancialEnvironment>(FinancialState(), financialEnvironment) {
 	
-	val deviceCurrency: Currency = Currency.getInstance(AppUtil.deviceLocale)
+	val deviceCurrency: Currency = Currency.getInstance(deviceLocale)
 	
 	init {
 		viewModelScope.launch(environment.dispatcher) {

@@ -17,6 +17,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.anafthdev.dujer.R
+import com.anafthdev.dujer.foundation.extension.deviceLocale
 import com.anafthdev.dujer.foundation.extension.isLightTheme
 import com.anafthdev.dujer.foundation.uiextension.horizontalScroll
 import com.anafthdev.dujer.foundation.uimode.data.LocalUiMode
@@ -82,7 +83,7 @@ fun BudgetCard(
 					Text(
 						textAlign = TextAlign.End,
 						text = CurrencyFormatter.format(
-							locale = AppUtil.deviceLocale,
+							locale = deviceLocale,
 							amount = totalIncome - totalExpense,
 							currencyCode = LocalCurrency.current.countryCode
 						),

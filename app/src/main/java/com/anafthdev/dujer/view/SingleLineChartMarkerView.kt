@@ -4,8 +4,8 @@ import android.annotation.SuppressLint
 import android.content.Context
 import android.widget.TextView
 import com.anafthdev.dujer.R
+import com.anafthdev.dujer.foundation.extension.deviceLocale
 import com.anafthdev.dujer.model.Currency
-import com.anafthdev.dujer.util.AppUtil
 import com.anafthdev.dujer.util.CurrencyFormatter
 import com.github.mikephil.charting.components.IMarker
 import com.github.mikephil.charting.components.MarkerView
@@ -24,7 +24,7 @@ class SingleLineChartMarkerView(
 	@SuppressLint("SetTextI18n")
 	override fun refreshContent(e: Entry, highlight: Highlight?) {
 		tvAmount.text = CurrencyFormatter.format(
-			locale = AppUtil.deviceLocale,
+			locale = deviceLocale,
 			amount = e.y.toDouble(),
 			currencyCode = currency.countryCode
 		)

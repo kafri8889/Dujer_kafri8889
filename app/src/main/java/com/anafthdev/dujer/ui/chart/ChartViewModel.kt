@@ -2,6 +2,7 @@ package com.anafthdev.dujer.ui.chart
 
 import androidx.lifecycle.viewModelScope
 import com.anafthdev.dujer.data.db.model.Financial
+import com.anafthdev.dujer.foundation.extension.deviceLocale
 import com.anafthdev.dujer.foundation.extension.forEachMap
 import com.anafthdev.dujer.foundation.extension.indexOf
 import com.anafthdev.dujer.foundation.extension.isPositive
@@ -25,8 +26,8 @@ class ChartViewModel @Inject constructor(
 	chartEnvironment
 ) {
 	
-	val monthFormatter = SimpleDateFormat("MMM", AppUtil.deviceLocale)
-	val yearFormatter = SimpleDateFormat("yyyy", AppUtil.deviceLocale)
+	val monthFormatter = SimpleDateFormat("MMM", deviceLocale)
+	val yearFormatter = SimpleDateFormat("yyyy", deviceLocale)
 	
 	private val calendar = Calendar.getInstance()
 	

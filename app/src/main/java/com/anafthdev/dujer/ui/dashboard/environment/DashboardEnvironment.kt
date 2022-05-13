@@ -6,6 +6,7 @@ import androidx.lifecycle.asFlow
 import com.anafthdev.dujer.data.db.model.Financial
 import com.anafthdev.dujer.data.repository.app.IAppRepository
 import com.anafthdev.dujer.foundation.di.DiName
+import com.anafthdev.dujer.foundation.extension.deviceLocale
 import com.anafthdev.dujer.foundation.extension.forEachMap
 import com.anafthdev.dujer.foundation.extension.indexOf
 import com.anafthdev.dujer.ui.financial.data.FinancialAction
@@ -52,7 +53,7 @@ class DashboardEnvironment @Inject constructor(
 		incomeList: List<Financial>,
 		expenseList: List<Financial>
 	): Pair<List<Entry>, List<Entry>> {
-		val monthFormatter = SimpleDateFormat("MMM", AppUtil.deviceLocale)
+		val monthFormatter = SimpleDateFormat("MMM", deviceLocale)
 		
 		val incomeListEntry = arrayListOf<Entry>().apply {
 			add(Entry(0f, 0f))

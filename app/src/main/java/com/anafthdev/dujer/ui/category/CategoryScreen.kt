@@ -189,7 +189,7 @@ fun CategoryScreen(
 						text = if (categoryAction == CategorySwipeAction.EDIT) stringResource(id = R.string.edit_category)
 						else stringResource(id = R.string.new_category),
 						style = Typography.bodyLarge.copy(
-							fontWeight = FontWeight.Medium,
+							fontWeight = FontWeight.Bold,
 							fontSize = Typography.bodyLarge.fontSize.spScaled
 						),
 						modifier = Modifier
@@ -254,7 +254,7 @@ fun CategoryScreen(
 					),
 					keyboardActions = KeyboardActions(
 						onDone = {
-							hideSheet()
+							focusManager.clearFocus(force = true)
 						}
 					),
 					placeholder = {

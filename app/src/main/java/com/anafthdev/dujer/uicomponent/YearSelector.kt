@@ -13,6 +13,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import com.anafthdev.dujer.foundation.extension.deviceLocale
 import com.anafthdev.dujer.foundation.window.dpScaled
 import com.anafthdev.dujer.foundation.window.spScaled
 import com.anafthdev.dujer.util.AppUtil
@@ -33,7 +34,7 @@ fun YearSelector(
 	onYearSelected: (Long) -> Unit
 ) {
 	
-	val yearFormatter = remember { SimpleDateFormat("yyyy", AppUtil.deviceLocale) }
+	val yearFormatter = remember { SimpleDateFormat("yyyy", deviceLocale) }
 	var selectedTimeInMillis by remember { mutableStateOf(initialTimeInMillis) }
 	var previousButtonEnabled by remember { mutableStateOf(true) }
 	var nextButtonEnabled by remember { mutableStateOf(true) }
