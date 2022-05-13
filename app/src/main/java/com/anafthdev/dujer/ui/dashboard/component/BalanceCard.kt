@@ -28,7 +28,8 @@ import com.google.accompanist.pager.rememberPagerState
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalPagerApi::class)
 @Composable
 fun BalanceCard(
-
+	modifier: Modifier = Modifier,
+	onAddWallet: () -> Unit
 ) {
 	
 	val density = LocalDensity.current
@@ -97,9 +98,9 @@ fun BalanceCard(
 			)
 			
 			TextButton(
-				onClick = {
-				
-				}
+				onClick = onAddWallet,
+				modifier = Modifier
+					.padding(top = 8.dpScaled)
 			) {
 				Icon(
 					imageVector = Icons.Rounded.Add,
