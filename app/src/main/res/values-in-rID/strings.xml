@@ -7,6 +7,9 @@
     <string name="type">Tipe</string>
     <string name="date">Tanggal</string>
     <string name="save">Simpan</string>
+    <string name="name">Nama</string>
+    <string name="icon">Ikon</string>
+    <string name="color">Warna</string>
     <string name="title">Judul</string>
     <string name="chart">Grafik</string>
     <string name="wallet">Dompet</string>

@@ -15,4 +15,17 @@ object WalletIcons {
 	const val BITCOIN = R.drawable.ic_bitcoin
 	const val STRONG_BOX = R.drawable.ic_strongbox_2
 	
+	val values = listOf(
+		ADS,
+		CARD,
+		BANK,
+		WALLET,
+		PAYPAL,
+		MONEY_1,
+		MONEY_2,
+		DIAGRAM,
+		BITCOIN,
+		STRONG_BOX
+	)
+	
 }

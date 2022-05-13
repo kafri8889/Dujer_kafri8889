@@ -42,9 +42,11 @@ import androidx.navigation.NavController
 import com.anafthdev.dujer.R
 import com.anafthdev.dujer.data.CategoryIcons
 import com.anafthdev.dujer.data.db.model.Category
+import com.anafthdev.dujer.foundation.extension.isLightTheme
 import com.anafthdev.dujer.foundation.extension.lastIndexOf
 import com.anafthdev.dujer.foundation.extension.removeFirstAndLastWhitespace
 import com.anafthdev.dujer.foundation.extension.toArray
+import com.anafthdev.dujer.foundation.uimode.data.LocalUiMode
 import com.anafthdev.dujer.foundation.window.dpScaled
 import com.anafthdev.dujer.foundation.window.spScaled
 import com.anafthdev.dujer.model.CategoryTint
@@ -74,6 +76,7 @@ fun CategoryScreen(
 	dujerViewModel: DujerViewModel
 ) {
 	
+	val uiMode = LocalUiMode.current
 	val context = LocalContext.current
 	val focusManager = LocalFocusManager.current
 	val keyboardController = LocalSoftwareKeyboardController.current
@@ -168,7 +171,10 @@ fun CategoryScreen(
 				modifier = Modifier
 					.imePadding()
 					.fillMaxWidth()
-					.background(MaterialTheme.colorScheme.background)
+					.background(
+						if (uiMode.isLightTheme()) MaterialTheme.colorScheme.background
+						else MaterialTheme.colorScheme.surfaceVariant
+					)
 			) {
 				Box(
 					modifier = Modifier
