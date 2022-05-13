@@ -21,14 +21,12 @@ import com.anafthdev.dujer.R
 import com.anafthdev.dujer.data.DujerDestination
 import com.anafthdev.dujer.data.FinancialType
 import com.anafthdev.dujer.data.db.model.Category
-import com.anafthdev.dujer.data.db.model.Financial
 import com.anafthdev.dujer.foundation.extension.isDarkTheme
 import com.anafthdev.dujer.foundation.uimode.UiModeViewModel
 import com.anafthdev.dujer.foundation.uimode.data.LocalUiMode
 import com.anafthdev.dujer.foundation.window.dpScaled
 import com.anafthdev.dujer.model.LocalCurrency
 import com.anafthdev.dujer.ui.app.component.CustomSnackbar
-import com.anafthdev.dujer.ui.app.data.OnDeleteListener
 import com.anafthdev.dujer.ui.category.CategoryScreen
 import com.anafthdev.dujer.ui.category.data.CategorySwipeAction
 import com.anafthdev.dujer.ui.change_currency.ChangeCurrencyScreen
@@ -39,8 +37,7 @@ import com.anafthdev.dujer.ui.theme.DujerTheme
 import com.anafthdev.dujer.ui.theme.black01
 import com.anafthdev.dujer.ui.theme.black10
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
-import kotlinx.coroutines.launch
-import timber.log.Timber
+import kotlinx.coroutines.Dispatchers
 
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
@@ -64,34 +61,30 @@ fun DujerApp() {
 	
 	val isSystemInDarkTheme = uiMode.isDarkTheme()
 	
-	val scope = rememberCoroutineScope()
 	val navController = rememberNavController()
 	val systemUiController = rememberSystemUiController()
 	val snackbarHostState = remember { SnackbarHostState() }
 	
-	DisposableEffect(dujerViewModel) {
-		Timber.i("dispatch listener")
-		dujerViewModel.setDeleteListener(object : OnDeleteListener {
-			override fun onDelete(financial: Financial) {
-				scope.launch {
-					snackbarHostState.showSnackbar(
-						message = "${context.getString(R.string.finance_removed)} \"${financial.name}\"",
-						duration = SnackbarDuration.Short
-					)
-				}
+	val effect by dujerViewModel.effect.collectAsState(
+		initial = DujerEffect.Nothing,
+		context = Dispatchers.Main
+	)
+	
+	LaunchedEffect(effect) {
+		when (effect) {
+			is DujerEffect.DeleteFinancial -> {
+				snackbarHostState.showSnackbar(
+					message = "${context.getString(R.string.finance_removed)} \"${(effect as DujerEffect.DeleteFinancial).financial.name}\"",
+					duration = SnackbarDuration.Short
+				)
 			}
-			
-			override fun onDelete(category: Category) {
-				scope.launch {
-					snackbarHostState.showSnackbar(
-						message = "${context.getString(R.string.category_removed)} \"${category.name}\"",
-						duration = SnackbarDuration.Short
-					)
-				}
+			is DujerEffect.DeleteCategory -> {
+				snackbarHostState.showSnackbar(
+					message = "${context.getString(R.string.category_removed)} \"${(effect as DujerEffect.DeleteCategory).category.name}\"",
+					duration = SnackbarDuration.Short
+				)
 			}
-		})
-		onDispose {
-			dujerViewModel.setDeleteListener(null)
+			else -> {}
 		}
 	}
 	
