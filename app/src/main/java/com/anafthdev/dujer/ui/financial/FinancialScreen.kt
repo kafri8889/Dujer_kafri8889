@@ -54,6 +54,7 @@ import kotlin.random.Random
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun FinancialScreen(
+	isScreenVisible: Boolean,
 	financial: Financial,
 	financialAction: String,
 	onBack: () -> Unit,
@@ -128,11 +129,9 @@ fun FinancialScreen(
 	
 	Timber.i("${financial.name} ?= ${financialNew.name}")
 	
-	DisposableEffect(financialAction) {
-		onDispose {
-			resetFinancial()
-			focusManager.clearFocus(force = true)
-		}
+	LaunchedEffect(isScreenVisible) {
+		resetFinancial()
+		focusManager.clearFocus(force = true)
 	}
 	
 	DisposableEffect(dateFocusRequesterHasFocus) {

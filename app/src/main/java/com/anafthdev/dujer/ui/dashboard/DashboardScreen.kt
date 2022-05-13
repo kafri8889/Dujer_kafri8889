@@ -155,6 +155,7 @@ fun DashboardScreen(
 		sheetState = financialScreenSheetState,
 		sheetContent = {
 			FinancialScreen(
+				isScreenVisible = financialScreenSheetState.isVisible,
 				financial = financial,
 				financialAction = financialAction,
 				onBack = {

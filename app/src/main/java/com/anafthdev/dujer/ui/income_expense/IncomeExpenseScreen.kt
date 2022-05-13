@@ -130,6 +130,7 @@ fun IncomeExpenseScreen(
 		sheetState = financialScreenSheetState,
 		sheetContent = {
 			FinancialScreen(
+				isScreenVisible = financialScreenSheetState.isVisible,
 				financial = financial,
 				financialAction = FinancialAction.EDIT,
 				onBack = hideSheet,
