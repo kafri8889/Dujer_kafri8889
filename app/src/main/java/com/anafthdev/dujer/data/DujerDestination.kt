@@ -30,4 +30,6 @@ sealed class DujerDestination(val route: String) {
 	object Setting: DujerDestination("setting")
 	
 	object Currency: DujerDestination("currency")
+	
+	object Wallet: DujerDestination("wallet")
 }
