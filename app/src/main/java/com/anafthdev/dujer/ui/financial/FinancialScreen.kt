@@ -191,6 +191,7 @@ fun FinancialScreen(
 					else R.string.edit
 				),
 				style = Typography.headlineSmall.copy(
+					fontWeight = FontWeight.SemiBold,
 					fontSize = Typography.headlineSmall.fontSize.spScaled
 				)
 			)
@@ -203,6 +204,7 @@ fun FinancialScreen(
 				Text(
 					text = stringResource(id = R.string.title),
 					style = Typography.bodyLarge.copy(
+						fontWeight = FontWeight.Medium,
 						fontSize = Typography.bodyLarge.fontSize.spScaled
 					),
 					modifier = Modifier
@@ -231,6 +233,7 @@ fun FinancialScreen(
 				Text(
 					text = stringResource(id = R.string.amount),
 					style = Typography.bodyLarge.copy(
+						fontWeight = FontWeight.Medium,
 						fontSize = Typography.bodyLarge.fontSize.spScaled
 					),
 					modifier = Modifier
@@ -309,6 +312,7 @@ fun FinancialScreen(
 				Text(
 					text = stringResource(id = R.string.date),
 					style = Typography.bodyLarge.copy(
+						fontWeight = FontWeight.Medium,
 						fontSize = Typography.bodyLarge.fontSize.spScaled
 					),
 					modifier = Modifier
@@ -354,6 +358,7 @@ fun FinancialScreen(
 				Text(
 					text = stringResource(id = R.string.category),
 					style = Typography.bodyLarge.copy(
+						fontWeight = FontWeight.Medium,
 						fontSize = Typography.bodyLarge.fontSize.spScaled
 					),
 					modifier = Modifier
@@ -420,6 +425,7 @@ fun FinancialScreen(
 				Text(
 					text = stringResource(id = R.string.type),
 					style = Typography.bodyLarge.copy(
+						fontWeight = FontWeight.Medium,
 						fontSize = Typography.bodyLarge.fontSize.spScaled
 					),
 					modifier = Modifier
