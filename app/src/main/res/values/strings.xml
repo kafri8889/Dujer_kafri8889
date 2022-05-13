@@ -7,6 +7,9 @@
     <string name="type">Type</string>
     <string name="date">Date</string>
     <string name="save">Save</string>
+    <string name="name">Name</string>
+    <string name="icon">Icon</string>
+    <string name="color">Color</string>
     <string name="title">Title</string>
     <string name="chart">Chart</string>
     <string name="wallet">Wallet</string>
