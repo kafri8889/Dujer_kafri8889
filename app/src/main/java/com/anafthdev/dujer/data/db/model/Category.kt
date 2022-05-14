@@ -3,11 +3,10 @@ package com.anafthdev.dujer.data.db.model
 import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.PrimaryKey
-import com.anafthdev.dujer.R
 import com.anafthdev.dujer.data.CategoryIcons
 import com.anafthdev.dujer.model.CategoryTint
 
-@Entity(tableName = "category")
+@Entity(tableName = "category_table")
 data class Category(
 	@PrimaryKey val id: Int,
 	@ColumnInfo(name = "name") var name: String,

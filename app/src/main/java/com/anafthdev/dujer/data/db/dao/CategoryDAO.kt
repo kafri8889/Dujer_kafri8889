@@ -7,10 +7,10 @@ import kotlinx.coroutines.flow.Flow
 @Dao
 interface CategoryDAO {
 	
-	@Query("SELECT * FROM category")
+	@Query("SELECT * FROM category_table")
 	fun getAllCategory(): Flow<List<Category>>
 	
-	@Query("SELECT * FROM category WHERE id LIKE :mID")
+	@Query("SELECT * FROM category_table WHERE id LIKE :mID")
 	suspend fun get(mID: Int): Category
 	
 	@Update
