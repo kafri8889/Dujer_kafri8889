@@ -573,7 +573,10 @@ private fun DashboardHomeScreen(
 					
 					BalanceCard(
 						wallets = wallets,
-						onAddWallet = showAddWalletSheet
+						onAddWallet = showAddWalletSheet,
+						onWalletClicked = { wallet ->
+						
+						}
 					)
 					
 					BudgetCard(
