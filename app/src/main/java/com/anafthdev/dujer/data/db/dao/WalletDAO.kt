@@ -11,6 +11,9 @@ interface WalletDAO {
 	@Query("SELECT * FROM wallet_table")
 	fun getAllWallet(): Flow<List<Wallet>>
 	
+	@Query("SELECT * FROM wallet_table WHERE id LIKE :mID")
+	fun get(mID: Int): Wallet
+	
 	@Query(
 		"SELECT * FROM financial_table WHERE " +
 				"(financial_table.type = :financialType) " +

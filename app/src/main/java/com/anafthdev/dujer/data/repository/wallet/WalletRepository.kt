@@ -12,6 +12,10 @@ class WalletRepository(
 		return appDatabase.walletDAO().getAllWallet()
 	}
 	
+	override fun get(mID: Int): Wallet {
+		return appDatabase.walletDAO().get(mID)
+	}
+	
 	override fun getFinancialTransaction(walletID: Int, financialType: Int) {
 		appDatabase.walletDAO().getFinancialTransaction(walletID, financialType)
 	}

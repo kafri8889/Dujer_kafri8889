@@ -7,6 +7,8 @@ interface IWalletRepository {
 
 	fun getAllWallet(): Flow<List<Wallet>>
 	
+	fun get(mID: Int): Wallet
+	
 	fun getFinancialTransaction(walletID: Int, financialType: Int)
 	
 	suspend fun updateWallet(vararg wallet: Wallet)
