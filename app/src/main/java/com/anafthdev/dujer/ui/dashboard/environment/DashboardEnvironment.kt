@@ -4,6 +4,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.asFlow
 import com.anafthdev.dujer.data.db.model.Financial
+import com.anafthdev.dujer.data.db.model.Wallet
 import com.anafthdev.dujer.data.repository.app.IAppRepository
 import com.anafthdev.dujer.foundation.di.DiName
 import com.anafthdev.dujer.foundation.extension.deviceLocale
@@ -19,7 +20,7 @@ import javax.inject.Inject
 import javax.inject.Named
 
 class DashboardEnvironment @Inject constructor(
-	@Named(DiName.DISPATCHER_MAIN) override val dispatcher: CoroutineDispatcher,
+	@Named(DiName.DISPATCHER_IO) override val dispatcher: CoroutineDispatcher,
 	private val appRepository: IAppRepository
 ): IDashboardEnvironment {
 	
@@ -110,7 +111,15 @@ class DashboardEnvironment @Inject constructor(
 	}
 	
 	override suspend fun setFinancialID(id: Int) {
-		_financial.value = appRepository.get(id) ?: Financial.default
+		_financial.postValue(appRepository.get(id) ?: Financial.default)
+	}
+	
+	override suspend fun insertWallet(wallet: Wallet) {
+		appRepository.walletRepository.insertWallet(wallet)
+	}
+	
+	override fun getAllWallet(): Flow<List<Wallet>> {
+		return appRepository.walletRepository.getAllWallet()
 	}
 	
 	override fun setFinancialAction(action: String) {

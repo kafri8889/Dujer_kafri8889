@@ -45,6 +45,7 @@
     <string name="bio_auth_title">Verification</string>
     <string name="finance_removed">Finance removed</string>
     <string name="change_currency">Change currency</string>
+    <string name="initial_balance">Initial balance</string>
     <string name="category_removed">Category removed</string>
     <string name="session_time_out">Session time out</string>
     <string name="currency_summary">Select the currency to be used</string>
@@ -61,6 +62,7 @@
     <string name="category_cannot_be_empty">Category cannot be empty</string>
     <string name="biometric_authentication">Biometric Authentication</string>
     <string name="display_and_configuration">Display and configuration</string>
+    <string name="wallet_name_cannot_be_empty">Wallet name cannot be empty</string>
     <string name="category_name_cannot_be_empty">Category name cannot be empty</string>
     <string name="biometric_authentication_summary">Use biometric authentication</string>
 

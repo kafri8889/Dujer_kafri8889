@@ -26,7 +26,6 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
@@ -37,7 +36,9 @@ import com.anafthdev.dujer.R
 import com.anafthdev.dujer.data.FinancialType
 import com.anafthdev.dujer.data.db.model.Category
 import com.anafthdev.dujer.data.db.model.Financial
-import com.anafthdev.dujer.foundation.extension.*
+import com.anafthdev.dujer.data.db.model.Wallet
+import com.anafthdev.dujer.foundation.extension.deviceLocale
+import com.anafthdev.dujer.foundation.extension.showDatePicker
 import com.anafthdev.dujer.foundation.window.dpScaled
 import com.anafthdev.dujer.foundation.window.spScaled
 import com.anafthdev.dujer.model.LocalCurrency
@@ -47,6 +48,7 @@ import com.anafthdev.dujer.ui.theme.*
 import com.anafthdev.dujer.uicomponent.TopAppBar
 import com.anafthdev.dujer.util.AppUtil.toast
 import com.anafthdev.dujer.util.CurrencyFormatter
+import com.anafthdev.dujer.util.TextFieldCurrencyFormatter
 import timber.log.Timber
 import java.text.SimpleDateFormat
 import kotlin.random.Random
@@ -247,43 +249,13 @@ fun FinancialScreen(
 						fontFamily = Inter
 					),
 					onValueChange = { s ->
-						var selectionIndex = s.selection
-						var amount = s.text.replace(
-							oldValue = listOf("-", " "),
-							newValue = "",
-							ignoreCase = true
+						val formattedValue = TextFieldCurrencyFormatter.getFormattedCurrency(
+							fieldValue = s,
+							countryCode = financial.currency.countryCode
 						)
 						
-						if (amount != s.text) {
-							selectionIndex = TextRange(selectionIndex.start - 1)
-						}
-						
-						while (amount.startsWith(listOf(",", "."))) {
-							amount = amount.replaceFirstChar("")
-							selectionIndex = TextRange.Zero
-						}
-						
-						financialAmountDouble = CurrencyFormatter.parse(
-							locale = deviceLocale,
-							amount = "${CurrencyFormatter.getSymbol(deviceLocale, financial.currency.countryCode)}$amount",
-							currencyCode = financial.currency.countryCode,
-						)
-						
-						Timber.i("amont format from: ${financialViewModel.deviceCurrency.symbol}$amount")
-						Timber.i("amont: $financialAmountDouble")
-						Timber.i("amont s: $amount")
-						
-						financialAmount = s.copy(
-							text = CurrencyFormatter.format(
-								locale = deviceLocale,
-								amount = financialAmountDouble,
-								useSymbol = false,
-								currencyCode = financial.currency.countryCode
-							),
-							selection = selectionIndex
-						)
-						
-						Timber.i("financial amont: ${financialAmount.text}")
+						financialAmountDouble = formattedValue.first
+						financialAmount = formattedValue.second
 					},
 					leadingIcon = {
 						Text(
@@ -540,7 +512,8 @@ fun FinancialScreen(
 												type = financialType,
 												category = financialCategory,
 												currency = localCurrency,
-												dateCreated = financialDate
+												dateCreated = financialDate,
+												walletID = Wallet.cash.id // TODO: pilih wallet
 											)
 										)
 									)

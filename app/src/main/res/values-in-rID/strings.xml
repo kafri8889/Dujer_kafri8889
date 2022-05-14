@@ -45,6 +45,7 @@
     <string name="bio_auth_title">Verifikasi</string>
     <string name="finance_removed">Keuangan dihapus</string>
     <string name="change_currency">Ganti mata uang</string>
+    <string name="initial_balance">Saldo awal</string>
     <string name="category_removed">Kategori dihapus</string>
     <string name="session_time_out">Waktu sesi habis</string>
     <string name="currency_summary">Pilih mata uang yang kamu gunakan</string>
@@ -61,6 +62,7 @@
     <string name="category_cannot_be_empty">Kategori tidak boleh kosong</string>
     <string name="biometric_authentication">Otentikasi biometrik</string>
     <string name="display_and_configuration">Tampilan dan Konfigurasi</string>
+    <string name="wallet_name_cannot_be_empty">Nama dompet tidak boleh kosong</string>
     <string name="category_name_cannot_be_empty">Nama kategori tidak boleh kosong</string>
     <string name="biometric_authentication_summary">Gunakan otentikasi biometrik</string>
 

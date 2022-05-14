@@ -22,26 +22,35 @@ import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.input.TextFieldValue
 import com.anafthdev.dujer.R
 import com.anafthdev.dujer.data.WalletIcons
 import com.anafthdev.dujer.data.db.model.Wallet
+import com.anafthdev.dujer.foundation.extension.deviceLocale
 import com.anafthdev.dujer.foundation.extension.isLightTheme
 import com.anafthdev.dujer.foundation.extension.toColor
 import com.anafthdev.dujer.foundation.uimode.data.LocalUiMode
 import com.anafthdev.dujer.foundation.window.dpScaled
 import com.anafthdev.dujer.foundation.window.spScaled
 import com.anafthdev.dujer.model.CategoryTint
+import com.anafthdev.dujer.model.LocalCurrency
 import com.anafthdev.dujer.ui.theme.*
-import com.anafthdev.dujer.uicomponent.OutlinedTextField
+import com.anafthdev.dujer.util.AppUtil.toast
+import com.anafthdev.dujer.util.CurrencyFormatter
+import com.anafthdev.dujer.util.TextFieldCurrencyFormatter
 import com.google.accompanist.flowlayout.FlowCrossAxisAlignment
 import com.google.accompanist.flowlayout.FlowMainAxisAlignment
 import com.google.accompanist.flowlayout.FlowRow
+import kotlin.random.Random
 
+@OptIn(ExperimentalLayoutApi::class)
 @Composable
 fun AddWalletScreen(
 	isScreenVisible: Boolean,
@@ -51,11 +60,16 @@ fun AddWalletScreen(
 ) {
 	
 	val uiMode = LocalUiMode.current
+	val localCurrency = LocalCurrency.current
+	val context = LocalContext.current
 	val focusManager = LocalFocusManager.current
 	
 	var walletName by remember { mutableStateOf("") }
 	var walletTint by remember { mutableStateOf(CategoryTint.tint_1) }
 	var walletIcon by remember { mutableStateOf(WalletIcons.WALLET) }
+	var walletInitialBalance by remember { mutableStateOf(0.0) }
+	
+	var walletBalanceFieldValue by remember { mutableStateOf(TextFieldValue()) }
 	
 	var isSelectorWalletTintShowed by remember { mutableStateOf(false) }
 	var isSelectorWalletIconShowed by remember { mutableStateOf(false) }
@@ -75,12 +89,13 @@ fun AddWalletScreen(
 	
 	Column(
 		modifier = Modifier
-			.imePadding()
+			.fillMaxWidth()
 			.background(
 				if (uiMode.isLightTheme()) MaterialTheme.colorScheme.background
 				else MaterialTheme.colorScheme.surfaceVariant
 			)
 			.verticalScroll(rememberScrollState())
+			.imePadding()
 	) {
 		Box(
 			modifier = Modifier
@@ -109,7 +124,21 @@ fun AddWalletScreen(
 			
 			IconButton(
 				onClick = {
-				
+					when {
+						walletName.isBlank() -> {
+							context.getString(R.string.wallet_name_cannot_be_empty).toast(context)
+						}
+						else -> onSave(
+							Wallet(
+								id = Random.nextInt(),
+								name = walletName,
+								balance = walletInitialBalance,
+								iconID = walletIcon,
+								tint = walletTint,
+								defaultWallet = false
+							)
+						)
+					}
 				},
 				modifier = Modifier
 					.align(Alignment.CenterEnd)
@@ -140,13 +169,11 @@ fun AddWalletScreen(
 			)
 			
 			OutlinedTextField(
-				maxCounter = 30,
 				singleLine = true,
+				shape = small_shape,
 				value = walletName,
 				onValueChange = { s ->
-					if (walletName.length < 30) {
-						walletName = s
-					}
+					walletName = s
 				},
 				textStyle = LocalTextStyle.current.copy(
 					fontFamily = Inter
@@ -162,6 +189,57 @@ fun AddWalletScreen(
 				placeholder = {
 					Text(stringResource(id = R.string.cash))
 				},
+				modifier = Modifier
+					.padding(
+						top = 8.dpScaled,
+						bottom = 16.dpScaled
+					)
+					.fillMaxWidth()
+					.focusRequester(walletNameFocusRequester)
+			)
+			
+			Text(
+				text = stringResource(id = R.string.initial_balance),
+				style = Typography.bodyLarge.copy(
+					fontWeight = FontWeight.Medium,
+					fontSize = Typography.bodyLarge.fontSize.spScaled
+				),
+				modifier = Modifier
+				
+			)
+			
+			OutlinedTextField(
+				singleLine = true,
+				shape = small_shape,
+				value = walletBalanceFieldValue,
+				onValueChange = { s ->
+					val formattedValue = TextFieldCurrencyFormatter.getFormattedCurrency(
+						fieldValue = s,
+						countryCode = localCurrency.countryCode
+					)
+					
+					walletInitialBalance = formattedValue.first
+					walletBalanceFieldValue = formattedValue.second
+				},
+				textStyle = LocalTextStyle.current.copy(
+					fontFamily = Inter
+				),
+				leadingIcon = {
+					Text(
+						text = CurrencyFormatter.getSymbol(
+							locale = deviceLocale,
+							currencyCode = localCurrency.countryCode
+						),
+						style = Typography.bodyMedium.copy(
+							fontWeight = FontWeight.Medium,
+							fontSize = Typography.bodyMedium.fontSize.spScaled
+						)
+					)
+				},
+				keyboardOptions = KeyboardOptions(
+					keyboardType = KeyboardType.Number,
+					imeAction = ImeAction.Next
+				),
 				modifier = Modifier
 					.padding(
 						top = 8.dpScaled,
@@ -393,7 +471,6 @@ fun AddWalletScreen(
 					}
 				}
 			}
-			
 		}
 	}
 }

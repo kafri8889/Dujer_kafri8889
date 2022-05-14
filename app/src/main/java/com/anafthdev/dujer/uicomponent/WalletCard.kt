@@ -36,7 +36,7 @@ fun WalletCard(
 			defaultElevation = 1.dp
 		),
 		colors = CardDefaults.cardColors(
-			containerColor = wallet.categoryTint.backgroundTint.toColor()
+			containerColor = wallet.tint.backgroundTint.toColor()
 		),
 		onClick = {},
 		modifier = modifier
@@ -52,7 +52,7 @@ fun WalletCard(
 		) {
 			Icon(
 				painter = painterResource(id = wallet.iconID),
-				tint = wallet.categoryTint.iconTint.toColor(),
+				tint = wallet.tint.iconTint.toColor(),
 				contentDescription = null,
 				modifier = Modifier
 					.size(40.dpScaled)

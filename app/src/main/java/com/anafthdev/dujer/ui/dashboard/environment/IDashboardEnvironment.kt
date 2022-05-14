@@ -1,6 +1,7 @@
 package com.anafthdev.dujer.ui.dashboard.environment
 
 import com.anafthdev.dujer.data.db.model.Financial
+import com.anafthdev.dujer.data.db.model.Wallet
 import com.github.mikephil.charting.data.Entry
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.Flow
@@ -25,6 +26,10 @@ interface IDashboardEnvironment {
 	): Pair<List<Entry>, List<Entry>>
 	
 	suspend fun setFinancialID(id: Int)
+	
+	suspend fun insertWallet(wallet: Wallet)
+	
+	fun getAllWallet(): Flow<List<Wallet>>
 	
 	fun setFinancialAction(action: String)
 	
