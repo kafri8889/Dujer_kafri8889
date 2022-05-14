@@ -10,6 +10,8 @@ import com.anafthdev.dujer.data.repository.expense.ExpenseRepository
 import com.anafthdev.dujer.data.repository.expense.IExpenseRepository
 import com.anafthdev.dujer.data.repository.income.IIncomeRepository
 import com.anafthdev.dujer.data.repository.income.IncomeRepository
+import com.anafthdev.dujer.data.repository.wallet.IWalletRepository
+import com.anafthdev.dujer.data.repository.wallet.WalletRepository
 import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject
 
@@ -17,6 +19,10 @@ class AppRepository @Inject constructor(
 	private val appDatabase: AppDatabase,
 	override val appDatastore: AppDatastore
 ): IAppRepository {
+	
+	override val walletRepository: IWalletRepository by lazy {
+		WalletRepository(appDatabase)
+	}
 	
 	override val categoryRepository: ICategoryRepository by lazy {
 		CategoryRepository(appDatabase)

@@ -7,13 +7,16 @@ import androidx.room.RoomDatabase
 import androidx.room.TypeConverters
 import com.anafthdev.dujer.data.db.dao.CategoryDAO
 import com.anafthdev.dujer.data.db.dao.FinancialDAO
+import com.anafthdev.dujer.data.db.dao.WalletDAO
 import com.anafthdev.dujer.data.db.model.Category
 import com.anafthdev.dujer.data.db.model.Financial
+import com.anafthdev.dujer.data.db.model.Wallet
 
 @Database(
 	entities = [
 		Financial::class,
-		Category::class
+		Category::class,
+		Wallet::class
 	],
 	version = 1,
 	exportSchema = false
@@ -23,6 +26,7 @@ abstract class AppDatabase: RoomDatabase() {
 	
 	abstract fun financialDao(): FinancialDAO
 	abstract fun categoryDao(): CategoryDAO
+	abstract fun walletDAO(): WalletDAO
 	
 	companion object {
 		private var INSTANCE: AppDatabase? = null

@@ -12,7 +12,7 @@ data class Wallet(
 	@ColumnInfo(name = "name") var name: String,
 	@ColumnInfo(name = "balance") var balance: Double,
 	@ColumnInfo(name = "iconID") var iconID: Int,
-	@ColumnInfo(name = "tint") val categoryTint: CategoryTint,
+	@ColumnInfo(name = "tint") val tint: CategoryTint,
 	@ColumnInfo(name = "defaultWallet") val defaultWallet: Boolean,
 ) {
 	companion object {
@@ -21,7 +21,7 @@ data class Wallet(
 			name = "",
 			balance = 0.0,
 			iconID = R.drawable.ic_wallet,
-			categoryTint = CategoryTint.tint_1,
+			tint = CategoryTint.tint_1,
 			defaultWallet = false
 		)
 		
@@ -30,7 +30,7 @@ data class Wallet(
 			name = "Cash",
 			balance = 0.0,
 			iconID = R.drawable.ic_wallet,
-			categoryTint = CategoryTint.tint_6,
+			tint = CategoryTint.tint_6,
 			defaultWallet = true
 		)
 	}

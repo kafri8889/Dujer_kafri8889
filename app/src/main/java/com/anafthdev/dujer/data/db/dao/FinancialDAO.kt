@@ -8,13 +8,13 @@ import kotlinx.coroutines.flow.Flow
 @Dao
 interface FinancialDAO {
 	
-	@Query("SELECT * FROM financial")
+	@Query("SELECT * FROM financial_table")
 	fun getAll(): Flow<List<Financial>>
 	
-	@Query("SELECT * FROM financial WHERE type= :mType")
+	@Query("SELECT * FROM financial_table WHERE type= :mType")
 	fun getByType(mType: Int): Flow<List<Financial>>
 	
-	@Query("SELECT * FROM financial WHERE id= :mID")
+	@Query("SELECT * FROM financial_table WHERE id= :mID")
 	suspend fun get(mID: Int): Financial?
 	
 	@Update
