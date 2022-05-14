@@ -2,6 +2,7 @@ package com.anafthdev.dujer.ui.dashboard
 
 import androidx.lifecycle.viewModelScope
 import com.anafthdev.dujer.data.db.model.Financial
+import com.anafthdev.dujer.data.db.model.Wallet
 import com.anafthdev.dujer.foundation.viewmodel.StatefulViewModel
 import com.anafthdev.dujer.ui.dashboard.environment.IDashboardEnvironment
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -15,26 +16,29 @@ class DashboardViewModel @Inject constructor(
 ): StatefulViewModel<DashboardState, Unit, DashboardAction, IDashboardEnvironment>(DashboardState(), dashboardEnvironment) {
 	
 	init {
-		getUserBalance()
-		getFinancialListAndCalculateEntry()
-		getFinancialID()
-		getFinancialAction()
-	}
-	
-	override fun dispatch(action: DashboardAction) {
-		when (action) {
-			is DashboardAction.SetFinancialID -> {
-				viewModelScope.launch(environment.dispatcher) {
-					environment.setFinancialID(action.id)
+		viewModelScope.launch(environment.dispatcher) {
+			environment.getAllWallet().collect { wallets ->
+				setState {
+					copy(
+						wallets = arrayListOf<Wallet>().apply {
+							add(Wallet.cash)
+							addAll(wallets)
+						}
+					)
 				}
 			}
-			is DashboardAction.SetFinancialAction -> {
-				environment.setFinancialAction(action.action)
+		}
+		
+		viewModelScope.launch(environment.dispatcher) {
+			environment.getUserBalance().collect { balance ->
+				setState {
+					copy(
+						userBalance = balance
+					)
+				}
 			}
 		}
-	}
-	
-	private fun getFinancialAction() {
+		
 		viewModelScope.launch(environment.dispatcher) {
 			environment.getFinancialAction().collect { action ->
 				setState {
@@ -44,9 +48,7 @@ class DashboardViewModel @Inject constructor(
 				}
 			}
 		}
-	}
-	
-	private fun getFinancialID() {
+		
 		viewModelScope.launch(environment.dispatcher) {
 			environment.getFinancial().collect { financial ->
 				setState {
@@ -56,21 +58,7 @@ class DashboardViewModel @Inject constructor(
 				}
 			}
 		}
-	}
-	
-	private fun getUserBalance() {
-		viewModelScope.launch(environment.dispatcher) {
-			environment.getUserBalance().collect { balance ->
-					setState {
-						copy(
-							userBalance = balance
-						)
-					}
-				}
-		}
-	}
-	
-	private fun getFinancialListAndCalculateEntry() {
+		
 		viewModelScope.launch(environment.dispatcher) {
 			environment.getIncomeFinancialList()
 				.combine(environment.getExpenseFinancialList()) { income, expense ->
@@ -88,6 +76,26 @@ class DashboardViewModel @Inject constructor(
 						expenseList = pair.second
 					)
 				}
+		}
+	}
+	
+	override fun dispatch(action: DashboardAction) {
+		when (action) {
+			is DashboardAction.NewWallet -> {
+				viewModelScope.launch(environment.dispatcher) {
+					environment.insertWallet(action.wallet)
+				}
+			}
+			is DashboardAction.SetFinancialID -> {
+				viewModelScope.launch(environment.dispatcher) {
+					environment.setFinancialID(action.id)
+				}
+			}
+			is DashboardAction.SetFinancialAction -> {
+				viewModelScope.launch(environment.dispatcher) {
+					environment.setFinancialAction(action.action)
+				}
+			}
 		}
 	}
 	

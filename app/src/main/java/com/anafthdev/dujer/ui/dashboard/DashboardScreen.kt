@@ -43,6 +43,7 @@ import com.anafthdev.dujer.R
 import com.anafthdev.dujer.data.DujerDestination
 import com.anafthdev.dujer.data.FinancialType
 import com.anafthdev.dujer.data.db.model.Financial
+import com.anafthdev.dujer.data.db.model.Wallet
 import com.anafthdev.dujer.foundation.extension.getBy
 import com.anafthdev.dujer.foundation.extension.merge
 import com.anafthdev.dujer.foundation.extension.toArray
@@ -176,7 +177,7 @@ fun DashboardScreen(
 			canBack = !financialScreenSheetState.isVisible,
 			content = {
 				DashboardContent(
-					dashboardState = state,
+					state = state,
 					incomeLineDataset = incomeLineDataset,
 					expenseLineDataset = expenseLineDataset,
 					financialScreenSheetState = financialScreenSheetState,
@@ -220,7 +221,7 @@ fun DashboardScreen(
 )
 @Composable
 private fun DashboardContent(
-	dashboardState: DashboardState,
+	state: DashboardState,
 	incomeLineDataset: LineDataSet,
 	expenseLineDataset: LineDataSet,
 	financialScreenSheetState: ModalBottomSheetState,
@@ -232,9 +233,10 @@ private fun DashboardContent(
 	
 	val context = LocalContext.current
 	
-	val userBalance = dashboardState.userBalance
-	val incomeFinancialList = dashboardState.incomeFinancialList
-	val expenseFinancialList = dashboardState.expenseFinancialList
+	val wallets = state.wallets
+	val userBalance = state.userBalance
+	val incomeFinancialList = state.incomeFinancialList
+	val expenseFinancialList = state.expenseFinancialList
 	
 	val scope = rememberCoroutineScope()
 	val dashboardNavController = rememberAnimatedNavController()
@@ -406,6 +408,7 @@ private fun DashboardContent(
 					composable(DujerDestination.Dashboard.Home.route) {
 						DashboardHomeScreen(
 							userBalance = userBalance,
+							wallets = wallets,
 							incomeFinancialList = incomeFinancialList,
 							incomeLineDataset = incomeLineDataset,
 							expenseFinancialList = expenseFinancialList,
@@ -432,6 +435,11 @@ private fun DashboardContent(
 							},
 							onWalletSheetOpened = { isOpened ->
 								showFABNewTransaction = !isOpened
+							},
+							onAddWallet = { wallet ->
+								dashboardViewModel.dispatch(
+									DashboardAction.NewWallet(wallet)
+								)
 							}
 						)
 					}
@@ -475,6 +483,7 @@ private fun DashboardContent(
 @Composable
 private fun DashboardHomeScreen(
 	userBalance: Double,
+	wallets: List<Wallet>,
 	incomeFinancialList: List<Financial>,
 	incomeLineDataset: LineDataSet,
 	expenseFinancialList: List<Financial>,
@@ -483,7 +492,8 @@ private fun DashboardHomeScreen(
 	onFinancialCardDismissToEnd: (Financial) -> Unit,
 	onFinancialCardCanDelete: (Financial) -> Unit,
 	onFinancialCardClicked: (Financial) -> Unit,
-	onWalletSheetOpened: (Boolean) -> Unit
+	onWalletSheetOpened: (Boolean) -> Unit,
+	onAddWallet: (Wallet) -> Unit
 ) {
 	
 	val focusManager = LocalFocusManager.current
@@ -492,7 +502,8 @@ private fun DashboardHomeScreen(
 	val scope = rememberCoroutineScope()
 	
 	val addWalletSheetState = rememberModalBottomSheetState(
-		initialValue = ModalBottomSheetValue.Hidden
+		initialValue = ModalBottomSheetValue.Hidden,
+		skipHalfExpanded = true
 	)
 	
 	val mixedFinancialList = remember(incomeFinancialList, expenseFinancialList) {
@@ -546,7 +557,8 @@ private fun DashboardHomeScreen(
 				walletNameFocusRequester = walletNameFocusRequester,
 				onCancel = hideAddWalletSheet,
 				onSave = { wallet ->
-				
+					onAddWallet(wallet)
+					hideAddWalletSheet()
 				}
 			)
 		}
@@ -560,6 +572,7 @@ private fun DashboardHomeScreen(
 				) {
 					
 					BalanceCard(
+						wallets = wallets,
 						onAddWallet = showAddWalletSheet
 					)
 					

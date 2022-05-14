@@ -28,6 +28,7 @@ import com.google.accompanist.pager.rememberPagerState
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalPagerApi::class)
 @Composable
 fun BalanceCard(
+	wallets: List<Wallet>,
 	modifier: Modifier = Modifier,
 	onAddWallet: () -> Unit
 ) {
@@ -64,7 +65,7 @@ fun BalanceCard(
 			)
 			
 			HorizontalPager(
-				count = 2,
+				count = wallets.size,
 				state = walletPagerState,
 				modifier = Modifier
 					.padding(
@@ -72,15 +73,9 @@ fun BalanceCard(
 					)
 					.fillMaxWidth()
 			) { page ->
-				when (page) {
-					0 -> WalletCard(
-						wallet = Wallet.cash,
-						modifier = Modifier
-							.padding(4.dpScaled)
-							.fillMaxWidth()
-					)
-					1 -> WalletCard(
-						wallet = Wallet.cash,
+				for (i in wallets.indices) {
+					WalletCard(
+						wallet = wallets[page],
 						modifier = Modifier
 							.padding(4.dpScaled)
 							.fillMaxWidth()
