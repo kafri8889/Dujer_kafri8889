@@ -27,9 +27,13 @@ sealed class DujerDestination(val route: String) {
 		object Chart: DujerDestination("${Dashboard.route}/chart")
 	}
 	
+	object Wallet: DujerDestination("wallet/{id}") {
+		fun createRoute(walletID: Int): String {
+			return "wallet/$walletID"
+		}
+	}
+	
 	object Setting: DujerDestination("setting")
 	
 	object Currency: DujerDestination("currency")
-	
-	object Wallet: DujerDestination("wallet")
 }

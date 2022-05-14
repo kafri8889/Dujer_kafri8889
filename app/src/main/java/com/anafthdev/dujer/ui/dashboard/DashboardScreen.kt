@@ -573,7 +573,15 @@ private fun DashboardHomeScreen(
 					
 					BalanceCard(
 						wallets = wallets,
-						onAddWallet = showAddWalletSheet
+						onAddWallet = showAddWalletSheet,
+						onWalletClicked = { wallet ->
+							navController.navigate(
+								DujerDestination.Wallet.createRoute(wallet.id)
+							) {
+								launchSingleTop = true
+								restoreState = true
+							}
+						}
 					)
 					
 					BudgetCard(

@@ -12,6 +12,7 @@
     <string name="color">Warna</string>
     <string name="title">Judul</string>
     <string name="chart">Grafik</string>
+    <string name="delete">Hapus</string>
     <string name="wallet">Dompet</string>
     <string name="cancel">Batalkan</string>
     <string name="income">Pemasukan</string>
@@ -39,9 +40,11 @@
     <string name="add_expenses">Tambah pengeluaran</string>
     <string name="new_category">Kategori baru</string>
     <string name="expenses_for">Pengeluaran untuk %1$s</string>
+    <string name="select_wallet">Pilih dompet</string>
     <string name="edit_category">Edit Category</string>
     <string name="category_name">Nama kategori</string>
     <string name="your_expenses">Pengeluaran kamu</string>
+    <string name="delete_wallet">Hapus dompet</string>
     <string name="bio_auth_title">Verifikasi</string>
     <string name="finance_removed">Keuangan dihapus</string>
     <string name="change_currency">Ganti mata uang</string>
@@ -62,6 +65,7 @@
     <string name="category_cannot_be_empty">Kategori tidak boleh kosong</string>
     <string name="biometric_authentication">Otentikasi biometrik</string>
     <string name="display_and_configuration">Tampilan dan Konfigurasi</string>
+    <string name="delete_wallet_confirmation">Apakah kamu yakin ingin menghapus dompet ini?</string>
     <string name="wallet_name_cannot_be_empty">Nama dompet tidak boleh kosong</string>
     <string name="category_name_cannot_be_empty">Nama kategori tidak boleh kosong</string>
     <string name="biometric_authentication_summary">Gunakan otentikasi biometrik</string>

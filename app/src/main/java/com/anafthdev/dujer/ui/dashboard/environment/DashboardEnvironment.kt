@@ -123,7 +123,7 @@ class DashboardEnvironment @Inject constructor(
 	}
 	
 	override fun setFinancialAction(action: String) {
-		_financialAction.value = action
+		_financialAction.postValue(action)
 	}
 	
 }

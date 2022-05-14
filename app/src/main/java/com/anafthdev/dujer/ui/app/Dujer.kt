@@ -21,6 +21,7 @@ import com.anafthdev.dujer.R
 import com.anafthdev.dujer.data.DujerDestination
 import com.anafthdev.dujer.data.FinancialType
 import com.anafthdev.dujer.data.db.model.Category
+import com.anafthdev.dujer.data.db.model.Wallet
 import com.anafthdev.dujer.foundation.extension.isDarkTheme
 import com.anafthdev.dujer.foundation.uimode.UiModeViewModel
 import com.anafthdev.dujer.foundation.uimode.data.LocalUiMode
@@ -36,6 +37,7 @@ import com.anafthdev.dujer.ui.setting.SettingScreen
 import com.anafthdev.dujer.ui.theme.DujerTheme
 import com.anafthdev.dujer.ui.theme.black01
 import com.anafthdev.dujer.ui.theme.black10
+import com.anafthdev.dujer.ui.wallet.WalletScreen
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
 import kotlinx.coroutines.Dispatchers
 
@@ -175,6 +177,22 @@ fun DujerApp() {
 							action = action,
 							navController = navController,
 							dujerViewModel = dujerViewModel
+						)
+					}
+					
+					composable(
+						route = DujerDestination.Wallet.route,
+						arguments = listOf(
+							navArgument("id") {
+								type = NavType.IntType
+							}
+						)
+					) { entry ->
+						val id = entry.arguments?.getInt("id") ?: Wallet.cash.id
+						
+						WalletScreen(
+							walletID = id,
+							navController = navController
 						)
 					}
 					

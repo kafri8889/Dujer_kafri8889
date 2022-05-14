@@ -27,7 +27,8 @@ import com.anafthdev.dujer.util.CurrencyFormatter
 @Composable
 fun WalletCard(
 	wallet: Wallet,
-	modifier: Modifier = Modifier
+	modifier: Modifier = Modifier,
+	onClick: () -> Unit
 ) {
 
 	Card(
@@ -38,7 +39,7 @@ fun WalletCard(
 		colors = CardDefaults.cardColors(
 			containerColor = wallet.tint.backgroundTint.toColor()
 		),
-		onClick = {},
+		onClick = onClick,
 		modifier = modifier
 	) {
 		Row(

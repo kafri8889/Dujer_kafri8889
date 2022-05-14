@@ -30,7 +30,8 @@ import com.google.accompanist.pager.rememberPagerState
 fun BalanceCard(
 	wallets: List<Wallet>,
 	modifier: Modifier = Modifier,
-	onAddWallet: () -> Unit
+	onAddWallet: () -> Unit,
+	onWalletClicked: (Wallet) -> Unit
 ) {
 	
 	val density = LocalDensity.current
@@ -76,6 +77,9 @@ fun BalanceCard(
 				for (i in wallets.indices) {
 					WalletCard(
 						wallet = wallets[page],
+						onClick = {
+							onWalletClicked(wallets[page])
+						},
 						modifier = Modifier
 							.padding(4.dpScaled)
 							.fillMaxWidth()
