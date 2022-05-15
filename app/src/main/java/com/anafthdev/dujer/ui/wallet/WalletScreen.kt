@@ -18,34 +18,37 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.ArrowBack
 import androidx.compose.material.icons.rounded.ArrowDropDown
 import androidx.compose.material.rememberModalBottomSheetState
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Text
+import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.zIndex
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.anafthdev.dujer.R
+import com.anafthdev.dujer.foundation.extension.deviceLocale
+import com.anafthdev.dujer.foundation.extension.isDarkTheme
 import com.anafthdev.dujer.foundation.extension.toColor
 import com.anafthdev.dujer.foundation.uimode.data.LocalUiMode
 import com.anafthdev.dujer.foundation.window.dpScaled
 import com.anafthdev.dujer.foundation.window.spScaled
-import com.anafthdev.dujer.ui.theme.Typography
-import com.anafthdev.dujer.ui.theme.medium_shape
-import com.anafthdev.dujer.ui.theme.shapes
+import com.anafthdev.dujer.model.LocalCurrency
+import com.anafthdev.dujer.ui.theme.*
 import com.anafthdev.dujer.ui.wallet.component.DeleteWalletPopup
 import com.anafthdev.dujer.ui.wallet.subscreen.SelectWalletScreen
 import com.anafthdev.dujer.uicomponent.TopAppBar
+import com.anafthdev.dujer.util.CurrencyFormatter
 import kotlinx.coroutines.launch
+import timber.log.Timber
 
-@OptIn(ExperimentalMaterialApi::class)
+@OptIn(ExperimentalMaterialApi::class, ExperimentalMaterial3Api::class)
 @Composable
 fun WalletScreen(
 	walletID: Int,
@@ -53,6 +56,7 @@ fun WalletScreen(
 ) {
 	
 	val uiMode = LocalUiMode.current
+	val context = LocalContext.current
 	
 	val walletViewModel = hiltViewModel<WalletViewModel>()
 	
@@ -68,6 +72,8 @@ fun WalletScreen(
 	
 	val wallet = state.wallet
 	val wallets = state.wallets
+	val incomeTransaction = state.incomeTransaction
+	val expenseTransaction = state.expenseTransaction
 	
 	val hideSelectWalletSheetState = {
 		scope.launch { selectWalletSheetState.hide() }
@@ -81,10 +87,15 @@ fun WalletScreen(
 	BackHandler {
 		navController.popBackStack()
 	}
+	Timber.i("totexns: $expenseTransaction")
 	
 	LaunchedEffect(walletID) {
 		walletViewModel.dispatch(
 			WalletAction.GetWallet(walletID)
+		)
+		
+		walletViewModel.dispatch(
+			WalletAction.GetTransaction(walletID)
 		)
 	}
 	
@@ -258,6 +269,116 @@ fun WalletScreen(
 								start = 8.dpScaled
 							)
 					)
+				}
+				
+				Card(
+					shape = MaterialTheme.shapes.large,
+					elevation = CardDefaults.cardElevation(
+						defaultElevation = 1.dpScaled
+					),
+					colors = CardDefaults.cardColors(
+						containerColor = if (LocalUiMode.current.isDarkTheme()) CardDefaults.cardColors().containerColor(true).value
+						else Color.White
+					),
+					modifier = Modifier
+						.padding(
+							16.dpScaled
+						)
+				) {
+					Column(
+						modifier = Modifier
+							.fillMaxWidth()
+							.padding(
+								16.dpScaled
+							)
+					) {
+						Row(
+							verticalAlignment = Alignment.CenterVertically,
+						) {
+							Text(
+								text = stringResource(id = R.string.balance),
+								style = MaterialTheme.typography.bodyMedium.copy(
+									fontSize = MaterialTheme.typography.bodyMedium.fontSize.spScaled
+								),
+								modifier = Modifier
+									.weight(0.4f)
+							)
+							
+							Text(
+								text = CurrencyFormatter.format(
+									locale = deviceLocale,
+									amount = wallet.balance,
+									useSymbol = true,
+									currencyCode = LocalCurrency.current.countryCode
+								),
+								textAlign = TextAlign.End,
+								style = MaterialTheme.typography.bodyMedium.copy(
+									fontWeight = FontWeight.Medium,
+									fontSize = MaterialTheme.typography.bodyMedium.fontSize.spScaled
+								),
+								modifier = Modifier
+									.weight(0.6f)
+							)
+						}
+						
+						Row(
+							verticalAlignment = Alignment.CenterVertically,
+							modifier = Modifier
+								.padding(
+									top = 16.dpScaled
+								)
+						) {
+							Text(
+								text = stringResource(id = R.string.income),
+								style = MaterialTheme.typography.bodyMedium.copy(
+									fontSize = MaterialTheme.typography.bodyMedium.fontSize.spScaled
+								),
+								modifier = Modifier
+									.weight(0.4f)
+							)
+							
+							Text(
+								text = "${incomeTransaction.size} ${context.getString(R.string.transaction)}",
+								textAlign = TextAlign.End,
+								style = MaterialTheme.typography.bodyMedium.copy(
+									color = incomeColor,
+									fontWeight = FontWeight.Medium,
+									fontSize = MaterialTheme.typography.bodyMedium.fontSize.spScaled
+								),
+								modifier = Modifier
+									.weight(0.6f)
+							)
+						}
+						
+						Row(
+							verticalAlignment = Alignment.CenterVertically,
+							modifier = Modifier
+								.padding(
+									top = 16.dpScaled
+								)
+						) {
+							Text(
+								text = stringResource(id = R.string.expenses),
+								style = MaterialTheme.typography.bodyMedium.copy(
+									fontSize = MaterialTheme.typography.bodyMedium.fontSize.spScaled
+								),
+								modifier = Modifier
+									.weight(0.4f)
+							)
+							
+							Text(
+								text = "${expenseTransaction.size} ${context.getString(R.string.transaction)}",
+								textAlign = TextAlign.End,
+								style = MaterialTheme.typography.bodyMedium.copy(
+									color = expenseColor,
+									fontWeight = FontWeight.Medium,
+									fontSize = MaterialTheme.typography.bodyMedium.fontSize.spScaled
+								),
+								modifier = Modifier
+									.weight(0.6f)
+							)
+						}
+					}
 				}
 			}
 		}
