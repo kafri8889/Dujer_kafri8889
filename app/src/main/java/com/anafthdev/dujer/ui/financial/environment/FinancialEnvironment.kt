@@ -2,6 +2,7 @@ package com.anafthdev.dujer.ui.financial.environment
 
 import com.anafthdev.dujer.data.db.model.Category
 import com.anafthdev.dujer.data.db.model.Financial
+import com.anafthdev.dujer.data.db.model.Wallet
 import com.anafthdev.dujer.data.repository.app.IAppRepository
 import com.anafthdev.dujer.foundation.di.DiName
 import kotlinx.coroutines.CoroutineDispatcher
@@ -16,6 +17,10 @@ class FinancialEnvironment @Inject constructor(
 	
 	override suspend fun getCategories(): Flow<List<Category>> {
 		return appRepository.categoryRepository.getAllCategory()
+	}
+	
+	override fun getWallets(): Flow<List<Wallet>> {
+		return appRepository.walletRepository.getAllWallet()
 	}
 	
 	override suspend fun updateFinancial(financial: Financial) {
