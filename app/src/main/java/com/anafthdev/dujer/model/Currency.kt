@@ -10,7 +10,7 @@ data class Currency(
 ) {
 	companion object {
 		
-		val DOLLAR = with(java.util.Currency.getInstance(com.anafthdev.dujer.data.Currency.USD.name)) {
+		val DOLLAR = with(android.icu.util.Currency.getInstance(com.anafthdev.dujer.data.Currency.USD.name)) {
 			Currency(
 				name = "Dollar",
 				country = displayName,
