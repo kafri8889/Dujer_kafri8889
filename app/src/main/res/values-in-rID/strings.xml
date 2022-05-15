@@ -18,6 +18,7 @@
     <string name="income">Pemasukan</string>
     <string name="amount">Jumlah</string>
     <string name="export">Ekspor</string>
+    <string name="balance">Saldo</string>
     <string name="setting">Pengaturan</string>
     <string name="security">Keamanan</string>
     <string name="expenses">Pengeluaran</string>
@@ -33,6 +34,7 @@
     <string name="add_income">Tambah pemasukan</string>
     <string name="add_wallet">Tambah dompet</string>
     <string name="new_wallet">Dompet baru</string>
+    <string name="transaction">Transaksi</string>
     <string name="auth_failed">Otentikasi gagal</string>
     <string name="your_income">Pemasukan kamu</string>
     <string name="my_spending">Pengeluaran saya</string>
