@@ -10,6 +10,7 @@ import com.anafthdev.dujer.data.repository.app.IAppRepository
 import com.anafthdev.dujer.foundation.di.DiName
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -26,6 +27,9 @@ class WalletEnvironment @Inject constructor(
 	private val _selectedWallet = MutableLiveData(Wallet.cash)
 	private val selectedWallet: LiveData<Wallet> = _selectedWallet
 	
+	private val _selectedFinancial = MutableLiveData(Financial.default)
+	private val selectedFinancial: LiveData<Financial> = _selectedFinancial
+	
 	private val _incomeTransaction = MutableLiveData(emptyList<Financial>())
 	private val incomeTransaction: LiveData<List<Financial>> = _incomeTransaction
 	
@@ -36,7 +40,7 @@ class WalletEnvironment @Inject constructor(
 	private var lastSelectedWalletID: StateFlow<Int> = _lastSelectedWalletID
 	
 	init {
-		CoroutineScope(dispatcher).launch {
+		CoroutineScope(Dispatchers.Main).launch {
 			appRepository.getAllFinancial()
 				.combine(lastSelectedWalletID) { id, wallets ->
 					id to wallets
@@ -61,15 +65,11 @@ class WalletEnvironment @Inject constructor(
 		appRepository.walletRepository.deleteWallet(wallet)
 	}
 	
-	override suspend fun getIncomeTransaction(walletID: Int) {
-		_lastSelectedWalletID.emit(walletID)
-	}
-	
 	override fun getIncomeTransaction(): Flow<List<Financial>> {
 		return incomeTransaction.asFlow()
 	}
 	
-	override suspend fun getExpenseTransaction(walletID: Int) {
+	override suspend fun getTransaction(walletID: Int) {
 		_lastSelectedWalletID.emit(walletID)
 	}
 	
@@ -81,7 +81,7 @@ class WalletEnvironment @Inject constructor(
 		return appRepository.walletRepository.getAllWallet()
 	}
 	
-	override fun getWallet(id: Int) {
+	override suspend fun getWallet(id: Int) {
 		_selectedWallet.postValue(
 			if (id == Wallet.cash.id) Wallet.cash else appRepository
 				.walletRepository
@@ -91,6 +91,16 @@ class WalletEnvironment @Inject constructor(
 	
 	override fun getWallet(): Flow<Wallet> {
 		return selectedWallet.asFlow()
+	}
+	
+	override suspend fun getFinancial(id: Int) {
+		_selectedFinancial.postValue(
+			appRepository.get(id) ?: Financial.default
+		)
+	}
+	
+	override fun getFinancial(): Flow<Financial> {
+		return selectedFinancial.asFlow()
 	}
 	
 	

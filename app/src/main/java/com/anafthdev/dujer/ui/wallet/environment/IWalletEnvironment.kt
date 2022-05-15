@@ -11,9 +11,7 @@ interface IWalletEnvironment {
 
 	suspend fun deleteWallet(wallet: Wallet)
 	
-	suspend fun getIncomeTransaction(walletID: Int)
-	
-	suspend fun getExpenseTransaction(walletID: Int)
+	suspend fun getTransaction(walletID: Int)
 	
 	fun getIncomeTransaction(): Flow<List<Financial>>
 	
@@ -21,8 +19,12 @@ interface IWalletEnvironment {
 	
 	fun getAllWallet(): Flow<List<Wallet>>
 	
-	fun getWallet(id: Int)
+	suspend fun getWallet(id: Int)
 	
 	fun getWallet(): Flow<Wallet>
+	
+	suspend fun getFinancial(id: Int)
+	
+	fun getFinancial(): Flow<Financial>
 	
 }
