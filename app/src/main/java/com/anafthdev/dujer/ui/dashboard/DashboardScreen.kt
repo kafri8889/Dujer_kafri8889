@@ -141,6 +141,10 @@ fun DashboardScreen(
 				dashboardViewModel.dispatch(
 					DashboardAction.SetFinancialID(Financial.default.id)
 				)
+				
+				dashboardViewModel.dispatch(
+					DashboardAction.SetFinancialAction(FinancialAction.NEW)
+				)
 			}
 		}
 	}

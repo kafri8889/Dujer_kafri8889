@@ -1,5 +1,6 @@
 package com.anafthdev.dujer.ui.financial
 
+import android.annotation.SuppressLint
 import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.tween
@@ -58,6 +59,7 @@ import timber.log.Timber
 import java.text.SimpleDateFormat
 import kotlin.random.Random
 
+@SuppressLint("RememberReturnType")
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun FinancialScreen(
@@ -98,6 +100,7 @@ fun FinancialScreen(
 	var selectedWallet by remember { mutableStateOf(Wallet.cash) }
 	
 	val resetFinancial = {
+		selectedWallet = Wallet.cash
 		financialNew = Financial.default
 		financialTitle = ""
 		financialDate = System.currentTimeMillis()
@@ -138,8 +141,6 @@ fun FinancialScreen(
 		}
 	}
 	
-	Timber.i("${financial.name} ?= ${financialNew.name}")
-	
 	LaunchedEffect(isScreenVisible) {
 		resetFinancial()
 		focusManager.clearFocus(force = true)
@@ -163,8 +164,9 @@ fun FinancialScreen(
 	}
 	
 	SideEffect {
-		if (!isCategoryListShowed and categoryFocusRequesterHasFocus) {
-			focusManager.clearFocus(force = true)
+		when {
+			!isCategoryListShowed and categoryFocusRequesterHasFocus -> focusManager.clearFocus(force = true)
+			!isWalletListShowed and walletFocusRequesterHasFocus -> focusManager.clearFocus(force = true)
 		}
 		
 	}
@@ -578,6 +580,9 @@ fun FinancialScreen(
 				
 				FilledTonalButton(
 					onClick = {
+						Timber.i("save: action $financialAction")
+						Timber.i("save (new):  $financialNew")
+						Timber.i("save (old):  $financial")
 						if (financialAction == FinancialAction.EDIT) {
 							financialViewModel.dispatch(
 								com.anafthdev.dujer.ui.financial.FinancialAction.Update(
@@ -586,7 +591,8 @@ fun FinancialScreen(
 										amount = financialAmountDouble,
 										dateCreated = financialDate,
 										category = financialCategory,
-										type = financialType
+										type = financialType,
+										walletID = selectedWallet.id
 									)
 								)
 							)
@@ -618,7 +624,6 @@ fun FinancialScreen(
 											)
 										)
 									)
-									Timber.i("invoke new financial")
 									saveFinancial()
 								}
 							}
