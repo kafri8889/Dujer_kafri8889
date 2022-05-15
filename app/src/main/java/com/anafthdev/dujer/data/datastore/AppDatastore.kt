@@ -6,11 +6,11 @@ import androidx.datastore.preferences.core.*
 import androidx.datastore.preferences.preferencesDataStore
 import com.anafthdev.dujer.data.preference.Language
 import com.anafthdev.dujer.data.preference.Preference
+import com.anafthdev.dujer.foundation.extension.deviceLocale
 import com.anafthdev.dujer.foundation.uimode.data.UiMode
 import com.anafthdev.dujer.model.Currency
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
-import timber.log.Timber
 import javax.inject.Inject
 
 class AppDatastore @Inject constructor(private val context: Context) {
@@ -50,8 +50,11 @@ class AppDatastore @Inject constructor(private val context: Context) {
 	}
 	
 	val getCurrentCurrency: Flow<Currency> = context.datastore.data.map { preferences ->
-		Timber.i("cur: ${preferences[currentCurrency]}")
-		with(java.util.Currency.getInstance((preferences[currentCurrency] ?: Currency.DOLLAR.countryCode))) {
+		val code = preferences[currentCurrency]
+		val currency = if (code == null) android.icu.util.Currency.getInstance(deviceLocale)
+		else android.icu.util.Currency.getInstance(code)
+		
+		with(currency) {
 			Currency(
 				name = "",
 				country = displayName,

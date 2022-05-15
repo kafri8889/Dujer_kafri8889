@@ -16,10 +16,6 @@ class WalletRepository(
 		return appDatabase.walletDAO().get(mID)
 	}
 	
-	override fun getFinancialTransaction(walletID: Int, financialType: Int) {
-		appDatabase.walletDAO().getFinancialTransaction(walletID, financialType)
-	}
-	
 	override suspend fun updateWallet(vararg wallet: Wallet) {
 		return appDatabase.walletDAO().update(*wallet)
 	}

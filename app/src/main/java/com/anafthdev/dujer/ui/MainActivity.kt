@@ -1,9 +1,7 @@
 package com.anafthdev.dujer.ui
 
 import android.os.Bundle
-import android.telephony.TelephonyManager
 import androidx.activity.compose.setContent
-import androidx.appcompat.app.AppCompatDelegate
 import androidx.biometric.BiometricPrompt
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.core.view.WindowCompat
@@ -11,9 +9,7 @@ import androidx.lifecycle.lifecycleScope
 import com.anafthdev.dujer.BuildConfig
 import com.anafthdev.dujer.data.datastore.AppDatastore
 import com.anafthdev.dujer.foundation.common.BiometricManager
-import com.anafthdev.dujer.foundation.extension.isDarkTheme
 import com.anafthdev.dujer.foundation.localized.LocalizedActivity
-import com.anafthdev.dujer.foundation.uimode.data.UiMode
 import com.anafthdev.dujer.ui.app.DujerApp
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Dispatchers
@@ -27,7 +23,6 @@ class MainActivity : LocalizedActivity() {
 	
 	@Inject lateinit var appDatastore: AppDatastore
 	
-	private lateinit var telephonyManager: TelephonyManager
 	private lateinit var biometricManager: BiometricManager
 	
 	@OptIn(ExperimentalFoundationApi::class)
@@ -42,10 +37,7 @@ class MainActivity : LocalizedActivity() {
 		}
 		
 		WindowCompat.setDecorFitsSystemWindows(window, false)
-		
-		telephonyManager = getSystemService(TELEPHONY_SERVICE) as TelephonyManager
-//		appDatastore.setCurrentCurrency(Currency.getInstance(AppUtil.deviceLocale).currencyCode) {}
-		
+
 		lifecycleScope.launch(Dispatchers.Main) {
 			val isUseBioAuthSecurity = appDatastore.isUseBioAuth.first()
 			
@@ -87,10 +79,6 @@ class MainActivity : LocalizedActivity() {
 		setContent {
 			DujerApp()
 		}
-	}
-	
-	private fun getUiMode(uiMode: UiMode): Int {
-		return if (uiMode.isDarkTheme()) AppCompatDelegate.MODE_NIGHT_YES else AppCompatDelegate.MODE_NIGHT_NO
 	}
 	
 }

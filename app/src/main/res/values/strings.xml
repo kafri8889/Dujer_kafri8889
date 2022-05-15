@@ -18,6 +18,7 @@
     <string name="income">Income</string>
     <string name="amount">Amount</string>
     <string name="export">Export</string>
+    <string name="balance">Balance</string>
     <string name="setting">Setting</string>
     <string name="security">Security</string>
     <string name="expenses">Expenses</string>
@@ -33,6 +34,7 @@
     <string name="add_income">Add income</string>
     <string name="add_wallet">Add wallet</string>
     <string name="new_wallet">New wallet</string>
+    <string name="transaction">Transaction</string>
     <string name="auth_failed">Authentication Failed</string>
     <string name="your_income">Your income</string>
     <string name="my_spending">My Spending</string>

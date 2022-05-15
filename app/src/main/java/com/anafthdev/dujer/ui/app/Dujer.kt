@@ -23,6 +23,7 @@ import com.anafthdev.dujer.data.FinancialType
 import com.anafthdev.dujer.data.db.model.Category
 import com.anafthdev.dujer.data.db.model.Wallet
 import com.anafthdev.dujer.foundation.extension.isDarkTheme
+import com.anafthdev.dujer.foundation.extension.toArray
 import com.anafthdev.dujer.foundation.uimode.UiModeViewModel
 import com.anafthdev.dujer.foundation.uimode.data.LocalUiMode
 import com.anafthdev.dujer.foundation.window.dpScaled
@@ -192,7 +193,19 @@ fun DujerApp() {
 						
 						WalletScreen(
 							walletID = id,
-							navController = navController
+							navController = navController,
+							onTransactionCanDelete = {
+								dujerViewModel.dispatch(
+									DujerAction.Vibrate(100)
+								)
+							},
+							onDeleteTransaction = { financial ->
+								dujerViewModel.dispatch(
+									DujerAction.DeleteFinancial(
+										financial.toArray()
+									)
+								)
+							}
 						)
 					}
 					

@@ -9,8 +9,6 @@ interface IWalletRepository {
 	
 	fun get(mID: Int): Wallet
 	
-	fun getFinancialTransaction(walletID: Int, financialType: Int)
-	
 	suspend fun updateWallet(vararg wallet: Wallet)
 	
 	suspend fun deleteWallet(vararg wallet: Wallet)
