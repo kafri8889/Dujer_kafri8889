@@ -42,6 +42,7 @@ import com.anafthdev.dujer.data.db.model.Category
 import com.anafthdev.dujer.data.db.model.Financial
 import com.anafthdev.dujer.data.db.model.Wallet
 import com.anafthdev.dujer.foundation.extension.deviceLocale
+import com.anafthdev.dujer.foundation.extension.get
 import com.anafthdev.dujer.foundation.extension.showDatePicker
 import com.anafthdev.dujer.foundation.extension.toColor
 import com.anafthdev.dujer.foundation.window.dpScaled
@@ -138,6 +139,8 @@ fun FinancialScreen(
 					currencyCode = financial.currency.countryCode
 				)
 			)
+			
+			selectedWallet = wallets.get { it.id == financial.walletID } ?: Wallet.cash
 		}
 	}
 	
