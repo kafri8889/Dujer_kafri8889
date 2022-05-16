@@ -6,6 +6,7 @@ import androidx.lifecycle.asFlow
 import com.anafthdev.dujer.data.datastore.AppDatastore
 import com.anafthdev.dujer.data.db.model.Category
 import com.anafthdev.dujer.data.db.model.Financial
+import com.anafthdev.dujer.data.db.model.Wallet
 import com.anafthdev.dujer.data.repository.app.AppRepository
 import com.anafthdev.dujer.foundation.common.vibrator.VibratorManager
 import com.anafthdev.dujer.foundation.di.DiName
@@ -38,16 +39,24 @@ class DujerEnvironment @Inject constructor(
 	 */
 	private val categoryTemp: ArrayList<Category> = arrayListOf()
 	
-	override suspend fun getAllFinancial(): Flow<List<Financial>> {
+	override fun getAllWallet(): Flow<List<Wallet>> {
+		return appRepository.walletRepository.getAllWallet()
+	}
+	
+	override fun getAllFinancial(): Flow<List<Financial>> {
 		return appRepository.getAllFinancial()
 	}
 	
-	override suspend fun getCurrentCurrency(): Flow<Currency> {
+	override fun getCurrentCurrency(): Flow<Currency> {
 		return appDatastore.getCurrentCurrency
 	}
 	
-	override suspend fun getDataCanBeReturned(): Flow<UndoType> {
+	override fun getDataCanBeReturned(): Flow<UndoType> {
 		return dataCanReturned.asFlow()
+	}
+	
+	override suspend fun updateWallet(vararg wallet: Wallet) {
+		appRepository.walletRepository.updateWallet(*wallet)
 	}
 	
 	override suspend fun updateFinancial(vararg financial: Financial) {

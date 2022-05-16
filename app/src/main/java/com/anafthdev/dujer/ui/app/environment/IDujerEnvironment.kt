@@ -2,6 +2,7 @@ package com.anafthdev.dujer.ui.app.environment
 
 import com.anafthdev.dujer.data.db.model.Category
 import com.anafthdev.dujer.data.db.model.Financial
+import com.anafthdev.dujer.data.db.model.Wallet
 import com.anafthdev.dujer.model.Currency
 import com.anafthdev.dujer.ui.app.data.UndoType
 import kotlinx.coroutines.CoroutineDispatcher
@@ -11,11 +12,15 @@ interface IDujerEnvironment {
 	
 	val dispatcher: CoroutineDispatcher
 	
-	suspend fun getAllFinancial(): Flow<List<Financial>>
+	fun getAllWallet(): Flow<List<Wallet>>
 	
-	suspend fun getCurrentCurrency(): Flow<Currency>
+	fun getAllFinancial(): Flow<List<Financial>>
 	
-	suspend fun getDataCanBeReturned(): Flow<UndoType>
+	fun getCurrentCurrency(): Flow<Currency>
+	
+	fun getDataCanBeReturned(): Flow<UndoType>
+	
+	suspend fun updateWallet(vararg wallet: Wallet)
 	
 	suspend fun updateFinancial(vararg financial: Financial)
 	
@@ -26,6 +31,8 @@ interface IDujerEnvironment {
 	suspend fun undoFinancial()
 	
 	suspend fun undoCategory()
+	
+	
 	
 	fun vibrate(millis: Long)
 	

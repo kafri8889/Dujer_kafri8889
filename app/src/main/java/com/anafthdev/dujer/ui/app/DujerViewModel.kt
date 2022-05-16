@@ -1,7 +1,9 @@
 package com.anafthdev.dujer.ui.app
 
 import androidx.lifecycle.viewModelScope
+import com.anafthdev.dujer.data.FinancialType
 import com.anafthdev.dujer.data.db.model.Financial
+import com.anafthdev.dujer.data.db.model.Wallet
 import com.anafthdev.dujer.foundation.extension.applyElement
 import com.anafthdev.dujer.foundation.viewmodel.StatefulViewModel
 import com.anafthdev.dujer.model.Currency
@@ -9,6 +11,7 @@ import com.anafthdev.dujer.ui.app.data.UndoType
 import com.anafthdev.dujer.ui.app.environment.IDujerEnvironment
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -42,6 +45,33 @@ class DujerViewModel @Inject constructor(
 					)
 				}
 			}
+		}
+		
+		viewModelScope.launch(environment.dispatcher) {
+			environment.getAllWallet()
+				.combine(environment.getAllFinancial()) { wallets, financials ->
+					wallets to financials
+				}.collect { (wallets, financials) ->
+					val updatedWallet = arrayListOf<Wallet>()
+					
+					wallets.forEach { wallet ->
+						val incomeTransaction = financials.filter {
+							(it.type == FinancialType.INCOME) and (it.walletID == wallet.id)
+						}.sumOf { it.amount }
+						
+						val expenseTransaction = financials.filter {
+							(it.type == FinancialType.EXPENSE) and (it.walletID == wallet.id)
+						}.sumOf { it.amount }
+						
+						updatedWallet.add(
+							wallet.copy(
+								balance = incomeTransaction - expenseTransaction
+							)
+						)
+					}
+					
+					environment.updateWallet(*updatedWallet.toTypedArray())
+				}
 		}
 	}
 	
