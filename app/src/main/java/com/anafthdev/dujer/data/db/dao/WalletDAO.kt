@@ -11,7 +11,7 @@ interface WalletDAO {
 	fun getAllWallet(): Flow<List<Wallet>>
 	
 	@Query("SELECT * FROM wallet_table WHERE id LIKE :mID")
-	fun get(mID: Int): Wallet
+	fun get(mID: Int): Wallet?
 	
 	@Update
 	suspend fun update(vararg wallet: Wallet)
@@ -19,7 +19,7 @@ interface WalletDAO {
 	@Delete
 	suspend fun delete(vararg wallet: Wallet)
 	
-	@Insert(onConflict = OnConflictStrategy.REPLACE)
+	@Insert(onConflict = OnConflictStrategy.IGNORE)
 	fun insert(vararg wallet: Wallet)
 	
 }

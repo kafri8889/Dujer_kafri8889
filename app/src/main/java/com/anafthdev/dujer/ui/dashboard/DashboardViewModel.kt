@@ -2,7 +2,6 @@ package com.anafthdev.dujer.ui.dashboard
 
 import androidx.lifecycle.viewModelScope
 import com.anafthdev.dujer.data.db.model.Financial
-import com.anafthdev.dujer.data.db.model.Wallet
 import com.anafthdev.dujer.foundation.viewmodel.StatefulViewModel
 import com.anafthdev.dujer.ui.dashboard.environment.IDashboardEnvironment
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -20,10 +19,7 @@ class DashboardViewModel @Inject constructor(
 			environment.getAllWallet().collect { wallets ->
 				setState {
 					copy(
-						wallets = arrayListOf<Wallet>().apply {
-							add(Wallet.cash)
-							addAll(wallets)
-						}
+						wallets = wallets.sortedBy { it.id }
 					)
 				}
 			}

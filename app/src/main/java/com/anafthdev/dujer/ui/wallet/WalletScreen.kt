@@ -54,7 +54,6 @@ import com.anafthdev.dujer.uicomponent.SwipeableFinancialCard
 import com.anafthdev.dujer.uicomponent.TopAppBar
 import com.anafthdev.dujer.util.CurrencyFormatter
 import kotlinx.coroutines.launch
-import timber.log.Timber
 
 @OptIn(ExperimentalMaterialApi::class, ExperimentalMaterial3Api::class)
 @Composable
@@ -118,7 +117,6 @@ fun WalletScreen(
 	BackHandler {
 		navController.popBackStack()
 	}
-	Timber.i("totexns: $expenseTransaction")
 	
 	LaunchedEffect(walletID) {
 		walletViewModel.dispatch(
@@ -127,6 +125,12 @@ fun WalletScreen(
 		
 		walletViewModel.dispatch(
 			WalletAction.GetTransaction(walletID)
+		)
+	}
+	
+	LaunchedEffect(mixedFinancialList) {
+		walletViewModel.dispatch(
+			WalletAction.GetWallet(wallet.id)
 		)
 	}
 	

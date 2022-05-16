@@ -36,7 +36,7 @@ class AppRepository @Inject constructor(
 		ExpenseRepository(appDatabase)
 	}
 	
-	override suspend fun getAllFinancial(): Flow<List<Financial>> {
+	override fun getAllFinancial(): Flow<List<Financial>> {
 		return appDatabase.financialDao().getAll()
 	}
 	

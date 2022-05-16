@@ -15,7 +15,7 @@ interface IAppRepository {
 	val incomeRepository: IIncomeRepository
 	val expenseRepository: IExpenseRepository
 	
-	suspend fun getAllFinancial(): Flow<List<Financial>>
+	fun getAllFinancial(): Flow<List<Financial>>
 	
 	suspend fun get(id: Int): Financial?
 	
