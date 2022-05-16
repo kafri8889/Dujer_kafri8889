@@ -20,6 +20,8 @@ interface IDujerEnvironment {
 	
 	fun getDataCanBeReturned(): Flow<UndoType>
 	
+	suspend fun insertWallet(vararg wallet: Wallet)
+	
 	suspend fun updateWallet(vararg wallet: Wallet)
 	
 	suspend fun updateFinancial(vararg financial: Financial)

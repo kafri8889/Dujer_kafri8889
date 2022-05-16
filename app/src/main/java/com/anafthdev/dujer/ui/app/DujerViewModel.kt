@@ -98,6 +98,11 @@ class DujerViewModel @Inject constructor(
 					environment.vibrate(action.durationInMillis)
 				}
 			}
+			is DujerAction.InsertWallet -> {
+				viewModelScope.launch(environment.dispatcher) {
+					environment.insertWallet(action.wallet)
+				}
+			}
 			is DujerAction.DeleteFinancial -> {
 				viewModelScope.launch(environment.dispatcher) {
 					environment.deleteFinancial(*action.financials)

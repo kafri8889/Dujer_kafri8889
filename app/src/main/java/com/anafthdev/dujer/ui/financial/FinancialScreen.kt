@@ -58,7 +58,6 @@ import com.anafthdev.dujer.util.CurrencyFormatter
 import com.anafthdev.dujer.util.TextFieldCurrencyFormatter
 import timber.log.Timber
 import java.text.SimpleDateFormat
-import kotlin.random.Random
 
 @SuppressLint("RememberReturnType")
 @OptIn(ExperimentalMaterial3Api::class)
@@ -173,6 +172,8 @@ fun FinancialScreen(
 		}
 		
 	}
+	
+	Timber.i("financial: $financial, new: $financialNew")
 	
 	Column(
 		modifier = Modifier
@@ -616,7 +617,7 @@ fun FinancialScreen(
 									financialViewModel.dispatch(
 										com.anafthdev.dujer.ui.financial.FinancialAction.Insert(
 											Financial(
-												id = Random.nextInt(),
+												id = (0..500_000).random(),
 												name = financialTitle,
 												amount = financialAmountDouble,
 												type = financialType,
@@ -624,7 +625,9 @@ fun FinancialScreen(
 												currency = localCurrency,
 												dateCreated = financialDate,
 												walletID = selectedWallet.id
-											)
+											).also {
+												Timber.i("begin insert: $it")
+											}
 										)
 									)
 									saveFinancial()

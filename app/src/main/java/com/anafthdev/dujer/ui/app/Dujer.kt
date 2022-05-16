@@ -11,7 +11,10 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -51,6 +54,7 @@ import kotlinx.coroutines.Dispatchers
 fun DujerApp() {
 	
 	val context = LocalContext.current
+	val lifecycleOwner = LocalLifecycleOwner.current
 	
 	val dujerViewModel = hiltViewModel<DujerViewModel>()
 	val uiModeViewModel = hiltViewModel<UiModeViewModel>()
@@ -72,6 +76,14 @@ fun DujerApp() {
 		initial = DujerEffect.Nothing,
 		context = Dispatchers.Main
 	)
+	
+	LaunchedEffect(lifecycleOwner) {
+		lifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
+			dujerViewModel.dispatch(
+				DujerAction.InsertWallet(Wallet.cash)
+			)
+		}
+	}
 	
 	LaunchedEffect(effect) {
 		when (effect) {

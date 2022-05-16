@@ -83,9 +83,9 @@ class WalletEnvironment @Inject constructor(
 	
 	override suspend fun getWallet(id: Int) {
 		_selectedWallet.postValue(
-			if (id == Wallet.cash.id) Wallet.cash else appRepository
+			appRepository
 				.walletRepository
-				.get(id)
+				.get(id) ?: Wallet.cash
 		)
 	}
 	

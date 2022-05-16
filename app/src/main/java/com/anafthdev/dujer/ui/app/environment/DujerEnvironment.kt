@@ -55,6 +55,10 @@ class DujerEnvironment @Inject constructor(
 		return dataCanReturned.asFlow()
 	}
 	
+	override suspend fun insertWallet(vararg wallet: Wallet) {
+		appRepository.walletRepository.insertWallet(*wallet)
+	}
+	
 	override suspend fun updateWallet(vararg wallet: Wallet) {
 		appRepository.walletRepository.updateWallet(*wallet)
 	}
