@@ -36,6 +36,7 @@ import androidx.compose.ui.zIndex
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.anafthdev.dujer.R
+import com.anafthdev.dujer.data.DujerDestination
 import com.anafthdev.dujer.data.db.model.Financial
 import com.anafthdev.dujer.foundation.extension.deviceLocale
 import com.anafthdev.dujer.foundation.extension.isDarkTheme
@@ -245,7 +246,11 @@ fun WalletScreen(
 										.align(Alignment.CenterEnd)
 								) {
 									IconButton(
-										onClick = {},
+										onClick = {
+											navController.navigate(
+												DujerDestination.Statistic.createRoute(wallet.id)
+											)
+										},
 										modifier = Modifier
 									) {
 										Icon(

@@ -33,6 +33,12 @@ sealed class DujerDestination(val route: String) {
 		}
 	}
 	
+	object Statistic: DujerDestination("statistic/{walletID}") {
+		fun createRoute(walletID: Int): String {
+			return "statistic/$walletID"
+		}
+	}
+	
 	object Setting: DujerDestination("setting")
 	
 	object Currency: DujerDestination("currency")

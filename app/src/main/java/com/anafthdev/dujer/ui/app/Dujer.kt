@@ -38,6 +38,7 @@ import com.anafthdev.dujer.ui.change_currency.ChangeCurrencyScreen
 import com.anafthdev.dujer.ui.dashboard.DashboardScreen
 import com.anafthdev.dujer.ui.income_expense.IncomeExpenseScreen
 import com.anafthdev.dujer.ui.setting.SettingScreen
+import com.anafthdev.dujer.ui.statistic.StatisticScreen
 import com.anafthdev.dujer.ui.theme.DujerTheme
 import com.anafthdev.dujer.ui.theme.black01
 import com.anafthdev.dujer.ui.theme.black10
@@ -218,6 +219,22 @@ fun DujerApp() {
 									)
 								)
 							}
+						)
+					}
+					
+					composable(
+						route = DujerDestination.Statistic.route,
+						arguments = listOf(
+							navArgument("walletID") {
+								type = NavType.IntType
+							}
+						)
+					) { entry ->
+						val walletID = entry.arguments?.getInt("walletID") ?: Wallet.cash.id
+						
+						StatisticScreen(
+							walletID = walletID,
+							navController = navController
 						)
 					}
 					
