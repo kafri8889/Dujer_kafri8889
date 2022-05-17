@@ -11,6 +11,7 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.*
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import com.anafthdev.dujer.foundation.extension.deviceLocale
@@ -35,9 +36,9 @@ fun YearSelector(
 ) {
 	
 	val yearFormatter = remember { SimpleDateFormat("yyyy", deviceLocale) }
-	var selectedTimeInMillis by remember { mutableStateOf(initialTimeInMillis) }
-	var previousButtonEnabled by remember { mutableStateOf(true) }
-	var nextButtonEnabled by remember { mutableStateOf(true) }
+	var selectedTimeInMillis by rememberSaveable { mutableStateOf(initialTimeInMillis) }
+	var previousButtonEnabled by rememberSaveable { mutableStateOf(true) }
+	var nextButtonEnabled by rememberSaveable { mutableStateOf(true) }
 	
 	LaunchedEffect(selectedTimeInMillis) {
 		nextButtonEnabled = yearFormatter.format(selectedTimeInMillis) != maxYear
