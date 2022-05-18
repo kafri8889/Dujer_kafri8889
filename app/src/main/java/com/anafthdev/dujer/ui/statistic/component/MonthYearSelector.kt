@@ -1,4 +1,4 @@
-package com.anafthdev.dujer.uicomponent
+package com.anafthdev.dujer.ui.statistic.component
 
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.padding
@@ -20,29 +20,28 @@ import com.anafthdev.dujer.foundation.window.spScaled
 import com.anafthdev.dujer.util.AppUtil
 import java.text.SimpleDateFormat
 
-/**
- * year selector
- * @param initialTimeInMillis initial time
- * @param maxYear maximum year, e.g: 2020, 1983, 2037
- * @param minYear minimum year, e.g: 2020, 1983, 2037
- */
 @Composable
-fun YearSelector(
-	initialTimeInMillis: Long,
+fun MonthYearSelector(
 	modifier: Modifier = Modifier,
-	maxYear: String = "",
-	minYear: String = "",
-	onYearSelected: (Long) -> Unit
+	minDate: Long = 0,
+	maxDate: Long = System.currentTimeMillis(),
+	initialTimeInMillis: Long = System.currentTimeMillis(),
+	onDateChanged: (Long) -> Unit
 ) {
 	
-	val yearFormatter = remember { SimpleDateFormat("yyyy", deviceLocale) }
+	val monthYearFormatter = remember { SimpleDateFormat("MMM yyyy", deviceLocale) }
 	var selectedTimeInMillis by rememberSaveable { mutableStateOf(initialTimeInMillis) }
 	var previousButtonEnabled by rememberSaveable { mutableStateOf(true) }
 	var nextButtonEnabled by rememberSaveable { mutableStateOf(true) }
 	
 	LaunchedEffect(selectedTimeInMillis) {
-		nextButtonEnabled = yearFormatter.format(selectedTimeInMillis) != maxYear
-		previousButtonEnabled = yearFormatter.format(selectedTimeInMillis) != minYear
+		nextButtonEnabled = monthYearFormatter.format(
+			selectedTimeInMillis
+		) != monthYearFormatter.format(maxDate)
+		
+		previousButtonEnabled = monthYearFormatter.format(
+			selectedTimeInMillis
+		) != monthYearFormatter.format(minDate)
 	}
 	
 	Row(
@@ -52,8 +51,8 @@ fun YearSelector(
 		IconButton(
 			enabled = previousButtonEnabled,
 			onClick = {
-				selectedTimeInMillis -= AppUtil.ONE_YEAR_IN_MILLIS
-				onYearSelected(selectedTimeInMillis)
+				selectedTimeInMillis -= AppUtil.ONE_MONTH_IN_MILLIS
+				onDateChanged(selectedTimeInMillis)
 			}
 		) {
 			Icon(
@@ -65,7 +64,7 @@ fun YearSelector(
 		}
 		
 		Text(
-			text = yearFormatter.format(selectedTimeInMillis),
+			text = monthYearFormatter.format(selectedTimeInMillis),
 			style = MaterialTheme.typography.bodyLarge.copy(
 				fontSize = MaterialTheme.typography.bodyLarge.fontSize.spScaled
 			),
@@ -76,8 +75,8 @@ fun YearSelector(
 		IconButton(
 			enabled = nextButtonEnabled,
 			onClick = {
-				selectedTimeInMillis += AppUtil.ONE_YEAR_IN_MILLIS
-				onYearSelected(selectedTimeInMillis)
+				selectedTimeInMillis += AppUtil.ONE_MONTH_IN_MILLIS
+				onDateChanged(selectedTimeInMillis)
 			}
 		) {
 			Icon(

@@ -10,6 +10,7 @@ import java.text.DateFormatSymbols
 object AppUtil {
 	
 	const val ONE_YEAR_IN_MILLIS = 31557600000
+	const val ONE_MONTH_IN_MILLIS = 2629800000
 	
 	val shortMonths: Array<String> = DateFormatSymbols(deviceLocale).shortMonths
 	

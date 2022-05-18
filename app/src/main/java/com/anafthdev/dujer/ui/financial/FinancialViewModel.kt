@@ -2,7 +2,6 @@ package com.anafthdev.dujer.ui.financial
 
 import androidx.lifecycle.viewModelScope
 import com.anafthdev.dujer.data.db.model.Category
-import com.anafthdev.dujer.data.db.model.Wallet
 import com.anafthdev.dujer.foundation.extension.merge
 import com.anafthdev.dujer.foundation.viewmodel.StatefulViewModel
 import com.anafthdev.dujer.ui.financial.environment.IFinancialEnvironment
@@ -32,10 +31,7 @@ class FinancialViewModel @Inject constructor(
 			environment.getWallets().collect { wallets ->
 				setState {
 					copy(
-						wallets = arrayListOf<Wallet>().apply {
-							add(Wallet.cash)
-							addAll(wallets)
-						}
+						wallets = wallets.sortedBy { it.id }
 					)
 				}
 			}

@@ -7,6 +7,7 @@ object CategoryIcons {
 	const val ads = R.drawable.ic_ads
 	const val bus = R.drawable.ic_bill
 	const val pet = R.drawable.ic_pet
+	const val coin = R.drawable.ic_coin
 	const val bill = R.drawable.ic_bill
 	const val game = R.drawable.ic_game
 	const val shop = R.drawable.ic_shop
@@ -29,6 +30,7 @@ object CategoryIcons {
 		ads,
 		bus,
 		pet,
+		coin,
 		bill,
 		game,
 		shop,

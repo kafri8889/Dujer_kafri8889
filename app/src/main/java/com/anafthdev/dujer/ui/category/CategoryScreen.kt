@@ -1,9 +1,7 @@
 package com.anafthdev.dujer.ui.category
 
 import androidx.activity.compose.BackHandler
-import androidx.compose.foundation.background
-import androidx.compose.foundation.border
-import androidx.compose.foundation.clickable
+import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
@@ -41,6 +39,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.anafthdev.dujer.R
 import com.anafthdev.dujer.data.CategoryIcons
+import com.anafthdev.dujer.data.FinancialType
 import com.anafthdev.dujer.data.db.model.Category
 import com.anafthdev.dujer.foundation.extension.isLightTheme
 import com.anafthdev.dujer.foundation.extension.lastIndexOf
@@ -57,6 +56,7 @@ import com.anafthdev.dujer.ui.category.data.CategorySwipeAction
 import com.anafthdev.dujer.ui.theme.Inter
 import com.anafthdev.dujer.ui.theme.Typography
 import com.anafthdev.dujer.ui.theme.shapes
+import com.anafthdev.dujer.uicomponent.FinancialTypeSelector
 import com.anafthdev.dujer.uicomponent.OutlinedTextField
 import com.anafthdev.dujer.uicomponent.TopAppBar
 import com.anafthdev.dujer.util.AppUtil.toast
@@ -98,7 +98,19 @@ fun CategoryScreen(
 	var categoryAction by remember { mutableStateOf(action) }
 	var newCategoryName by remember { mutableStateOf("") }
 	var selectedCategoryIcon by remember { mutableStateOf(CategoryIcons.other) }
-	val categoryNameFocusRequester by remember { mutableStateOf(FocusRequester()) }
+	var selectedFinancialTypeNewCategory by remember { mutableStateOf(FinancialType.INCOME) }
+	
+	var selectedFinancialType by remember { mutableStateOf(FinancialType.INCOME) }
+	
+	val categoryNameFocusRequester = remember { FocusRequester() }
+	
+	val incomeCategories = remember(categories, selectedFinancialType) {
+		categories.filter { it.type == FinancialType.INCOME }
+	}
+	
+	val expenseCategories = remember(categories, selectedFinancialType) {
+		categories.filter { it.type == FinancialType.EXPENSE }
+	}
 	
 	val hideSheet = {
 		scope.launch { sheetState.hide() }
@@ -169,12 +181,13 @@ fun CategoryScreen(
 		sheetContent = {
 			Column(
 				modifier = Modifier
-					.imePadding()
-					.fillMaxWidth()
+					.fillMaxSize()
 					.background(
 						if (uiMode.isLightTheme()) MaterialTheme.colorScheme.background
 						else MaterialTheme.colorScheme.surfaceVariant
 					)
+					.statusBarsPadding()
+					.verticalScroll(rememberScrollState())
 			) {
 				Box(
 					modifier = Modifier
@@ -225,6 +238,7 @@ fun CategoryScreen(
 													id = Random.nextInt(),
 													name = newCategoryName.removeFirstAndLastWhitespace(),
 													iconID = selectedCategoryIcon,
+													type = selectedFinancialTypeNewCategory,
 													tint = CategoryTint.getRandomTint()
 												).toArray()
 											)
@@ -244,6 +258,15 @@ fun CategoryScreen(
 						)
 					}
 				}
+				
+				FinancialTypeSelector(
+					selectedFinancialType = selectedFinancialTypeNewCategory,
+					onFinancialTypeChanged = { type ->
+						selectedFinancialTypeNewCategory = type
+					},
+					modifier = Modifier
+						.padding(8.dpScaled)
+				)
 				
 				OutlinedTextField(
 					singleLine = true,
@@ -340,33 +363,48 @@ fun CategoryScreen(
 			
 			LazyColumn {
 				item {
-					TopAppBar {
-						IconButton(
-							onClick = {
-								navController.popBackStack()
-							},
-							modifier = Modifier
-								.padding(start = 8.dpScaled)
-								.align(Alignment.CenterStart)
-						) {
-							Icon(
-								imageVector = Icons.Rounded.ArrowBack,
-								contentDescription = null
+					Column(
+						horizontalAlignment = Alignment.CenterHorizontally,
+						modifier = Modifier
+							.fillMaxWidth()
+					) {
+						TopAppBar {
+							IconButton(
+								onClick = {
+									navController.popBackStack()
+								},
+								modifier = Modifier
+									.padding(start = 8.dpScaled)
+									.align(Alignment.CenterStart)
+							) {
+								Icon(
+									imageVector = Icons.Rounded.ArrowBack,
+									contentDescription = null
+								)
+							}
+							
+							Text(
+								text = stringResource(id = R.string.category),
+								style = Typography.titleLarge.copy(
+									fontWeight = FontWeight.Bold,
+									fontSize = Typography.titleLarge.fontSize.spScaled
+								)
 							)
 						}
 						
-						Text(
-							text = stringResource(id = R.string.category),
-							style = Typography.titleLarge.copy(
-								fontWeight = FontWeight.Bold,
-								fontSize = Typography.titleLarge.fontSize.spScaled
-							)
+						FinancialTypeSelector(
+							selectedFinancialType = selectedFinancialType,
+							onFinancialTypeChanged = { type ->
+								selectedFinancialType = type
+							},
+							modifier = Modifier
+								.padding(8.dpScaled)
 						)
 					}
 				}
 				
 				itemsIndexed(
-					items = categories,
+					items = if (selectedFinancialType == FinancialType.INCOME) incomeCategories else expenseCategories,
 					key = { _: Int, item: Category -> item.id }
 				) { i, item ->
 					SwipeableCategory(
