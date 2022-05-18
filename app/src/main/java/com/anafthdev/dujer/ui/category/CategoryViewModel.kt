@@ -1,6 +1,7 @@
 package com.anafthdev.dujer.ui.category
 
 import androidx.lifecycle.viewModelScope
+import com.anafthdev.dujer.data.FinancialType
 import com.anafthdev.dujer.data.db.model.Category
 import com.anafthdev.dujer.data.db.model.Financial
 import com.anafthdev.dujer.foundation.extension.applyElement
@@ -68,7 +69,8 @@ class CategoryViewModel @Inject constructor(
 		environment.updateFinancial(
 			*financialList.applyElement { financial ->
 				financial.copy(
-					category = categories.get { it.id == financial.category.id } ?: Category.other
+					category = categories.get { it.id == financial.category.id } ?:
+					if (financial.type == FinancialType.INCOME) Category.otherIncome else Category.otherExpense
 				)
 			}.toTypedArray()
 		)
@@ -87,7 +89,8 @@ class CategoryViewModel @Inject constructor(
 		environment.updateFinancial(
 			*filteredFinancial.applyElement { financial ->
 				financial.copy(
-					category = Category.other
+					category = if (financial.type == FinancialType.INCOME) Category.otherIncome
+					else Category.otherExpense
 				)
 			}.toTypedArray()
 		)
