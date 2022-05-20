@@ -94,8 +94,8 @@ fun FinancialLineChart(
 				lineChart.marker = MultiLineChartMarkerView(
 					context,
 					localCurrency,
-					incomeLineDataset.entries,
-					expenseLineDataset.entries
+					incomeLineDataset.values,
+					expenseLineDataset.values
 				)
 				
 				lineChart.invalidate()
