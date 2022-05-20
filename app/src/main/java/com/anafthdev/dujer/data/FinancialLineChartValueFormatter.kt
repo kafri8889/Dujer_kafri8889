@@ -2,11 +2,10 @@ package com.anafthdev.dujer.data
 
 import com.anafthdev.dujer.foundation.extension.addStringBefore
 import com.anafthdev.dujer.foundation.extension.endsWithNumber
-import com.github.mikephil.charting.components.AxisBase
-import com.github.mikephil.charting.formatter.IAxisValueFormatter
+import com.github.mikephil.charting.formatter.ValueFormatter
 import java.text.DecimalFormat
 
-class FinancialLineChartValueFormatter: IAxisValueFormatter {
+class FinancialLineChartValueFormatter: ValueFormatter() {
 	
 	private val mSuffix = arrayOf(
 		"", "k", "m", "b", "t"
@@ -15,9 +14,8 @@ class FinancialLineChartValueFormatter: IAxisValueFormatter {
 	private val mMaxLength = 5
 	private val mFormat: DecimalFormat = DecimalFormat("###E00")
 	
-	override fun getFormattedValue(value: Float, axis: AxisBase?): String {
+	override fun getFormattedValue(value: Float): String {
 		return if (value > 0) format(value.toDouble()) else ""
-		
 	}
 	
 	private fun format(number: Double): String {
