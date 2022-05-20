@@ -38,8 +38,8 @@ import androidx.navigation.NavController
 import com.anafthdev.dujer.R
 import com.anafthdev.dujer.data.DujerDestination
 import com.anafthdev.dujer.data.db.model.Financial
+import com.anafthdev.dujer.foundation.extension.darkenColor
 import com.anafthdev.dujer.foundation.extension.deviceLocale
-import com.anafthdev.dujer.foundation.extension.isDarkTheme
 import com.anafthdev.dujer.foundation.extension.merge
 import com.anafthdev.dujer.foundation.extension.toColor
 import com.anafthdev.dujer.foundation.uimode.data.LocalUiMode
@@ -339,10 +339,6 @@ fun WalletScreen(
 								elevation = CardDefaults.cardElevation(
 									defaultElevation = 1.dpScaled
 								),
-								colors = CardDefaults.cardColors(
-									containerColor = if (LocalUiMode.current.isDarkTheme()) CardDefaults.cardColors().containerColor(true).value
-									else Color.White
-								),
 								modifier = Modifier
 									.padding(
 										16.dpScaled
@@ -404,7 +400,7 @@ fun WalletScreen(
 											text = "${incomeTransaction.size} ${context.getString(R.string.transaction)}",
 											textAlign = TextAlign.End,
 											style = MaterialTheme.typography.bodyMedium.copy(
-												color = incomeColor,
+												color = incomeColor.darkenColor(0.14f),
 												fontWeight = FontWeight.Medium,
 												fontSize = MaterialTheme.typography.bodyMedium.fontSize.spScaled
 											),
@@ -433,7 +429,7 @@ fun WalletScreen(
 											text = "${expenseTransaction.size} ${context.getString(R.string.transaction)}",
 											textAlign = TextAlign.End,
 											style = MaterialTheme.typography.bodyMedium.copy(
-												color = expenseColor,
+												color = expenseColor.darkenColor(0.14f),
 												fontWeight = FontWeight.Medium,
 												fontSize = MaterialTheme.typography.bodyMedium.fontSize.spScaled
 											),

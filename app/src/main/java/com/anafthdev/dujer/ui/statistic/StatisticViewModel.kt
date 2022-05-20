@@ -45,6 +45,36 @@ class StatisticViewModel @Inject constructor(
 				}
 			}
 		}
+		
+		viewModelScope.launch(environment.dispatcher) {
+			environment.getSelectedFinancialType().collect { type ->
+				setState {
+					copy(
+						selectedFinancialType = type
+					)
+				}
+			}
+		}
+		
+		viewModelScope.launch(environment.dispatcher) {
+			environment.getAvailableCategory().collect { categories ->
+				setState {
+					copy(
+						availableCategory = categories
+					)
+				}
+			}
+		}
+		
+		viewModelScope.launch(environment.dispatcher) {
+			environment.getPieEntry().collect { entries ->
+				setState {
+					copy(
+						pieEntries = entries
+					)
+				}
+			}
+		}
 	}
 	
 	override fun dispatch(action: StatisticAction) {
@@ -52,6 +82,11 @@ class StatisticViewModel @Inject constructor(
 			is StatisticAction.Get -> {
 				viewModelScope.launch(environment.dispatcher) {
 					environment.getWallet(action.walletID)
+				}
+			}
+			is StatisticAction.SetSelectedFinancialType -> {
+				viewModelScope.launch(environment.dispatcher) {
+					environment.setSelectedFinancialType(action.type)
 				}
 			}
 		}
