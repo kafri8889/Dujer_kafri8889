@@ -17,6 +17,9 @@ interface FinancialDAO {
 	@Query("SELECT * FROM financial_table WHERE id= :mID")
 	suspend fun get(mID: Int): Financial?
 	
+	@Query("SELECT EXISTS(SELECT * FROM financial_table WHERE id = :financialID)")
+	suspend fun isExists(financialID: Int): Boolean
+	
 	@Update
 	suspend fun update(vararg financial: Financial)
 	

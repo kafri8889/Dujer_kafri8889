@@ -19,6 +19,8 @@ interface IAppRepository {
 	
 	suspend fun get(id: Int): Financial?
 	
+	suspend fun isExists(financialID: Int): Boolean
+	
 	suspend fun update(vararg financials: Financial)
 	
 	suspend fun delete(vararg financials: Financial)
