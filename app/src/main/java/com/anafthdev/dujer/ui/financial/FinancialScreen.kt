@@ -99,6 +99,10 @@ fun FinancialScreen(
 	var isWalletListShowed by remember { mutableStateOf(false) }
 	var selectedWallet by remember { mutableStateOf(Wallet.cash) }
 	
+	val categorySelectorItems = remember(categories, financialType) {
+		categories.filter { it.type == financialType }
+	}
+	
 	val resetFinancial = {
 		selectedWallet = Wallet.cash
 		financialNew = Financial.default
@@ -400,7 +404,7 @@ fun FinancialScreen(
 						.padding(top = 8.dpScaled)
 				) {
 					CategoryList(
-						categories = categories,
+						categories = categorySelectorItems,
 						onItemClick = { category ->
 							financialCategory = category
 							isCategoryListShowed = false
