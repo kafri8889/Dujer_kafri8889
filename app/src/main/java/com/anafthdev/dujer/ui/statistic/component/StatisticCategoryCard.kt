@@ -3,6 +3,7 @@ package com.anafthdev.dujer.ui.statistic.component
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -11,19 +12,25 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextOverflow
 import com.anafthdev.dujer.R
 import com.anafthdev.dujer.data.db.model.Category
+import com.anafthdev.dujer.foundation.extension.deviceLocale
 import com.anafthdev.dujer.foundation.extension.isDefault
 import com.anafthdev.dujer.foundation.extension.lightenColor
+import com.anafthdev.dujer.foundation.uiextension.horizontalScroll
 import com.anafthdev.dujer.foundation.window.dpScaled
 import com.anafthdev.dujer.foundation.window.spScaled
+import com.anafthdev.dujer.model.LocalCurrency
 import com.anafthdev.dujer.ui.theme.Typography
+import com.anafthdev.dujer.util.CurrencyFormatter
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun StatisticCategoryCard(
 	color: Color,
 	category: Category,
+	totalAmount: Double,
 	modifier: Modifier = Modifier
 ) {
 	
@@ -65,6 +72,7 @@ fun StatisticCategoryCard(
 				Text(
 					text = category.name,
 					maxLines = 1,
+					overflow = TextOverflow.Ellipsis,
 					style = Typography.bodyMedium.copy(
 						fontWeight = FontWeight.SemiBold,
 						fontSize = Typography.bodyMedium.fontSize.spScaled
@@ -73,15 +81,40 @@ fun StatisticCategoryCard(
 				
 				Spacer(modifier = Modifier.weight(1f))
 				
-				Text(
-					text = category.type.name,
-					style = Typography.labelSmall.copy(
-						fontWeight = FontWeight.Normal,
-						fontSize = Typography.labelSmall.fontSize.spScaled
-					),
-					modifier = Modifier
-						.padding(top = 8.dpScaled)
-				)
+				Column(
+					horizontalAlignment = Alignment.End
+				) {
+					Text(
+						text = CurrencyFormatter.format(
+							locale = deviceLocale,
+							amount = totalAmount,
+							currencyCode = LocalCurrency.current.countryCode
+						),
+						maxLines = 1,
+						overflow = TextOverflow.Ellipsis,
+						style = Typography.bodyMedium.copy(
+							fontWeight = FontWeight.SemiBold,
+							fontSize = Typography.bodyMedium.fontSize.spScaled
+						),
+						modifier = Modifier
+							.horizontalScroll(
+								state = rememberScrollState(),
+								autoRestart = true
+							)
+					)
+					
+					Text(
+						text = category.type.name,
+						maxLines = 1,
+						overflow = TextOverflow.Ellipsis,
+						style = Typography.labelSmall.copy(
+							fontWeight = FontWeight.Normal,
+							fontSize = Typography.labelSmall.fontSize.spScaled
+						),
+						modifier = Modifier
+							.padding(top = 8.dpScaled)
+					)
+				}
 			}
 		}
 	}

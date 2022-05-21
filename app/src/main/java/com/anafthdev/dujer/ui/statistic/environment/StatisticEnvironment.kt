@@ -68,9 +68,9 @@ class StatisticEnvironment @Inject constructor(
 					(it.walletID == triple.second) and (it.type == FinancialType.EXPENSE)
 				}
 				
-				val categories = if (triple.third == FinancialType.INCOME) incomeList.getBy {
+				val categories = (if (triple.third == FinancialType.INCOME) incomeList.getBy {
 					it.category
-				} else expenseList.getBy { it.category }
+				} else expenseList.getBy { it.category }).distinctBy { it.id }
 				
 				_availableCategory.postValue(categories)
 				_incomeTransaction.postValue(incomeList)
