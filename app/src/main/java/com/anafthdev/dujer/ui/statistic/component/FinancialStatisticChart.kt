@@ -4,6 +4,7 @@ import android.graphics.Color
 import androidx.compose.animation.*
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
@@ -17,6 +18,7 @@ import androidx.core.content.res.ResourcesCompat
 import com.anafthdev.dujer.R
 import com.anafthdev.dujer.data.FinancialType
 import com.anafthdev.dujer.data.db.model.Category
+import com.anafthdev.dujer.data.db.model.Financial
 import com.anafthdev.dujer.foundation.extension.isDarkTheme
 import com.anafthdev.dujer.foundation.extension.isDefault
 import com.anafthdev.dujer.foundation.uimode.data.LocalUiMode
@@ -37,6 +39,7 @@ fun FinancialStatisticChart(
 	dataSet: PieDataSet,
 	financialType: FinancialType,
 	category: Category,
+	financialsForSelectedCategory: List<Financial>,
 	selectedColor: androidx.compose.ui.graphics.Color,
 	modifier: Modifier = Modifier,
 	onPieDataSelected: (PieEntry?, Highlight?) -> Unit,
@@ -61,10 +64,7 @@ fun FinancialStatisticChart(
 		elevation = CardDefaults.cardElevation(
 			defaultElevation = 1.dpScaled
 		),
-		modifier = Modifier
-			.padding(
-				16.dpScaled
-			)
+		modifier = modifier
 			.fillMaxWidth()
 			.padding(4.dpScaled)
 	) {
@@ -110,7 +110,14 @@ fun FinancialStatisticChart(
 				pieChart.data = PieData(dataSet)
 				pieChart.invalidate()
 			},
-			modifier = modifier
+			modifier = Modifier
+				.padding(
+					vertical = 8.dpScaled
+				)
+				.fillMaxWidth()
+				.heightIn(
+					min = 256.dpScaled
+				)
 		)
 		
 		AnimatedVisibility(
@@ -130,7 +137,8 @@ fun FinancialStatisticChart(
 		) {
 			StatisticCategoryCard(
 				color = selectedColor,
-				category = selectedCategory
+				category = selectedCategory,
+				totalAmount = financialsForSelectedCategory.sumOf { it.amount }
 			)
 		}
 	}

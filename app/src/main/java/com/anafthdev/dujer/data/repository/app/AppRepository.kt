@@ -44,6 +44,10 @@ class AppRepository @Inject constructor(
 		return appDatabase.financialDao().get(id)
 	}
 	
+	override suspend fun isExists(financialID: Int): Boolean {
+		return appDatabase.financialDao().isExists(financialID)
+	}
+	
 	override suspend fun update(vararg financials: Financial) {
 		financials.forEach { financial ->
 			if (financial.type == FinancialType.INCOME) incomeRepository.updateIncome(financial)
