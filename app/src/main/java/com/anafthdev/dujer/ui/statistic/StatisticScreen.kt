@@ -91,6 +91,7 @@ fun StatisticScreen(
 	
 	Column(
 		modifier = Modifier
+			.systemBarsPadding()
 			.fillMaxSize()
 	) {
 		TopAppBar {
