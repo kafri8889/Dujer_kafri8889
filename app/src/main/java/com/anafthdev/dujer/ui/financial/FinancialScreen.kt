@@ -58,6 +58,7 @@ import com.anafthdev.dujer.util.CurrencyFormatter
 import com.anafthdev.dujer.util.TextFieldCurrencyFormatter
 import timber.log.Timber
 import java.text.SimpleDateFormat
+import kotlin.random.Random
 
 @SuppressLint("RememberReturnType")
 @OptIn(ExperimentalMaterial3Api::class)
@@ -555,10 +556,13 @@ fun FinancialScreen(
 									R.string.category_cannot_be_empty
 								).toast(context)
 								else -> {
+									val random = Random(System.currentTimeMillis())
+									val id = random.nextInt()
+									
 									financialViewModel.dispatch(
 										com.anafthdev.dujer.ui.financial.FinancialAction.Insert(
 											Financial(
-												id = (0..500_000).random(),
+												id = id,
 												name = financialTitle,
 												amount = financialAmountDouble,
 												type = financialType,
