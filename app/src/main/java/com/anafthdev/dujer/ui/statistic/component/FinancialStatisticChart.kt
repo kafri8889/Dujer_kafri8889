@@ -13,6 +13,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.toArgb
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.core.content.res.ResourcesCompat
 import com.anafthdev.dujer.R
@@ -36,6 +37,7 @@ import timber.log.Timber
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun FinancialStatisticChart(
+	isDataSetEmpty: Boolean,
 	dataSet: PieDataSet,
 	financialType: FinancialType,
 	category: Category,
@@ -47,12 +49,23 @@ fun FinancialStatisticChart(
 ) {
 	
 	val uiMode = LocalUiMode.current
+	val context = LocalContext.current
 	
 	val pieLabelColor = if (uiMode.isDarkTheme()) Color.WHITE else Color.BLACK
 	val background = MaterialTheme.colorScheme.background
 	
 	var selectedCategory by remember { mutableStateOf(Category.default) }
 	var showSelectedCategory by remember { mutableStateOf(false) }
+	
+	val pieChart = remember {
+		PieChart(context)
+	}
+	val pieChartRenderer = remember {
+		CustomPieChartRenderer(
+			pieChart = pieChart,
+			circleRadius = 10f
+		)
+	}
 	
 	LaunchedEffect(category) {
 		selectedCategory = category
@@ -69,8 +82,8 @@ fun FinancialStatisticChart(
 			.padding(4.dpScaled)
 	) {
 		AndroidView(
-			factory = { context ->
-				PieChart(context).apply {
+			factory = { _ ->
+				pieChart.apply {
 					holeRadius = 60f
 					rotationAngle = 0f
 					isDrawHoleEnabled = true
@@ -78,7 +91,10 @@ fun FinancialStatisticChart(
 					legend.isEnabled = false
 					description.isEnabled = false
 					isHighlightPerTapEnabled = true
-					renderer = CustomPieChartRenderer(this, 10f)
+//					renderer = CustomPieChartRenderer(
+//						pieChart = this,
+//						circleRadius = if (!isDataSetEmpty) 10f else 0f
+//					)
 					
 					setExtraOffsets(0f, 16f, 0f, 16f)
 					setEntryLabelColor(pieLabelColor)
@@ -93,8 +109,8 @@ fun FinancialStatisticChart(
 					)
 				}
 			},
-			update = { pieChart ->
-				pieChart.setOnChartValueSelectedListener(object : OnChartValueSelectedListener {
+			update = { mPieChart ->
+				mPieChart.setOnChartValueSelectedListener(object : OnChartValueSelectedListener {
 					override fun onValueSelected(e: Entry?, h: Highlight?) {
 						Timber.i("selekted entri: $e, $h")
 						onPieDataSelected((e as PieEntry), h)
@@ -105,10 +121,13 @@ fun FinancialStatisticChart(
 					}
 				})
 				
-				pieChart.centerText = ""
+				mPieChart.renderer = pieChartRenderer.setCircleRadius(
+					if (!isDataSetEmpty) 10f else 0f
+				)
 				
-				pieChart.data = PieData(dataSet)
-				pieChart.invalidate()
+				mPieChart.centerText = if (isDataSetEmpty) context.getString(R.string.no_data) else ""
+				mPieChart.data = PieData(dataSet)
+				mPieChart.invalidate()
 			},
 			modifier = Modifier
 				.padding(

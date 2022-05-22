@@ -28,6 +28,7 @@ import com.anafthdev.dujer.ui.statistic.component.FinancialStatisticChart
 import com.anafthdev.dujer.ui.statistic.component.MonthYearSelector
 import com.anafthdev.dujer.ui.statistic.data.PercentValueFormatter
 import com.anafthdev.dujer.ui.theme.Typography
+import com.anafthdev.dujer.uicomponent.FinancialTypeSelector
 import com.anafthdev.dujer.uicomponent.TopAppBar
 import com.anafthdev.dujer.util.ColorTemplate
 import com.github.mikephil.charting.data.PieDataSet
@@ -57,6 +58,7 @@ fun StatisticScreen(
 	
 	var selectedCategory by remember { mutableStateOf(Category.default) }
 	var selectedPieColor by remember { mutableStateOf(androidx.compose.ui.graphics.Color.Transparent) }
+	var isDataSetEmpty by remember { mutableStateOf(false) }
 	
 	val pieColors = remember { mutableStateListOf<Int>() }
 	val categories = remember(availableCategory) { availableCategory }
@@ -65,10 +67,18 @@ fun StatisticScreen(
 	}
 
 	val pieDataSet = remember(pieEntries) {
-		pieColors.clear()
-		pieColors.addAll(ColorTemplate.getRandomColor(pieEntries.size))
+		val isEntryEmpty = pieEntries.isEmpty()
+		val entries = pieEntries.ifEmpty { listOf(PieEntry(100f)) }
 		
-		PieDataSet(pieEntries, "").apply {
+		isDataSetEmpty = isEntryEmpty
+		
+		pieColors.clear()
+		pieColors.addAll(
+			if (!isEntryEmpty) ColorTemplate.getRandomColor(pieEntries.size)
+			else listOf(Color.GRAY)
+		)
+		
+		PieDataSet(entries, "").apply {
 			valueTextSize = 13f
 			valueLineWidth = 2f
 			selectionShift = 3f
@@ -85,6 +95,8 @@ fun StatisticScreen(
 				context,
 				R.font.inter_regular
 			)
+			
+			setDrawValues(!isDataSetEmpty)
 		}
 	}
 	
@@ -96,6 +108,13 @@ fun StatisticScreen(
 		statisticViewModel.dispatch(
 			StatisticAction.Get(walletID)
 		)
+	}
+	
+	LaunchedEffect(pieEntries) {
+		if (pieEntries.isEmpty()) {
+			selectedCategory = Category.default
+			selectedPieColor = androidx.compose.ui.graphics.Color.Transparent
+		}
 	}
 	
 	Column(
@@ -127,17 +146,32 @@ fun StatisticScreen(
 		}
 		
 		MonthYearSelector(
-			onDateChanged = {
-			
+			onDateChanged = { date ->
+				statisticViewModel.dispatch(
+					StatisticAction.SetSelectedDate(date)
+				)
 			},
 			modifier = Modifier
 				.align(Alignment.CenterHorizontally)
 		)
-		Timber.i("categories: $availableCategory")
+		
+		FinancialTypeSelector(
+			selectedFinancialType = selectedFinancialType,
+			onFinancialTypeChanged = { type ->
+				statisticViewModel.dispatch(
+					StatisticAction.SetSelectedFinancialType(type)
+				)
+			},
+			modifier = Modifier
+				.padding(
+					horizontal = 8.dpScaled
+				)
+		)
 		
 		// TODO: Selected cateogryyy
 		FinancialStatisticChart(
 			dataSet = pieDataSet,
+			isDataSetEmpty = isDataSetEmpty,
 			category = selectedCategory,
 			selectedColor = selectedPieColor,
 			financialType = selectedFinancialType,

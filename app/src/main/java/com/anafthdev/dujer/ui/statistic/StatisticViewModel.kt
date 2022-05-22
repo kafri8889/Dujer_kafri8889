@@ -89,6 +89,11 @@ class StatisticViewModel @Inject constructor(
 					environment.setSelectedFinancialType(action.type)
 				}
 			}
+			is StatisticAction.SetSelectedDate -> {
+				viewModelScope.launch(environment.dispatcher) {
+					environment.setSelectedDate(action.date)
+				}
+			}
 		}
 	}
 	

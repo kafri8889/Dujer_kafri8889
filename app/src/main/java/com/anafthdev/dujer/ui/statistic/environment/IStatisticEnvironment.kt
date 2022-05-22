@@ -12,8 +12,6 @@ interface IStatisticEnvironment {
 	
 	val dispatcher: CoroutineDispatcher
 	
-	fun getWallet(walletID: Int)
-	
 	fun getWallet(): Flow<Wallet>
 	
 	fun getPieEntry(): Flow<List<PieEntry>>
@@ -25,6 +23,12 @@ interface IStatisticEnvironment {
 	fun getAvailableCategory(): Flow<List<Category>>
 	
 	fun getSelectedFinancialType(): Flow<FinancialType>
+	
+	
+	
+	suspend fun getWallet(walletID: Int)
+	
+	suspend fun setSelectedDate(date: Long)
 	
 	suspend fun setSelectedFinancialType(type: FinancialType)
 	
