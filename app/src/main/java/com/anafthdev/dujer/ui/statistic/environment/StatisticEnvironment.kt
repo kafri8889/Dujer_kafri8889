@@ -1,47 +1,49 @@
 package com.anafthdev.dujer.ui.statistic.environment
 
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.asFlow
 import com.anafthdev.dujer.data.FinancialType
 import com.anafthdev.dujer.data.db.model.Category
 import com.anafthdev.dujer.data.db.model.Financial
 import com.anafthdev.dujer.data.db.model.Wallet
 import com.anafthdev.dujer.data.repository.app.IAppRepository
+import com.anafthdev.dujer.foundation.common.Quad
 import com.anafthdev.dujer.foundation.di.DiName
+import com.anafthdev.dujer.foundation.extension.deviceLocale
 import com.anafthdev.dujer.foundation.extension.getBy
 import com.github.mikephil.charting.data.PieEntry
-import kotlinx.coroutines.CoroutineDispatcher
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
-import kotlinx.coroutines.launch
 import timber.log.Timber
+import java.text.SimpleDateFormat
 import javax.inject.Inject
 import javax.inject.Named
 
 class StatisticEnvironment @Inject constructor(
-	@Named(DiName.DISPATCHER_IO) override val dispatcher: CoroutineDispatcher,
+	@Named(DiName.DISPATCHER_MAIN) override val dispatcher: CoroutineDispatcher,
 	private val appRepository: IAppRepository
 ): IStatisticEnvironment {
 	
-	private val _selectedWallet = MutableLiveData(Wallet.cash)
-	private val selectedWallet: LiveData<Wallet> = _selectedWallet
+	private val monthYearFormatter = SimpleDateFormat("MMM yyyy", deviceLocale)
 	
-	private val _incomeTransaction = MutableLiveData(emptyList<Financial>())
-	private val incomeTransaction: LiveData<List<Financial>> = _incomeTransaction
+	private val _selectedWallet = MutableStateFlow(Wallet.cash)
+	private val selectedWallet: StateFlow<Wallet> = _selectedWallet
 	
-	private val _expenseTransaction = MutableLiveData(emptyList<Financial>())
-	private val expenseTransaction: LiveData<List<Financial>> = _expenseTransaction
+	private val _incomeTransaction = MutableStateFlow(emptyList<Financial>())
+	private val incomeTransaction: StateFlow<List<Financial>> = _incomeTransaction
 	
-	private val _availableCategory = MutableLiveData(emptyList<Category>())
-	private val availableCategory: LiveData<List<Category>> = _availableCategory
+	private val _expenseTransaction = MutableStateFlow(emptyList<Financial>())
+	private val expenseTransaction: StateFlow<List<Financial>> = _expenseTransaction
 	
-	private val _pieEntry = MutableLiveData(emptyList<PieEntry>())
-	private val pieEntry: LiveData<List<PieEntry>> = _pieEntry
+	private val _availableCategory = MutableStateFlow(emptyList<Category>())
+	private val availableCategory: StateFlow<List<Category>> = _availableCategory
+	
+	private val _pieEntry = MutableStateFlow(emptyList<PieEntry>())
+	private val pieEntry: StateFlow<List<PieEntry>> = _pieEntry
+	
+	private val _selectedDate = MutableStateFlow(System.currentTimeMillis())
+	private val selectedDate: StateFlow<Long> = _selectedDate
 	
 	private val _selectedFinancialType = MutableStateFlow(FinancialType.INCOME)
 	private val selectedFinancialType: StateFlow<FinancialType> = _selectedFinancialType
@@ -50,34 +52,41 @@ class StatisticEnvironment @Inject constructor(
 	private val lastSelectedWalletID: StateFlow<Int> = _lastSelectedWalletID
 	
 	init {
-		CoroutineScope(Dispatchers.Main).launch {
+		CoroutineScope(dispatcher).launch {
 			combine(
 				appRepository.getAllFinancial(),
 				lastSelectedWalletID,
-				selectedFinancialType
-			) { financials: List<Financial>, walletID: Int, financialType: FinancialType ->
-				Triple(financials, walletID, financialType)
-			}.collect { triple ->
-				Timber.i("collect triple: $triple")
+				selectedFinancialType,
+				selectedDate
+			) { financials, walletID, financialType, selectedDate ->
+				Quad(financials, walletID, financialType, selectedDate)
+			}.collect { quad ->
 				
-				val incomeList = triple.first.filter {
-					(it.walletID == triple.second) and (it.type == FinancialType.INCOME)
+				val incomeList = quad.first.filter {
+					(it.walletID == quad.second)
+						.and(it.type == FinancialType.INCOME)
+						.and(
+							monthYearFormatter.format(it.dateCreated).equals(
+								other = monthYearFormatter.format(quad.fourth),
+								ignoreCase = true
+							)
+						)
 				}
 				
-				val expenseList = triple.first.filter {
-					(it.walletID == triple.second) and (it.type == FinancialType.EXPENSE)
+				val expenseList = quad.first.filter {
+					(it.walletID == quad.second) and (it.type == FinancialType.EXPENSE)
 				}
 				
-				val categories = (if (triple.third == FinancialType.INCOME) incomeList.getBy {
+				val categories = (if (quad.third == FinancialType.INCOME) incomeList.getBy {
 					it.category
 				} else expenseList.getBy { it.category }).distinctBy { it.id }
 				
-				_availableCategory.postValue(categories)
-				_incomeTransaction.postValue(incomeList)
-				_expenseTransaction.postValue(expenseList)
-				_pieEntry.postValue(
+				_availableCategory.emit(categories)
+				_incomeTransaction.emit(incomeList)
+				_expenseTransaction.emit(expenseList)
+				_pieEntry.emit(
 					calculatePieEntry(
-						if (triple.third == FinancialType.INCOME) incomeList else expenseList,
+						if (quad.third == FinancialType.INCOME) incomeList else expenseList,
 						categories
 					)
 				)
@@ -85,35 +94,41 @@ class StatisticEnvironment @Inject constructor(
 		}
 	}
 	
-	override fun getWallet(walletID: Int) {
+	override suspend fun getWallet(walletID: Int) {
 		_lastSelectedWalletID.tryEmit(walletID)
-		_selectedWallet.postValue(
-			appRepository.walletRepository.get(walletID) ?: Wallet.cash
-		)
+		withContext(Dispatchers.IO) {
+			_selectedWallet.emit(
+				appRepository.walletRepository.get(walletID) ?: Wallet.cash
+			)
+		}
 	}
 	
 	override fun getWallet(): Flow<Wallet> {
-		return selectedWallet.asFlow()
+		return selectedWallet
 	}
 	
 	override fun getPieEntry(): Flow<List<PieEntry>> {
-		return pieEntry.asFlow()
+		return pieEntry
 	}
 	
 	override fun getIncomeTransaction(): Flow<List<Financial>> {
-		return incomeTransaction.asFlow()
+		return incomeTransaction
 	}
 	
 	override fun getExpenseTransaction(): Flow<List<Financial>> {
-		return expenseTransaction.asFlow()
+		return expenseTransaction
 	}
 	
 	override fun getAvailableCategory(): Flow<List<Category>> {
-		return availableCategory.asFlow()
+		return availableCategory
 	}
 	
 	override fun getSelectedFinancialType(): Flow<FinancialType> {
 		return selectedFinancialType
+	}
+	
+	override suspend fun setSelectedDate(date: Long) {
+		_selectedDate.emit(date)
 	}
 	
 	override suspend fun setSelectedFinancialType(type: FinancialType) {

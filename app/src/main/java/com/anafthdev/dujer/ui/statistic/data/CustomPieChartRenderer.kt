@@ -10,8 +10,9 @@ import kotlin.math.cos
 import kotlin.math.sin
 
 class CustomPieChartRenderer(
-	pieChart: PieChart, private val circleRadius: Float
-) : PieChartRenderer(pieChart, pieChart.animator, pieChart.viewPortHandler) {
+	pieChart: PieChart,
+	private var circleRadius: Float
+): PieChartRenderer(pieChart, pieChart.animator, pieChart.viewPortHandler) {
 	
 	override fun drawValues(c: Canvas) {
 		super.drawValues(c)
@@ -78,5 +79,10 @@ class CustomPieChartRenderer(
 		}
 		MPPointF.recycleInstance(center)
 		c.restore()
+	}
+	
+	fun setCircleRadius(radius: Float): CustomPieChartRenderer {
+		circleRadius = radius
+		return this
 	}
 }

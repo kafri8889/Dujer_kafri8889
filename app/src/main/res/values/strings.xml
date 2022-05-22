@@ -20,6 +20,7 @@
     <string name="export">Export</string>
     <string name="balance">Balance</string>
     <string name="setting">Setting</string>
+    <string name="no_data">No data</string>
     <string name="security">Security</string>
     <string name="expenses">Expenses</string>
     <string name="category">Category</string>
