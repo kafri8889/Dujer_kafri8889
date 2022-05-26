@@ -50,6 +50,7 @@
     <string name="your_expenses">Pengeluaran kamu</string>
     <string name="delete_wallet">Hapus dompet</string>
     <string name="bio_auth_title">Verifikasi</string>
+    <string name="add_transaction">Tambah transaksi</string>
     <string name="finance_removed">Keuangan dihapus</string>
     <string name="change_currency">Ganti mata uang</string>
     <string name="initial_balance">Saldo awal</string>
