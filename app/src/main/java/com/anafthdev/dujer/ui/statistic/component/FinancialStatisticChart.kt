@@ -72,6 +72,13 @@ fun FinancialStatisticChart(
 		showSelectedCategory = !category.isDefault()
 	}
 	
+	LaunchedEffect(dataSet) {
+		selectedCategory = Category.default
+		showSelectedCategory = false
+		
+		pieChart.highlightValues(null)
+	}
+	
 	Card(
 		shape = MaterialTheme.shapes.large,
 		elevation = CardDefaults.cardElevation(
@@ -91,10 +98,6 @@ fun FinancialStatisticChart(
 					legend.isEnabled = false
 					description.isEnabled = false
 					isHighlightPerTapEnabled = true
-//					renderer = CustomPieChartRenderer(
-//						pieChart = this,
-//						circleRadius = if (!isDataSetEmpty) 10f else 0f
-//					)
 					
 					setExtraOffsets(0f, 16f, 0f, 16f)
 					setEntryLabelColor(pieLabelColor)
