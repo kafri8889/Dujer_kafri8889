@@ -39,6 +39,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.anafthdev.dujer.R
 import com.anafthdev.dujer.data.DujerDestination
+import com.anafthdev.dujer.data.FinancialType
 import com.anafthdev.dujer.data.db.model.Category
 import com.anafthdev.dujer.data.db.model.Financial
 import com.anafthdev.dujer.data.db.model.Wallet
@@ -261,14 +262,18 @@ private fun WalletScreenContent(
 	var selectedPieColor by remember { mutableStateOf(Color.Transparent) }
 	var isDataSetEmpty by remember { mutableStateOf(false) }
 	
-	val mixedFinancialList = remember(incomeTransaction, expenseTransaction) {
-		incomeTransaction.merge(expenseTransaction).sortedBy { it.dateCreated }
+	val financialList = remember(incomeTransaction, expenseTransaction, selectedFinancialType) {
+		when (selectedFinancialType) {
+			FinancialType.INCOME -> incomeTransaction
+			FinancialType.EXPENSE -> expenseTransaction
+			else -> incomeTransaction + expenseTransaction
+		}.sortedBy { it.dateCreated }
 	}
 	
 	val pieColors = remember { mutableStateListOf<Int>() }
 	val categories = remember(availableCategory) { availableCategory }
-	val financialsForSelectedCategory = remember(mixedFinancialList, selectedCategory) {
-		mixedFinancialList.filter { it.category.id == selectedCategory.id }
+	val financialsForSelectedCategory = remember(financialList, selectedCategory) {
+		financialList.filter { it.category.id == selectedCategory.id }
 	}
 	
 	val pieDataSet = remember(pieEntries) {
@@ -310,7 +315,7 @@ private fun WalletScreenContent(
 		selectedPieColor = Color.Transparent
 	}
 	
-	LaunchedEffect(mixedFinancialList) {
+	LaunchedEffect(financialList) {
 		walletViewModel.dispatch(
 			WalletAction.GetWallet(wallet.id)
 		)
@@ -568,6 +573,11 @@ private fun WalletScreenContent(
 							WalletAction.SetSelectedFinancialType(type)
 						)
 					},
+					onDoubleClick = {
+						walletViewModel.dispatch(
+							WalletAction.SetSelectedFinancialType(FinancialType.ALL)
+						)
+					},
 					modifier = Modifier
 						.padding(8.dpScaled)
 				)
@@ -579,6 +589,7 @@ private fun WalletScreenContent(
 					selectedColor = selectedPieColor,
 					financialType = selectedFinancialType,
 					financialsForSelectedCategory = financialsForSelectedCategory,
+					onNothingSelected = resetPieChart,
 					onPieDataSelected = { entry: PieEntry?, highlight: Highlight? ->
 						val category = if (categories.isNotEmpty()) categories[highlight?.x?.toInt() ?: -1]
 						else Category.default
@@ -594,7 +605,8 @@ private fun WalletScreenContent(
 						Timber.i("entry: $entry, highlight: $highlight")
 						Timber.i("selected category: $category")
 					},
-					onNothingSelected = resetPieChart
+					modifier = Modifier
+						.padding(8.dpScaled)
 				)
 				
 				Text(
@@ -609,7 +621,7 @@ private fun WalletScreenContent(
 		}
 		
 		items(
-			items = mixedFinancialList,
+			items = financialList,
 			key = { item: Financial -> item.hashCode() }
 		) { financial ->
 			SwipeableFinancialCard(

@@ -10,6 +10,7 @@ import com.anafthdev.dujer.data.db.model.Wallet
 import com.anafthdev.dujer.data.repository.app.IAppRepository
 import com.anafthdev.dujer.foundation.di.DiName
 import com.anafthdev.dujer.foundation.extension.getBy
+import com.anafthdev.dujer.foundation.extension.merge
 import com.github.mikephil.charting.data.PieEntry
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
@@ -69,16 +70,26 @@ class WalletEnvironment @Inject constructor(
 					(it.walletID == triple.second) and (it.type == FinancialType.EXPENSE)
 				}
 				
-				val categories = (if (triple.third == FinancialType.INCOME) incomeList.getBy {
-					it.category
-				} else expenseList.getBy { it.category }).distinctBy { it.id }
+				val categories = when (triple.third) {
+					FinancialType.INCOME -> incomeList.getBy {
+						it.category
+					}.distinctBy { it.id }
+					FinancialType.EXPENSE ->  expenseList.getBy {
+						it.category
+					}.distinctBy { it.id }
+					else -> triple.first.getBy { it.category }.distinctBy { it.id }
+				}
 				
 				_availableCategory.emit(categories)
 				_incomeTransaction.postValue(incomeList)
 				_expenseTransaction.postValue(expenseList)
 				_pieEntry.emit(
 					calculatePieEntry(
-						if (triple.third == FinancialType.INCOME) incomeList else expenseList,
+						when (triple.third) {
+							FinancialType.INCOME -> incomeList
+							FinancialType.EXPENSE -> expenseList
+							else -> triple.first
+						},
 						categories
 					)
 				)
