@@ -46,7 +46,7 @@ fun BalanceCard(
 		colors = CardDefaults.cardColors(
 			containerColor = balance_card_background
 		),
-		modifier = Modifier
+		modifier = modifier
 			.fillMaxWidth()
 	) {
 		Column(
