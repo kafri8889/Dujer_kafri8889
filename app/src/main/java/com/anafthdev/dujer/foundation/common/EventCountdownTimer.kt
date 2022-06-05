@@ -14,8 +14,8 @@ class EventCountdownTimer {
 	
 	fun startTimer(
 		millisInFuture: Long,
-		onTick: (Long) -> Unit,
-		onFinish: () -> Unit
+		onTick: (Long) -> Unit = {},
+		onFinish: () -> Unit = {}
 	) {
 		if (!_isTimerRunning) {
 			_isTimerRunning = true
