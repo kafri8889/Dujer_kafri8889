@@ -4,6 +4,8 @@ import android.content.Context
 import android.os.Handler
 import android.os.Looper
 import android.widget.Toast
+import androidx.compose.runtime.Composable
+import androidx.compose.ui.platform.LocalContext
 import com.anafthdev.dujer.foundation.extension.deviceLocale
 import java.text.DateFormatSymbols
 
@@ -20,6 +22,11 @@ object AppUtil {
 		Handler(Looper.getMainLooper()).post {
 			Toast.makeText(context, this.toString(), length).show()
 		}
+	}
+	
+	@Composable
+	fun Any?.toast(length: Int = Toast.LENGTH_SHORT) {
+		Toast.makeText(LocalContext.current, this.toString(), length).show()
 	}
 	
 }
