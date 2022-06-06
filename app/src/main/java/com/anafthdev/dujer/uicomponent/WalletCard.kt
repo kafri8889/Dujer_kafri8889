@@ -63,44 +63,45 @@ fun WalletCard(
 				verticalArrangement = Arrangement.Center,
 				modifier = Modifier
 					.padding(start = 8.dpScaled)
+					.fillMaxWidth()
 					.weight(1f)
 			) {
-				CompositionLocalProvider(
-					LocalContentColor provides black01
-				) {
-					Text(
-						maxLines = 1,
-						text = wallet.name,
-						overflow = TextOverflow.Ellipsis,
-						textAlign = TextAlign.Center,
-						style = MaterialTheme.typography.bodyMedium.copy(
-							fontWeight = FontWeight.SemiBold,
-							fontSize = MaterialTheme.typography.bodyMedium.fontSize.spScaled
-						),
-						modifier = Modifier
-							.padding(2.dpScaled)
-					)
-					
-					Text(
-						maxLines = 1,
-						textAlign = TextAlign.Center,
-						text = CurrencyFormatter.format(
-							locale = deviceLocale,
-							amount = wallet.balance,
-							useSymbol = true,
-							currencyCode = LocalCurrency.current.countryCode
-						),
-						style = MaterialTheme.typography.bodyMedium.copy(
-							fontSize = MaterialTheme.typography.bodyMedium.fontSize.spScaled
-						),
-						modifier = Modifier
-							.padding(2.dpScaled)
-							.horizontalScroll(
-								state = rememberScrollState(),
-								autoRestart = true
-							)
-					)
-				}
+				Text(
+					maxLines = 1,
+					text = wallet.name,
+					overflow = TextOverflow.Ellipsis,
+					textAlign = TextAlign.Start,
+					style = MaterialTheme.typography.bodyMedium.copy(
+						color = black01,
+						fontWeight = FontWeight.SemiBold,
+						fontSize = MaterialTheme.typography.bodyMedium.fontSize.spScaled
+					),
+					modifier = Modifier
+						.padding(2.dpScaled)
+						.fillMaxWidth()
+				)
+				
+				Text(
+					maxLines = 1,
+					textAlign = TextAlign.Start,
+					text = CurrencyFormatter.format(
+						locale = deviceLocale,
+						amount = wallet.balance,
+						useSymbol = true,
+						currencyCode = LocalCurrency.current.countryCode
+					),
+					style = MaterialTheme.typography.bodyMedium.copy(
+						color = black01,
+						fontSize = MaterialTheme.typography.bodyMedium.fontSize.spScaled
+					),
+					modifier = Modifier
+						.padding(2.dpScaled)
+						.fillMaxWidth()
+						.horizontalScroll(
+							state = rememberScrollState(),
+							autoRestart = true
+						)
+				)
 			}
 		}
 	}
