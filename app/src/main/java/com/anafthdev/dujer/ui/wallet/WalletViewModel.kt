@@ -65,13 +65,43 @@ class WalletViewModel @Inject constructor(
 				}
 			}
 		}
+		
+		viewModelScope.launch(environment.dispatcher) {
+			environment.getSelectedFinancialType().collect { type ->
+				setState {
+					copy(
+						selectedFinancialType = type
+					)
+				}
+			}
+		}
+		
+		viewModelScope.launch(environment.dispatcher) {
+			environment.getAvailableCategory().collect { categories ->
+				setState {
+					copy(
+						availableCategory = categories
+					)
+				}
+			}
+		}
+		
+		viewModelScope.launch(environment.dispatcher) {
+			environment.getPieEntries().collect { entries ->
+				setState {
+					copy(
+						pieEntries = entries
+					)
+				}
+			}
+		}
 	}
 	
 	override fun dispatch(action: WalletAction) {
 		when (action) {
 			is WalletAction.GetWallet -> {
 				viewModelScope.launch(environment.dispatcher) {
-					environment.getWallet(action.id)
+					environment.setWalletID(action.id)
 				}
 			}
 			is WalletAction.GetTransaction -> {
@@ -81,12 +111,17 @@ class WalletViewModel @Inject constructor(
 			}
 			is WalletAction.GetFinancial -> {
 				viewModelScope.launch(environment.dispatcher) {
-					environment.getFinancial(action.id)
+					environment.setFinancialID(action.id)
 				}
 			}
 			is WalletAction.DeleteWallet -> {
 				viewModelScope.launch(environment.dispatcher) {
 					environment.deleteWallet(action.wallet)
+				}
+			}
+			is WalletAction.SetSelectedFinancialType -> {
+				viewModelScope.launch(environment.dispatcher) {
+					environment.setSelectedFinancialType(action.type)
 				}
 			}
 		}

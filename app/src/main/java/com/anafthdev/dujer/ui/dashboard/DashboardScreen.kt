@@ -89,7 +89,7 @@ fun DashboardScreen(
 	
 	val dashboardViewModel = hiltViewModel<DashboardViewModel>()
 	
-	val scope = rememberCoroutineScope { Dispatchers.Main }
+	val scope = rememberCoroutineScope()
 	val financialScreenSheetState = rememberModalBottomSheetState(
 		initialValue = ModalBottomSheetValue.Hidden,
 		skipHalfExpanded = true
@@ -238,7 +238,6 @@ private fun DashboardContent(
 	val context = LocalContext.current
 	
 	val wallets = state.wallets
-	val userBalance = state.userBalance
 	val incomeFinancialList = state.incomeFinancialList
 	val expenseFinancialList = state.expenseFinancialList
 	
@@ -411,7 +410,6 @@ private fun DashboardContent(
 				) {
 					composable(DujerDestination.Dashboard.Home.route) {
 						DashboardHomeScreen(
-							userBalance = userBalance,
 							wallets = wallets,
 							incomeFinancialList = incomeFinancialList,
 							incomeLineDataset = incomeLineDataset,
@@ -486,7 +484,6 @@ private fun DashboardContent(
 @OptIn(ExperimentalMaterialApi::class, ExperimentalComposeUiApi::class)
 @Composable
 private fun DashboardHomeScreen(
-	userBalance: Double,
 	wallets: List<Wallet>,
 	incomeFinancialList: List<Financial>,
 	incomeLineDataset: LineDataSet,

@@ -6,7 +6,6 @@ import com.anafthdev.dujer.ui.financial.data.FinancialAction
 import com.github.mikephil.charting.data.Entry
 
 data class DashboardState(
-	val userBalance: Double = 0.0,
 	val wallets: List<Wallet> = emptyList(),
 	val financial: Financial = Financial.default,
 	val financialAction: String = FinancialAction.NEW,

@@ -1,7 +1,10 @@
 package com.anafthdev.dujer.ui.wallet.environment
 
+import com.anafthdev.dujer.data.FinancialType
+import com.anafthdev.dujer.data.db.model.Category
 import com.anafthdev.dujer.data.db.model.Financial
 import com.anafthdev.dujer.data.db.model.Wallet
+import com.github.mikephil.charting.data.PieEntry
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.Flow
 
@@ -19,12 +22,21 @@ interface IWalletEnvironment {
 	
 	fun getAllWallet(): Flow<List<Wallet>>
 	
-	suspend fun getWallet(id: Int)
-	
 	fun getWallet(): Flow<Wallet>
 	
-	suspend fun getFinancial(id: Int)
-	
 	fun getFinancial(): Flow<Financial>
+	
+	fun getPieEntries(): Flow<List<PieEntry>>
+	
+	fun getAvailableCategory(): Flow<List<Category>>
+	
+	fun getSelectedFinancialType(): Flow<FinancialType>
+	
+	
+	suspend fun setWalletID(id: Int)
+	
+	suspend fun setFinancialID(id: Int)
+	
+	suspend fun setSelectedFinancialType(type: FinancialType)
 	
 }

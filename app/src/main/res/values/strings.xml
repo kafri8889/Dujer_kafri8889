@@ -50,6 +50,7 @@
     <string name="your_expenses">Your expenses</string>
     <string name="delete_wallet">Delete wallet</string>
     <string name="bio_auth_title">Verification</string>
+    <string name="add_transaction">Add transaction</string>
     <string name="finance_removed">Finance removed</string>
     <string name="change_currency">Change currency</string>
     <string name="initial_balance">Initial balance</string>
