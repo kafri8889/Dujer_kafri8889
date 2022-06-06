@@ -1,6 +1,22 @@
 package com.anafthdev.dujer.foundation.extension
 
 /**
+ * take a string that is not a number
+ *
+ * ex:
+ * val s = "123a456b"
+ * s.takeNonDigitString() => "ab"
+ * @author kafri8889
+ */
+fun String.takeNonDigitString(): String {
+	val builder = StringBuilder()
+	
+	forEach { if (!it.isDigit()) builder.append(it) }
+	
+	return builder.toString()
+}
+
+/**
  * if this string not equals s return default
  */
 fun String.notEquals(s: String, ignoreCase: Boolean = false, default: () -> String): String {
@@ -51,6 +67,7 @@ fun String.addStringAfter(s: String, index: Int): String {
 
 /**
  * Returns a new string with all occurrences of oldValue replaced with newValue.
+ * @author kafri8889
  */
 fun String.replace(
 	oldValue: List<String>,
