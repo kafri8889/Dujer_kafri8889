@@ -14,8 +14,6 @@ interface IDashboardEnvironment {
 	
 	suspend fun getFinancialAction(): Flow<String>
 	
-	suspend fun getUserBalance(): Flow<Double>
-	
 	suspend fun getIncomeFinancialList(): Flow<List<Financial>>
 	
 	suspend fun getExpenseFinancialList(): Flow<List<Financial>>

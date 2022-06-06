@@ -15,12 +15,6 @@ import javax.inject.Inject
 
 class AppDatastore @Inject constructor(private val context: Context) {
 	
-	suspend fun setUserBalance(balance: Double) {
-		context.datastore.edit { preferences ->
-			preferences[userBalance] = balance
-		}
-	}
-	
 	suspend fun setCurrentCurrency(countryID: String) {
 		context.datastore.edit { preferences ->
 			preferences[currentCurrency] = countryID
@@ -43,10 +37,6 @@ class AppDatastore @Inject constructor(private val context: Context) {
 		context.datastore.edit { preferences ->
 			preferences[uiMode] = mUiMode.ordinal
 		}
-	}
-	
-	val getUserBalance: Flow<Double> = context.datastore.data.map { preferences ->
-		preferences[userBalance] ?: 0.0
 	}
 	
 	val getCurrentCurrency: Flow<Currency> = context.datastore.data.map { preferences ->
@@ -79,7 +69,6 @@ class AppDatastore @Inject constructor(private val context: Context) {
 	companion object {
 		val Context.datastore: DataStore<Preferences> by preferencesDataStore("app_datastore")
 		
-		val userBalance = doublePreferencesKey(Preference.USER_BALANCE)
 		val currentCurrency = stringPreferencesKey(Preference.CURRENT_CURRENCY)
 		val useBioAuth = booleanPreferencesKey(Preference.USE_BIO_AUTH)
 		val language = intPreferencesKey(Preference.LANGUAGE)

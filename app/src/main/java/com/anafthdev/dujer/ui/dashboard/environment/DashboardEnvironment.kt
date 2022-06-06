@@ -38,10 +38,6 @@ class DashboardEnvironment @Inject constructor(
 		return financialAction.asFlow()
 	}
 	
-	override suspend fun getUserBalance(): Flow<Double> {
-		return appRepository.appDatastore.getUserBalance
-	}
-	
 	override suspend fun getIncomeFinancialList(): Flow<List<Financial>> {
 		return appRepository.incomeRepository.getIncome()
 	}

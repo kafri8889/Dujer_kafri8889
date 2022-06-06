@@ -26,16 +26,6 @@ class DashboardViewModel @Inject constructor(
 		}
 		
 		viewModelScope.launch(environment.dispatcher) {
-			environment.getUserBalance().collect { balance ->
-				setState {
-					copy(
-						userBalance = balance
-					)
-				}
-			}
-		}
-		
-		viewModelScope.launch(environment.dispatcher) {
 			environment.getFinancialAction().collect { action ->
 				setState {
 					copy(
