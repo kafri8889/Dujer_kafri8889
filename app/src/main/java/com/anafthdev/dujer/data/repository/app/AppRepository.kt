@@ -10,9 +10,9 @@ import com.anafthdev.dujer.data.repository.expense.ExpenseRepository
 import com.anafthdev.dujer.data.repository.expense.IExpenseRepository
 import com.anafthdev.dujer.data.repository.income.IIncomeRepository
 import com.anafthdev.dujer.data.repository.income.IncomeRepository
-import com.anafthdev.dujer.data.repository.wallet.IWalletRepository
 import com.anafthdev.dujer.data.repository.wallet.WalletRepository
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.distinctUntilChanged
 import javax.inject.Inject
 
 class AppRepository @Inject constructor(
@@ -20,7 +20,7 @@ class AppRepository @Inject constructor(
 	override val appDatastore: AppDatastore
 ): IAppRepository {
 	
-	override val walletRepository: IWalletRepository by lazy {
+	override val walletRepository: WalletRepository by lazy {
 		WalletRepository(appDatabase)
 	}
 	
@@ -37,7 +37,7 @@ class AppRepository @Inject constructor(
 	}
 	
 	override fun getAllFinancial(): Flow<List<Financial>> {
-		return appDatabase.financialDao().getAll()
+		return appDatabase.financialDao().getAll().distinctUntilChanged()
 	}
 	
 	override suspend fun get(id: Int): Financial? {

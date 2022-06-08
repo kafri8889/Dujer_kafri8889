@@ -12,7 +12,5 @@ data class WalletState(
 	val wallets: List<Wallet> = emptyList(),
 	val pieEntries: List<PieEntry> = emptyList(),
 	val availableCategory: List<Category> = emptyList(),
-	val incomeTransaction: List<Financial> = emptyList(),
-	val expenseTransaction: List<Financial> = emptyList(),
 	val selectedFinancialType: FinancialType = FinancialType.INCOME
 )

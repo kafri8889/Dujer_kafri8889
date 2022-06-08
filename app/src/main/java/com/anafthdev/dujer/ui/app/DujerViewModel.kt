@@ -52,24 +52,32 @@ class DujerViewModel @Inject constructor(
 				.combine(environment.getAllFinancial()) { wallets, financials ->
 					wallets to financials
 				}.collect { (wallets, financials) ->
-					val updatedWallet = arrayListOf<Wallet>()
+					setState {
+						copy(
+							allWallet = wallets,
+							allIncomeTransaction = financials.filter { it.type == FinancialType.INCOME },
+							allExpenseTransaction = financials.filter { it.type == FinancialType.EXPENSE },
+						)
+					}
 					
+					val updatedWallet = arrayListOf<Wallet>()
+
 					wallets.forEach { wallet ->
 						val incomeTransaction = financials.filter {
 							(it.type == FinancialType.INCOME) and (it.walletID == wallet.id)
 						}.sumOf { it.amount }
-						
+
 						val expenseTransaction = financials.filter {
 							(it.type == FinancialType.EXPENSE) and (it.walletID == wallet.id)
 						}.sumOf { it.amount }
-						
+
 						updatedWallet.add(
 							wallet.copy(
-								balance = incomeTransaction - expenseTransaction
+								balance = wallet.initialBalance + incomeTransaction - expenseTransaction
 							)
 						)
 					}
-					
+
 					environment.updateWallet(*updatedWallet.toTypedArray())
 				}
 		}

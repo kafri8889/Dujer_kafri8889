@@ -12,13 +12,9 @@ interface IWalletEnvironment {
 
 	val dispatcher: CoroutineDispatcher
 
+	suspend fun updateWallet(wallet: Wallet)
+	
 	suspend fun deleteWallet(wallet: Wallet)
-	
-	suspend fun getTransaction(walletID: Int)
-	
-	fun getIncomeTransaction(): Flow<List<Financial>>
-	
-	fun getExpenseTransaction(): Flow<List<Financial>>
 	
 	fun getAllWallet(): Flow<List<Wallet>>
 	

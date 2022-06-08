@@ -13,7 +13,7 @@ interface WalletDAO {
 	@Query("SELECT * FROM wallet_table WHERE id LIKE :mID")
 	fun get(mID: Int): Wallet?
 	
-	@Update
+	@Update(onConflict = OnConflictStrategy.REPLACE)
 	suspend fun update(vararg wallet: Wallet)
 	
 	@Delete

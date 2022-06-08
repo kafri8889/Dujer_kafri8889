@@ -117,6 +117,7 @@ fun DujerApp() {
 		CompositionLocalProvider(
 			LocalUiMode provides uiMode,
 			LocalCurrency provides currentCurrency,
+			LocalDujerState provides state,
 			LocalContentColor provides if (isSystemInDarkTheme) black10 else black01,
 			LocalOverScrollConfiguration provides null
 		) {

@@ -8,18 +8,16 @@ import com.anafthdev.dujer.data.db.model.Category
 import com.anafthdev.dujer.data.db.model.Financial
 import com.anafthdev.dujer.data.db.model.Wallet
 import com.anafthdev.dujer.data.repository.app.IAppRepository
+import com.anafthdev.dujer.foundation.common.Quad
 import com.anafthdev.dujer.foundation.di.DiName
 import com.anafthdev.dujer.foundation.extension.getBy
 import com.anafthdev.dujer.foundation.extension.merge
 import com.github.mikephil.charting.data.PieEntry
-import kotlinx.coroutines.CoroutineDispatcher
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
-import kotlinx.coroutines.launch
 import timber.log.Timber
 import javax.inject.Inject
 import javax.inject.Named
@@ -35,12 +33,6 @@ class WalletEnvironment @Inject constructor(
 	private val _selectedFinancial = MutableLiveData(Financial.default)
 	private val selectedFinancial: LiveData<Financial> = _selectedFinancial
 	
-	private val _incomeTransaction = MutableLiveData(emptyList<Financial>())
-	private val incomeTransaction: LiveData<List<Financial>> = _incomeTransaction
-	
-	private val _expenseTransaction = MutableLiveData(emptyList<Financial>())
-	private val expenseTransaction: LiveData<List<Financial>> = _expenseTransaction
-	
 	private val _availableCategory = MutableStateFlow(emptyList<Category>())
 	private val availableCategory: StateFlow<List<Category>> = _availableCategory
 	
@@ -50,10 +42,19 @@ class WalletEnvironment @Inject constructor(
 	private val _pieEntry = MutableStateFlow(emptyList<PieEntry>())
 	private val pieEntry: StateFlow<List<PieEntry>> = _pieEntry
 	
-	private var _lastSelectedWalletID = MutableStateFlow(Wallet.default.id)
-	private var lastSelectedWalletID: StateFlow<Int> = _lastSelectedWalletID
+	private val _lastSelectedWalletID = MutableStateFlow(Wallet.default.id)
+	private val lastSelectedWalletID: StateFlow<Int> = _lastSelectedWalletID
+	
+	private val availableWallets: ArrayList<Wallet> = arrayListOf()
 	
 	init {
+		CoroutineScope(dispatcher).launch {
+			appRepository.walletRepository.getAllWallet().collect { wallets ->
+				availableWallets.clear()
+				availableWallets.addAll(wallets.also { Timber.i(it.toString()) })
+			}
+		}
+		
 		CoroutineScope(Dispatchers.Main).launch {
 			combine(
 				appRepository.getAllFinancial(),
@@ -81,8 +82,9 @@ class WalletEnvironment @Inject constructor(
 				}
 				
 				_availableCategory.emit(categories)
-				_incomeTransaction.postValue(incomeList)
-				_expenseTransaction.postValue(expenseList)
+				_selectedWallet.postValue(
+					availableWallets.find { it.id == triple.second } ?: Wallet.cash
+				)
 				_pieEntry.emit(
 					calculatePieEntry(
 						when (triple.third) {
@@ -97,20 +99,22 @@ class WalletEnvironment @Inject constructor(
 		}
 	}
 	
+	override suspend fun updateWallet(wallet: Wallet) {
+		withContext(Dispatchers.Main) {
+			appRepository.walletRepository.updateWallet(
+				wallet.also {
+					Timber.i("wallet to update: $wallet")
+				}
+			)
+		}
+		
+		_selectedWallet.postValue(Wallet.default)
+		_selectedWallet.postValue(wallet)
+		
+	}
+	
 	override suspend fun deleteWallet(wallet: Wallet) {
 		appRepository.walletRepository.deleteWallet(wallet)
-	}
-	
-	override fun getIncomeTransaction(): Flow<List<Financial>> {
-		return incomeTransaction.asFlow()
-	}
-	
-	override suspend fun getTransaction(walletID: Int) {
-		_lastSelectedWalletID.emit(walletID)
-	}
-	
-	override fun getExpenseTransaction(): Flow<List<Financial>> {
-		return expenseTransaction.asFlow()
 	}
 	
 	override fun getAllWallet(): Flow<List<Wallet>> {
@@ -118,11 +122,7 @@ class WalletEnvironment @Inject constructor(
 	}
 	
 	override suspend fun setWalletID(id: Int) {
-		_selectedWallet.postValue(
-			appRepository
-				.walletRepository
-				.get(id) ?: Wallet.cash
-		)
+		_lastSelectedWalletID.emit(id)
 	}
 	
 	override fun getWallet(): Flow<Wallet> {
