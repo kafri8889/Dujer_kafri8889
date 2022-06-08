@@ -47,6 +47,7 @@ import com.anafthdev.dujer.foundation.extension.toColor
 import com.anafthdev.dujer.foundation.window.dpScaled
 import com.anafthdev.dujer.foundation.window.spScaled
 import com.anafthdev.dujer.model.LocalCurrency
+import com.anafthdev.dujer.ui.app.LocalDujerState
 import com.anafthdev.dujer.ui.financial.component.CategoryList
 import com.anafthdev.dujer.ui.financial.component.WalletList
 import com.anafthdev.dujer.ui.financial.data.FinancialAction
@@ -72,15 +73,14 @@ fun FinancialScreen(
 ) {
 	
 	val context = LocalContext.current
-	val focusManager = LocalFocusManager.current
+	val dujerState = LocalDujerState.current
 	val localCurrency = LocalCurrency.current
+	val focusManager = LocalFocusManager.current
 	
 	val financialViewModel = hiltViewModel<FinancialViewModel>()
 	
-	val state by financialViewModel.state.collectAsState()
-	
-	val wallets = state.wallets
-	val categories = state.categories
+	val wallets = dujerState.allWallet
+	val categories = dujerState.allCategory
 	
 	var financialNew by remember { mutableStateOf(Financial.default.copy(id = -1)) }
 	var financialTitle: String by remember { mutableStateOf("") }

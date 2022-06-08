@@ -1,6 +1,7 @@
 package com.anafthdev.dujer.ui.app
 
 import androidx.compose.runtime.compositionLocalOf
+import com.anafthdev.dujer.data.db.model.Category
 import com.anafthdev.dujer.data.db.model.Financial
 import com.anafthdev.dujer.data.db.model.Wallet
 import com.anafthdev.dujer.model.Currency
@@ -12,6 +13,7 @@ data class DujerState(
 	val currentCurrency: Currency = Currency.DOLLAR,
 	val dataCanReturned: UndoType = UndoType.Financial,
 	val allWallet: List<Wallet> = emptyList(),
+	val allCategory: List<Category> = emptyList(),
 	val allIncomeTransaction: List<Financial> = emptyList(),
 	val allExpenseTransaction: List<Financial> = emptyList(),
 )

@@ -14,6 +14,8 @@ interface IDujerEnvironment {
 	
 	fun getAllWallet(): Flow<List<Wallet>>
 	
+	fun getAllCategory(): Flow<List<Category>>
+	
 	fun getAllFinancial(): Flow<List<Financial>>
 	
 	fun getCurrentCurrency(): Flow<Currency>

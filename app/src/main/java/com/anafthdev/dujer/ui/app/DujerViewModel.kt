@@ -2,9 +2,11 @@ package com.anafthdev.dujer.ui.app
 
 import androidx.lifecycle.viewModelScope
 import com.anafthdev.dujer.data.FinancialType
+import com.anafthdev.dujer.data.db.model.Category
 import com.anafthdev.dujer.data.db.model.Financial
 import com.anafthdev.dujer.data.db.model.Wallet
 import com.anafthdev.dujer.foundation.extension.applyElement
+import com.anafthdev.dujer.foundation.extension.merge
 import com.anafthdev.dujer.foundation.viewmodel.StatefulViewModel
 import com.anafthdev.dujer.model.Currency
 import com.anafthdev.dujer.ui.app.data.UndoType
@@ -15,6 +17,7 @@ import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import timber.log.Timber
 import javax.inject.Inject
 
 @HiltViewModel
@@ -42,6 +45,18 @@ class DujerViewModel @Inject constructor(
 				setState {
 					copy(
 						dataCanReturned = undoType
+					)
+				}
+			}
+		}
+		
+		viewModelScope.launch(environment.dispatcher) {
+			environment.getAllCategory().collect { categories ->
+				setState {
+					copy(
+						allCategory = categories.merge(Category.values)
+							.sortedBy { it.name }
+							.distinctBy { it.id }
 					)
 				}
 			}

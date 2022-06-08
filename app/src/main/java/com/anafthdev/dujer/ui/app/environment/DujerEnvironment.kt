@@ -43,6 +43,10 @@ class DujerEnvironment @Inject constructor(
 		return appRepository.walletRepository.getAllWallet()
 	}
 	
+	override fun getAllCategory(): Flow<List<Category>> {
+		return appRepository.categoryRepository.getAllCategory()
+	}
+	
 	override fun getAllFinancial(): Flow<List<Financial>> {
 		return appRepository.getAllFinancial()
 	}

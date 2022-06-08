@@ -5,7 +5,6 @@ import com.anafthdev.dujer.data.datastore.AppDatastore
 import com.anafthdev.dujer.data.db.AppDatabase
 import com.anafthdev.dujer.data.db.model.Financial
 import com.anafthdev.dujer.data.repository.category.CategoryRepository
-import com.anafthdev.dujer.data.repository.category.ICategoryRepository
 import com.anafthdev.dujer.data.repository.expense.ExpenseRepository
 import com.anafthdev.dujer.data.repository.expense.IExpenseRepository
 import com.anafthdev.dujer.data.repository.income.IIncomeRepository
@@ -24,7 +23,7 @@ class AppRepository @Inject constructor(
 		WalletRepository(appDatabase)
 	}
 	
-	override val categoryRepository: ICategoryRepository by lazy {
+	override val categoryRepository: CategoryRepository by lazy {
 		CategoryRepository(appDatabase)
 	}
 	
