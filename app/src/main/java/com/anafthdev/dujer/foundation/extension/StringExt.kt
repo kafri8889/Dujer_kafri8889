@@ -16,6 +16,19 @@ fun String.takeNonDigitString(): String {
 	return builder.toString()
 }
 
+fun String.removeNonDigitChar(): String {
+	val nonDigitChar = mutableSetOf<Char>()
+	
+	forEach {
+		if (!it.isDigit()) nonDigitChar.add(it)
+	}
+	
+	return replace(
+		oldValue = nonDigitChar.map { it.toString() },
+		newValue = ""
+	)
+}
+
 /**
  * if this string not equals s return default
  */

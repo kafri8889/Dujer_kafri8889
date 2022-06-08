@@ -10,10 +10,6 @@ interface IIncomeExpenseEnvironment {
 	
 	suspend fun deleteFinancial(vararg financial: Financial)
 	
-	suspend fun getIncomeFinancialList(): Flow<List<Financial>>
-	
-	suspend fun getExpenseFinancialList(): Flow<List<Financial>>
-	
 	suspend fun getFinancial(): Flow<Financial>
 	
 	suspend fun setFinancialID(id: Int)

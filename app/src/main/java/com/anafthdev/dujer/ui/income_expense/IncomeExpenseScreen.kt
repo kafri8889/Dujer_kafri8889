@@ -33,6 +33,7 @@ import com.anafthdev.dujer.data.FinancialType
 import com.anafthdev.dujer.data.db.model.Financial
 import com.anafthdev.dujer.foundation.extension.deviceLocale
 import com.anafthdev.dujer.foundation.extension.getBy
+import com.anafthdev.dujer.foundation.extension.replace
 import com.anafthdev.dujer.foundation.extension.toArray
 import com.anafthdev.dujer.foundation.uiextension.horizontalScroll
 import com.anafthdev.dujer.foundation.window.dpScaled
@@ -40,6 +41,7 @@ import com.anafthdev.dujer.foundation.window.spScaled
 import com.anafthdev.dujer.model.LocalCurrency
 import com.anafthdev.dujer.ui.app.DujerAction
 import com.anafthdev.dujer.ui.app.DujerViewModel
+import com.anafthdev.dujer.ui.app.LocalDujerState
 import com.anafthdev.dujer.ui.financial.FinancialScreen
 import com.anafthdev.dujer.ui.financial.data.FinancialAction
 import com.anafthdev.dujer.ui.income_expense.component.IncomeExpenseLineChart
@@ -50,11 +52,13 @@ import com.anafthdev.dujer.uicomponent.SwipeableFinancialCard
 import com.anafthdev.dujer.uicomponent.TopAppBar
 import com.anafthdev.dujer.util.AppUtil
 import com.anafthdev.dujer.util.CurrencyFormatter
+import com.github.mikephil.charting.data.Entry
 import com.github.mikephil.charting.data.LineDataSet
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import timber.log.Timber
 import java.util.*
+import kotlin.math.exp
 
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
@@ -65,6 +69,7 @@ fun IncomeExpenseScreen(
 ) {
 	
 	val context = LocalContext.current
+	val dujerState = LocalDujerState.current
 	
 	val incomeExpenseViewModel = hiltViewModel<IncomeExpenseViewModel>()
 	
@@ -77,17 +82,24 @@ fun IncomeExpenseScreen(
 	val state by incomeExpenseViewModel.state.collectAsState()
 	
 	val financial = state.financial
-	val incomeFinancialList = state.incomeFinancialList
-	val expenseFinancialList = state.expenseFinancialList
-	val incomeLineChartEntry = state.incomeLineChartEntry
-	val expenseLineChartEntry = state.expenseLineChartEntry
 	
-	val incomeBalance by rememberUpdatedState(
-		newValue = incomeFinancialList.getBy { it.amount }.sum()
-	)
-	val expenseBalance by rememberUpdatedState(
-		newValue = expenseFinancialList.getBy { it.amount }.sum()
-	)
+	// TODO: Filter transaksi by bulan?
+	val incomeTransaction = dujerState.allIncomeTransaction
+	val expenseTransaction = dujerState.allExpenseTransaction
+	
+	val incomeBalance = remember(incomeTransaction) {
+		incomeTransaction.sumOf { it.amount }
+	}
+	val expenseBalance = remember(expenseTransaction) {
+		expenseTransaction.sumOf { it.amount }
+	}
+	
+	val incomeLineChartEntry = remember {
+		mutableStateListOf<Entry>()
+	}
+	val expenseLineChartEntry = remember {
+		mutableStateListOf<Entry>()
+	}
 	
 	val hideSheet = {
 		scope.launch { financialScreenSheetState.hide() }
@@ -98,8 +110,6 @@ fun IncomeExpenseScreen(
 		scope.launch { financialScreenSheetState.show() }
 		Unit
 	}
-	
-	Timber.i("$incomeLineChartEntry <-> $expenseLineChartEntry")
 	
 	val incomeExpenseLineDataset by rememberUpdatedState(
 		newValue = LineDataSet(
@@ -119,6 +129,16 @@ fun IncomeExpenseScreen(
 			setCircleColor(android.graphics.Color.parseColor("#81B2CA"))
 		}
 	)
+	
+	LaunchedEffect(incomeTransaction, expenseTransaction) {
+		val (incomeEntry, expenseEntry) = incomeExpenseViewModel.calculateEntry(
+			incomeList = incomeTransaction,
+			expenseList = expenseTransaction
+		)
+		
+		incomeLineChartEntry.replace(incomeEntry)
+		expenseLineChartEntry.replace(expenseEntry)
+	}
 	
 	BackHandler(
 		enabled = financialScreenSheetState.isVisible,
@@ -261,7 +281,7 @@ fun IncomeExpenseScreen(
 			}
 			
 			items(
-				items = if (type == FinancialType.INCOME) incomeFinancialList else expenseFinancialList,
+				items = if (type == FinancialType.INCOME) incomeTransaction else expenseTransaction,
 				key = { item: Financial -> item.hashCode() }
 			) { financial ->
 				SwipeableFinancialCard(

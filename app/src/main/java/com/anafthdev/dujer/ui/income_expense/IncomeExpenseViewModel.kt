@@ -39,21 +39,6 @@ class IncomeExpenseViewModel @Inject constructor(
 	
 	init {
 		viewModelScope.launch(environment.dispatcher) {
-			environment.getIncomeFinancialList()
-				.combine(environment.getExpenseFinancialList()) { income, expense ->
-					income to expense
-				}.collect { pair ->
-					calculateEntry(pair.first, pair.second)
-					setState {
-						copy(
-							incomeFinancialList = pair.first,
-							expenseFinancialList = pair.second
-						)
-					}
-				}
-		}
-		
-		viewModelScope.launch(environment.dispatcher) {
 			environment.getFinancial().collect { financial ->
 				setState {
 					copy(
@@ -74,68 +59,65 @@ class IncomeExpenseViewModel @Inject constructor(
 		}
 	}
 	
-	private fun calculateEntry(incomeList: List<Financial>, expenseList: List<Financial>) {
-		viewModelScope.launch(Dispatchers.Main) {
-			val monthFormatter = SimpleDateFormat("MMM", deviceLocale)
-			
-			val incomeListEntry = arrayListOf<Entry>().apply {
-				add(Entry(0f, 0f))
-				add(Entry(1f, 0f))
-				add(Entry(2f, 0f))
-				add(Entry(3f, 0f))
-				add(Entry(4f, 0f))
-				add(Entry(5f, 0f))
-				add(Entry(6f, 0f))
-				add(Entry(7f, 0f))
-				add(Entry(8f, 0f))
-				add(Entry(9f, 0f))
-				add(Entry(10f, 0f))
-				add(Entry(11f, 0f))
-			}
-			
-			val expenseListEntry = arrayListOf<Entry>().apply {
-				add(Entry(0f, 0f))
-				add(Entry(1f, 0f))
-				add(Entry(2f, 0f))
-				add(Entry(3f, 0f))
-				add(Entry(4f, 0f))
-				add(Entry(5f, 0f))
-				add(Entry(6f, 0f))
-				add(Entry(7f, 0f))
-				add(Entry(8f, 0f))
-				add(Entry(9f, 0f))
-				add(Entry(10f, 0f))
-				add(Entry(11f, 0f))
-			}
-			
-			val monthGroupIncomeList = incomeList.groupBy { monthFormatter.format(it.dateCreated) }
-			val monthGroupExpenseList = expenseList.groupBy { monthFormatter.format(it.dateCreated) }
-			
-			monthGroupIncomeList.forEachMap { k, v ->
-				val entryIndex = AppUtil.shortMonths.indexOf { it.contentEquals(k, true) }
-				
-				incomeListEntry[entryIndex] = Entry(
-					entryIndex.toFloat(),
-					v.sumOf { it.amount }.toFloat()
-				)
-			}
-			
-			monthGroupExpenseList.forEachMap { k, v ->
-				val entryIndex = AppUtil.shortMonths.indexOf { it.contentEquals(k, true) }
-				
-				expenseListEntry[entryIndex] = Entry(
-					entryIndex.toFloat(),
-					v.sumOf { it.amount }.toFloat()
-				)
-			}
-			
-			setState {
-				copy(
-					incomeLineChartEntry = incomeListEntry,
-					expenseLineChartEntry = expenseListEntry
-				)
-			}
+	fun calculateEntry(incomeList: List<Financial>, expenseList: List<Financial>): Pair<List<Entry>, List<Entry>> {
+		val monthFormatter = SimpleDateFormat("MMM", deviceLocale)
+		
+		val incomeListEntry = arrayListOf<Entry>().apply {
+			add(Entry(0f, 0f, 0.0))
+			add(Entry(1f, 0f, 0.0))
+			add(Entry(2f, 0f, 0.0))
+			add(Entry(3f, 0f, 0.0))
+			add(Entry(4f, 0f, 0.0))
+			add(Entry(5f, 0f, 0.0))
+			add(Entry(6f, 0f, 0.0))
+			add(Entry(7f, 0f, 0.0))
+			add(Entry(8f, 0f, 0.0))
+			add(Entry(9f, 0f, 0.0))
+			add(Entry(10f, 0f, 0.0))
+			add(Entry(11f, 0f, 0.0))
 		}
+		
+		val expenseListEntry = arrayListOf<Entry>().apply {
+			add(Entry(0f, 0f, 0.0))
+			add(Entry(1f, 0f, 0.0))
+			add(Entry(2f, 0f, 0.0))
+			add(Entry(3f, 0f, 0.0))
+			add(Entry(4f, 0f, 0.0))
+			add(Entry(5f, 0f, 0.0))
+			add(Entry(6f, 0f, 0.0))
+			add(Entry(7f, 0f, 0.0))
+			add(Entry(8f, 0f, 0.0))
+			add(Entry(9f, 0f, 0.0))
+			add(Entry(10f, 0f, 0.0))
+			add(Entry(11f, 0f, 0.0))
+		}
+		
+		val monthGroupIncomeList = incomeList.groupBy { monthFormatter.format(it.dateCreated) }
+		val monthGroupExpenseList = expenseList.groupBy { monthFormatter.format(it.dateCreated) }
+		
+		monthGroupIncomeList.forEachMap { k, v ->
+			val totalAmount = v.sumOf { it.amount }
+			val entryIndex = AppUtil.shortMonths.indexOf { it.contentEquals(k, true) }
+			
+			incomeListEntry[entryIndex] = Entry(
+				entryIndex.toFloat(),
+				totalAmount.toFloat(),
+				totalAmount
+			)
+		}
+		
+		monthGroupExpenseList.forEachMap { k, v ->
+			val totalAmount = v.sumOf { it.amount }
+			val entryIndex = AppUtil.shortMonths.indexOf { it.contentEquals(k, true) }
+			
+			expenseListEntry[entryIndex] = Entry(
+				entryIndex.toFloat(),
+				totalAmount.toFloat(),
+				totalAmount
+			)
+		}
+		
+		return incomeListEntry to expenseListEntry
 	}
 	
 }
