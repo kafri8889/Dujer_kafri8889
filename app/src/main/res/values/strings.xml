@@ -41,6 +41,7 @@
     <string name="your_income">Your income</string>
     <string name="my_spending">My Spending</string>
     <string name="see_details">See Details</string>
+    <string name="edit_balance">Edit balance</string>
     <string name="add_expenses">Add expenses</string>
     <string name="new_category">New category</string>
     <string name="expenses_for">Expenses for %1$s</string>
@@ -63,6 +64,7 @@
     <string name="currency_format_note">We format currency using your device Locale, some formats may not be suitable.</string>
     <string name="select_your_language">Select your language</string>
     <string name="bio_auth_description">Verify that this is you</string>
+    <string name="change_initial_amount">Change initial amount</string>
     <string name="no_fp_sensor_detected">Fingerprint sensor not detected</string>
     <string name="title_cannot_be_empty">Title cannot be empty</string>
     <string name="add_fingerprint_first">Add fingerprint first</string>
