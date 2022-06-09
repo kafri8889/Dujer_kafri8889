@@ -2,11 +2,17 @@ package com.anafthdev.dujer.ui.dashboard
 
 import androidx.lifecycle.viewModelScope
 import com.anafthdev.dujer.data.db.model.Financial
+import com.anafthdev.dujer.foundation.extension.deviceLocale
+import com.anafthdev.dujer.foundation.extension.forEachMap
+import com.anafthdev.dujer.foundation.extension.indexOf
 import com.anafthdev.dujer.foundation.viewmodel.StatefulViewModel
 import com.anafthdev.dujer.ui.dashboard.environment.IDashboardEnvironment
+import com.anafthdev.dujer.util.AppUtil
+import com.github.mikephil.charting.data.Entry
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.launch
+import java.text.SimpleDateFormat
 import javax.inject.Inject
 
 @HiltViewModel
@@ -15,16 +21,6 @@ class DashboardViewModel @Inject constructor(
 ): StatefulViewModel<DashboardState, Unit, DashboardAction, IDashboardEnvironment>(DashboardState(), dashboardEnvironment) {
 	
 	init {
-		viewModelScope.launch(environment.dispatcher) {
-			environment.getAllWallet().collect { wallets ->
-				setState {
-					copy(
-						wallets = wallets.sortedBy { it.id }
-					)
-				}
-			}
-		}
-		
 		viewModelScope.launch(environment.dispatcher) {
 			environment.getFinancialAction().collect { action ->
 				setState {
@@ -43,25 +39,6 @@ class DashboardViewModel @Inject constructor(
 					)
 				}
 			}
-		}
-		
-		viewModelScope.launch(environment.dispatcher) {
-			environment.getIncomeFinancialList()
-				.combine(environment.getExpenseFinancialList()) { income, expense ->
-					income to expense
-				}.collect { pair ->
-					setState {
-						copy(
-							incomeFinancialList = pair.first,
-							expenseFinancialList = pair.second
-						)
-					}
-					
-					calculateIncomeExpenseLineDatasetEntry(
-						incomeList = pair.first,
-						expenseList = pair.second
-					)
-				}
 		}
 	}
 	
@@ -85,23 +62,68 @@ class DashboardViewModel @Inject constructor(
 		}
 	}
 	
-	private fun calculateIncomeExpenseLineDatasetEntry(
+	fun getLineDataSetEntry(
 		incomeList: List<Financial>,
 		expenseList: List<Financial>
-	) {
-		viewModelScope.launch(environment.dispatcher) {
-			val datasetEntry = environment.getLineDataSetEntry(
-				incomeList = incomeList,
-				expenseList = expenseList
-			)
-			
-			setState {
-				copy(
-					incomeLineDataSetEntry = datasetEntry.first,
-					expenseLineDataSetEntry = datasetEntry.second
-				)
-			}
+	): Pair<List<Entry>, List<Entry>> {
+		val monthFormatter = SimpleDateFormat("MMM", deviceLocale)
+		
+		val incomeListEntry = arrayListOf<Entry>().apply {
+			add(Entry(0f, 0f, 0.0))
+			add(Entry(1f, 0f, 0.0))
+			add(Entry(2f, 0f, 0.0))
+			add(Entry(3f, 0f, 0.0))
+			add(Entry(4f, 0f, 0.0))
+			add(Entry(5f, 0f, 0.0))
+			add(Entry(6f, 0f, 0.0))
+			add(Entry(7f, 0f, 0.0))
+			add(Entry(8f, 0f, 0.0))
+			add(Entry(9f, 0f, 0.0))
+			add(Entry(10f, 0f, 0.0))
+			add(Entry(11f, 0f, 0.0))
 		}
+		
+		val expenseListEntry = arrayListOf<Entry>().apply {
+			add(Entry(0f, 0f, 0.0))
+			add(Entry(1f, 0f, 0.0))
+			add(Entry(2f, 0f, 0.0))
+			add(Entry(3f, 0f, 0.0))
+			add(Entry(4f, 0f, 0.0))
+			add(Entry(5f, 0f, 0.0))
+			add(Entry(6f, 0f, 0.0))
+			add(Entry(7f, 0f, 0.0))
+			add(Entry(8f, 0f, 0.0))
+			add(Entry(9f, 0f, 0.0))
+			add(Entry(10f, 0f, 0.0))
+			add(Entry(11f, 0f, 0.0))
+		}
+		
+		val monthGroupIncomeList = incomeList.groupBy { monthFormatter.format(it.dateCreated) }
+		val monthGroupExpenseList = expenseList.groupBy { monthFormatter.format(it.dateCreated) }
+		
+		monthGroupIncomeList.forEachMap { k, v ->
+			val totalAmount = v.sumOf { it.amount }
+			val entryIndex = AppUtil.shortMonths.indexOf { it.contentEquals(k, true) }
+			
+			incomeListEntry[entryIndex] = Entry(
+				entryIndex.toFloat(),
+				totalAmount.toFloat(),
+				totalAmount
+			)
+		}
+		
+		monthGroupExpenseList.forEachMap { k, v ->
+			val totalAmount = v.sumOf { it.amount }
+			val entryIndex = AppUtil.shortMonths.indexOf { it.contentEquals(k, true) }
+			
+			expenseListEntry[entryIndex] = Entry(
+				entryIndex.toFloat(),
+				totalAmount.toFloat(),
+				totalAmount
+			)
+		}
+		
+		return incomeListEntry to expenseListEntry
 	}
 	
 }

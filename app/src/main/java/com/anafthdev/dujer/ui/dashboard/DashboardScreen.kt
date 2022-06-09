@@ -51,6 +51,7 @@ import com.anafthdev.dujer.foundation.window.dpScaled
 import com.anafthdev.dujer.foundation.window.spScaled
 import com.anafthdev.dujer.ui.app.DujerAction
 import com.anafthdev.dujer.ui.app.DujerViewModel
+import com.anafthdev.dujer.ui.app.LocalDujerState
 import com.anafthdev.dujer.ui.chart.ChartScreen
 import com.anafthdev.dujer.ui.dashboard.component.*
 import com.anafthdev.dujer.ui.dashboard.subscreen.AddWalletScreen
@@ -64,11 +65,11 @@ import com.anafthdev.dujer.ui.theme.shapes
 import com.anafthdev.dujer.uicomponent.BudgetCard
 import com.anafthdev.dujer.uicomponent.SwipeableFinancialCard
 import com.anafthdev.dujer.uicomponent.TopAppBar
+import com.github.mikephil.charting.data.Entry
 import com.github.mikephil.charting.data.LineDataSet
 import com.google.accompanist.navigation.animation.AnimatedNavHost
 import com.google.accompanist.navigation.animation.composable
 import com.google.accompanist.navigation.animation.rememberAnimatedNavController
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
@@ -96,44 +97,8 @@ fun DashboardScreen(
 	)
 	
 	val state by dashboardViewModel.state.collectAsState()
-	val incomeLineDataSetEntry = state.incomeLineDataSetEntry
-	val expenseLineDataSetEntry = state.expenseLineDataSetEntry
 	val financial = state.financial
 	val financialAction = state.financialAction
-	
-	val incomeLineDataset by rememberUpdatedState(
-		newValue = LineDataSet(
-			incomeLineDataSetEntry,
-			context.getString(R.string.income)
-		).apply {
-			lineWidth = 2.5f
-			cubicIntensity = .2f
-			mode = LineDataSet.Mode.CUBIC_BEZIER
-			color = incomeColor.toArgb()
-			setDrawValues(false)
-			setDrawFilled(false)
-			setDrawCircles(false)
-			setCircleColor(incomeColor.toArgb())
-			setDrawHorizontalHighlightIndicator(false)
-		}
-	)
-	
-	val expenseLineDataset by rememberUpdatedState(
-		newValue = LineDataSet(
-			expenseLineDataSetEntry,
-			context.getString(R.string.income)
-		).apply {
-			lineWidth = 2.5f
-			cubicIntensity = .2f
-			mode = LineDataSet.Mode.CUBIC_BEZIER
-			color = expenseColor.toArgb()
-			setDrawValues(false)
-			setDrawFilled(false)
-			setDrawCircles(false)
-			setCircleColor(expenseColor.toArgb())
-			setDrawHorizontalHighlightIndicator(false)
-		}
-	)
 	
 	DisposableEffect(financialScreenSheetState.isVisible) {
 		onDispose {
@@ -181,9 +146,6 @@ fun DashboardScreen(
 			canBack = !financialScreenSheetState.isVisible,
 			content = {
 				DashboardContent(
-					state = state,
-					incomeLineDataset = incomeLineDataset,
-					expenseLineDataset = expenseLineDataset,
 					financialScreenSheetState = financialScreenSheetState,
 					dujerViewModel = dujerViewModel,
 					dashboardViewModel = dashboardViewModel,
@@ -225,9 +187,6 @@ fun DashboardScreen(
 )
 @Composable
 private fun DashboardContent(
-	state: DashboardState,
-	incomeLineDataset: LineDataSet,
-	expenseLineDataset: LineDataSet,
 	financialScreenSheetState: ModalBottomSheetState,
 	dujerViewModel: DujerViewModel,
 	dashboardViewModel: DashboardViewModel,
@@ -235,16 +194,52 @@ private fun DashboardContent(
 	onSettingClicked: () -> Unit
 ) {
 	
+	val composer = currentComposer
 	val context = LocalContext.current
+	val dujerState = LocalDujerState.current
 	
-	val wallets = state.wallets
-	val incomeFinancialList = state.incomeFinancialList
-	val expenseFinancialList = state.expenseFinancialList
+	val wallets = dujerState.allWallet
+	val incomeTransaction = dujerState.allIncomeTransaction
+	val expenseTransaction = dujerState.allExpenseTransaction
 	
 	val scope = rememberCoroutineScope()
 	val dashboardNavController = rememberAnimatedNavController()
 	
 	val currentRoute = dashboardNavController.currentDestination?.route
+	
+	val incomeLineDataset = remember {
+		LineDataSet(
+			emptyList(),
+			context.getString(R.string.income)
+		).apply {
+			lineWidth = 2.5f
+			cubicIntensity = .2f
+			mode = LineDataSet.Mode.CUBIC_BEZIER
+			color = incomeColor.toArgb()
+			setDrawValues(false)
+			setDrawFilled(false)
+			setDrawCircles(false)
+			setCircleColor(incomeColor.toArgb())
+			setDrawHorizontalHighlightIndicator(false)
+		}
+	}
+	
+	val expenseLineDataset = remember {
+		LineDataSet(
+			emptyList(),
+			context.getString(R.string.income)
+		).apply {
+			lineWidth = 2.5f
+			cubicIntensity = .2f
+			mode = LineDataSet.Mode.CUBIC_BEZIER
+			color = expenseColor.toArgb()
+			setDrawValues(false)
+			setDrawFilled(false)
+			setDrawCircles(false)
+			setCircleColor(expenseColor.toArgb())
+			setDrawHorizontalHighlightIndicator(false)
+		}
+	}
 	
 	val showFinancialSheet = {
 		scope.launch { financialScreenSheetState.show() }
@@ -270,6 +265,20 @@ private fun DashboardContent(
 		targetValue = if (showNavRail) 16.dpScaled else 0.dpScaled,
 		animationSpec = tween(400)
 	)
+	
+	LaunchedEffect(incomeTransaction, expenseTransaction) {
+		val (incomeEntry, expenseEntry) = dashboardViewModel.getLineDataSetEntry(
+			incomeList = incomeTransaction,
+			expenseList = expenseTransaction
+		)
+		
+		incomeLineDataset.values = incomeEntry
+		expenseLineDataset.values = expenseEntry
+		
+		// because replacing lineDataSet value doesn't trigger recomposition,
+		// call recomposition manually
+		composer.composition.recompose()
+	}
 	
 	BackHandler {
 		when {
@@ -411,9 +420,9 @@ private fun DashboardContent(
 					composable(DujerDestination.Dashboard.Home.route) {
 						DashboardHomeScreen(
 							wallets = wallets,
-							incomeFinancialList = incomeFinancialList,
+							incomeTransaction = incomeTransaction,
 							incomeLineDataset = incomeLineDataset,
-							expenseFinancialList = expenseFinancialList,
+							expenseTransaction = expenseTransaction,
 							expenseLineDataset = expenseLineDataset,
 							navController = navController,
 							onFinancialCardClicked = { financial ->
@@ -485,9 +494,9 @@ private fun DashboardContent(
 @Composable
 private fun DashboardHomeScreen(
 	wallets: List<Wallet>,
-	incomeFinancialList: List<Financial>,
+	incomeTransaction: List<Financial>,
 	incomeLineDataset: LineDataSet,
-	expenseFinancialList: List<Financial>,
+	expenseTransaction: List<Financial>,
 	expenseLineDataset: LineDataSet,
 	navController: NavController,
 	onFinancialCardDismissToEnd: (Financial) -> Unit,
@@ -507,12 +516,12 @@ private fun DashboardHomeScreen(
 		skipHalfExpanded = true
 	)
 	
-	val mixedFinancialList = remember(incomeFinancialList, expenseFinancialList) {
-		incomeFinancialList.merge(expenseFinancialList).sortedBy { it.dateCreated }
+	val mixedTransaction = remember(incomeTransaction, expenseTransaction) {
+		incomeTransaction.merge(expenseTransaction).sortedBy { it.dateCreated }
 	}
 	
-	val totalAmountIncomeList = remember(incomeFinancialList) { incomeFinancialList.sumOf { it.amount } }
-	val totalAmountExpenseList = remember(expenseFinancialList) { expenseFinancialList.sumOf { it.amount } }
+	val totalAmountIncomeList = remember(incomeTransaction) { incomeTransaction.sumOf { it.amount } }
+	val totalAmountExpenseList = remember(expenseTransaction) { expenseTransaction.sumOf { it.amount } }
 	
 	val walletNameFocusRequester by remember { mutableStateOf(FocusRequester()) }
 	
@@ -601,7 +610,7 @@ private fun DashboardHomeScreen(
 							)
 					) {
 						IncomeCard(
-							income = incomeFinancialList.getBy { it.amount }.sum(),
+							income = incomeTransaction.getBy { it.amount }.sum(),
 							onClick = {
 								navController.navigate(
 									DujerDestination.IncomeExpense.createRoute(FinancialType.INCOME)
@@ -615,7 +624,7 @@ private fun DashboardHomeScreen(
 						)
 						
 						ExpenseCard(
-							expense = expenseFinancialList.getBy { it.amount }.sum(),
+							expense = expenseTransaction.getBy { it.amount }.sum(),
 							onClick = {
 								navController.navigate(
 									DujerDestination.IncomeExpense.createRoute(FinancialType.EXPENSE)
@@ -637,7 +646,7 @@ private fun DashboardHomeScreen(
 			}
 			
 			items(
-				items = mixedFinancialList,
+				items = mixedTransaction,
 				key = { item: Financial -> item.hashCode() }
 			) { financial ->
 				SwipeableFinancialCard(
