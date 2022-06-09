@@ -19,28 +19,7 @@ import javax.inject.Inject
 @HiltViewModel
 class CategoryViewModel @Inject constructor(
 	categoryEnvironment: ICategoryEnvironment
-): StatefulViewModel<CategoryState, Unit, CategoryAction, ICategoryEnvironment>(CategoryState(), categoryEnvironment) {
-	
-	init {
-		viewModelScope.launch(environment.dispatcher) {
-			environment.getAll().collect { categories ->
-				val categoryIDs = categories.merge(Category.values).getBy { it.id }
-				val financialList = environment.getAllFinancial().first()
-				
-				listenDeletedCategory(financialList, categoryIDs)
-				listenModifiedCategory(financialList, categories)
-				
-				setState {
-					copy(
-						categories = categories
-							.merge(Category.values)
-							.distinctBy { it.id }
-							.sortedBy { it.name }
-					)
-				}
-			}
-		}
-	}
+): StatefulViewModel<CategoryState, Unit, CategoryAction, ICategoryEnvironment>(CategoryState, categoryEnvironment) {
 	
 	override fun dispatch(action: CategoryAction) {
 		when (action) {
@@ -62,7 +41,7 @@ class CategoryViewModel @Inject constructor(
 		}
 	}
 	
-	private suspend fun listenModifiedCategory(
+	suspend fun listenModifiedCategory(
 		financialList: List<Financial>,
 		categories: List<Category>
 	) {
@@ -76,7 +55,7 @@ class CategoryViewModel @Inject constructor(
 		)
 	}
 	
-	private suspend fun listenDeletedCategory(
+	suspend fun listenDeletedCategory(
 		financialList: List<Financial>,
 		categoryIDs: List<Int>
 	) {
