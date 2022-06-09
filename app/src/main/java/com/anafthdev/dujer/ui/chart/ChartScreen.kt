@@ -30,10 +30,12 @@ import com.anafthdev.dujer.R
 import com.anafthdev.dujer.data.db.model.Financial
 import com.anafthdev.dujer.foundation.extension.deviceLocale
 import com.anafthdev.dujer.foundation.extension.merge
+import com.anafthdev.dujer.foundation.extension.replace
 import com.anafthdev.dujer.foundation.uiextension.horizontalScroll
 import com.anafthdev.dujer.foundation.window.dpScaled
 import com.anafthdev.dujer.foundation.window.spScaled
 import com.anafthdev.dujer.model.LocalCurrency
+import com.anafthdev.dujer.ui.app.LocalDujerState
 import com.anafthdev.dujer.ui.chart.data.MonthBarChartFormatter
 import com.anafthdev.dujer.ui.theme.Typography
 import com.anafthdev.dujer.ui.theme.expenseColor
@@ -64,33 +66,35 @@ fun ChartScreen(
 	
 	val config = LocalConfiguration.current
 	val density = LocalDensity.current
+	val dujerState = LocalDujerState.current
 	
-	val barDataSets = listOf(
-		BarDataSet(BarData.sample1),
-		BarDataSet(BarData.sample2)
-	)
+//	val barDataSets = listOf(
+//		BarDataSet(BarData.sample1),
+//		BarDataSet(BarData.sample2)
+//	)
 	
 	val chartViewModel = hiltViewModel<ChartViewModel>()
 	
 	val state by chartViewModel.state.collectAsState()
 	
-	val incomeFinancialList = state.incomeFinancialList
-	val expenseFinancialList = state.expenseFinancialList
-	val incomeBarDataList = state.incomeBarDataList
-	val expenseBarDataList = state.expenseBarDataList
+	val incomeTransaction = dujerState.allIncomeTransaction
+	val expenseTransaction = dujerState.allExpenseTransaction
+	
+	val incomeBarDataList = remember { mutableStateListOf<BarData>() }
+	val expenseBarDataList = remember { mutableStateListOf<BarData>() }
 	
 	var selectedYear by remember { mutableStateOf(System.currentTimeMillis()) }
 	var selectedBarDataGroup by remember { mutableStateOf(Calendar.getInstance()[Calendar.MONTH]) }
-	val totalAmountIncomeList = remember(incomeFinancialList) { incomeFinancialList.sumOf { it.amount } }
-	val totalAmountExpenseList = remember(expenseFinancialList) { expenseFinancialList.sumOf { it.amount } }
+	val totalAmountIncomeList = remember(incomeTransaction) { incomeTransaction.sumOf { it.amount } }
+	val totalAmountExpenseList = remember(expenseTransaction) { expenseTransaction.sumOf { it.amount } }
 	val lazyListValue = remember(
 		selectedYear,
 		selectedBarDataGroup,
-		incomeFinancialList,
-		expenseFinancialList
+		incomeTransaction,
+		expenseTransaction
 	) {
-		incomeFinancialList.merge(
-			expenseFinancialList
+		incomeTransaction.merge(
+			expenseTransaction
 		).filter {
 			chartViewModel.monthFormatter.format(
 				it.dateCreated
@@ -113,6 +117,20 @@ fun ChartScreen(
 	}
 	
 	LaunchedEffect(selectedYear) {
+		val (filteredIncome, filteredExpense) = chartViewModel.filter(
+			yearInMillis = selectedYear,
+			incomeList = incomeTransaction,
+			expenseList = expenseTransaction
+		)
+		
+		val (incomeBarData, expenseBarData) = chartViewModel.calculateBarData(
+			incomeList = filteredIncome,
+			expenseList = filteredExpense
+		)
+		
+		incomeBarDataList.replace(incomeBarData)
+		expenseBarDataList.replace(expenseBarData)
+		
 		delay(400)
 		barChartState.lazyListState.animateScrollToItem(selectedBarDataGroup)
 	}
@@ -143,12 +161,6 @@ fun ChartScreen(
 						}
 						
 						selectedYear = year
-						
-						chartViewModel.dispatch(
-							ChartAction.GetData(
-								yearInMillis = selectedYear
-							)
-						)
 					}
 				)
 				
@@ -259,7 +271,7 @@ fun ChartScreen(
 							Text(
 								text = CurrencyFormatter.format(
 									locale = deviceLocale,
-									amount = incomeFinancialList.filter {
+									amount = incomeTransaction.filter {
 										chartViewModel.monthFormatter.format(
 											it.dateCreated
 										) == chartViewModel.monthFormatter.format(
@@ -308,7 +320,7 @@ fun ChartScreen(
 							Text(
 								text = CurrencyFormatter.format(
 									locale = deviceLocale,
-									amount = expenseFinancialList.filter {
+									amount = expenseTransaction.filter {
 										chartViewModel.monthFormatter.format(
 											it.dateCreated
 										) == chartViewModel.monthFormatter.format(

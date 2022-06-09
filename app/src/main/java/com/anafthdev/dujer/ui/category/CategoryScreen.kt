@@ -41,16 +41,14 @@ import com.anafthdev.dujer.R
 import com.anafthdev.dujer.data.CategoryIcons
 import com.anafthdev.dujer.data.FinancialType
 import com.anafthdev.dujer.data.db.model.Category
-import com.anafthdev.dujer.foundation.extension.isLightTheme
-import com.anafthdev.dujer.foundation.extension.lastIndexOf
-import com.anafthdev.dujer.foundation.extension.removeFirstAndLastWhitespace
-import com.anafthdev.dujer.foundation.extension.toArray
+import com.anafthdev.dujer.foundation.extension.*
 import com.anafthdev.dujer.foundation.uimode.data.LocalUiMode
 import com.anafthdev.dujer.foundation.window.dpScaled
 import com.anafthdev.dujer.foundation.window.spScaled
 import com.anafthdev.dujer.model.CategoryTint
 import com.anafthdev.dujer.ui.app.DujerAction
 import com.anafthdev.dujer.ui.app.DujerViewModel
+import com.anafthdev.dujer.ui.app.LocalDujerState
 import com.anafthdev.dujer.ui.category.component.SwipeableCategory
 import com.anafthdev.dujer.ui.category.data.CategorySwipeAction
 import com.anafthdev.dujer.ui.theme.Inter
@@ -78,6 +76,7 @@ fun CategoryScreen(
 	
 	val uiMode = LocalUiMode.current
 	val context = LocalContext.current
+	val dujerState = LocalDujerState.current
 	val focusManager = LocalFocusManager.current
 	val keyboardController = LocalSoftwareKeyboardController.current
 	
@@ -91,7 +90,7 @@ fun CategoryScreen(
 	
 	val state by categoryViewModel.state.collectAsState()
 	
-	val categories = state.categories
+	val categories = dujerState.allCategory
 	
 	var category by remember { mutableStateOf(Category.default) }
 	var hasNavigate by remember { mutableStateOf(false) }
@@ -144,6 +143,14 @@ fun CategoryScreen(
 		if ((id != Category.default.id) and (categoryAction == CategorySwipeAction.EDIT)) {
 			getCategory()
 		}
+	}
+	
+	LaunchedEffect(dujerState.allCategory) {
+		val categoryIDs = categories.getBy { it.id }
+		val financialList = dujerState.allIncomeTransaction + dujerState.allExpenseTransaction
+		
+		categoryViewModel.listenDeletedCategory(financialList, categoryIDs)
+		categoryViewModel.listenModifiedCategory(financialList, categories)
 	}
 	
 	DisposableEffect(

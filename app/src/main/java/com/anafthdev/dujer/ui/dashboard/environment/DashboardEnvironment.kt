@@ -38,88 +38,12 @@ class DashboardEnvironment @Inject constructor(
 		return financialAction.asFlow()
 	}
 	
-	override suspend fun getIncomeFinancialList(): Flow<List<Financial>> {
-		return appRepository.incomeRepository.getIncome()
-	}
-	
-	override suspend fun getExpenseFinancialList(): Flow<List<Financial>> {
-		return appRepository.expenseRepository.getExpense()
-	}
-	
-	override suspend fun getLineDataSetEntry(
-		incomeList: List<Financial>,
-		expenseList: List<Financial>
-	): Pair<List<Entry>, List<Entry>> {
-		val monthFormatter = SimpleDateFormat("MMM", deviceLocale)
-		
-		val incomeListEntry = arrayListOf<Entry>().apply {
-			add(Entry(0f, 0f, 0.0))
-			add(Entry(1f, 0f, 0.0))
-			add(Entry(2f, 0f, 0.0))
-			add(Entry(3f, 0f, 0.0))
-			add(Entry(4f, 0f, 0.0))
-			add(Entry(5f, 0f, 0.0))
-			add(Entry(6f, 0f, 0.0))
-			add(Entry(7f, 0f, 0.0))
-			add(Entry(8f, 0f, 0.0))
-			add(Entry(9f, 0f, 0.0))
-			add(Entry(10f, 0f, 0.0))
-			add(Entry(11f, 0f, 0.0))
-		}
-		
-		val expenseListEntry = arrayListOf<Entry>().apply {
-			add(Entry(0f, 0f, 0.0))
-			add(Entry(1f, 0f, 0.0))
-			add(Entry(2f, 0f, 0.0))
-			add(Entry(3f, 0f, 0.0))
-			add(Entry(4f, 0f, 0.0))
-			add(Entry(5f, 0f, 0.0))
-			add(Entry(6f, 0f, 0.0))
-			add(Entry(7f, 0f, 0.0))
-			add(Entry(8f, 0f, 0.0))
-			add(Entry(9f, 0f, 0.0))
-			add(Entry(10f, 0f, 0.0))
-			add(Entry(11f, 0f, 0.0))
-		}
-		
-		val monthGroupIncomeList = incomeList.groupBy { monthFormatter.format(it.dateCreated) }
-		val monthGroupExpenseList = expenseList.groupBy { monthFormatter.format(it.dateCreated) }
-		
-		monthGroupIncomeList.forEachMap { k, v ->
-			val totalAmount = v.sumOf { it.amount }
-			val entryIndex = AppUtil.shortMonths.indexOf { it.contentEquals(k, true) }
-			
-			incomeListEntry[entryIndex] = Entry(
-				entryIndex.toFloat(),
-				totalAmount.toFloat(),
-				totalAmount
-			)
-		}
-		
-		monthGroupExpenseList.forEachMap { k, v ->
-			val totalAmount = v.sumOf { it.amount }
-			val entryIndex = AppUtil.shortMonths.indexOf { it.contentEquals(k, true) }
-			
-			expenseListEntry[entryIndex] = Entry(
-				entryIndex.toFloat(),
-				totalAmount.toFloat(),
-				totalAmount
-			)
-		}
-		
-		return incomeListEntry to expenseListEntry
-	}
-	
 	override suspend fun setFinancialID(id: Int) {
 		_financial.postValue(appRepository.get(id) ?: Financial.default)
 	}
 	
 	override suspend fun insertWallet(wallet: Wallet) {
 		appRepository.walletRepository.insertWallet(wallet)
-	}
-	
-	override fun getAllWallet(): Flow<List<Wallet>> {
-		return appRepository.walletRepository.getAllWallet()
 	}
 	
 	override fun setFinancialAction(action: String) {

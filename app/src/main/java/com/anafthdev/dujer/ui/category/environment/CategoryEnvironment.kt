@@ -25,14 +25,6 @@ class CategoryEnvironment @Inject constructor(
 		appRepository.update(*financial)
 	}
 	
-	override suspend fun getAllFinancial(): Flow<List<Financial>> {
-		return appRepository.getAllFinancial()
-	}
-	
-	override suspend fun getAll(): Flow<List<Category>> {
-		return appRepository.categoryRepository.getAllCategory()
-	}
-	
 	override suspend fun update(vararg category: Category) {
 		appRepository.categoryRepository.update(*category)
 	}

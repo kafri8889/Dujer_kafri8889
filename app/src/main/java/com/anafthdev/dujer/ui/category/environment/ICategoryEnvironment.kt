@@ -9,10 +9,6 @@ interface ICategoryEnvironment {
 	
 	val dispatcher: CoroutineDispatcher
 	
-	suspend fun getAllFinancial(): Flow<List<Financial>>
-	
-	suspend fun getAll(): Flow<List<Category>>
-	
 	suspend fun get(id: Int, action: (Category) -> Unit)
 	
 	suspend fun updateFinancial(vararg financial: Financial)
