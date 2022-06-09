@@ -23,14 +23,6 @@ class IncomeExpenseEnvironment @Inject constructor(
 		appRepository.delete(*financial)
 	}
 	
-	override suspend fun getIncomeFinancialList(): Flow<List<Financial>> {
-		return appRepository.incomeRepository.getIncome()
-	}
-	
-	override suspend fun getExpenseFinancialList(): Flow<List<Financial>> {
-		return appRepository.expenseRepository.getExpense()
-	}
-	
 	override suspend fun getFinancial(): Flow<Financial> {
 		return financial.asFlow()
 	}

@@ -11,14 +11,17 @@ import androidx.compose.material.icons.rounded.Close
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.TextFieldValue
 import com.anafthdev.dujer.R
 import com.anafthdev.dujer.data.db.model.Wallet
@@ -35,36 +38,36 @@ import com.anafthdev.dujer.util.AppUtil.toast
 import com.anafthdev.dujer.util.CurrencyFormatter
 import com.anafthdev.dujer.util.TextFieldCurrencyFormatter
 
-@OptIn(ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalComposeUiApi::class)
 @Composable
 fun EditWalletBalanceScreen(
 	wallet: Wallet,
 	onCancel: () -> Unit,
 	onSave: (Wallet) -> Unit
 ) {
-	// TODO: select option
+	
 	val uiMode = LocalUiMode.current
 	val context = LocalContext.current
 	val localCurrency = LocalCurrency.current
 	val focusManager = LocalFocusManager.current
 	
-	var balance by remember { mutableStateOf(0.0) }
+	var initialBalance by remember { mutableStateOf(0.0) }
 	var balanceFieldValue by remember { mutableStateOf(TextFieldValue()) }
 	var editBalanceOption by remember { mutableStateOf(EditBalanceOption.ADD_TRANSACTION) }
 	
 	val balanceFocusRequester = remember { FocusRequester() }
 	
 	LaunchedEffect(wallet.id) {
-		balance = wallet.balance
+		initialBalance = wallet.initialBalance
 	}
 	
-	LaunchedEffect(wallet.balance) {
+	LaunchedEffect(wallet.initialBalance) {
 		
-		balance = wallet.balance
+		initialBalance = wallet.initialBalance
 		balanceFieldValue = balanceFieldValue.copy(
 			text = CurrencyFormatter.format(
 				locale = deviceLocale,
-				amount = wallet.balance,
+				amount = wallet.initialBalance,
 				useSymbol = false,
 				currencyCode = localCurrency.countryCode
 			)
@@ -73,6 +76,7 @@ fun EditWalletBalanceScreen(
 	
 	Column(
 		modifier = Modifier
+			.imePadding()
 			.fillMaxWidth()
 			.background(
 				if (uiMode.isLightTheme()) MaterialTheme.colorScheme.background
@@ -98,7 +102,7 @@ fun EditWalletBalanceScreen(
 			}
 			
 			Text(
-				text = stringResource(id = R.string.new_wallet),
+				text = stringResource(id = R.string.edit_balance),
 				style = Typography.bodyLarge.copy(
 					fontWeight = FontWeight.Bold,
 					fontSize = Typography.bodyLarge.fontSize.spScaled
@@ -111,11 +115,11 @@ fun EditWalletBalanceScreen(
 				onClick = {
 					when {
 						balanceFieldValue.text.isBlank() -> {
-							context.getString(R.string.wallet_name_cannot_be_empty).toast(context)
+							context.getString(R.string.amount_cannot_be_empty).toast(context)
 						}
 						else -> onSave(
 							wallet.copy(
-							
+								initialBalance = initialBalance
 							)
 						)
 					}
@@ -140,13 +144,14 @@ fun EditWalletBalanceScreen(
 					countryCode = localCurrency.countryCode
 				)
 				
-				balance = formattedValue.first
+				initialBalance = formattedValue.first
 				balanceFieldValue = formattedValue.second
 			},
 			textStyle = LocalTextStyle.current.copy(
 				fontFamily = Inter
 			),
 			keyboardOptions = KeyboardOptions(
+				keyboardType = KeyboardType.Number,
 				imeAction = ImeAction.Done
 			),
 			keyboardActions = KeyboardActions(
@@ -217,13 +222,13 @@ fun EditWalletBalanceScreen(
 					vertical = 4.dpScaled
 				)
 				.clickable {
-					editBalanceOption = EditBalanceOption.JUST_CHANGE
+					editBalanceOption = EditBalanceOption.CHANGE_INITIAL_AMOUNT
 				}
 		) {
 			RadioButton(
-				selected = editBalanceOption == EditBalanceOption.JUST_CHANGE,
+				selected = editBalanceOption == EditBalanceOption.CHANGE_INITIAL_AMOUNT,
 				onClick = {
-					editBalanceOption = EditBalanceOption.JUST_CHANGE
+					editBalanceOption = EditBalanceOption.CHANGE_INITIAL_AMOUNT
 				},
 				modifier = Modifier
 					.padding(
@@ -232,7 +237,7 @@ fun EditWalletBalanceScreen(
 			)
 			
 			Text(
-				text = stringResource(id = R.string.add_transaction),
+				text = stringResource(id = R.string.change_initial_amount),
 				style = Typography.bodyMedium.copy(
 					fontWeight = FontWeight.Normal,
 					fontSize = Typography.bodyMedium.fontSize.spScaled
@@ -244,5 +249,5 @@ fun EditWalletBalanceScreen(
 
 private enum class EditBalanceOption {
 	ADD_TRANSACTION,
-	JUST_CHANGE
+	CHANGE_INITIAL_AMOUNT
 }

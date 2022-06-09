@@ -132,6 +132,7 @@ fun AddWalletScreen(
 							Wallet(
 								id = Random.nextInt(),
 								name = walletName,
+								initialBalance = walletInitialBalance,
 								balance = walletInitialBalance,
 								iconID = walletIcon,
 								tint = walletTint,

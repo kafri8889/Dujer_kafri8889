@@ -14,8 +14,4 @@ interface IFinancialEnvironment {
 	
 	suspend fun insertFinancial(financial: Financial)
 	
-	suspend fun getCategories(): Flow<List<Category>>
-	
-	fun getWallets(): Flow<List<Wallet>>
-	
 }

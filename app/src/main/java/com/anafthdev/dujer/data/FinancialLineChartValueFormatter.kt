@@ -2,10 +2,14 @@ package com.anafthdev.dujer.data
 
 import com.anafthdev.dujer.foundation.extension.addStringBefore
 import com.anafthdev.dujer.foundation.extension.endsWithNumber
+import com.anafthdev.dujer.foundation.extension.removeNonDigitChar
 import com.anafthdev.dujer.foundation.extension.takeNonDigitString
+import com.github.mikephil.charting.data.Entry
 import com.github.mikephil.charting.formatter.ValueFormatter
+import com.github.mikephil.charting.utils.ViewPortHandler
 import timber.log.Timber
 import java.text.DecimalFormat
+import kotlin.math.roundToInt
 
 class FinancialLineChartValueFormatter: ValueFormatter() {
 	
@@ -43,6 +47,7 @@ class FinancialLineChartValueFormatter: ValueFormatter() {
 		"az",
 	)
 	
+	private val mMaxLength = 5
 	private val mFormat: DecimalFormat = DecimalFormat("###E00")
 	
 	override fun getFormattedValue(value: Float): String {
@@ -51,15 +56,29 @@ class FinancialLineChartValueFormatter: ValueFormatter() {
 	
 	private fun format(number: Double): String {
 		var r: String = mFormat.format(number)
+		Timber.i("er 0: $r")
 		val numericValue1 = Character.getNumericValue(r[r.length - 1])
 		val numericValue2 = Character.getNumericValue(r[r.length - 2])
 		val combined = Integer.valueOf(numericValue2.toString() + "" + numericValue1)
+		val suffix = mSuffix[combined / 3]
 		
-		r = r.replace("E[0-9][0-9]".toRegex(), mSuffix[combined / 3])
-		r = r.substring(0, r.length - mSuffix[combined / 3].length)
-		r = r.reversed().substring(combined).reversed().replace(".", "") + mSuffix[combined/3]
+		r = r.replace("E[0-9][0-9]".toRegex(), suffix)
+		Timber.i("er 1: $r")
+		r = r.removeNonDigitChar()
+		Timber.i("er 2: $r")
 		
-		return r
+		while (r.length > mMaxLength || r.matches("[0-9]+\\.[a-z]".toRegex())) {
+			r = r.substring(0, r.length - 2) + r.substring(r.length - 1)
+			Timber.i("er ~: $r")
+		}
+		
+		r += suffix
+		Timber.i("er 3: $r")
+		
+		return if (!r.endsWithNumber()) r.addStringBefore(
+			" ",
+			if (suffix.length == 2) r.lastIndex - 1 else r.lastIndex
+		) else r
 	}
 	
 }

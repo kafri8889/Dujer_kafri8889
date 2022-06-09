@@ -11,6 +11,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CornerSize
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
@@ -24,10 +25,12 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -47,17 +50,18 @@ import com.anafthdev.dujer.foundation.extension.darkenColor
 import com.anafthdev.dujer.foundation.extension.deviceLocale
 import com.anafthdev.dujer.foundation.extension.merge
 import com.anafthdev.dujer.foundation.extension.toColor
+import com.anafthdev.dujer.foundation.uiextension.horizontalScroll
 import com.anafthdev.dujer.foundation.window.dpScaled
 import com.anafthdev.dujer.foundation.window.spScaled
 import com.anafthdev.dujer.model.LocalCurrency
+import com.anafthdev.dujer.ui.app.LocalDujerState
 import com.anafthdev.dujer.ui.financial.FinancialScreen
 import com.anafthdev.dujer.ui.financial.data.FinancialAction
 import com.anafthdev.dujer.ui.statistic.component.FinancialStatisticChart
 import com.anafthdev.dujer.ui.statistic.data.PercentValueFormatter
 import com.anafthdev.dujer.ui.theme.*
 import com.anafthdev.dujer.ui.wallet.component.DeleteWalletPopup
-import com.anafthdev.dujer.ui.wallet.subscreen.EditWalletBalanceScreen
-import com.anafthdev.dujer.ui.wallet.subscreen.SelectWalletScreen
+import com.anafthdev.dujer.ui.wallet.subscreen.*
 import com.anafthdev.dujer.uicomponent.FinancialTypeSelector
 import com.anafthdev.dujer.uicomponent.SwipeableFinancialCard
 import com.anafthdev.dujer.uicomponent.TopAppBar
@@ -77,6 +81,8 @@ fun WalletScreen(
 	onTransactionCanDelete: () -> Unit,
 	onDeleteTransaction: (Financial) -> Unit
 ) {
+	
+	val dujerState = LocalDujerState.current
 	
 	val walletViewModel = hiltViewModel<WalletViewModel>()
 	
@@ -104,6 +110,20 @@ fun WalletScreen(
 	val wallet = state.wallet
 	val wallets = state.wallets
 	val financial = state.financial
+	
+	val incomeTransaction = remember(dujerState.allIncomeTransaction) {
+		dujerState.allIncomeTransaction.filter { it.walletID == wallet.id }
+	}
+	val expenseTransaction = remember(dujerState.allExpenseTransaction) {
+		dujerState.allExpenseTransaction.filter { it.walletID == wallet.id }
+	}
+	
+	val incomeAmount = remember(dujerState.allIncomeTransaction) {
+		dujerState.allIncomeTransaction.filter { it.walletID == walletID }.sumOf { it.amount }
+	}
+	val expenseAmount = remember(dujerState.allExpenseTransaction) {
+		dujerState.allExpenseTransaction.filter { it.walletID == walletID }.sumOf { it.amount }
+	}
 	
 	val hideEditBalanceSheetState = {
 		scope.launch { editBalanceSheetState.hide() }
@@ -143,10 +163,6 @@ fun WalletScreen(
 		walletViewModel.dispatch(
 			WalletAction.GetWallet(walletID)
 		)
-		
-		walletViewModel.dispatch(
-			WalletAction.GetTransaction(walletID)
-		)
 	}
 	
 	Box(
@@ -185,7 +201,7 @@ fun WalletScreen(
 			)
 		}
 		
-		FinancialScreenBottomSheet(
+		FinancialBottomSheetWalletScreen(
 			state = financialScreenSheetState,
 			financial = financial,
 			onBack = hideFinancialSheetState,
@@ -200,10 +216,6 @@ fun WalletScreen(
 					walletViewModel.dispatch(
 						WalletAction.GetWallet(wallet.id)
 					)
-					
-					walletViewModel.dispatch(
-						WalletAction.GetTransaction(wallet.id)
-					)
 				}
 			) {
 				EditBalanceBottomSheet(
@@ -211,13 +223,25 @@ fun WalletScreen(
 					wallet = wallet,
 					onCancel = hideEditBalanceSheetState,
 					onSave = { mWallet ->
-					
+						walletViewModel.dispatch(
+							WalletAction.UpdateWallet(
+								mWallet.copy(
+									balance = (mWallet.initialBalance + incomeAmount - expenseAmount).also {
+										Timber.i("$it, w: ${mWallet.initialBalance}, i: $incomeAmount, e: $expenseAmount")
+									}
+								).also { Timber.i("$it, in: $incomeTransaction, ex: $expenseTransaction") }
+							)
+						)
+						
+						hideEditBalanceSheetState()
 					}
 				) {
 					WalletScreenContent(
 						state = state,
 						navController = navController,
 						walletViewModel = walletViewModel,
+						incomeTransaction = incomeTransaction,
+						expenseTransaction = expenseTransaction,
 						onTransactionCanDelete = onTransactionCanDelete,
 						onDeleteTransaction = onDeleteTransaction,
 						onShowFinancialSheet = showFinancialSheetState,
@@ -239,6 +263,8 @@ private fun WalletScreenContent(
 	state: WalletState,
 	navController: NavController,
 	walletViewModel: WalletViewModel,
+	incomeTransaction: List<Financial>,
+	expenseTransaction: List<Financial>,
 	onDeleteWallet: () -> Unit,
 	onShowFinancialSheet: () ->Unit,
 	onShowEditBalanceSheet: () ->Unit,
@@ -248,20 +274,33 @@ private fun WalletScreenContent(
 ) {
 	
 	val context = LocalContext.current
+	val localCurrency = LocalCurrency.current
 	
 	val wallet = state.wallet
 	val pieEntries = state.pieEntries
 	val availableCategory = state.availableCategory
-	val incomeTransaction = state.incomeTransaction
-	val expenseTransaction = state.expenseTransaction
 	val selectedFinancialType = state.selectedFinancialType
-	
-	val scope = rememberCoroutineScope()
 	
 	var selectedCategory by remember { mutableStateOf(Category.default) }
 	var selectedPieColor by remember { mutableStateOf(Color.Transparent) }
 	var isDataSetEmpty by remember { mutableStateOf(false) }
 	
+	val balance = remember(wallet.balance) {
+		CurrencyFormatter.format(
+			locale = deviceLocale,
+			amount = wallet.balance,
+			useSymbol = true,
+			currencyCode = localCurrency.countryCode
+		)
+	}
+	val initialBalance = remember(wallet.initialBalance) {
+		CurrencyFormatter.format(
+			locale = deviceLocale,
+			amount = wallet.initialBalance,
+			useSymbol = true,
+			currencyCode = localCurrency.countryCode
+		)
+	}
 	val financialList = remember(incomeTransaction, expenseTransaction, selectedFinancialType) {
 		when (selectedFinancialType) {
 			FinancialType.INCOME -> incomeTransaction
@@ -449,6 +488,26 @@ private fun WalletScreenContent(
 					)
 				}
 				
+				Text(
+					maxLines = 1,
+					textAlign = TextAlign.Center,
+					text = balance,
+					style = MaterialTheme.typography.bodyLarge.copy(
+						fontWeight = FontWeight.SemiBold,
+						fontSize = MaterialTheme.typography.bodyLarge.fontSize.spScaled
+					),
+					modifier = Modifier
+						.padding(
+							vertical = 8.dpScaled,
+							horizontal = 16.dpScaled
+						)
+						.fillMaxWidth()
+						.horizontalScroll(
+							autoRestart = true,
+							state = rememberScrollState()
+						)
+				)
+				
 				FilledTonalButton(
 					onClick = onShowEditBalanceSheet,
 					modifier = Modifier
@@ -480,7 +539,7 @@ private fun WalletScreenContent(
 							verticalAlignment = Alignment.CenterVertically,
 						) {
 							Text(
-								text = stringResource(id = R.string.balance),
+								text = stringResource(id = R.string.initial_balance),
 								style = MaterialTheme.typography.bodyMedium.copy(
 									fontSize = MaterialTheme.typography.bodyMedium.fontSize.spScaled
 								),
@@ -489,19 +548,19 @@ private fun WalletScreenContent(
 							)
 							
 							Text(
-								text = CurrencyFormatter.format(
-									locale = deviceLocale,
-									amount = wallet.balance,
-									useSymbol = true,
-									currencyCode = LocalCurrency.current.countryCode
-								),
+								maxLines = 1,
 								textAlign = TextAlign.End,
+								text = initialBalance,
 								style = MaterialTheme.typography.bodyMedium.copy(
 									fontWeight = FontWeight.Medium,
 									fontSize = MaterialTheme.typography.bodyMedium.fontSize.spScaled
 								),
 								modifier = Modifier
 									.weight(0.6f)
+									.horizontalScroll(
+										autoRestart = true,
+										state = rememberScrollState()
+									)
 							)
 						}
 						
@@ -641,85 +700,4 @@ private fun WalletScreenContent(
 			)
 		}
 	}
-}
-
-@OptIn(ExperimentalMaterialApi::class)
-@Composable
-private fun FinancialScreenBottomSheet(
-	state: ModalBottomSheetState,
-	financial: Financial,
-	onBack: () -> Unit,
-	onSave: () -> Unit,
-	content: @Composable () -> Unit
-) {
-	ModalBottomSheetLayout(
-		scrimColor = Color.Unspecified,
-		sheetState = state,
-		sheetContent = {
-			FinancialScreen(
-				isScreenVisible = state.isVisible,
-				financial = financial,
-				financialAction = FinancialAction.EDIT,
-				onBack = onBack,
-				onSave = onSave
-			)
-		},
-		content = content
-	)
-}
-
-@OptIn(ExperimentalMaterialApi::class)
-@Composable
-private fun SelectWalletBottomSheet(
-	state: ModalBottomSheetState,
-	wallet: Wallet,
-	wallets: List<Wallet>,
-	onWalletSelected: (Wallet) -> Unit,
-	content: @Composable () -> Unit
-) {
-	ModalBottomSheetLayout(
-		sheetState = state,
-		sheetShape = RoundedCornerShape(
-			topStart = shapes.medium.topStart,
-			topEnd = shapes.medium.topEnd,
-			bottomEnd = CornerSize(0.dpScaled),
-			bottomStart = CornerSize(0.dpScaled)
-		),
-		sheetContent = {
-			SelectWalletScreen(
-				selectedWallet = wallet,
-				wallets = wallets,
-				onWalletSelected = onWalletSelected
-			)
-		},
-		content = content
-	)
-}
-
-@OptIn(ExperimentalMaterialApi::class)
-@Composable
-private fun EditBalanceBottomSheet(
-	wallet: Wallet,
-	state: ModalBottomSheetState,
-	onCancel: () -> Unit,
-	onSave: (Wallet) -> Unit,
-	content: @Composable () -> Unit
-) {
-	ModalBottomSheetLayout(
-		sheetState = state,
-		sheetShape = RoundedCornerShape(
-			topStart = shapes.medium.topStart,
-			topEnd = shapes.medium.topEnd,
-			bottomEnd = CornerSize(0.dpScaled),
-			bottomStart = CornerSize(0.dpScaled)
-		),
-		sheetContent = {
-			EditWalletBalanceScreen(
-				wallet = wallet,
-				onCancel = onCancel,
-				onSave = onSave
-			)
-		},
-		content = content
-	)
 }

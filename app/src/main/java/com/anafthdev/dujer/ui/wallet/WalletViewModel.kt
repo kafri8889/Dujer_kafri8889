@@ -16,7 +16,7 @@ class WalletViewModel @Inject constructor(
 ) {
 	
 	init {
-		viewModelScope.launch(environment.dispatcher) {
+		viewModelScope.launch {
 			environment.getWallet().collect { wallet ->
 				setState {
 					copy(
@@ -26,31 +26,11 @@ class WalletViewModel @Inject constructor(
 			}
 		}
 		
-		viewModelScope.launch(environment.dispatcher) {
+		viewModelScope.launch {
 			environment.getAllWallet().collect { wallets ->
 				setState {
 					copy(
 						wallets = wallets.sortedBy { it.id }
-					)
-				}
-			}
-		}
-		
-		viewModelScope.launch(environment.dispatcher) {
-			environment.getIncomeTransaction().collect { transaction ->
-				setState {
-					copy(
-						incomeTransaction = transaction
-					)
-				}
-			}
-		}
-		
-		viewModelScope.launch(environment.dispatcher) {
-			environment.getExpenseTransaction().collect { transaction ->
-				setState {
-					copy(
-						expenseTransaction = transaction
 					)
 				}
 			}
@@ -104,14 +84,14 @@ class WalletViewModel @Inject constructor(
 					environment.setWalletID(action.id)
 				}
 			}
-			is WalletAction.GetTransaction -> {
-				viewModelScope.launch(environment.dispatcher) {
-					environment.getTransaction(action.id)
-				}
-			}
 			is WalletAction.GetFinancial -> {
 				viewModelScope.launch(environment.dispatcher) {
 					environment.setFinancialID(action.id)
+				}
+			}
+			is WalletAction.UpdateWallet -> {
+				viewModelScope.launch(environment.dispatcher) {
+					environment.updateWallet(action.wallet)
 				}
 			}
 			is WalletAction.DeleteWallet -> {

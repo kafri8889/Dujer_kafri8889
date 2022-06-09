@@ -34,13 +34,13 @@ class MultiLineChartMarkerView(
 			
 			tvIncomeAmount.text = CurrencyFormatter.format(
 				locale = deviceLocale,
-				amount = incomeEntry.y.toDouble(),
+				amount = (incomeEntry.data as Double),
 				currencyCode = currency.countryCode
 			)
 			
 			tvExpenseAmount.text = CurrencyFormatter.format(
 				locale = deviceLocale,
-				amount = expenseEntry.y.toDouble(),
+				amount = (expenseEntry.data as Double),
 				currencyCode = currency.countryCode
 			)
 		} else {

@@ -12,6 +12,7 @@ import com.github.mikephil.charting.components.MarkerView
 import com.github.mikephil.charting.data.Entry
 import com.github.mikephil.charting.highlight.Highlight
 import com.github.mikephil.charting.utils.MPPointF
+import timber.log.Timber
 
 @SuppressLint("ViewConstructor")
 class SingleLineChartMarkerView(
@@ -25,7 +26,7 @@ class SingleLineChartMarkerView(
 	override fun refreshContent(e: Entry, highlight: Highlight?) {
 		tvAmount.text = CurrencyFormatter.format(
 			locale = deviceLocale,
-			amount = e.y.toDouble(),
+			amount = if (e.data != null) (e.data as Double) else 0.0,
 			currencyCode = currency.countryCode
 		)
 		

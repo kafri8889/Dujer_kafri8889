@@ -2,16 +2,16 @@ package com.anafthdev.dujer.data.repository.app
 
 import com.anafthdev.dujer.data.datastore.AppDatastore
 import com.anafthdev.dujer.data.db.model.Financial
-import com.anafthdev.dujer.data.repository.category.ICategoryRepository
+import com.anafthdev.dujer.data.repository.category.CategoryRepository
 import com.anafthdev.dujer.data.repository.expense.IExpenseRepository
 import com.anafthdev.dujer.data.repository.income.IIncomeRepository
-import com.anafthdev.dujer.data.repository.wallet.IWalletRepository
+import com.anafthdev.dujer.data.repository.wallet.WalletRepository
 import kotlinx.coroutines.flow.Flow
 
 interface IAppRepository {
 	val appDatastore: AppDatastore
-	val walletRepository: IWalletRepository
-	val categoryRepository: ICategoryRepository
+	val walletRepository: WalletRepository
+	val categoryRepository: CategoryRepository
 	val incomeRepository: IIncomeRepository
 	val expenseRepository: IExpenseRepository
 	
