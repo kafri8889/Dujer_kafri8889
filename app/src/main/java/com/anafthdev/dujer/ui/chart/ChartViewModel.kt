@@ -22,7 +22,7 @@ import javax.inject.Inject
 class ChartViewModel @Inject constructor(
 	chartEnvironment: IChartEnvironment
 ): StatefulViewModel<ChartState, Unit, ChartAction, IChartEnvironment>(
-	ChartState(),
+	ChartState,
 	chartEnvironment
 ) {
 	
@@ -31,41 +31,36 @@ class ChartViewModel @Inject constructor(
 	
 	private val calendar = Calendar.getInstance()
 	
-	init {
-		viewModelScope.launch(environment.dispatcher) {
-			environment.getFilteredIncomeList()
-				.combine(environment.getFilteredExpenseList()) { income, expense ->
-					income to expense
-				}.collect { pair ->
-				setState {
-					copy(
-						incomeFinancialList = pair.first,
-						expenseFinancialList = pair.second
-					)
-				}
-
-				calculateBarData(pair.first, pair.second)
-			}
+	override fun dispatch(action: ChartAction) {}
+	
+	fun filter(
+		yearInMillis: Long,
+		incomeList: List<Financial>,
+		expenseList: List<Financial>
+	): Pair<List<Financial>, List<Financial>> {
+		val filteredIncome = incomeList.filter {
+			yearFormatter.format(
+				it.dateCreated
+			) == yearFormatter.format(
+				yearInMillis
+			)
 		}
+		
+		val filteredExpense = expenseList.filter {
+			yearFormatter.format(
+				it.dateCreated
+			) == yearFormatter.format(
+				yearInMillis
+			)
+		}
+		
+		return filteredIncome to filteredExpense
 	}
 	
-	override fun dispatch(action: ChartAction) {
-		when (action) {
-			is ChartAction.GetData -> {
-				viewModelScope.launch(environment.dispatcher) {
-					environment.getFilteredIncomeList(
-						yearInMillis = action.yearInMillis
-					)
-					
-					environment.getFilteredExpenseList(
-						yearInMillis = action.yearInMillis
-					)
-				}
-			}
-		}
-	}
-	
-	private fun calculateBarData(incomeList: List<Financial>, expenseList: List<Financial>) {
+	fun calculateBarData(
+		incomeList: List<Financial>,
+		expenseList: List<Financial>
+	): Pair<List<BarData>, List<BarData>> {
 		val incomeBarData = arrayListOf<BarData>()
 		val expenseBarData = arrayListOf<BarData>()
 		
@@ -101,14 +96,7 @@ class ChartViewModel @Inject constructor(
 		
 		Timber.i("income: $incomeBarData, expense: $expenseBarData")
 		
-		viewModelScope.launch(environment.dispatcher) {
-			setState {
-				copy(
-					incomeBarDataList = incomeBarData,
-					expenseBarDataList = expenseBarData
-				)
-			}
-		}
+		return incomeBarData to expenseBarData
 	}
 	
 	fun getTimeInMillis(month: Int): Long {
