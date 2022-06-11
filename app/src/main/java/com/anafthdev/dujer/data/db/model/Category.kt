@@ -1,5 +1,6 @@
 package com.anafthdev.dujer.data.db.model
 
+import androidx.compose.runtime.saveable.listSaver
 import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.PrimaryKey
@@ -19,6 +20,29 @@ data class Category(
 ) {
 	
 	companion object {
+		
+		val Saver = listSaver<Category, Any>(
+			save = {
+				listOf(
+					it.id,
+					it.name,
+					it.iconID,
+					it.tint.toJSON(),
+					it.type,
+					it.defaultCategory,
+				)
+			},
+			restore = {
+				Category(
+					id = it[0] as Int,
+					name = it[1] as String,
+					iconID = it[2] as Int,
+					tint = CategoryTint.fromJSON(it[3] as String),
+					type = it[4] as FinancialType,
+					defaultCategory = it[5] as Boolean
+				)
+			}
+		)
 		
 		val default = Category(
 			id = 0,

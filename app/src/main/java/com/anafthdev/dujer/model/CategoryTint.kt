@@ -2,6 +2,7 @@ package com.anafthdev.dujer.model
 
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
+import com.google.gson.Gson
 
 /**
  * tint in ARGB
@@ -10,6 +11,9 @@ data class CategoryTint(
 	val iconTint: Int,
 	val backgroundTint: Int
 ) {
+	
+	fun toJSON(): String = Gson().toJson(this)
+	
 	companion object {
 		
 		val transaction = CategoryTint(
@@ -141,5 +145,8 @@ data class CategoryTint(
 		)
 		
 		fun getRandomTint(): CategoryTint = values.random()
+		
+		fun fromJSON(s: String): CategoryTint = Gson().fromJson(s, CategoryTint::class.java)
+		
 	}
 }
