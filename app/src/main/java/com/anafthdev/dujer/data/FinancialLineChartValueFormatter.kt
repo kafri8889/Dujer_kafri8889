@@ -47,7 +47,7 @@ class FinancialLineChartValueFormatter: ValueFormatter() {
 		"az",
 	)
 	
-	private val mMaxLength = 5
+	private val mMaxLength = 3
 	private val mFormat: DecimalFormat = DecimalFormat("###E00")
 	
 	override fun getFormattedValue(value: Float): String {
