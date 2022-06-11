@@ -20,6 +20,8 @@ import androidx.compose.material.icons.rounded.ArrowDropDown
 import androidx.compose.material.rememberModalBottomSheetState
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.runtime.saveable.Saver
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -39,9 +41,8 @@ import com.anafthdev.dujer.data.DujerDestination
 import com.anafthdev.dujer.data.FinancialType
 import com.anafthdev.dujer.data.db.model.Category
 import com.anafthdev.dujer.data.db.model.Financial
-import com.anafthdev.dujer.foundation.extension.darkenColor
-import com.anafthdev.dujer.foundation.extension.deviceLocale
-import com.anafthdev.dujer.foundation.extension.toColor
+import com.anafthdev.dujer.data.db.model.Wallet
+import com.anafthdev.dujer.foundation.extension.*
 import com.anafthdev.dujer.foundation.uiextension.horizontalScroll
 import com.anafthdev.dujer.foundation.window.dpScaled
 import com.anafthdev.dujer.foundation.window.spScaled
@@ -65,8 +66,11 @@ import com.anafthdev.dujer.util.CurrencyFormatter
 import com.github.mikephil.charting.data.PieDataSet
 import com.github.mikephil.charting.data.PieEntry
 import com.github.mikephil.charting.highlight.Highlight
+import com.google.accompanist.swiperefresh.SwipeRefresh
+import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
 import kotlinx.coroutines.launch
 import timber.log.Timber
+import kotlin.collections.sumOf
 
 @OptIn(ExperimentalMaterialApi::class, ExperimentalMaterial3Api::class)
 @Composable
@@ -217,16 +221,22 @@ fun WalletScreen(
 					state = editBalanceSheetState,
 					wallet = wallet,
 					onCancel = hideEditBalanceSheetState,
-					onSave = { mWallet ->
+					onSave = { mWallet, financial ->
 						walletViewModel.dispatch(
 							WalletAction.UpdateWallet(
 								mWallet.copy(
-									balance = (mWallet.initialBalance + incomeAmount - expenseAmount).also {
+									balance = (((mWallet.initialBalance + incomeAmount) - expenseAmount)).also {
 										Timber.i("$it, w: ${mWallet.initialBalance}, i: $incomeAmount, e: $expenseAmount")
 									}
 								).also { Timber.i("$it, in: $incomeTransaction, ex: $expenseTransaction") }
 							)
 						)
+						
+						if (financial.id != Financial.default.id) {
+							walletViewModel.dispatch(
+								WalletAction.InsertFinancial(financial)
+							)
+						}
 						
 						hideEditBalanceSheetState()
 					}
@@ -276,9 +286,9 @@ private fun WalletScreenContent(
 	val availableCategory = state.availableCategory
 	val selectedFinancialType = state.selectedFinancialType
 	
-	var selectedCategory by remember { mutableStateOf(Category.default) }
+	var selectedCategory = rememberSaveable(saver = Category.Saver) { Category.default }
+	var isDataSetEmpty by rememberSaveable { mutableStateOf(false) }
 	var selectedPieColor by remember { mutableStateOf(Color.Transparent) }
-	var isDataSetEmpty by remember { mutableStateOf(false) }
 	
 	val balance = remember(wallet.balance) {
 		CurrencyFormatter.format(

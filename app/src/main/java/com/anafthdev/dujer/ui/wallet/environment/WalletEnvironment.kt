@@ -50,6 +50,10 @@ class WalletEnvironment @Inject constructor(
 	init {
 		CoroutineScope(dispatcher).launch {
 			appRepository.walletRepository.getAllWallet().collect { wallets ->
+				_selectedWallet.postValue(
+					wallets.find { it.id == lastSelectedWalletID.value } ?: Wallet.cash
+				)
+				
 				availableWallets.clear()
 				availableWallets.addAll(wallets.also { Timber.i(it.toString()) })
 			}
@@ -99,6 +103,10 @@ class WalletEnvironment @Inject constructor(
 		}
 	}
 	
+	override suspend fun insertFinancial(financial: Financial) {
+		appRepository.insert(financial)
+	}
+	
 	override suspend fun updateWallet(wallet: Wallet) {
 		withContext(Dispatchers.Main) {
 			appRepository.walletRepository.updateWallet(
@@ -122,6 +130,7 @@ class WalletEnvironment @Inject constructor(
 	}
 	
 	override suspend fun setWalletID(id: Int) {
+		_lastSelectedWalletID.emit(Wallet.default.id)
 		_lastSelectedWalletID.emit(id)
 	}
 	
