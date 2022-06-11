@@ -1,5 +1,6 @@
 package com.anafthdev.dujer.ui.wallet.subscreen
 
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -15,9 +16,9 @@ import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
-import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
@@ -58,7 +59,7 @@ fun EditWalletBalanceScreen(
 	
 	var initialBalance by remember { mutableStateOf(0.0) }
 	var balanceFieldValue by remember { mutableStateOf(TextFieldValue()) }
-	var editBalanceOption by remember { mutableStateOf(EditBalanceOption.ADD_TRANSACTION) }
+	var editBalanceOption by remember { mutableStateOf(EditBalanceOption.CHANGE_BALANCE) }
 	
 	val balanceFocusRequester = remember { FocusRequester() }
 	
@@ -125,13 +126,14 @@ fun EditWalletBalanceScreen(
 							val random = Random(System.currentTimeMillis())
 							val id = random.nextInt()
 							
+							// amount - currentBalance
+							val amount = initialBalance - wallet.balance
+							
 							val mWallet = wallet.copy(
+								balance = wallet.balance + amount,
 								initialBalance = if (editBalanceOption == EditBalanceOption.CHANGE_INITIAL_AMOUNT) initialBalance
 								else wallet.initialBalance
 							)
-							
-							// amount - currentBalance
-							val amount = initialBalance - mWallet.balance
 							
 							val financial = Financial(
 								id = id,
@@ -146,7 +148,7 @@ fun EditWalletBalanceScreen(
 							
 							onSave(
 								mWallet,
-								if (editBalanceOption == EditBalanceOption.ADD_TRANSACTION) financial
+								if (editBalanceOption == EditBalanceOption.CHANGE_BALANCE) financial
 								else Financial.default
 							)
 						}
@@ -219,13 +221,13 @@ fun EditWalletBalanceScreen(
 					vertical = 4.dpScaled
 				)
 				.clickable {
-					editBalanceOption = EditBalanceOption.ADD_TRANSACTION
+					editBalanceOption = EditBalanceOption.CHANGE_BALANCE
 				}
 		) {
 			RadioButton(
-				selected = editBalanceOption == EditBalanceOption.ADD_TRANSACTION,
+				selected = editBalanceOption == EditBalanceOption.CHANGE_BALANCE,
 				onClick = {
-					editBalanceOption = EditBalanceOption.ADD_TRANSACTION
+					editBalanceOption = EditBalanceOption.CHANGE_BALANCE
 				},
 				modifier = Modifier
 					.padding(
@@ -233,13 +235,28 @@ fun EditWalletBalanceScreen(
 					)
 			)
 			
-			Text(
-				text = stringResource(id = R.string.add_transaction),
-				style = Typography.bodyMedium.copy(
-					fontWeight = FontWeight.Normal,
-					fontSize = Typography.bodyMedium.fontSize.spScaled
+			Column {
+				Text(
+					text = stringResource(id = R.string.change_balance),
+					style = Typography.bodyMedium.copy(
+						fontWeight = FontWeight.Normal,
+						fontSize = Typography.bodyMedium.fontSize.spScaled
+					)
 				)
-			)
+				
+				AnimatedVisibility(
+					visible = editBalanceOption == EditBalanceOption.CHANGE_BALANCE
+				) {
+					Text(
+						text = stringResource(id = R.string.new_transaction_will_be_added),
+						style = Typography.bodySmall.copy(
+							color = Color.Gray,
+							fontWeight = FontWeight.Normal,
+							fontSize = Typography.bodySmall.fontSize.spScaled
+						)
+					)
+				}
+			}
 		}
 		
 		Row(
@@ -276,6 +293,6 @@ fun EditWalletBalanceScreen(
 }
 
 private enum class EditBalanceOption {
-	ADD_TRANSACTION,
+	CHANGE_BALANCE,
 	CHANGE_INITIAL_AMOUNT
 }
