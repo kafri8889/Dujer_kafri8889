@@ -17,6 +17,7 @@ object CategoryIcons {
 	const val mobile = R.drawable.ic_mobile
 	const val bitcoin = R.drawable.ic_bitcoin
 	const val blogger = R.drawable.ic_blogger
+	const val cardCoin = R.drawable.ic_card_coin
 	const val electronic = R.drawable.ic_electronic
 	const val investment = R.drawable.ic_investment
 	const val moneyReceive = R.drawable.ic_money_receive
@@ -40,6 +41,7 @@ object CategoryIcons {
 		mobile,
 		bitcoin,
 		blogger,
+		cardCoin,
 		electronic,
 		investment,
 		moneyReceive,

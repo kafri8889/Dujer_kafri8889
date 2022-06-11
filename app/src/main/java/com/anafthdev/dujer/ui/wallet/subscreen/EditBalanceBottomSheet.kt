@@ -9,6 +9,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
+import com.anafthdev.dujer.data.db.model.Financial
 import com.anafthdev.dujer.data.db.model.Wallet
 import com.anafthdev.dujer.foundation.window.dpScaled
 import com.anafthdev.dujer.ui.theme.shapes
@@ -19,7 +20,7 @@ fun EditBalanceBottomSheet(
 	wallet: Wallet,
 	state: ModalBottomSheetState,
 	onCancel: () -> Unit,
-	onSave: (Wallet) -> Unit,
+	onSave: (Wallet, Financial) -> Unit,
 	content: @Composable () -> Unit
 ) {
 	

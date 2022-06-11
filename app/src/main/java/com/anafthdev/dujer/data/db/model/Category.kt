@@ -29,6 +29,15 @@ data class Category(
 			defaultCategory = false
 		)
 		
+		val transaction = Category(
+			id = -9,
+			name = "Transaction",
+			iconID = CategoryIcons.cardCoin,
+			tint = CategoryTint.transaction,
+			type = FinancialType.EXPENSE,
+			defaultCategory = true
+		)
+		
 		val food = Category(
 			id = 1,
 			name = "Food",

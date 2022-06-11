@@ -217,16 +217,22 @@ fun WalletScreen(
 					state = editBalanceSheetState,
 					wallet = wallet,
 					onCancel = hideEditBalanceSheetState,
-					onSave = { mWallet ->
+					onSave = { mWallet, financial ->
 						walletViewModel.dispatch(
 							WalletAction.UpdateWallet(
 								mWallet.copy(
-									balance = (mWallet.initialBalance + incomeAmount - expenseAmount).also {
+									balance = (((mWallet.initialBalance + incomeAmount) - expenseAmount)).also {
 										Timber.i("$it, w: ${mWallet.initialBalance}, i: $incomeAmount, e: $expenseAmount")
 									}
 								).also { Timber.i("$it, in: $incomeTransaction, ex: $expenseTransaction") }
 							)
 						)
+						
+						if (financial.id != Financial.default.id) {
+							walletViewModel.dispatch(
+								WalletAction.InsertFinancial(financial)
+							)
+						}
 						
 						hideEditBalanceSheetState()
 					}

@@ -12,6 +12,11 @@ data class CategoryTint(
 ) {
 	companion object {
 		
+		val transaction = CategoryTint(
+			iconTint = Color(0xFF8A8A8A).toArgb(),
+			backgroundTint = Color(0xFFF3F3F3).toArgb()
+		)
+		
 		val tint_1 = CategoryTint(
 			iconTint = Color(0xFF81B2CA).toArgb(),
 			backgroundTint = Color(0xFFEDF4F7).toArgb()

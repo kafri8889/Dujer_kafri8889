@@ -11,6 +11,8 @@ import kotlinx.coroutines.flow.Flow
 interface IWalletEnvironment {
 
 	val dispatcher: CoroutineDispatcher
+	
+	suspend fun insertFinancial(financial: Financial)
 
 	suspend fun updateWallet(wallet: Wallet)
 	

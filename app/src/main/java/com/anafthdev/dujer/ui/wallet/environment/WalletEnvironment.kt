@@ -99,6 +99,10 @@ class WalletEnvironment @Inject constructor(
 		}
 	}
 	
+	override suspend fun insertFinancial(financial: Financial) {
+		appRepository.insert(financial)
+	}
+	
 	override suspend fun updateWallet(wallet: Wallet) {
 		withContext(Dispatchers.Main) {
 			appRepository.walletRepository.updateWallet(

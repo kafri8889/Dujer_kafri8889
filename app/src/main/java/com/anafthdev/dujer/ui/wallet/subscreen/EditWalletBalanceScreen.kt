@@ -24,9 +24,13 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.TextFieldValue
 import com.anafthdev.dujer.R
+import com.anafthdev.dujer.data.FinancialType
+import com.anafthdev.dujer.data.db.model.Category
+import com.anafthdev.dujer.data.db.model.Financial
 import com.anafthdev.dujer.data.db.model.Wallet
 import com.anafthdev.dujer.foundation.extension.deviceLocale
 import com.anafthdev.dujer.foundation.extension.isLightTheme
+import com.anafthdev.dujer.foundation.extension.toPositive
 import com.anafthdev.dujer.foundation.uimode.data.LocalUiMode
 import com.anafthdev.dujer.foundation.window.dpScaled
 import com.anafthdev.dujer.foundation.window.spScaled
@@ -37,13 +41,14 @@ import com.anafthdev.dujer.ui.theme.small_shape
 import com.anafthdev.dujer.util.AppUtil.toast
 import com.anafthdev.dujer.util.CurrencyFormatter
 import com.anafthdev.dujer.util.TextFieldCurrencyFormatter
+import kotlin.random.Random
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalComposeUiApi::class)
 @Composable
 fun EditWalletBalanceScreen(
 	wallet: Wallet,
 	onCancel: () -> Unit,
-	onSave: (Wallet) -> Unit
+	onSave: (Wallet, Financial) -> Unit
 ) {
 	
 	val uiMode = LocalUiMode.current
@@ -62,7 +67,6 @@ fun EditWalletBalanceScreen(
 	}
 	
 	LaunchedEffect(wallet.initialBalance) {
-		
 		initialBalance = wallet.initialBalance
 		balanceFieldValue = balanceFieldValue.copy(
 			text = CurrencyFormatter.format(
@@ -117,11 +121,35 @@ fun EditWalletBalanceScreen(
 						balanceFieldValue.text.isBlank() -> {
 							context.getString(R.string.amount_cannot_be_empty).toast(context)
 						}
-						else -> onSave(
-							wallet.copy(
-								initialBalance = initialBalance
+						else -> {
+							val random = Random(System.currentTimeMillis())
+							val id = random.nextInt()
+							
+							val mWallet = wallet.copy(
+								initialBalance = if (editBalanceOption == EditBalanceOption.CHANGE_INITIAL_AMOUNT) initialBalance
+								else wallet.initialBalance
 							)
-						)
+							
+							// amount - currentBalance
+							val amount = initialBalance - mWallet.balance
+							
+							val financial = Financial(
+								id = id,
+								name = "Transaction",
+								amount = amount.toPositive(),
+								type = if (amount >= 0) FinancialType.INCOME else FinancialType.EXPENSE,
+								walletID = mWallet.id,
+								category = Category.transaction,
+								currency = localCurrency,
+								dateCreated = System.currentTimeMillis()
+							)
+							
+							onSave(
+								mWallet,
+								if (editBalanceOption == EditBalanceOption.ADD_TRANSACTION) financial
+								else Financial.default
+							)
+						}
 					}
 				},
 				modifier = Modifier

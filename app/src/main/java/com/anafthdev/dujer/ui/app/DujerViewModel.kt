@@ -62,7 +62,7 @@ class DujerViewModel @Inject constructor(
 			}
 		}
 		
-		viewModelScope.launch(environment.dispatcher) {
+		viewModelScope.launch {
 			environment.getAllWallet()
 				.combine(environment.getAllFinancial()) { wallets, financials ->
 					wallets to financials

@@ -194,7 +194,6 @@ private fun DashboardContent(
 	onSettingClicked: () -> Unit
 ) {
 	
-	val composer = currentComposer
 	val context = LocalContext.current
 	val dujerState = LocalDujerState.current
 	
@@ -207,38 +206,42 @@ private fun DashboardContent(
 	
 	val currentRoute = dashboardNavController.currentDestination?.route
 	
-	val incomeLineDataset = remember {
-		LineDataSet(
-			emptyList(),
-			context.getString(R.string.income)
-		).apply {
-			lineWidth = 2.5f
-			cubicIntensity = .2f
-			mode = LineDataSet.Mode.CUBIC_BEZIER
-			color = incomeColor.toArgb()
-			setDrawValues(false)
-			setDrawFilled(false)
-			setDrawCircles(false)
-			setCircleColor(incomeColor.toArgb())
-			setDrawHorizontalHighlightIndicator(false)
-		}
+	val incomeLineDataset by remember {
+		mutableStateOf(
+			LineDataSet(
+				emptyList(),
+				context.getString(R.string.income)
+			).apply {
+				lineWidth = 2.5f
+				cubicIntensity = .2f
+				mode = LineDataSet.Mode.CUBIC_BEZIER
+				color = incomeColor.toArgb()
+				setDrawValues(false)
+				setDrawFilled(false)
+				setDrawCircles(false)
+				setCircleColor(incomeColor.toArgb())
+				setDrawHorizontalHighlightIndicator(false)
+			}
+		)
 	}
 	
-	val expenseLineDataset = remember {
-		LineDataSet(
-			emptyList(),
-			context.getString(R.string.income)
-		).apply {
-			lineWidth = 2.5f
-			cubicIntensity = .2f
-			mode = LineDataSet.Mode.CUBIC_BEZIER
-			color = expenseColor.toArgb()
-			setDrawValues(false)
-			setDrawFilled(false)
-			setDrawCircles(false)
-			setCircleColor(expenseColor.toArgb())
-			setDrawHorizontalHighlightIndicator(false)
-		}
+	val expenseLineDataset by remember {
+		mutableStateOf(
+			LineDataSet(
+				emptyList(),
+				context.getString(R.string.expenses)
+			).apply {
+				lineWidth = 2.5f
+				cubicIntensity = .2f
+				mode = LineDataSet.Mode.CUBIC_BEZIER
+				color = expenseColor.toArgb()
+				setDrawValues(false)
+				setDrawFilled(false)
+				setDrawCircles(false)
+				setCircleColor(expenseColor.toArgb())
+				setDrawHorizontalHighlightIndicator(false)
+			}
+		)
 	}
 	
 	val showFinancialSheet = {
@@ -274,10 +277,6 @@ private fun DashboardContent(
 		
 		incomeLineDataset.values = incomeEntry
 		expenseLineDataset.values = expenseEntry
-		
-		// because replacing lineDataSet value doesn't trigger recomposition,
-		// call recomposition manually
-		composer.composition.recompose()
 	}
 	
 	BackHandler {
