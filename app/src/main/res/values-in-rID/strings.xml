@@ -51,7 +51,7 @@
     <string name="your_expenses">Pengeluaran kamu</string>
     <string name="delete_wallet">Hapus dompet</string>
     <string name="bio_auth_title">Verifikasi</string>
-    <string name="add_transaction">Tambah transaksi</string>
+    <string name="change_balance">Ubah saldo</string>
     <string name="finance_removed">Keuangan dihapus</string>
     <string name="change_currency">Ganti mata uang</string>
     <string name="initial_balance">Saldo awal</string>
@@ -74,6 +74,7 @@
     <string name="display_and_configuration">Tampilan dan Konfigurasi</string>
     <string name="delete_wallet_confirmation">Apakah kamu yakin ingin menghapus dompet ini?</string>
     <string name="wallet_name_cannot_be_empty">Nama dompet tidak boleh kosong</string>
+    <string name="new_transaction_will_be_added">Transaksi baru akan ditambahkan</string>
     <string name="category_name_cannot_be_empty">Nama kategori tidak boleh kosong</string>
     <string name="biometric_authentication_summary">Gunakan otentikasi biometrik</string>
 
