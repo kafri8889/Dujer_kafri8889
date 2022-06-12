@@ -3,6 +3,7 @@ package com.anafthdev.dujer.foundation.window
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.compositionLocalOf
 import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
@@ -23,6 +24,10 @@ val Double.dpScaled: Dp get() = if (isLargeScreen) (this + (this / 2)).dp else t
 val Float.dpScaled: Dp get() = if (isLargeScreen) (this + (this / 2)).dp else this.dp
 
 val TextUnit.spScaled: TextUnit get() = if (isLargeScreen) (this.value + (this.value / 2)).sp else this
+
+val Dp.px: Float
+	@Composable
+	get() = with(LocalDensity.current) { this@px.toPx() }
 
 @Composable
 fun rememberWindowInfo(): WindowInfo {
