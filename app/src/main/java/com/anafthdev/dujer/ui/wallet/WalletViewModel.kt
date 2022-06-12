@@ -16,6 +16,16 @@ class WalletViewModel @Inject constructor(
 ) {
 	
 	init {
+		viewModelScope.launch(environment.dispatcher) {
+			environment.getSortType().collect { type ->
+				setState {
+					copy(
+						sortType = type
+					)
+				}
+			}
+		}
+		
 		viewModelScope.launch {
 			environment.getWallet().collect { wallet ->
 				setState {
@@ -107,6 +117,11 @@ class WalletViewModel @Inject constructor(
 			is WalletAction.SetSelectedFinancialType -> {
 				viewModelScope.launch(environment.dispatcher) {
 					environment.setSelectedFinancialType(action.type)
+				}
+			}
+			is WalletAction.SetSortType -> {
+				viewModelScope.launch(environment.dispatcher) {
+					environment.setSortType(action.sortType)
 				}
 			}
 		}

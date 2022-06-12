@@ -5,6 +5,7 @@ import com.anafthdev.dujer.foundation.viewmodel.StatefulViewModel
 import com.anafthdev.dujer.ui.statistic.environment.IStatisticEnvironment
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
+import java.text.DecimalFormat
 import javax.inject.Inject
 
 @HiltViewModel
@@ -14,6 +15,8 @@ class StatisticViewModel @Inject constructor(
 	StatisticState(),
 	statisticEnvironment
 ) {
+	
+	val percentDecimalFormat = DecimalFormat("###,###,##0.0")
 	
 	init {
 		viewModelScope.launch(environment.dispatcher) {

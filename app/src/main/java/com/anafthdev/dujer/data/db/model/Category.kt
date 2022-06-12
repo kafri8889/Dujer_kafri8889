@@ -47,7 +47,7 @@ data class Category(
 		val default = Category(
 			id = 0,
 			name = "-",
-			iconID = 0,
+			iconID = CategoryIcons.other,
 			tint = CategoryTint.tint_1,
 			type = FinancialType.INCOME,
 			defaultCategory = false

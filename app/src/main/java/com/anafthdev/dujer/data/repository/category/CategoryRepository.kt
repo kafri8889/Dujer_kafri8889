@@ -12,7 +12,7 @@ class CategoryRepository(
 		return appDatabase.categoryDao().getAllCategory()
 	}
 	
-	suspend fun get(mID: Int): Category {
+	suspend fun get(mID: Int): Category? {
 		return appDatabase.categoryDao().get(mID)
 	}
 	

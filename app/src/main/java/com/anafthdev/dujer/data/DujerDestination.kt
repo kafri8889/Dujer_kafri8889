@@ -39,6 +39,12 @@ sealed class DujerDestination(val route: String) {
 		}
 	}
 	
+	object CategoryTransaction: DujerDestination("category_transaction/{categoryID}") {
+		fun createRoute(categoryID: Int): String {
+			return "category_transaction/$categoryID"
+		}
+	}
+	
 	object Setting: DujerDestination("setting")
 	
 	object Currency: DujerDestination("currency")

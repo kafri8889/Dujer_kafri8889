@@ -74,7 +74,14 @@ class StatisticEnvironment @Inject constructor(
 				}
 				
 				val expenseList = quad.first.filter {
-					(it.walletID == quad.second) and (it.type == FinancialType.EXPENSE)
+					(it.walletID == quad.second)
+						.and(it.type == FinancialType.EXPENSE)
+						.and(
+							monthYearFormatter.format(it.dateCreated).equals(
+								other = monthYearFormatter.format(quad.fourth),
+								ignoreCase = true
+							)
+						)
 				}
 				
 				val categories = (if (quad.third == FinancialType.INCOME) incomeList.getBy {

@@ -105,12 +105,13 @@ fun FinancialCard(
 						.weight(0.55f)
 				) {
 					Text(
-						text = (if (financial.type == FinancialType.INCOME) "+" else "-") +
-								CurrencyFormatter.format(
-									locale = deviceLocale,
-									amount = financial.amount,
-									currencyCode = LocalCurrency.current.countryCode
-								),
+						text = "${if (financial.type == FinancialType.INCOME) " + " else " - "}${
+							CurrencyFormatter.format(
+								locale = deviceLocale,
+								amount = financial.amount,
+								currencyCode = LocalCurrency.current.countryCode
+							)
+						}",
 						style = Typography.bodyMedium.copy(
 							fontWeight = FontWeight.SemiBold,
 							fontSize = Typography.bodyMedium.fontSize.spScaled
