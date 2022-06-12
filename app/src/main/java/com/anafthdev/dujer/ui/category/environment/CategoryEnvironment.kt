@@ -5,7 +5,6 @@ import com.anafthdev.dujer.data.db.model.Financial
 import com.anafthdev.dujer.data.repository.app.IAppRepository
 import com.anafthdev.dujer.foundation.di.DiName
 import kotlinx.coroutines.CoroutineDispatcher
-import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject
 import javax.inject.Named
 
@@ -17,7 +16,7 @@ class CategoryEnvironment @Inject constructor(
 	override suspend fun get(id: Int, action: (Category) -> Unit) {
 		if (id != Category.default.id) {
 			val category = appRepository.categoryRepository.get(id)
-			action(category)
+			action(category ?: Category.default)
 		}
 	}
 	

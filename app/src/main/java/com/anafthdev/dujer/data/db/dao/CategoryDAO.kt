@@ -11,7 +11,7 @@ interface CategoryDAO {
 	fun getAllCategory(): Flow<List<Category>>
 	
 	@Query("SELECT * FROM category_table WHERE id LIKE :mID")
-	suspend fun get(mID: Int): Category
+	suspend fun get(mID: Int): Category?
 	
 	@Update
 	suspend fun update(vararg category: Category)
