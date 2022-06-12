@@ -21,6 +21,7 @@ import androidx.core.content.res.ResourcesCompat
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.anafthdev.dujer.R
+import com.anafthdev.dujer.data.DujerDestination
 import com.anafthdev.dujer.data.FinancialType
 import com.anafthdev.dujer.data.db.model.Category
 import com.anafthdev.dujer.foundation.extension.merge
@@ -259,7 +260,12 @@ fun StatisticScreen(
 				category = category,
 				percent = percent,
 				totalAmount = totalAmount,
-				financialList = financialList
+				financialList = financialList,
+				onClick = {
+					navController.navigate(
+						DujerDestination.CategoryTransaction.createRoute(category.id)
+					)
+				}
 			)
 		}
 	}
