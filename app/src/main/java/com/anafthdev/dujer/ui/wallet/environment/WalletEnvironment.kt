@@ -4,14 +4,13 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.asFlow
 import com.anafthdev.dujer.data.FinancialType
+import com.anafthdev.dujer.data.SortType
 import com.anafthdev.dujer.data.db.model.Category
 import com.anafthdev.dujer.data.db.model.Financial
 import com.anafthdev.dujer.data.db.model.Wallet
 import com.anafthdev.dujer.data.repository.app.IAppRepository
-import com.anafthdev.dujer.foundation.common.Quad
 import com.anafthdev.dujer.foundation.di.DiName
 import com.anafthdev.dujer.foundation.extension.getBy
-import com.anafthdev.dujer.foundation.extension.merge
 import com.github.mikephil.charting.data.PieEntry
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.Flow
@@ -26,6 +25,9 @@ class WalletEnvironment @Inject constructor(
 	@Named(DiName.DISPATCHER_IO) override val dispatcher: CoroutineDispatcher,
 	private val appRepository: IAppRepository
 ): IWalletEnvironment {
+	
+	private val _sortType = MutableStateFlow(SortType.HIGHEST)
+	private val sortType: StateFlow<SortType> = _sortType
 	
 	private val _selectedWallet = MutableLiveData(Wallet.cash)
 	private val selectedWallet: LiveData<Wallet> = _selectedWallet
@@ -138,10 +140,18 @@ class WalletEnvironment @Inject constructor(
 		return selectedWallet.asFlow()
 	}
 	
+	override fun getSortType(): Flow<SortType> {
+		return sortType
+	}
+	
 	override suspend fun setFinancialID(id: Int) {
 		_selectedFinancial.postValue(
 			appRepository.get(id) ?: Financial.default
 		)
+	}
+	
+	override suspend fun setSortType(sortType: SortType) {
+		_sortType.emit(sortType)
 	}
 	
 	override suspend fun setSelectedFinancialType(type: FinancialType) {

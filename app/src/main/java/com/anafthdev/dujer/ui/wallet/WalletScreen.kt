@@ -17,6 +17,7 @@ import androidx.compose.material.ModalBottomSheetValue
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.ArrowBack
 import androidx.compose.material.icons.rounded.ArrowDropDown
+import androidx.compose.material.icons.rounded.ArrowLeft
 import androidx.compose.material.rememberModalBottomSheetState
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -38,9 +39,9 @@ import androidx.navigation.NavController
 import com.anafthdev.dujer.R
 import com.anafthdev.dujer.data.DujerDestination
 import com.anafthdev.dujer.data.FinancialType
+import com.anafthdev.dujer.data.SortType
 import com.anafthdev.dujer.data.db.model.Category
 import com.anafthdev.dujer.data.db.model.Financial
-import com.anafthdev.dujer.foundation.extension.darkenColor
 import com.anafthdev.dujer.foundation.extension.deviceLocale
 import com.anafthdev.dujer.foundation.extension.toColor
 import com.anafthdev.dujer.foundation.uiextension.horizontalScroll
@@ -84,6 +85,10 @@ fun WalletScreen(
 	
 	val state by walletViewModel.state.collectAsState()
 	
+	val wallet = state.wallet
+	val wallets = state.wallets
+	val financial = state.financial
+	
 	val scope = rememberCoroutineScope()
 	
 	val editBalanceSheetState = rememberModalBottomSheetState(
@@ -101,11 +106,7 @@ fun WalletScreen(
 		skipHalfExpanded = true
 	)
 	
-	var isDeleteConfirmationPopupShowing by remember { mutableStateOf(false) }
-	
-	val wallet = state.wallet
-	val wallets = state.wallets
-	val financial = state.financial
+	var isDeleteConfirmationPopupShowing by rememberSaveable { mutableStateOf(false) }
 	
 	val incomeTransaction = remember(dujerState.allIncomeTransaction) {
 		dujerState.allIncomeTransaction.filter { it.walletID == wallet.id }
@@ -259,7 +260,7 @@ fun WalletScreen(
 	}
 }
 
-@OptIn(ExperimentalMaterialApi::class, ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun WalletScreenContent(
 	state: WalletState,
@@ -279,14 +280,17 @@ private fun WalletScreenContent(
 	val localCurrency = LocalCurrency.current
 	
 	val wallet = state.wallet
+	val sortType = state.sortType
 	val pieEntries = state.pieEntries
 	val availableCategory = state.availableCategory
 	val selectedFinancialType = state.selectedFinancialType
 	
-	var selectedCategory = rememberSaveable(saver = Category.Saver) { Category.default }
-	var isDataSetEmpty by rememberSaveable { mutableStateOf(false) }
+	val pieColors = remember { mutableStateListOf<Int>() }
 	var selectedPieColor by remember { mutableStateOf(Color.Transparent) }
 	
+	var selectedCategory = rememberSaveable(saver = Category.Saver) { Category.default }
+	var isDataSetEmpty by rememberSaveable { mutableStateOf(false) }
+
 	val balance = remember(wallet.balance) {
 		CurrencyFormatter.format(
 			locale = deviceLocale,
@@ -303,15 +307,25 @@ private fun WalletScreenContent(
 			currencyCode = localCurrency.countryCode
 		)
 	}
-	val financialList = remember(incomeTransaction, expenseTransaction, selectedFinancialType) {
-		when (selectedFinancialType) {
+	val financialList = remember(
+		sortType,
+		incomeTransaction,
+		expenseTransaction,
+		selectedFinancialType
+	) {
+		val list = when (selectedFinancialType) {
 			FinancialType.INCOME -> incomeTransaction
 			FinancialType.EXPENSE -> expenseTransaction
 			else -> incomeTransaction + expenseTransaction
-		}.sortedBy { it.dateCreated }
+		}
+		
+		return@remember when (sortType) {
+			SortType.HIGHEST -> list.sortedByDescending { it.amount }
+			SortType.LOWEST -> list.sortedBy { it.amount }
+			else -> list.sortedBy { it.dateCreated }
+		}
 	}
 	
-	val pieColors = remember { mutableStateListOf<Int>() }
 	val categories = remember(availableCategory) { availableCategory }
 	val financialsForSelectedCategory = remember(financialList, selectedCategory) {
 		financialList.filter { it.category.id == selectedCategory.id }
@@ -586,7 +600,7 @@ private fun WalletScreenContent(
 								text = "${incomeTransaction.size} ${context.getString(R.string.transaction)}",
 								textAlign = TextAlign.End,
 								style = MaterialTheme.typography.bodyMedium.copy(
-									color = incomeColor.darkenColor(0.14f),
+									color = incomeColor,
 									fontWeight = FontWeight.Medium,
 									fontSize = MaterialTheme.typography.bodyMedium.fontSize.spScaled
 								),
@@ -615,7 +629,7 @@ private fun WalletScreenContent(
 								text = "${expenseTransaction.size} ${context.getString(R.string.transaction)}",
 								textAlign = TextAlign.End,
 								style = MaterialTheme.typography.bodyMedium.copy(
-									color = expenseColor.darkenColor(0.14f),
+									color = expenseColor,
 									fontWeight = FontWeight.Medium,
 									fontSize = MaterialTheme.typography.bodyMedium.fontSize.spScaled
 								),
@@ -670,14 +684,49 @@ private fun WalletScreenContent(
 						.padding(8.dpScaled)
 				)
 				
-				Text(
-					text = stringResource(id = R.string.transaction),
-					style = MaterialTheme.typography.bodyLarge.copy(
-						fontSize = MaterialTheme.typography.bodyLarge.fontSize.spScaled
-					),
+				Row(
+					verticalAlignment = Alignment.CenterVertically,
 					modifier = Modifier
 						.padding(16.dpScaled)
-				)
+						.fillMaxWidth()
+				) {
+					Text(
+						text = stringResource(id = R.string.transaction),
+						style = MaterialTheme.typography.bodyLarge.copy(
+							fontSize = MaterialTheme.typography.bodyLarge.fontSize.spScaled
+						)
+					)
+					
+					Spacer(modifier = Modifier.weight(1f))
+					
+					IconButton(
+						onClick = {
+							walletViewModel.dispatch(
+								WalletAction.SetSortType(
+									if (sortType == SortType.HIGHEST) SortType.LOWEST
+									else SortType.HIGHEST
+								)
+							)
+						},
+						modifier = Modifier
+							.padding(2.dpScaled)
+					) {
+						Icon(
+							imageVector = Icons.Rounded.ArrowLeft,
+							contentDescription = null
+						)
+					}
+					
+					Text(
+						text = stringResource(
+							id = if (sortType == SortType.HIGHEST) R.string.highest
+							else R.string.lowest
+						),
+						style = MaterialTheme.typography.bodyLarge.copy(
+							fontSize = MaterialTheme.typography.bodyLarge.fontSize.spScaled
+						)
+					)
+				}
 			}
 		}
 		

@@ -1,6 +1,7 @@
 package com.anafthdev.dujer.ui.wallet.environment
 
 import com.anafthdev.dujer.data.FinancialType
+import com.anafthdev.dujer.data.SortType
 import com.anafthdev.dujer.data.db.model.Category
 import com.anafthdev.dujer.data.db.model.Financial
 import com.anafthdev.dujer.data.db.model.Wallet
@@ -22,6 +23,8 @@ interface IWalletEnvironment {
 	
 	fun getWallet(): Flow<Wallet>
 	
+	fun getSortType(): Flow<SortType>
+	
 	fun getFinancial(): Flow<Financial>
 	
 	fun getPieEntries(): Flow<List<PieEntry>>
@@ -34,6 +37,8 @@ interface IWalletEnvironment {
 	suspend fun setWalletID(id: Int)
 	
 	suspend fun setFinancialID(id: Int)
+	
+	suspend fun setSortType(sortType: SortType)
 	
 	suspend fun setSelectedFinancialType(type: FinancialType)
 	
