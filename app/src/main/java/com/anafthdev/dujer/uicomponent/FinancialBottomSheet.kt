@@ -1,4 +1,4 @@
-package com.anafthdev.dujer.ui.wallet.subscreen
+package com.anafthdev.dujer.uicomponent
 
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.ModalBottomSheetLayout
@@ -11,7 +11,7 @@ import com.anafthdev.dujer.ui.financial.data.FinancialAction
 
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
-fun FinancialBottomSheetWalletScreen(
+fun FinancialBottomSheet(
 	state: ModalBottomSheetState,
 	financial: Financial,
 	onBack: () -> Unit,

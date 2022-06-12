@@ -57,8 +57,8 @@ import com.anafthdev.dujer.ui.theme.incomeColor
 import com.anafthdev.dujer.ui.theme.medium_shape
 import com.anafthdev.dujer.ui.wallet.component.DeleteWalletPopup
 import com.anafthdev.dujer.ui.wallet.subscreen.EditBalanceBottomSheet
-import com.anafthdev.dujer.ui.wallet.subscreen.FinancialBottomSheetWalletScreen
 import com.anafthdev.dujer.ui.wallet.subscreen.SelectWalletBottomSheet
+import com.anafthdev.dujer.uicomponent.FinancialBottomSheet
 import com.anafthdev.dujer.uicomponent.FinancialTypeSelector
 import com.anafthdev.dujer.uicomponent.SwipeableFinancialCard
 import com.anafthdev.dujer.uicomponent.TopAppBar
@@ -70,7 +70,7 @@ import com.github.mikephil.charting.highlight.Highlight
 import kotlinx.coroutines.launch
 import timber.log.Timber
 
-@OptIn(ExperimentalMaterialApi::class, ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun WalletScreen(
 	walletID: Int,
@@ -198,7 +198,7 @@ fun WalletScreen(
 			)
 		}
 		
-		FinancialBottomSheetWalletScreen(
+		FinancialBottomSheet(
 			state = financialScreenSheetState,
 			financial = financial,
 			onBack = hideFinancialSheetState,
