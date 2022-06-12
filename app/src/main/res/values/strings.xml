@@ -9,6 +9,7 @@
     <string name="save">Save</string>
     <string name="name">Name</string>
     <string name="icon">Icon</string>
+    <string name="total">Total</string>
     <string name="color">Color</string>
     <string name="title">Title</string>
     <string name="chart">Chart</string>
@@ -18,6 +19,9 @@
     <string name="income">Income</string>
     <string name="amount">Amount</string>
     <string name="export">Export</string>
+    <string name="lowest">Lowest</string>
+    <string name="highest">Highest</string>
+    <string name="summary">Summary</string>
     <string name="balance">Balance</string>
     <string name="setting">Setting</string>
     <string name="no_data">No data</string>
@@ -50,10 +54,12 @@
     <string name="category_name">Category name</string>
     <string name="your_expenses">Your expenses</string>
     <string name="delete_wallet">Delete wallet</string>
+    <string name="n_transaction">%1$s Transaction</string>
     <string name="bio_auth_title">Verification</string>
     <string name="change_balance">Change balance</string>
     <string name="finance_removed">Finance removed</string>
     <string name="change_currency">Change currency</string>
+    <string name="current_balance">Current balance</string>
     <string name="initial_balance">Initial balance</string>
     <string name="category_removed">Category removed</string>
     <string name="session_time_out">Session time out</string>

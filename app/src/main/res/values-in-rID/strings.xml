@@ -9,6 +9,7 @@
     <string name="save">Simpan</string>
     <string name="name">Nama</string>
     <string name="icon">Ikon</string>
+    <string name="total">Total</string>
     <string name="color">Warna</string>
     <string name="title">Judul</string>
     <string name="chart">Grafik</string>
@@ -18,6 +19,9 @@
     <string name="income">Pemasukan</string>
     <string name="amount">Jumlah</string>
     <string name="export">Ekspor</string>
+    <string name="lowest">Terendah</string>
+    <string name="highest">Tertinggi</string>
+    <string name="summary">Ringkasan</string>
     <string name="balance">Saldo</string>
     <string name="setting">Pengaturan</string>
     <string name="no_data">Tidak ada data</string>
@@ -50,10 +54,12 @@
     <string name="category_name">Nama kategori</string>
     <string name="your_expenses">Pengeluaran kamu</string>
     <string name="delete_wallet">Hapus dompet</string>
+    <string name="n_transaction">%1$s Transaksi</string>
     <string name="bio_auth_title">Verifikasi</string>
     <string name="change_balance">Ubah saldo</string>
     <string name="finance_removed">Keuangan dihapus</string>
     <string name="change_currency">Ganti mata uang</string>
+    <string name="current_balance">Saldo saat ini</string>
     <string name="initial_balance">Saldo awal</string>
     <string name="category_removed">Kategori dihapus</string>
     <string name="session_time_out">Waktu sesi habis</string>
