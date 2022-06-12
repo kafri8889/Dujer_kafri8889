@@ -1,10 +1,7 @@
 package com.anafthdev.dujer.ui.category.component
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
-import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.*
-import androidx.compose.material.ripple.rememberRipple
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -29,11 +26,12 @@ import com.anafthdev.dujer.ui.theme.medium_shape
 fun CategoryCard(
 	category: Category,
 	modifier: Modifier = Modifier,
-	onClick: (() -> Unit)? = null
+	onClick: () -> Unit
 ) {
 	
 	Card(
 		shape = large_shape,
+		onClick = onClick,
 		elevation = CardDefaults.cardElevation(
 			defaultElevation = 1.dp
 		),
@@ -43,16 +41,6 @@ fun CategoryCard(
 		),
 		modifier = modifier
 			.clip(large_shape)
-			.clickable(
-				interactionSource = MutableInteractionSource(),
-				indication = rememberRipple(),
-				enabled = onClick != null,
-				onClick = {
-					if (onClick != null) {
-						onClick()
-					}
-				}
-			)
 	) {
 		Row(
 			verticalAlignment = Alignment.CenterVertically,

@@ -39,6 +39,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.anafthdev.dujer.R
 import com.anafthdev.dujer.data.CategoryIcons
+import com.anafthdev.dujer.data.DujerDestination
 import com.anafthdev.dujer.data.FinancialType
 import com.anafthdev.dujer.data.db.model.Category
 import com.anafthdev.dujer.foundation.extension.*
@@ -416,6 +417,11 @@ fun CategoryScreen(
 				) { i, item ->
 					SwipeableCategory(
 						category = item,
+						onClick = {
+							navController.navigate(
+								DujerDestination.CategoryTransaction.createRoute(item.id)
+							)
+						},
 						onCanDelete = {
 							dujerViewModel.dispatch(
 								DujerAction.Vibrate(100)

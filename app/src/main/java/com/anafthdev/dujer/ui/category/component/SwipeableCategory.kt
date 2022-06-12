@@ -25,6 +25,7 @@ import com.anafthdev.dujer.ui.theme.swipe_dismiss_edit_background
 fun SwipeableCategory(
 	category: Category,
 	modifier: Modifier = Modifier,
+	onClick: () -> Unit,
 	onCanDelete: () -> Unit,
 	onDismissToEnd: () -> Unit,
 	onDismissToStart: () -> Unit
@@ -103,7 +104,8 @@ fun SwipeableCategory(
 		modifier = modifier
 	) {
 		CategoryCard(
-			category = category
+			category = category,
+			onClick = onClick
 		)
 	}
 }
