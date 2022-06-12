@@ -1,24 +1,21 @@
 package com.anafthdev.dujer.uicomponent
 
-import androidx.compose.foundation.clickable
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import com.anafthdev.dujer.R
 import com.anafthdev.dujer.data.FinancialType
 import com.anafthdev.dujer.foundation.common.DelayManager
-import com.anafthdev.dujer.foundation.common.EventCountdownTimer
-import com.anafthdev.dujer.foundation.common.LocalEventCountdownTimer
 import com.anafthdev.dujer.foundation.window.dpScaled
 import com.anafthdev.dujer.foundation.window.spScaled
+import com.anafthdev.dujer.ui.theme.black01
 import com.anafthdev.dujer.ui.theme.expense_card_background
 import com.anafthdev.dujer.ui.theme.income_card_background
-import com.anafthdev.dujer.util.AppUtil.toast
 import timber.log.Timber
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -29,8 +26,6 @@ fun FinancialTypeSelector(
 	onDoubleClick: () -> Unit = {},
 	onFinancialTypeChanged: (FinancialType) -> Unit
 ) {
-	
-	val context = LocalContext.current
 	
 	val eventCountdownTimer by remember {
 		mutableStateOf(
@@ -78,8 +73,10 @@ fun FinancialTypeSelector(
 				) {
 					Text(
 						text = stringResource(id = R.string.income),
+						textAlign = TextAlign.Center,
 						style = MaterialTheme.typography.bodyMedium.copy(
-							textAlign = TextAlign.Center,
+							color = if (isSystemInDarkTheme() and ((selectedFinancialType == FinancialType.INCOME) or selectAll))
+								black01 else MaterialTheme.typography.bodyMedium.color,
 							fontSize = MaterialTheme.typography.bodyMedium.fontSize.spScaled
 						)
 					)
@@ -124,8 +121,10 @@ fun FinancialTypeSelector(
 				) {
 					Text(
 						text = stringResource(id = R.string.expenses),
+						textAlign = TextAlign.Center,
 						style = MaterialTheme.typography.bodyMedium.copy(
-							textAlign = TextAlign.Center,
+							color = if (isSystemInDarkTheme() and ((selectedFinancialType == FinancialType.EXPENSE) or selectAll))
+								black01 else MaterialTheme.typography.bodyMedium.color,
 							fontSize = MaterialTheme.typography.bodyMedium.fontSize.spScaled
 						)
 					)
