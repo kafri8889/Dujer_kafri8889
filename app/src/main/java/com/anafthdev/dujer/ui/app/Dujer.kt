@@ -5,7 +5,6 @@ import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.gestures.LocalOverScrollConfiguration
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
@@ -34,6 +33,7 @@ import com.anafthdev.dujer.model.LocalCurrency
 import com.anafthdev.dujer.ui.app.component.CustomSnackbar
 import com.anafthdev.dujer.ui.category.CategoryScreen
 import com.anafthdev.dujer.ui.category.data.CategorySwipeAction
+import com.anafthdev.dujer.ui.category_transaction.CategoryTransactionScreen
 import com.anafthdev.dujer.ui.change_currency.ChangeCurrencyScreen
 import com.anafthdev.dujer.ui.dashboard.DashboardScreen
 import com.anafthdev.dujer.ui.income_expense.IncomeExpenseScreen
@@ -48,7 +48,8 @@ import kotlinx.coroutines.Dispatchers
 
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
-@OptIn(ExperimentalMaterialApi::class, ExperimentalFoundationApi::class,
+@OptIn(
+	ExperimentalFoundationApi::class,
 	ExperimentalMaterial3Api::class
 )
 @Composable
@@ -236,6 +237,34 @@ fun DujerApp() {
 						StatisticScreen(
 							walletID = walletID,
 							navController = navController
+						)
+					}
+					
+					composable(
+						route = DujerDestination.CategoryTransaction.route,
+						arguments = listOf(
+							navArgument("categoryID") {
+								type = NavType.IntType
+							}
+						)
+					) { entry ->
+						val categoryID = entry.arguments?.getInt("categoryID") ?: Category.default.id
+						
+						CategoryTransactionScreen(
+							categoryID = categoryID,
+							navController = navController,
+							onTransactionCanDelete = {
+								dujerViewModel.dispatch(
+									DujerAction.Vibrate(100)
+								)
+							},
+							onDeleteTransaction = { financial ->
+								dujerViewModel.dispatch(
+									DujerAction.DeleteFinancial(
+										financial.toArray()
+									)
+								)
+							}
 						)
 					}
 					
