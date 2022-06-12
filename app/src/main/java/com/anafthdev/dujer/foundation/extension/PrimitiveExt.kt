@@ -4,6 +4,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.Dp
+import kotlin.math.roundToInt
 
 fun Int.isMinus(): Boolean = this < 0
 
@@ -29,6 +30,15 @@ fun Float.toNegative(): Float = if (this >= 0) this * -1 else this
 fun Double.toPositive(): Double = if (this <= -1) this * -1 else this
 
 fun Double.toNegative(): Double = if (this >= 0) this * -1 else this
+
+
+fun Float.roundToInt(onNaN: (Float) -> Int): Int {
+	return try { roundToInt() } catch (e: Exception) { return onNaN(this) }
+}
+
+fun Double.roundToInt(onNaN: (Double) -> Int): Int {
+	return try { roundToInt() } catch (e: Exception) { return onNaN(this) }
+}
 
 
 /**
