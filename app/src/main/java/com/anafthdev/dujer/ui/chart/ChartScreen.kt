@@ -59,8 +59,8 @@ import java.util.*
 @Composable
 fun ChartScreen(
 	dashboardNavController: NavController,
+	onFinancialCardCanDelete: () -> Unit,
 	onFinancialCardDismissToEnd: (Financial) -> Unit,
-	onFinancialCardCanDelete: (Financial) -> Unit,
 	onFinancialCardClicked: (Financial) -> Unit
 ) {
 	
@@ -366,9 +366,9 @@ fun ChartScreen(
 		) { financial ->
 			SwipeableFinancialCard(
 				financial = financial,
-				onDismissToEnd = { onFinancialCardDismissToEnd(financial) },
-				onCanDelete = { onFinancialCardCanDelete(financial) },
+				onCanDelete = onFinancialCardCanDelete,
 				onClick = { onFinancialCardClicked(financial) },
+				onDismissToEnd = { onFinancialCardDismissToEnd(financial) },
 				modifier = Modifier
 					.padding(horizontal = 8.dpScaled)
 					.testTag("SwipeableFinancialCard")
