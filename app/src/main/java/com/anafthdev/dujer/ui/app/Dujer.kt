@@ -153,7 +153,18 @@ fun DujerApp() {
 					composable(DujerDestination.Dashboard.route) {
 						DashboardScreen(
 							navController = navController,
-							dujerViewModel = dujerViewModel
+							onTransactionCanDelete = {
+								dujerViewModel.dispatch(
+									DujerAction.Vibrate(100)
+								)
+							},
+							onDeleteTransaction = { financial ->
+								dujerViewModel.dispatch(
+									DujerAction.DeleteFinancial(
+										financial.toArray()
+									)
+								)
+							}
 						)
 					}
 					

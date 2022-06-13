@@ -61,6 +61,7 @@
     <string name="change_currency">Change currency</string>
     <string name="current_balance">Current balance</string>
     <string name="initial_balance">Initial balance</string>
+    <string name="highest_expense">Highest expense</string>
     <string name="category_removed">Category removed</string>
     <string name="session_time_out">Session time out</string>
     <string name="currency_summary">Select the currency to be used</string>
@@ -83,5 +84,6 @@
     <string name="new_transaction_will_be_added">New transaction will be added</string>
     <string name="category_name_cannot_be_empty">Category name cannot be empty</string>
     <string name="biometric_authentication_summary">Use biometric authentication</string>
+    <string name="the_category_with_the_highest_spending_will_appear_here">The category with the highest spending will appear here</string>
 
 </resources>

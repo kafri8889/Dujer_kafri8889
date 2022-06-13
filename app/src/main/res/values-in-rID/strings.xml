@@ -61,6 +61,7 @@
     <string name="change_currency">Ganti mata uang</string>
     <string name="current_balance">Saldo saat ini</string>
     <string name="initial_balance">Saldo awal</string>
+    <string name="highest_expense">Pengeluaran tertinggi</string>
     <string name="category_removed">Kategori dihapus</string>
     <string name="session_time_out">Waktu sesi habis</string>
     <string name="currency_summary">Pilih mata uang yang kamu gunakan</string>
@@ -83,5 +84,6 @@
     <string name="new_transaction_will_be_added">Transaksi baru akan ditambahkan</string>
     <string name="category_name_cannot_be_empty">Nama kategori tidak boleh kosong</string>
     <string name="biometric_authentication_summary">Gunakan otentikasi biometrik</string>
+    <string name="the_category_with_the_highest_spending_will_appear_here">Kategori dengan pengeluaran tertinggi akan muncul disini</string>
 
 </resources>

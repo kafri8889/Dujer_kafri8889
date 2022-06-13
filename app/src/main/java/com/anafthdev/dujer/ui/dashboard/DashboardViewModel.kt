@@ -10,7 +10,6 @@ import com.anafthdev.dujer.ui.dashboard.environment.IDashboardEnvironment
 import com.anafthdev.dujer.util.AppUtil
 import com.github.mikephil.charting.data.Entry
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
 import javax.inject.Inject
@@ -36,6 +35,26 @@ class DashboardViewModel @Inject constructor(
 				setState {
 					copy(
 						financial = financial
+					)
+				}
+			}
+		}
+		
+		viewModelScope.launch(environment.dispatcher) {
+			environment.getHighestExpenseCategory().collect { category ->
+				setState {
+					copy(
+						highestExpenseCategory = category
+					)
+				}
+			}
+		}
+		
+		viewModelScope.launch(environment.dispatcher) {
+			environment.getHighestExpenseCategoryAmount().collect { amount ->
+				setState {
+					copy(
+						highestExpenseCategoryAmount = amount
 					)
 				}
 			}
