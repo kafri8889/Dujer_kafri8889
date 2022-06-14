@@ -45,6 +45,8 @@ sealed class DujerDestination(val route: String) {
 		}
 	}
 	
+	object BudgetList: DujerDestination("budgetList")
+	
 	object Setting: DujerDestination("setting")
 	
 	object Currency: DujerDestination("currency")

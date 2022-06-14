@@ -34,7 +34,8 @@ import java.util.*
 fun BudgetCard(
 	totalExpense: Double,
 	totalIncome: Double,
-	modifier: Modifier = Modifier
+	modifier: Modifier = Modifier,
+	onClick: () -> Unit
 ) {
 	
 	val uiMode = LocalUiMode.current
@@ -51,7 +52,7 @@ fun BudgetCard(
 		colors = CardDefaults.cardColors(
 			containerColor = MaterialTheme.colorScheme.tertiaryContainer
 		),
-		onClick = {},
+		onClick = onClick,
 		modifier = modifier
 			.fillMaxWidth()
 	) {

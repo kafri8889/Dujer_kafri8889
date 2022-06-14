@@ -1,4 +1,4 @@
-package com.anafthdev.dujer.data.repository.category
+package com.anafthdev.dujer.data.repository
 
 import com.anafthdev.dujer.data.db.AppDatabase
 import com.anafthdev.dujer.data.db.model.Category
@@ -9,23 +9,23 @@ class CategoryRepository(
 ) {
 	
 	fun getAllCategory(): Flow<List<Category>> {
-		return appDatabase.categoryDao().getAllCategory()
+		return appDatabase.categoryDAO().getAllCategory()
 	}
 	
 	suspend fun get(mID: Int): Category? {
-		return appDatabase.categoryDao().get(mID)
+		return appDatabase.categoryDAO().get(mID)
 	}
 	
 	suspend fun update(vararg category: Category) {
-		return appDatabase.categoryDao().update(*category)
+		return appDatabase.categoryDAO().update(*category)
 	}
 	
 	suspend fun delete(vararg category: Category) {
-		return appDatabase.categoryDao().delete(*category)
+		return appDatabase.categoryDAO().delete(*category)
 	}
 	
 	suspend fun insert(vararg category: Category) {
-		return appDatabase.categoryDao().insert(*category)
+		return appDatabase.categoryDAO().insert(*category)
 	}
 	
 	

@@ -33,4 +33,10 @@ object DatabaseConverter {
 	@TypeConverter
 	fun categoryTintFromJSON(json: String) = Gson().fromJson(json, CategoryTint::class.java)!!
 	
+	@TypeConverter
+	fun intListToJSON(list: List<Int>) = Gson().toJson(list)!!
+	
+	@TypeConverter
+	fun intListFromJSON(json: String) = Gson().fromJson(json, Array<Int>::class.java).toList()
+	
 }

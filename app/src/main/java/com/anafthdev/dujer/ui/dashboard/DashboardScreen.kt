@@ -390,7 +390,6 @@ private fun DashboardContent(
 					
 					composable(DujerDestination.Dashboard.Chart.route) {
 						ChartScreen(
-							dashboardNavController = dashboardNavController,
 							onFinancialCardDismissToEnd = onDeleteTransaction,
 							onFinancialCardCanDelete = onTransactionCanDelete,
 							onFinancialCardClicked = { financial ->
@@ -403,7 +402,10 @@ private fun DashboardContent(
 								)
 								
 								showFinancialSheet()
-							}
+							},
+							onBudgetCardClicked = {
+								navController.navigate(DujerDestination.BudgetList.route)
+							},
 						)
 					}
 					
@@ -578,6 +580,9 @@ private fun DashboardHomeScreen(
 					BudgetCard(
 						totalExpense = totalAmountExpenseList,
 						totalIncome = totalAmountIncomeList,
+						onClick = {
+							navController.navigate(DujerDestination.BudgetList.route)
+						},
 						modifier = Modifier
 							.padding(top = 16.dpScaled)
 					)

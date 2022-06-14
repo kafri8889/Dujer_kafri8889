@@ -25,7 +25,6 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.navigation.NavController
 import com.anafthdev.dujer.R
 import com.anafthdev.dujer.data.db.model.Financial
 import com.anafthdev.dujer.foundation.extension.deviceLocale
@@ -58,7 +57,7 @@ import java.util.*
 @OptIn(ExperimentalAnimationApi::class)
 @Composable
 fun ChartScreen(
-	dashboardNavController: NavController,
+	onBudgetCardClicked: () -> Unit,
 	onFinancialCardCanDelete: () -> Unit,
 	onFinancialCardDismissToEnd: (Financial) -> Unit,
 	onFinancialCardClicked: (Financial) -> Unit
@@ -219,6 +218,7 @@ fun ChartScreen(
 				BudgetCard(
 					totalExpense = totalAmountExpenseList,
 					totalIncome = totalAmountIncomeList,
+					onClick = onBudgetCardClicked,
 					modifier = Modifier
 						.padding(
 							vertical = 4.dpScaled,
