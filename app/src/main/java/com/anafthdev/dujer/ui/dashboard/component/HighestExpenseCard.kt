@@ -1,6 +1,5 @@
 package com.anafthdev.dujer.ui.dashboard.component
 
-import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
@@ -30,7 +29,7 @@ import com.anafthdev.dujer.util.AppUtil
 import com.anafthdev.dujer.util.CurrencyFormatter
 import java.util.*
 
-@OptIn(ExperimentalMaterial3Api::class, ExperimentalAnimationApi::class)
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HighestExpenseCard(
 	category: Category,
@@ -53,7 +52,7 @@ fun HighestExpenseCard(
 	) {
 		Column(
 			modifier = Modifier
-				.padding(16.dpScaled)
+				.padding(12.dpScaled)
 		) {
 			Row(
 				verticalAlignment = Alignment.CenterVertically,
@@ -61,7 +60,7 @@ fun HighestExpenseCard(
 					.fillMaxWidth()
 			) {
 				Text(
-					text = stringResource(id = R.string.highest_expense,),
+					text = stringResource(id = R.string.highest_expense),
 					style = Typography.bodyMedium.copy(
 						color = black01,
 						fontWeight = FontWeight.SemiBold,
@@ -108,7 +107,7 @@ fun HighestExpenseCard(
 					tint = category.tint.iconTint.toColor(),
 					modifier = Modifier
 						.size(32.dpScaled)
-						.weight(0.2f)
+						.weight(0.16f)
 				)
 				
 				Text(
@@ -119,14 +118,14 @@ fun HighestExpenseCard(
 						fontSize = Typography.bodyMedium.fontSize.spScaled
 					),
 					modifier = Modifier
-						.weight(0.33f)
+						.weight(0.35f)
 						.horizontalScroll(
 							state = rememberScrollState(),
 							autoRestart = true
 						)
 				)
 				
-				Spacer(modifier = Modifier.weight(0.04f))
+				Spacer(modifier = Modifier.weight(0.02f))
 				
 				Text(
 					maxLines = 1,
@@ -142,12 +141,14 @@ fun HighestExpenseCard(
 						fontSize = Typography.bodyMedium.fontSize.spScaled
 					),
 					modifier = Modifier
-						.weight(0.43f)
+						.weight(0.45f)
 						.horizontalScroll(
 							state = rememberScrollState(),
 							autoRestart = true
 						)
 				)
+				
+				Spacer(modifier = Modifier.weight(0.02f))
 			}
 		}
 	}

@@ -1,4 +1,4 @@
-package com.anafthdev.dujer.data.repository.wallet
+package com.anafthdev.dujer.data.repository
 
 import com.anafthdev.dujer.data.db.AppDatabase
 import com.anafthdev.dujer.data.db.model.Wallet

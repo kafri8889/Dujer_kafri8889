@@ -31,6 +31,7 @@ import com.anafthdev.dujer.foundation.uimode.data.LocalUiMode
 import com.anafthdev.dujer.foundation.window.dpScaled
 import com.anafthdev.dujer.model.LocalCurrency
 import com.anafthdev.dujer.ui.app.component.CustomSnackbar
+import com.anafthdev.dujer.ui.budget_list.BudgetScreen
 import com.anafthdev.dujer.ui.category.CategoryScreen
 import com.anafthdev.dujer.ui.category.data.CategorySwipeAction
 import com.anafthdev.dujer.ui.category_transaction.CategoryTransactionScreen
@@ -276,6 +277,12 @@ fun DujerApp() {
 									)
 								)
 							}
+						)
+					}
+					
+					composable(DujerDestination.BudgetList.route) {
+						BudgetScreen(
+							navController = navController
 						)
 					}
 					
