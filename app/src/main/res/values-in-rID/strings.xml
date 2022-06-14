@@ -13,6 +13,7 @@
     <string name="color">Warna</string>
     <string name="title">Judul</string>
     <string name="chart">Grafik</string>
+    <string name="budget">Anggaran</string>
     <string name="delete">Hapus</string>
     <string name="wallet">Dompet</string>
     <string name="cancel">Batalkan</string>

@@ -13,6 +13,7 @@
     <string name="color">Color</string>
     <string name="title">Title</string>
     <string name="chart">Chart</string>
+    <string name="budget">Budget</string>
     <string name="delete">Delete</string>
     <string name="wallet">Wallet</string>
     <string name="cancel">Cancel</string>
