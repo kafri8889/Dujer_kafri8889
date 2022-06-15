@@ -68,6 +68,7 @@
     <string name="currency_summary">Pilih mata uang yang kamu gunakan</string>
     <string name="category_summary">Tambah atau hapus kategori</string>
     <string name="language_summary">Pilih bahasa yang kamu gunakan</string>
+    <string name="average_per_month">Rata-rata per bulan</string>
     <string name="available_balance">Saldo tersedia</string>
     <string name="currency_format_note">Kami memformat mata uang menggunakan Locale perangkat Anda, beberapa format mungkin tidak sesuai.</string>
     <string name="select_your_language">Pilih bahasa mu</string>

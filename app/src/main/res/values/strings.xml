@@ -68,6 +68,7 @@
     <string name="currency_summary">Select the currency to be used</string>
     <string name="category_summary">Add or remove category</string>
     <string name="language_summary">Select the language you use</string>
+    <string name="average_per_month">Average per month</string>
     <string name="available_balance">Available balance</string>
     <string name="currency_format_note">We format currency using your device Locale, some formats may not be suitable.</string>
     <string name="select_your_language">Select your language</string>
