@@ -62,7 +62,6 @@ import java.text.SimpleDateFormat
 import kotlin.random.Random
 
 @SuppressLint("RememberReturnType")
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun FinancialScreen(
 	isScreenVisible: Boolean,
