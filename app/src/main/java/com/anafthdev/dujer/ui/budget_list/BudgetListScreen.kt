@@ -25,6 +25,7 @@ import androidx.compose.ui.zIndex
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.anafthdev.dujer.R
+import com.anafthdev.dujer.data.DujerDestination
 import com.anafthdev.dujer.data.db.model.Budget
 import com.anafthdev.dujer.foundation.common.DelayManager
 import com.anafthdev.dujer.foundation.window.dpScaled
@@ -177,7 +178,11 @@ fun BudgetListScreen(
 						budget = budget,
 						expensesAmount = expensesAmount,
 						onClick = {
-						
+							navController.navigate(
+								DujerDestination.Budget.createRoute(budget.id)
+							) {
+								launchSingleTop = true
+							}
 						},
 						modifier = Modifier
 							.padding(
