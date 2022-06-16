@@ -76,6 +76,7 @@ fun ChartScreen(
 	
 	val state by chartViewModel.state.collectAsState()
 	
+	val allBudget = dujerState.allBudget
 	val incomeTransaction = dujerState.allIncomeTransaction
 	val expenseTransaction = dujerState.allExpenseTransaction
 	
@@ -84,8 +85,6 @@ fun ChartScreen(
 	
 	var selectedYear by remember { mutableStateOf(System.currentTimeMillis()) }
 	var selectedBarDataGroup by remember { mutableStateOf(Calendar.getInstance()[Calendar.MONTH]) }
-	val totalAmountIncomeList = remember(incomeTransaction) { incomeTransaction.sumOf { it.amount } }
-	val totalAmountExpenseList = remember(expenseTransaction) { expenseTransaction.sumOf { it.amount } }
 	val lazyListValue = remember(
 		selectedYear,
 		selectedBarDataGroup,
@@ -99,6 +98,18 @@ fun ChartScreen(
 				it.dateCreated
 			) == chartViewModel.monthFormatter.format(chartViewModel.getTimeInMillis(selectedBarDataGroup))
 		}
+	}
+	val totalAmountBudget = remember(allBudget) { allBudget.sumOf { it.max } }
+	val totalAmountBudgetExpenses = remember(allBudget, expenseTransaction) {
+		val amount = arrayListOf<Double>()
+		allBudget.forEach { budget ->
+			amount.add(
+				expenseTransaction.filter { it.category.id == budget.category.id }
+					.sumOf { it.amount }
+			)
+		}
+		
+		amount.sum()
 	}
 	
 	var enterBarChartAnimOffset by remember {
@@ -216,8 +227,8 @@ fun ChartScreen(
 				}
 				
 				BudgetCard(
-					totalExpense = totalAmountExpenseList,
-					totalIncome = totalAmountIncomeList,
+					totalExpense = totalAmountBudgetExpenses,
+					totalBudget = totalAmountBudget,
 					onClick = onBudgetCardClicked,
 					modifier = Modifier
 						.padding(
