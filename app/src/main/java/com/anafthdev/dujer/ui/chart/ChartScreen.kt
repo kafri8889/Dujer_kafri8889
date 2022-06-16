@@ -37,9 +37,9 @@ import com.anafthdev.dujer.model.LocalCurrency
 import com.anafthdev.dujer.ui.app.LocalDujerState
 import com.anafthdev.dujer.ui.chart.data.MonthBarChartFormatter
 import com.anafthdev.dujer.ui.theme.Typography
-import com.anafthdev.dujer.ui.theme.expenseColor
+import com.anafthdev.dujer.ui.theme.expense_color
 import com.anafthdev.dujer.ui.theme.extra_large_shape
-import com.anafthdev.dujer.ui.theme.incomeColor
+import com.anafthdev.dujer.ui.theme.income_color
 import com.anafthdev.dujer.uicomponent.BudgetCard
 import com.anafthdev.dujer.uicomponent.SwipeableFinancialCard
 import com.anafthdev.dujer.uicomponent.YearSelector
@@ -185,7 +185,7 @@ fun ChartScreen(
 						),
 						style = listOf(
 							BarChartDefault.barStyle(
-								selectedBarColor = incomeColor,
+								selectedBarColor = income_color,
 								selectedStartPaddingBarContainer = 24.dpScaled,
 								selectedShowXAxisLine = false,
 								unSelectedShowXAxisLine = true,
@@ -195,7 +195,7 @@ fun ChartScreen(
 								)
 							),
 							BarChartDefault.barStyle(
-								selectedBarColor = expenseColor,
+								selectedBarColor = expense_color,
 								selectedEndPaddingBarContainer = 24.dpScaled,
 								selectedShowXAxisLine = false,
 								unSelectedShowXAxisLine = true,

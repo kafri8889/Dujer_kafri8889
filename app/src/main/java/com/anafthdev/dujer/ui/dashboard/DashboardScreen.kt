@@ -56,8 +56,8 @@ import com.anafthdev.dujer.ui.financial.FinancialScreen
 import com.anafthdev.dujer.ui.financial.data.FinancialAction
 import com.anafthdev.dujer.ui.search.SearchScreen
 import com.anafthdev.dujer.ui.theme.Typography
-import com.anafthdev.dujer.ui.theme.expenseColor
-import com.anafthdev.dujer.ui.theme.incomeColor
+import com.anafthdev.dujer.ui.theme.expense_color
+import com.anafthdev.dujer.ui.theme.income_color
 import com.anafthdev.dujer.ui.theme.shapes
 import com.anafthdev.dujer.uicomponent.BudgetCard
 import com.anafthdev.dujer.uicomponent.SwipeableFinancialCard
@@ -469,11 +469,11 @@ private fun DashboardHomeScreen(
 				lineWidth = 2.5f
 				cubicIntensity = .2f
 				mode = LineDataSet.Mode.CUBIC_BEZIER
-				color = incomeColor.toArgb()
+				color = income_color.toArgb()
 				setDrawValues(false)
 				setDrawFilled(false)
 				setDrawCircles(false)
-				setCircleColor(incomeColor.toArgb())
+				setCircleColor(income_color.toArgb())
 				setDrawHorizontalHighlightIndicator(false)
 			}
 		)
@@ -488,11 +488,11 @@ private fun DashboardHomeScreen(
 				lineWidth = 2.5f
 				cubicIntensity = .2f
 				mode = LineDataSet.Mode.CUBIC_BEZIER
-				color = expenseColor.toArgb()
+				color = expense_color.toArgb()
 				setDrawValues(false)
 				setDrawFilled(false)
 				setDrawCircles(false)
-				setCircleColor(expenseColor.toArgb())
+				setCircleColor(expense_color.toArgb())
 				setDrawHorizontalHighlightIndicator(false)
 			}
 		)

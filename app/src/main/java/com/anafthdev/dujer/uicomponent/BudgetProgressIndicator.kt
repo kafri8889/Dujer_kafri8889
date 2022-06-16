@@ -13,9 +13,9 @@ import com.anafthdev.dujer.foundation.extension.darkenColor
 import com.anafthdev.dujer.foundation.extension.isLightTheme
 import com.anafthdev.dujer.foundation.uimode.data.LocalUiMode
 import com.anafthdev.dujer.foundation.window.dpScaled
-import com.anafthdev.dujer.ui.theme.dangerColor
-import com.anafthdev.dujer.ui.theme.saveColor
-import com.anafthdev.dujer.ui.theme.warningColor
+import com.anafthdev.dujer.ui.theme.danger_color
+import com.anafthdev.dujer.ui.theme.save_color
+import com.anafthdev.dujer.ui.theme.warning_color
 
 @Composable
 fun BudgetProgressIndicator(
@@ -28,13 +28,13 @@ fun BudgetProgressIndicator(
 	val uiMode = LocalUiMode.current
 	
 	val color = when {
-		progress <= 0.3f -> saveColor.darkenColor(
+		progress <= 0.3f -> save_color.darkenColor(
 			if (uiMode.isLightTheme()) 0.14f else 0f
 		)
-		progress <= 0.8f -> warningColor.darkenColor(
+		progress <= 0.8f -> warning_color.darkenColor(
 			if (uiMode.isLightTheme()) 0.14f else 0f
 		)
-		progress <= 1f -> dangerColor.darkenColor(
+		progress <= 1f -> danger_color.darkenColor(
 			if (uiMode.isLightTheme()) 0.1f else 0f
 		)
 		else -> Color.Transparent

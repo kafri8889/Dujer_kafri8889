@@ -52,8 +52,8 @@ import com.anafthdev.dujer.ui.app.LocalDujerState
 import com.anafthdev.dujer.ui.statistic.component.FinancialStatisticChart
 import com.anafthdev.dujer.ui.statistic.data.PercentValueFormatter
 import com.anafthdev.dujer.ui.theme.Typography
-import com.anafthdev.dujer.ui.theme.expenseColor
-import com.anafthdev.dujer.ui.theme.incomeColor
+import com.anafthdev.dujer.ui.theme.expense_color
+import com.anafthdev.dujer.ui.theme.income_color
 import com.anafthdev.dujer.ui.theme.medium_shape
 import com.anafthdev.dujer.ui.wallet.component.DeleteWalletPopup
 import com.anafthdev.dujer.ui.wallet.subscreen.EditBalanceBottomSheet
@@ -600,7 +600,7 @@ private fun WalletScreenContent(
 								text = "${incomeTransaction.size} ${context.getString(R.string.transaction)}",
 								textAlign = TextAlign.End,
 								style = MaterialTheme.typography.bodyMedium.copy(
-									color = incomeColor,
+									color = income_color,
 									fontWeight = FontWeight.Medium,
 									fontSize = MaterialTheme.typography.bodyMedium.fontSize.spScaled
 								),
@@ -629,7 +629,7 @@ private fun WalletScreenContent(
 								text = "${expenseTransaction.size} ${context.getString(R.string.transaction)}",
 								textAlign = TextAlign.End,
 								style = MaterialTheme.typography.bodyMedium.copy(
-									color = expenseColor,
+									color = expense_color,
 									fontWeight = FontWeight.Medium,
 									fontSize = MaterialTheme.typography.bodyMedium.fontSize.spScaled
 								),

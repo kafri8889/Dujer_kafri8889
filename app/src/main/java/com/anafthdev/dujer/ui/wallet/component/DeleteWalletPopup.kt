@@ -17,7 +17,7 @@ import com.anafthdev.dujer.foundation.extension.isLightTheme
 import com.anafthdev.dujer.foundation.uimode.data.LocalUiMode
 import com.anafthdev.dujer.foundation.window.dpScaled
 import com.anafthdev.dujer.foundation.window.spScaled
-import com.anafthdev.dujer.ui.theme.dangerColor
+import com.anafthdev.dujer.ui.theme.danger_color
 import com.anafthdev.dujer.ui.theme.medium_shape
 
 @Composable
@@ -102,7 +102,7 @@ fun DeleteWalletPopup(
 				ElevatedButton(
 					shape = MaterialTheme.shapes.medium,
 					colors = ButtonDefaults.elevatedButtonColors(
-						containerColor = dangerColor
+						containerColor = danger_color
 					),
 					onClick = onDelete,
 					modifier = Modifier
