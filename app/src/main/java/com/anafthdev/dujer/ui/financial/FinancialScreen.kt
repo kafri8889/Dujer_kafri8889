@@ -51,7 +51,10 @@ import com.anafthdev.dujer.ui.app.LocalDujerState
 import com.anafthdev.dujer.ui.financial.component.CategoryList
 import com.anafthdev.dujer.ui.financial.component.WalletList
 import com.anafthdev.dujer.ui.financial.data.FinancialAction
-import com.anafthdev.dujer.ui.theme.*
+import com.anafthdev.dujer.ui.theme.Inter
+import com.anafthdev.dujer.ui.theme.Typography
+import com.anafthdev.dujer.ui.theme.medium_shape
+import com.anafthdev.dujer.ui.theme.small_shape
 import com.anafthdev.dujer.uicomponent.FinancialTypeSelector
 import com.anafthdev.dujer.uicomponent.TopAppBar
 import com.anafthdev.dujer.util.AppUtil.toast
@@ -62,7 +65,6 @@ import java.text.SimpleDateFormat
 import kotlin.random.Random
 
 @SuppressLint("RememberReturnType")
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun FinancialScreen(
 	isScreenVisible: Boolean,
@@ -196,7 +198,6 @@ fun FinancialScreen(
 			) {
 				Icon(
 					imageVector = Icons.Rounded.ArrowBack,
-					tint = black04,
 					contentDescription = null
 				)
 			}

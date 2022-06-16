@@ -1,5 +1,6 @@
 package com.anafthdev.dujer.ui.app.environment
 
+import com.anafthdev.dujer.data.db.model.Budget
 import com.anafthdev.dujer.data.db.model.Category
 import com.anafthdev.dujer.data.db.model.Financial
 import com.anafthdev.dujer.data.db.model.Wallet
@@ -11,6 +12,8 @@ import kotlinx.coroutines.flow.Flow
 interface IDujerEnvironment {
 	
 	val dispatcher: CoroutineDispatcher
+	
+	fun getAllBudget(): Flow<List<Budget>>
 	
 	fun getAllWallet(): Flow<List<Wallet>>
 	

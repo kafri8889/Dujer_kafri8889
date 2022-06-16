@@ -17,7 +17,6 @@ import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import timber.log.Timber
 import javax.inject.Inject
 
 @HiltViewModel
@@ -57,6 +56,21 @@ class DujerViewModel @Inject constructor(
 						allCategory = categories.merge(Category.values)
 							.sortedBy { it.name }
 							.distinctBy { it.id }
+					)
+				}
+			}
+		}
+		
+		viewModelScope.launch(environment.dispatcher) {
+			combine(
+				environment.getAllBudget(),
+				environment.getAllFinancial()
+			) { budgets, financials ->
+				budgets to financials
+			}.collect { (budgets, financials) ->
+				setState {
+					copy(
+						allBudget = budgets
 					)
 				}
 			}

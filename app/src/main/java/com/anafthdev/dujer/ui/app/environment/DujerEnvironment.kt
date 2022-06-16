@@ -4,6 +4,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.asFlow
 import com.anafthdev.dujer.data.datastore.AppDatastore
+import com.anafthdev.dujer.data.db.model.Budget
 import com.anafthdev.dujer.data.db.model.Category
 import com.anafthdev.dujer.data.db.model.Financial
 import com.anafthdev.dujer.data.db.model.Wallet
@@ -38,6 +39,10 @@ class DujerEnvironment @Inject constructor(
 	 * deleted financial from [DeleteCategory]
 	 */
 	private val categoryTemp: ArrayList<Category> = arrayListOf()
+	
+	override fun getAllBudget(): Flow<List<Budget>> {
+		return appRepository.budgetRepository.getAll()
+	}
 	
 	override fun getAllWallet(): Flow<List<Wallet>> {
 		return appRepository.walletRepository.getAllWallet()

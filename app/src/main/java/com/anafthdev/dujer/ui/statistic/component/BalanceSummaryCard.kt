@@ -19,8 +19,8 @@ import com.anafthdev.dujer.foundation.uiextension.horizontalScroll
 import com.anafthdev.dujer.foundation.window.dpScaled
 import com.anafthdev.dujer.foundation.window.spScaled
 import com.anafthdev.dujer.model.LocalCurrency
-import com.anafthdev.dujer.ui.theme.expenseColor
-import com.anafthdev.dujer.ui.theme.incomeColor
+import com.anafthdev.dujer.ui.theme.expense_color
+import com.anafthdev.dujer.ui.theme.income_color
 import com.anafthdev.dujer.util.CurrencyFormatter
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -88,7 +88,7 @@ fun BalanceSummaryCard(
 					}",
 					textAlign = TextAlign.End,
 					style = MaterialTheme.typography.bodyMedium.copy(
-						color = incomeColor,
+						color = income_color,
 						fontSize = MaterialTheme.typography.bodyMedium.fontSize.spScaled
 					),
 					modifier = Modifier
@@ -128,7 +128,7 @@ fun BalanceSummaryCard(
 					}",
 					textAlign = TextAlign.End,
 					style = MaterialTheme.typography.bodyMedium.copy(
-						color = expenseColor,
+						color = expense_color,
 						fontSize = MaterialTheme.typography.bodyMedium.fontSize.spScaled
 					),
 					modifier = Modifier

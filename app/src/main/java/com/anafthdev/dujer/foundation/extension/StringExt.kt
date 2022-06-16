@@ -16,6 +16,12 @@ fun String.takeNonDigitString(): String {
 	return builder.toString()
 }
 
+/**
+ * remove non digit char
+ *
+ * ex:
+ * "123abc456" => "123456"
+ */
 fun String.removeNonDigitChar(): String {
 	val nonDigitChar = mutableSetOf<Char>()
 	
@@ -28,6 +34,47 @@ fun String.removeNonDigitChar(): String {
 		newValue = ""
 	)
 }
+
+/**
+ * get start index and end index
+ *
+ * @return (startIndex, endIndex)
+ */
+fun String.indexOf(s: String, ignoreCase: Boolean = false): Pair<Int, Int> {
+	val startIndex = indexOf(string = s, ignoreCase = ignoreCase)
+	val endIndex = startIndex + (s.length - 1)
+	
+	return startIndex to endIndex
+}
+
+//fun String.indexOf(s: String): Pair<Int, Int> {
+//    var match = false
+//    var matchedCount = 0
+//    var firstIndex = -1
+//    var lastIndex = -1
+//
+//    run loop@ {
+//        forEachIndexed { cIndex, c ->
+//            if (matchedCount == s.length) {
+//                lastIndex = cIndex
+//                return@loop
+//            } else {
+//                if (c == s[matchedCount]) {
+//                    val matchTemp = match
+//                    match = c == s[matchedCount]
+//
+//                    if (match and !matchTemp) {
+//                        firstIndex = cIndex
+//                    }
+//
+//                    matchedCount = if (match) matchedCount + 1 else 0
+//                }
+//            }
+//        }
+//    }
+//
+//    return firstIndex to lastIndex
+//}
 
 /**
  * if this string not equals s return default

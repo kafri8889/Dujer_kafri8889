@@ -68,10 +68,12 @@
     <string name="currency_summary">Pilih mata uang yang kamu gunakan</string>
     <string name="category_summary">Tambah atau hapus kategori</string>
     <string name="language_summary">Pilih bahasa yang kamu gunakan</string>
+    <string name="average_per_month">Rata-rata per bulan</string>
     <string name="available_balance">Saldo tersedia</string>
     <string name="currency_format_note">Kami memformat mata uang menggunakan Locale perangkat Anda, beberapa format mungkin tidak sesuai.</string>
     <string name="select_your_language">Pilih bahasa mu</string>
     <string name="bio_auth_description">Verifikasi bahwa ini adalah Anda</string>
+    <string name="set_a_monthly_budget">tetapkan anggaran bulanan</string>
     <string name="change_initial_amount">Ubah jumlah awal</string>
     <string name="no_fp_sensor_detected">Sensor sidik jari tidak terdeteksi</string>
     <string name="title_cannot_be_empty">Judul tidak boleh kosong</string>
@@ -82,9 +84,11 @@
     <string name="display_and_configuration">Tampilan dan Konfigurasi</string>
     <string name="delete_wallet_confirmation">Apakah kamu yakin ingin menghapus dompet ini?</string>
     <string name="wallet_name_cannot_be_empty">Nama dompet tidak boleh kosong</string>
+    <string name="choose_your_budget_category">Pilih kategori anggaran anda</string>
     <string name="new_transaction_will_be_added">Transaksi baru akan ditambahkan</string>
     <string name="category_name_cannot_be_empty">Nama kategori tidak boleh kosong</string>
     <string name="biometric_authentication_summary">Gunakan otentikasi biometrik</string>
+    <string name="budget_with_category_x_already_exists">Anggaran dengan kategori %1$s sudah ada</string>
     <string name="the_category_with_the_highest_spending_will_appear_here">Kategori dengan pengeluaran tertinggi akan muncul disini</string>
 
 </resources>

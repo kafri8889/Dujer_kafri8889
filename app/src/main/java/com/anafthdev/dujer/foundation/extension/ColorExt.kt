@@ -2,6 +2,7 @@ package com.anafthdev.dujer.foundation.extension
 
 import androidx.annotation.FloatRange
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.luminance
 
 /**
  * convert ARGB color int to [Color]
@@ -39,6 +40,21 @@ fun Color.lightenColor(
 		green = this.green + (1 - this.green) * factor,
 		blue = this.blue + (1 - this.blue) * factor
 	) else this
+}
+
+/**
+ * darken color if luminance greater than `moreThanLuminance`
+ * @param moreThanLuminance luminance in percent
+ * @param factor darken factor
+ *
+ * @author kafri8889
+ */
+fun Color.darkenColor(
+	@FloatRange(from = 0.0, to = 100.0) moreThanLuminance: Float,
+	factor: Float
+): Color {
+	val luminancePercent = luminance() * 100
+	return if (luminancePercent > moreThanLuminance) darkenColor(factor) else this
 }
 
 enum class ColorSchemeKeyTokens {
