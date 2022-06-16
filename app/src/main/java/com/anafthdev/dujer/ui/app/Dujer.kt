@@ -22,6 +22,7 @@ import androidx.navigation.navArgument
 import com.anafthdev.dujer.R
 import com.anafthdev.dujer.data.DujerDestination
 import com.anafthdev.dujer.data.FinancialType
+import com.anafthdev.dujer.data.db.model.Budget
 import com.anafthdev.dujer.data.db.model.Category
 import com.anafthdev.dujer.data.db.model.Wallet
 import com.anafthdev.dujer.foundation.extension.isDarkTheme
@@ -31,7 +32,8 @@ import com.anafthdev.dujer.foundation.uimode.data.LocalUiMode
 import com.anafthdev.dujer.foundation.window.dpScaled
 import com.anafthdev.dujer.model.LocalCurrency
 import com.anafthdev.dujer.ui.app.component.CustomSnackbar
-import com.anafthdev.dujer.ui.budget_list.BudgetScreen
+import com.anafthdev.dujer.ui.budget.BudgetScreen
+import com.anafthdev.dujer.ui.budget_list.BudgetListScreen
 import com.anafthdev.dujer.ui.category.CategoryScreen
 import com.anafthdev.dujer.ui.category.data.CategorySwipeAction
 import com.anafthdev.dujer.ui.category_transaction.CategoryTransactionScreen
@@ -280,8 +282,24 @@ fun DujerApp() {
 						)
 					}
 					
-					composable(DujerDestination.BudgetList.route) {
+					composable(
+						route = DujerDestination.Budget.route,
+						arguments = listOf(
+							navArgument("budgetID") {
+								type = NavType.IntType
+							}
+						)
+					) { entry ->
+						val budgetID = entry.arguments?.getInt("budgetID") ?: Budget.defalut.id
+						
 						BudgetScreen(
+							budgetID = budgetID,
+							navController = navController
+						)
+					}
+					
+					composable(DujerDestination.BudgetList.route) {
+						BudgetListScreen(
 							navController = navController
 						)
 					}

@@ -4,6 +4,14 @@ import com.anafthdev.dujer.ui.category.data.CategorySwipeAction
 
 sealed class DujerDestination(val route: String) {
 	
+	object Dashboard: DujerDestination("dashboard") {
+		object Home: DujerDestination("${Dashboard.route}/home")
+		
+		object Export: DujerDestination("${Dashboard.route}/export")
+		
+		object Chart: DujerDestination("${Dashboard.route}/chart")
+	}
+	
 	object IncomeExpense: DujerDestination("incomeExpense/{type}") {
 		fun createRoute(type: FinancialType): String {
 			return "incomeExpense/${type.ordinal}"
@@ -17,14 +25,6 @@ sealed class DujerDestination(val route: String) {
 		): String {
 			return "category/$action/$id"
 		}
-	}
-	
-	object Dashboard: DujerDestination("dashboard") {
-		object Home: DujerDestination("${Dashboard.route}/home")
-		
-		object Export: DujerDestination("${Dashboard.route}/export")
-		
-		object Chart: DujerDestination("${Dashboard.route}/chart")
 	}
 	
 	object Wallet: DujerDestination("wallet/{id}") {
@@ -42,6 +42,12 @@ sealed class DujerDestination(val route: String) {
 	object CategoryTransaction: DujerDestination("category_transaction/{categoryID}") {
 		fun createRoute(categoryID: Int): String {
 			return "category_transaction/$categoryID"
+		}
+	}
+	
+	object Budget: DujerDestination("budget/{budgetID}") {
+		fun createRoute(budgetID: Int): String {
+			return "budget/$budgetID"
 		}
 	}
 	

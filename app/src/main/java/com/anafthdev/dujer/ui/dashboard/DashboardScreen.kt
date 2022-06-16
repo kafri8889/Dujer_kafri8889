@@ -438,6 +438,7 @@ private fun DashboardHomeScreen(
 	val keyboardController = LocalSoftwareKeyboardController.current
 	
 	val wallets = dujerState.allWallet
+	val allBudget = dujerState.allBudget
 	val incomeTransaction = dujerState.allIncomeTransaction
 	val expenseTransaction = dujerState.allExpenseTransaction
 	
@@ -455,8 +456,18 @@ private fun DashboardHomeScreen(
 		incomeTransaction.merge(expenseTransaction).sortedBy { it.dateCreated }
 	}
 	
-	val totalAmountIncomeList = remember(incomeTransaction) { incomeTransaction.sumOf { it.amount } }
-	val totalAmountExpenseList = remember(expenseTransaction) { expenseTransaction.sumOf { it.amount } }
+	val totalAmountBudget = remember(allBudget) { allBudget.sumOf { it.max } }
+	val totalAmountBudgetExpenses = remember(allBudget, expenseTransaction) {
+		val amount = arrayListOf<Double>()
+		allBudget.forEach { budget ->
+			amount.add(
+				expenseTransaction.filter { it.category.id == budget.category.id }
+					.sumOf { it.amount }
+			)
+		}
+		
+		amount.sum()
+	}
 	
 	val walletNameFocusRequester by remember { mutableStateOf(FocusRequester()) }
 	
@@ -578,8 +589,8 @@ private fun DashboardHomeScreen(
 					)
 					
 					BudgetCard(
-						totalExpense = totalAmountExpenseList,
-						totalIncome = totalAmountIncomeList,
+						totalExpense = totalAmountBudgetExpenses,
+						totalBudget = totalAmountBudget,
 						onClick = {
 							navController.navigate(DujerDestination.BudgetList.route)
 						},
@@ -601,7 +612,9 @@ private fun DashboardHomeScreen(
 										DujerDestination.CategoryTransaction.createRoute(
 											highestExpenseCategory.id
 										)
-									)
+									) {
+										launchSingleTop = true
+									}
 								}
 							},
 							modifier = Modifier

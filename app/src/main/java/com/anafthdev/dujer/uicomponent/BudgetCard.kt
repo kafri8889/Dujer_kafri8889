@@ -33,7 +33,7 @@ import java.util.*
 @Composable
 fun BudgetCard(
 	totalExpense: Double,
-	totalIncome: Double,
+	totalBudget: Double,
 	modifier: Modifier = Modifier,
 	onClick: () -> Unit
 ) {
@@ -41,7 +41,7 @@ fun BudgetCard(
 	val uiMode = LocalUiMode.current
 	
 	val indicatorProgress = try {
-		(totalExpense / totalIncome).toFloat()
+		(totalExpense / totalBudget).toFloat()
 	} catch (e: Exception) { 0f }
 	
 	Card(
@@ -85,7 +85,7 @@ fun BudgetCard(
 						textAlign = TextAlign.End,
 						text = CurrencyFormatter.format(
 							locale = deviceLocale,
-							amount = totalIncome - totalExpense,
+							amount = totalBudget - totalExpense,
 							currencyCode = LocalCurrency.current.countryCode
 						),
 						style = Typography.titleMedium.copy(

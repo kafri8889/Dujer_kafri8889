@@ -126,7 +126,6 @@ fun AddBudgetScreen(
 									id = Random(System.currentTimeMillis()).nextInt(),
 									max = budgetAmountDouble,
 									category = selectedCategory,
-									expenseID = emptyList()
 								)
 							)
 						} else onBudgetExists(true)

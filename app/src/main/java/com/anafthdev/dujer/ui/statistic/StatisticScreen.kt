@@ -264,7 +264,9 @@ fun StatisticScreen(
 				onClick = {
 					navController.navigate(
 						DujerDestination.CategoryTransaction.createRoute(category.id)
-					)
+					) {
+						launchSingleTop = true
+					}
 				}
 			)
 		}
