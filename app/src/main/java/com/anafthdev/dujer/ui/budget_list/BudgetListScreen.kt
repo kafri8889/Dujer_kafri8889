@@ -38,7 +38,7 @@ import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
-fun BudgetScreen(
+fun BudgetListScreen(
 	navController: NavController
 ) {
 	
@@ -49,6 +49,7 @@ fun BudgetScreen(
 	val state by viewModel.state.collectAsState()
 	
 	val allBudget = dujerState.allBudget
+	val allExpenseTransaction = dujerState.allExpenseTransaction
 	
 	val isTopSnackbarShowed = state.isTopSnackbarShowed
 	val averagePerMonthCategory = state.averagePerMonthCategory
@@ -165,8 +166,16 @@ fun BudgetScreen(
 					items = allBudget,
 					key = { item: Budget -> item.hashCode() }
 				) { budget ->
+					
+					val expensesAmount = remember(budget, allExpenseTransaction) {
+						allExpenseTransaction
+							.filter { it.category.id == budget.category.id }
+							.sumOf { it.amount }
+					}
+					
 					BudgetCard(
 						budget = budget,
+						expensesAmount = expensesAmount,
 						onClick = {
 						
 						},
