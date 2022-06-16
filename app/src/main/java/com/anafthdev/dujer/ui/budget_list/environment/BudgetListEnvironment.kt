@@ -1,6 +1,10 @@
 package com.anafthdev.dujer.ui.budget_list.environment
 
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.asFlow
 import com.anafthdev.dujer.data.FinancialType
+import com.anafthdev.dujer.data.db.model.Budget
 import com.anafthdev.dujer.data.db.model.Category
 import com.anafthdev.dujer.data.repository.app.IAppRepository
 import com.anafthdev.dujer.foundation.di.DiName
@@ -13,6 +17,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.launch
+import timber.log.Timber
 import java.text.SimpleDateFormat
 import javax.inject.Inject
 import javax.inject.Named
@@ -24,8 +29,11 @@ class BudgetListEnvironment @Inject constructor(
 	
 	private val monthFormatter = SimpleDateFormat("MMM", deviceLocale)
 	
-	private val _averagePerMonthCategory = MutableStateFlow(emptyList<Pair<Double, Category>>())
-	private val averagePerMonthCategory: StateFlow<List<Pair<Double, Category>>> = _averagePerMonthCategory
+	private val _isTopSnackbarShowed = MutableStateFlow(false)
+	private val isTopSnackbarShowed: StateFlow<Boolean> = _isTopSnackbarShowed
+	
+	private val _averagePerMonthCategory = MutableLiveData(emptyList<Pair<Double, Category>>())
+	private val averagePerMonthCategory: LiveData<List<Pair<Double, Category>>> = _averagePerMonthCategory
 	
 	init {
 		CoroutineScope(dispatcher).launch {
@@ -34,9 +42,10 @@ class BudgetListEnvironment @Inject constructor(
 				appRepository.categoryRepository.getAllCategory()
 			) { financials, categories ->
 				financials to categories
-			}.collect { (financials, categories) ->
+			}.collect { (financialList, categoryList) ->
+				val categories = categoryList + Category.expenseValues
 				val average = arrayListOf<Pair<Double, Category>>()
-				val expenses = financials.filter { it.type == FinancialType.EXPENSE }
+				val expenses = financialList.filter { it.type == FinancialType.EXPENSE }
 				val groupedExpensesByCategory = expenses.groupBy { it.category.id }
 				
 				groupedExpensesByCategory.forEachMap { categoryID, mFinancials ->
@@ -52,15 +61,29 @@ class BudgetListEnvironment @Inject constructor(
 					average.add(
 						totalPerMonth.average() to (categories.find { it.id == categoryID } ?: Category.default)
 					)
+					
+					Timber.i("average: $average")
 				}
 				
-				_averagePerMonthCategory.emit(average)
+				_averagePerMonthCategory.postValue(average)
 			}
 		}
 	}
 	
+	override fun isTopSnackbarShowed(): Flow<Boolean> {
+		return isTopSnackbarShowed
+	}
+	
 	override fun getAveragePerMonthCategory(): Flow<List<Pair<Double, Category>>> {
-		return averagePerMonthCategory
+		return averagePerMonthCategory.asFlow()
+	}
+	
+	override suspend fun showTopSnackbar(show: Boolean) {
+		_isTopSnackbarShowed.emit(show)
+	}
+	
+	override suspend fun insertBudget(budget: Budget) {
+		appRepository.budgetRepository.insert(budget)
 	}
 	
 }

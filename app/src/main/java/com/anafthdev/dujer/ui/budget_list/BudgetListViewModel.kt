@@ -25,11 +25,35 @@ class BudgetListViewModel @Inject constructor(
 				}
 			}
 		}
+		
+		viewModelScope.launch(environment.dispatcher) {
+			environment.isTopSnackbarShowed().collect { showed ->
+				setState {
+					copy(
+						isTopSnackbarShowed = showed
+					)
+				}
+			}
+		}
 	}
 	
 	override fun dispatch(action: BudgetListAction) {
 		when (action) {
-		
+			is BudgetListAction.ShowTopSnackbar -> {
+				viewModelScope.launch(environment.dispatcher) {
+					environment.showTopSnackbar(true)
+				}
+			}
+			is BudgetListAction.HideTopSnackbar -> {
+				viewModelScope.launch(environment.dispatcher) {
+					environment.showTopSnackbar(false)
+				}
+			}
+			is BudgetListAction.InsertBudget -> {
+				viewModelScope.launch(environment.dispatcher) {
+					environment.insertBudget(action.budget)
+				}
+			}
 		}
 	}
 	

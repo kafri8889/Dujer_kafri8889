@@ -10,6 +10,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import com.anafthdev.dujer.R
 import com.anafthdev.dujer.data.db.model.Category
 import com.anafthdev.dujer.foundation.extension.darkenColor
@@ -19,7 +21,7 @@ import com.anafthdev.dujer.foundation.uiextension.horizontalScroll
 import com.anafthdev.dujer.foundation.window.dpScaled
 import com.anafthdev.dujer.foundation.window.spScaled
 import com.anafthdev.dujer.model.LocalCurrency
-import com.anafthdev.dujer.ui.theme.Typography
+import com.anafthdev.dujer.ui.theme.*
 import com.anafthdev.dujer.util.CurrencyFormatter
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -44,7 +46,7 @@ fun SelectBudgetCategoryCard(
 		),
 		border = BorderStroke(
 			width = 1.dpScaled,
-			color = if (selected) MaterialTheme.colorScheme.primary
+			color = if (selected) md_theme_light_primary
 			else Color.Transparent
 		),
 		modifier = modifier
@@ -58,6 +60,7 @@ fun SelectBudgetCategoryCard(
 			Icon(
 				painter = painterResource(id = category.iconID),
 				contentDescription = null,
+				tint = category.tint.iconTint.toColor(),
 				modifier = Modifier
 					.padding(8.dpScaled)
 			)
@@ -70,6 +73,8 @@ fun SelectBudgetCategoryCard(
 				Text(
 					text = category.name,
 					style = Typography.bodyMedium.copy(
+						color = black01,
+						fontWeight = FontWeight.Medium,
 						fontSize = Typography.bodyMedium.fontSize.spScaled
 					),
 					modifier = Modifier
@@ -88,6 +93,7 @@ fun SelectBudgetCategoryCard(
 					Text(
 						text = stringResource(id = R.string.average_per_month),
 						style = Typography.bodySmall.copy(
+							color = black04,
 							fontSize = Typography.bodySmall.fontSize.spScaled
 						),
 						modifier = Modifier
@@ -97,12 +103,15 @@ fun SelectBudgetCategoryCard(
 					Spacer(modifier = Modifier.weight(0.1f))
 					
 					Text(
+						maxLines = 1,
+						textAlign = TextAlign.End,
 						text = CurrencyFormatter.format(
 							locale = deviceLocale,
 							amount = averagePerMonth,
 							currencyCode = LocalCurrency.current.countryCode
 						),
 						style = Typography.bodySmall.copy(
+							color = black04,
 							fontSize = Typography.bodySmall.fontSize.spScaled
 						),
 						modifier = Modifier
@@ -117,7 +126,11 @@ fun SelectBudgetCategoryCard(
 			
 			RadioButton(
 				selected = selected,
-				onClick = onClick
+				onClick = onClick,
+				colors = RadioButtonDefaults.colors(
+					selectedColor = md_theme_light_primary,
+					unselectedColor = md_theme_light_onSurface
+				)
 			)
 		}
 	}

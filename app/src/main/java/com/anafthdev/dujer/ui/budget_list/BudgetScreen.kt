@@ -15,10 +15,7 @@ import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -29,6 +26,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.anafthdev.dujer.R
 import com.anafthdev.dujer.data.db.model.Budget
+import com.anafthdev.dujer.foundation.common.DelayManager
 import com.anafthdev.dujer.foundation.window.dpScaled
 import com.anafthdev.dujer.foundation.window.spScaled
 import com.anafthdev.dujer.ui.app.LocalDujerState
@@ -52,6 +50,7 @@ fun BudgetScreen(
 	
 	val allBudget = dujerState.allBudget
 	
+	val isTopSnackbarShowed = state.isTopSnackbarShowed
 	val averagePerMonthCategory = state.averagePerMonthCategory
 	
 	val scope = rememberCoroutineScope()
@@ -59,6 +58,10 @@ fun BudgetScreen(
 		initialValue = ModalBottomSheetValue.Hidden,
 		skipHalfExpanded = true
 	)
+	
+	val delayManager = remember {
+		DelayManager()
+	}
 	
 	val hideAddBudgetScreenSheetState = {
 		scope.launch {
@@ -86,10 +89,24 @@ fun BudgetScreen(
 		sheetState = addBudgetScreenSheetState,
 		sheetContent = {
 			AddBudgetScreen(
+				isScreenVisible = addBudgetScreenSheetState.isVisible,
+				showTopSnackbar = isTopSnackbarShowed,
 				averagePerMonthCategory = averagePerMonthCategory,
 				onBack = hideAddBudgetScreenSheetState,
-				onAdded = {
-				
+				onAdded = { budget ->
+					viewModel.dispatch(
+						BudgetListAction.InsertBudget(budget)
+					)
+					
+					hideAddBudgetScreenSheetState()
+				},
+				onBudgetExists = { isExists ->
+					if (isExists) {
+						viewModel.dispatch(BudgetListAction.ShowTopSnackbar)
+						delayManager.delay(3000) {
+							viewModel.dispatch(BudgetListAction.HideTopSnackbar)
+						}
+					} else viewModel.dispatch(BudgetListAction.HideTopSnackbar)
 				}
 			)
 		}
@@ -152,7 +169,12 @@ fun BudgetScreen(
 						budget = budget,
 						onClick = {
 						
-						}
+						},
+						modifier = Modifier
+							.padding(
+								vertical = 8.dpScaled,
+								horizontal = 16.dpScaled
+							)
 					)
 				}
 				
