@@ -601,7 +601,9 @@ private fun DashboardHomeScreen(
 										DujerDestination.CategoryTransaction.createRoute(
 											highestExpenseCategory.id
 										)
-									)
+									) {
+										launchSingleTop = true
+									}
 								}
 							},
 							modifier = Modifier
