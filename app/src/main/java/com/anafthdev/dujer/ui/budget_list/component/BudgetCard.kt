@@ -206,7 +206,7 @@ fun BudgetCard(
 					.fillMaxWidth()
 			) {
 				Text(
-					text = stringResource(id = R.string.total),
+					text = stringResource(id = R.string.remaining),
 					overflow = TextOverflow.Ellipsis,
 					style = MaterialTheme.typography.bodyMedium.copy(
 						color = black01,
