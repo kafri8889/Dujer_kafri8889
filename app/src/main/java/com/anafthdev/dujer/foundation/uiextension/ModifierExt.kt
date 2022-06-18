@@ -12,7 +12,6 @@ import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.dp
 import com.anafthdev.dujer.foundation.common.DelayManager
-import com.anafthdev.dujer.foundation.common.EventCountdownTimer
 import kotlinx.coroutines.launch
 
 /**

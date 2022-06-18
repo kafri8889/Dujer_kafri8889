@@ -20,7 +20,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.focus.FocusRequester
-import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
@@ -33,6 +32,9 @@ import androidx.compose.ui.text.input.TextFieldValue
 import com.anafthdev.dujer.R
 import com.anafthdev.dujer.data.WalletIcons
 import com.anafthdev.dujer.data.db.model.Wallet
+import com.anafthdev.dujer.foundation.common.FocusHandler
+import com.anafthdev.dujer.foundation.common.detectGesture
+import com.anafthdev.dujer.foundation.common.freeFocusOnClickOutside
 import com.anafthdev.dujer.foundation.extension.deviceLocale
 import com.anafthdev.dujer.foundation.extension.isLightTheme
 import com.anafthdev.dujer.foundation.extension.toColor
@@ -50,7 +52,6 @@ import com.google.accompanist.flowlayout.FlowMainAxisAlignment
 import com.google.accompanist.flowlayout.FlowRow
 import kotlin.random.Random
 
-@OptIn(ExperimentalLayoutApi::class)
 @Composable
 fun AddWalletScreen(
 	isScreenVisible: Boolean,
@@ -63,6 +64,9 @@ fun AddWalletScreen(
 	val localCurrency = LocalCurrency.current
 	val context = LocalContext.current
 	val focusManager = LocalFocusManager.current
+	
+	val focusHandler = remember { FocusHandler(focusManager) }
+	val walletBalanceFocusRequester = remember { FocusRequester() }
 	
 	var walletName by remember { mutableStateOf("") }
 	var walletTint by remember { mutableStateOf(CategoryTint.tint_1) }
@@ -90,6 +94,7 @@ fun AddWalletScreen(
 	Column(
 		modifier = Modifier
 			.fillMaxWidth()
+			.detectGesture(focusHandler)
 			.background(
 				if (uiMode.isLightTheme()) MaterialTheme.colorScheme.background
 				else MaterialTheme.colorScheme.surfaceVariant
@@ -196,7 +201,11 @@ fun AddWalletScreen(
 						bottom = 16.dpScaled
 					)
 					.fillMaxWidth()
-					.focusRequester(walletNameFocusRequester)
+					.freeFocusOnClickOutside(
+						"walletName",
+						walletNameFocusRequester,
+						focusHandler
+					)
 			)
 			
 			Text(
@@ -247,7 +256,11 @@ fun AddWalletScreen(
 						bottom = 16.dpScaled
 					)
 					.fillMaxWidth()
-					.focusRequester(walletNameFocusRequester)
+					.freeFocusOnClickOutside(
+					"walletBalance",
+						walletBalanceFocusRequester,
+						focusHandler
+					)
 			)
 			
 			Row(

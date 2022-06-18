@@ -35,6 +35,7 @@
     <string name="dashboard">Dashboard</string>
     <string name="my_income">My Income</string>
     <string name="no_result">No result</string>
+    <string name="remaining">Remaining</string>
     <string name="dark_theme">Dark theme</string>
     <string name="income_for">Income for %1$s</string>
     <string name="budget_for">Budget for %1$s</string>

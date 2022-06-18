@@ -25,7 +25,6 @@ import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.focus.FocusRequester
-import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
@@ -42,6 +41,9 @@ import com.anafthdev.dujer.data.CategoryIcons
 import com.anafthdev.dujer.data.DujerDestination
 import com.anafthdev.dujer.data.FinancialType
 import com.anafthdev.dujer.data.db.model.Category
+import com.anafthdev.dujer.foundation.common.FocusHandler
+import com.anafthdev.dujer.foundation.common.detectGesture
+import com.anafthdev.dujer.foundation.common.freeFocusOnClickOutside
 import com.anafthdev.dujer.foundation.extension.*
 import com.anafthdev.dujer.foundation.uimode.data.LocalUiMode
 import com.anafthdev.dujer.foundation.window.dpScaled
@@ -83,6 +85,9 @@ fun CategoryScreen(
 	
 	val categoryViewModel = hiltViewModel<CategoryViewModel>()
 	
+	val focusHandler = remember { FocusHandler(focusManager) }
+	val categoryNameFocusRequester = remember { FocusRequester() }
+	
 	val scope = rememberCoroutineScope()
 	val sheetState = rememberModalBottomSheetState(
 		initialValue = ModalBottomSheetValue.Hidden,
@@ -101,8 +106,6 @@ fun CategoryScreen(
 	var selectedFinancialTypeNewCategory by remember { mutableStateOf(FinancialType.INCOME) }
 	
 	var selectedFinancialType by remember { mutableStateOf(FinancialType.INCOME) }
-	
-	val categoryNameFocusRequester = remember { FocusRequester() }
 	
 	val incomeCategories = remember(categories, selectedFinancialType) {
 		categories.filter { it.type == FinancialType.INCOME }
@@ -196,6 +199,7 @@ fun CategoryScreen(
 					)
 					.statusBarsPadding()
 					.verticalScroll(rememberScrollState())
+					.detectGesture(focusHandler)
 			) {
 				Box(
 					modifier = Modifier
@@ -305,7 +309,11 @@ fun CategoryScreen(
 							bottom = 16.dpScaled
 						)
 						.fillMaxWidth()
-						.focusRequester(categoryNameFocusRequester)
+						.freeFocusOnClickOutside(
+							"categoryName",
+							categoryNameFocusRequester,
+							focusHandler
+						)
 				)
 				
 				FlowRow(
