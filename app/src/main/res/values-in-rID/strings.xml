@@ -35,6 +35,7 @@
     <string name="dashboard">Dasbor</string>
     <string name="my_income">Pemasukan saya</string>
     <string name="no_result">Tidak ada hasil</string>
+    <string name="remaining">Tersisa</string>
     <string name="dark_theme">Tema gelap</string>
     <string name="income_for">Pemasukan untuk %1$s</string>
     <string name="budget_for">Anggaran bulan %1$s</string>
