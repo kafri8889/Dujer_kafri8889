@@ -21,6 +21,7 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.anafthdev.dujer.R
+import com.anafthdev.dujer.foundation.ui.LocalUiColor
 import com.anafthdev.dujer.foundation.window.dpScaled
 import com.anafthdev.dujer.foundation.window.spScaled
 import com.anafthdev.dujer.model.Currency
@@ -74,6 +75,7 @@ fun ChangeCurrencyScreen(
 			Text(
 				text = stringResource(id = R.string.change_currency),
 				style = MaterialTheme.typography.titleLarge.copy(
+					color = LocalUiColor.current.headlineText,
 					fontWeight = FontWeight.Bold,
 					fontSize = Typography.titleLarge.fontSize.spScaled
 				)

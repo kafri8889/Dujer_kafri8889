@@ -15,6 +15,7 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import com.anafthdev.dujer.foundation.extension.deviceLocale
+import com.anafthdev.dujer.foundation.ui.LocalUiColor
 import com.anafthdev.dujer.foundation.window.dpScaled
 import com.anafthdev.dujer.foundation.window.spScaled
 import com.anafthdev.dujer.util.AppUtil
@@ -66,8 +67,9 @@ fun YearSelector(
 		
 		Text(
 			text = yearFormatter.format(selectedTimeInMillis),
-			style = MaterialTheme.typography.bodyLarge.copy(
-				fontSize = MaterialTheme.typography.bodyLarge.fontSize.spScaled
+			style = MaterialTheme.typography.titleMedium.copy(
+				color = LocalUiColor.current.titleText,
+				fontSize = MaterialTheme.typography.titleMedium.fontSize.spScaled
 			),
 			modifier = Modifier
 				.padding(4.dpScaled)

@@ -46,6 +46,7 @@ import com.anafthdev.dujer.data.db.model.Financial
 import com.anafthdev.dujer.data.db.model.Wallet
 import com.anafthdev.dujer.foundation.extension.getBy
 import com.anafthdev.dujer.foundation.extension.merge
+import com.anafthdev.dujer.foundation.ui.LocalUiColor
 import com.anafthdev.dujer.foundation.window.dpScaled
 import com.anafthdev.dujer.foundation.window.spScaled
 import com.anafthdev.dujer.ui.app.LocalDujerState
@@ -294,6 +295,7 @@ private fun DashboardContent(
 				Text(
 					text = stringResource(id = R.string.dashboard),
 					style = Typography.titleLarge.copy(
+						color = LocalUiColor.current.headlineText,
 						fontWeight = FontWeight.Bold,
 						fontSize = Typography.titleLarge.fontSize.spScaled
 					)

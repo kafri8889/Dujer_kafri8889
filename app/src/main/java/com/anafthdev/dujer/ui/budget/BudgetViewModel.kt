@@ -25,13 +25,68 @@ class BudgetViewModel @Inject constructor(
 				}
 			}
 		}
+		
+		viewModelScope.launch(environment.dispatcher) {
+			environment.getBarEntries().collect { entries ->
+				setState {
+					copy(
+						barEntries = entries
+					)
+				}
+			}
+		}
+		
+		viewModelScope.launch(environment.dispatcher) {
+			environment.getTransactions().collect { transactions ->
+				setState {
+					copy(
+						transactions = transactions
+					)
+				}
+			}
+		}
+		
+		viewModelScope.launch(environment.dispatcher) {
+			environment.getSortType().collect { type ->
+				setState {
+					copy(
+						sortType = type
+					)
+				}
+			}
+		}
+		
+		viewModelScope.launch(environment.dispatcher) {
+			environment.getSelectedMonth().collect { months ->
+				setState {
+					copy(
+						selectedMonth = months
+					)
+				}
+			}
+		}
 	}
 	
 	override fun dispatch(action: BudgetAction) {
 		when (action) {
 			is BudgetAction.GetBudget -> {
 				viewModelScope.launch(environment.dispatcher) {
-					environment
+					environment.setBudget(action.id)
+				}
+			}
+			is BudgetAction.UpdateBudget -> {
+				viewModelScope.launch(environment.dispatcher) {
+					environment.updateBudget(action.budget)
+				}
+			}
+			is BudgetAction.SetSortType -> {
+				viewModelScope.launch(environment.dispatcher) {
+					environment.setSortType(action.sortType)
+				}
+			}
+			is BudgetAction.SetSelectedMonth -> {
+				viewModelScope.launch(environment.dispatcher) {
+					environment.setSelectedMonth(action.months)
 				}
 			}
 		}

@@ -14,6 +14,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import com.anafthdev.dujer.R
 import com.anafthdev.dujer.foundation.extension.deviceLocale
+import com.anafthdev.dujer.foundation.ui.LocalUiColor
 import com.anafthdev.dujer.foundation.uiextension.horizontalScroll
 import com.anafthdev.dujer.foundation.window.dpScaled
 import com.anafthdev.dujer.foundation.window.spScaled
@@ -44,6 +45,7 @@ fun BalanceInfoCard(
 			Text(
 				text = stringResource(id = R.string.balance),
 				style = MaterialTheme.typography.titleMedium.copy(
+					color = LocalUiColor.current.titleText,
 					fontWeight = FontWeight.SemiBold,
 					fontSize = MaterialTheme.typography.titleMedium.fontSize.spScaled
 				),
@@ -65,6 +67,7 @@ fun BalanceInfoCard(
 					text = stringResource(id = R.string.initial_balance),
 					textAlign = TextAlign.Start,
 					style = MaterialTheme.typography.bodyMedium.copy(
+						color = LocalUiColor.current.titleText,
 						fontSize = MaterialTheme.typography.bodyMedium.fontSize.spScaled
 					),
 					modifier = Modifier
@@ -79,6 +82,7 @@ fun BalanceInfoCard(
 					),
 					textAlign = TextAlign.End,
 					style = MaterialTheme.typography.bodyMedium.copy(
+						color = LocalUiColor.current.titleText,
 						fontSize = MaterialTheme.typography.bodyMedium.fontSize.spScaled
 					),
 					modifier = Modifier
@@ -102,6 +106,7 @@ fun BalanceInfoCard(
 					text = stringResource(id = R.string.current_balance),
 					textAlign = TextAlign.Start,
 					style = MaterialTheme.typography.bodyMedium.copy(
+						color = LocalUiColor.current.titleText,
 						fontSize = MaterialTheme.typography.bodyMedium.fontSize.spScaled
 					),
 					modifier = Modifier
@@ -116,6 +121,7 @@ fun BalanceInfoCard(
 					),
 					textAlign = TextAlign.End,
 					style = MaterialTheme.typography.bodyMedium.copy(
+						color = LocalUiColor.current.titleText,
 						fontSize = MaterialTheme.typography.bodyMedium.fontSize.spScaled
 					),
 					modifier = Modifier

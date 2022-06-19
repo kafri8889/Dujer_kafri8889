@@ -27,6 +27,8 @@ import com.anafthdev.dujer.data.db.model.Category
 import com.anafthdev.dujer.data.db.model.Wallet
 import com.anafthdev.dujer.foundation.extension.isDarkTheme
 import com.anafthdev.dujer.foundation.extension.toArray
+import com.anafthdev.dujer.foundation.ui.LocalUiColor
+import com.anafthdev.dujer.foundation.ui.UiColor
 import com.anafthdev.dujer.foundation.uimode.UiModeViewModel
 import com.anafthdev.dujer.foundation.uimode.data.LocalUiMode
 import com.anafthdev.dujer.foundation.window.dpScaled
@@ -42,13 +44,10 @@ import com.anafthdev.dujer.ui.dashboard.DashboardScreen
 import com.anafthdev.dujer.ui.income_expense.IncomeExpenseScreen
 import com.anafthdev.dujer.ui.setting.SettingScreen
 import com.anafthdev.dujer.ui.statistic.StatisticScreen
-import com.anafthdev.dujer.ui.theme.DujerTheme
-import com.anafthdev.dujer.ui.theme.black01
-import com.anafthdev.dujer.ui.theme.black10
+import com.anafthdev.dujer.ui.theme.*
 import com.anafthdev.dujer.ui.wallet.WalletScreen
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
 import kotlinx.coroutines.Dispatchers
-
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @OptIn(
@@ -120,6 +119,13 @@ fun DujerApp() {
 	) {
 		CompositionLocalProvider(
 			LocalUiMode provides uiMode,
+			LocalUiColor provides UiColor(
+				headlineText = if (isSystemInDarkTheme) black09 else black02,
+				titleText = if (isSystemInDarkTheme) black08 else black03,
+				normalText = if (isSystemInDarkTheme) black10 else black01,
+				bodyText = if (isSystemInDarkTheme) black07 else black05,
+				labelText = if (isSystemInDarkTheme) black06 else black06
+			),
 			LocalCurrency provides currentCurrency,
 			LocalDujerState provides state,
 			LocalContentColor provides if (isSystemInDarkTheme) black10 else black01,

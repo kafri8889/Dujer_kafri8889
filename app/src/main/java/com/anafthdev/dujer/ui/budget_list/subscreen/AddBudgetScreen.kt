@@ -16,10 +16,8 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -34,17 +32,18 @@ import com.anafthdev.dujer.R
 import com.anafthdev.dujer.data.FinancialType
 import com.anafthdev.dujer.data.db.model.Budget
 import com.anafthdev.dujer.data.db.model.Category
-import com.anafthdev.dujer.foundation.common.FocusHandler
-import com.anafthdev.dujer.foundation.common.detectGesture
-import com.anafthdev.dujer.foundation.common.freeFocusOnClickOutside
 import com.anafthdev.dujer.foundation.extension.*
+import com.anafthdev.dujer.foundation.ui.LocalUiColor
 import com.anafthdev.dujer.foundation.uimode.data.LocalUiMode
 import com.anafthdev.dujer.foundation.window.dpScaled
 import com.anafthdev.dujer.foundation.window.spScaled
 import com.anafthdev.dujer.model.LocalCurrency
 import com.anafthdev.dujer.ui.app.LocalDujerState
 import com.anafthdev.dujer.ui.budget_list.component.SelectBudgetCategoryCard
-import com.anafthdev.dujer.ui.theme.*
+import com.anafthdev.dujer.ui.theme.Inter
+import com.anafthdev.dujer.ui.theme.Typography
+import com.anafthdev.dujer.ui.theme.small_shape
+import com.anafthdev.dujer.ui.theme.warning_color
 import com.anafthdev.dujer.uicomponent.TopAppBar
 import com.anafthdev.dujer.util.AppUtil.toast
 import com.anafthdev.dujer.util.CurrencyFormatter
@@ -65,15 +64,10 @@ fun AddBudgetScreen(
 	val uiMode = LocalUiMode.current
 	val context = LocalContext.current
 	val dujerState = LocalDujerState.current
-	val focusManager = LocalFocusManager.current
 	val localCurrency = LocalCurrency.current
 	val keyboardController = LocalSoftwareKeyboardController.current
 	
 	val allBudget = dujerState.allBudget
-	val allExpenseTransaction = dujerState.allExpenseTransaction
-	
-	val focusHandler = remember { FocusHandler(focusManager) }
-	val monthlyBudgetFocusRequester = remember { FocusRequester() }
 	
 	val categories = remember(dujerState.allCategory) {
 		dujerState.allCategory
@@ -110,7 +104,6 @@ fun AddBudgetScreen(
 			.background(MaterialTheme.colorScheme.background)
 			.systemBarsPadding()
 			.verticalScroll(rememberScrollState())
-			.detectGesture(focusHandler)
 	) {
 		TopAppBar {
 			IconButton(
@@ -198,6 +191,7 @@ fun AddBudgetScreen(
 								if (i in startIndex..endIndex) {
 									withStyle(
 										MaterialTheme.typography.bodyMedium.copy(
+											color = LocalUiColor.current.titleText,
 											fontWeight = FontWeight.SemiBold
 										).toSpanStyle()
 									) {
@@ -205,7 +199,7 @@ fun AddBudgetScreen(
 									}
 								} else withStyle(
 									MaterialTheme.typography.bodyMedium.copy(
-										color = if (uiMode.isLightTheme()) black04 else black08
+										color = LocalUiColor.current.bodyText
 									).toSpanStyle()
 								) {
 									append(c)
@@ -225,6 +219,7 @@ fun AddBudgetScreen(
 		Text(
 			text = stringResource(id = R.string.set_a_monthly_budget),
 			style = MaterialTheme.typography.bodyLarge.copy(
+				color = LocalUiColor.current.bodyText,
 				fontSize = MaterialTheme.typography.bodyLarge.fontSize.spScaled
 			),
 			modifier = Modifier
@@ -273,16 +268,12 @@ fun AddBudgetScreen(
 					bottom = 16.dpScaled,
 				)
 				.fillMaxWidth()
-				.freeFocusOnClickOutside(
-					"tf",
-					monthlyBudgetFocusRequester,
-					focusHandler
-				)
 		)
 		
 		Text(
 			text = stringResource(id = R.string.choose_your_budget_category),
 			style = MaterialTheme.typography.bodyLarge.copy(
+				color = LocalUiColor.current.bodyText,
 				fontSize = MaterialTheme.typography.bodyLarge.fontSize.spScaled
 			),
 			modifier = Modifier

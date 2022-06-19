@@ -17,12 +17,11 @@ import com.anafthdev.dujer.R
 import com.anafthdev.dujer.data.db.model.Category
 import com.anafthdev.dujer.foundation.extension.deviceLocale
 import com.anafthdev.dujer.foundation.extension.toColor
+import com.anafthdev.dujer.foundation.ui.LocalUiColor
 import com.anafthdev.dujer.foundation.uiextension.horizontalScroll
 import com.anafthdev.dujer.foundation.window.dpScaled
 import com.anafthdev.dujer.foundation.window.spScaled
 import com.anafthdev.dujer.model.LocalCurrency
-import com.anafthdev.dujer.ui.theme.Typography
-import com.anafthdev.dujer.ui.theme.black01
 import com.anafthdev.dujer.ui.theme.large_shape
 import com.anafthdev.dujer.ui.theme.md_theme_light_secondaryContainer
 import com.anafthdev.dujer.util.AppUtil
@@ -61,10 +60,10 @@ fun HighestExpenseCard(
 			) {
 				Text(
 					text = stringResource(id = R.string.highest_expense),
-					style = Typography.bodyMedium.copy(
-						color = black01,
+					style = MaterialTheme.typography.titleSmall.copy(
+						color = LocalUiColor.current.titleText,
 						fontWeight = FontWeight.SemiBold,
-						fontSize = Typography.bodyMedium.fontSize.spScaled
+						fontSize = MaterialTheme.typography.titleSmall.fontSize.spScaled
 					),
 					modifier = Modifier
 						.weight(0.8f)
@@ -77,10 +76,10 @@ fun HighestExpenseCard(
 				Text(
 					textAlign = TextAlign.End,
 					text = AppUtil.longMonths[Calendar.getInstance()[Calendar.MONTH]],
-					style = Typography.titleMedium.copy(
-						color = black01,
+					style = MaterialTheme.typography.titleSmall.copy(
+						color = LocalUiColor.current.titleText,
 						fontWeight = FontWeight.SemiBold,
-						fontSize = Typography.bodyMedium.fontSize.spScaled
+						fontSize = MaterialTheme.typography.titleSmall.fontSize.spScaled
 					),
 					modifier = Modifier
 						.weight(0.2f)
@@ -114,8 +113,9 @@ fun HighestExpenseCard(
 					maxLines = 1,
 					text = category.name,
 					overflow = TextOverflow.Ellipsis,
-					style = Typography.bodyMedium.copy(
-						fontSize = Typography.bodyMedium.fontSize.spScaled
+					style = MaterialTheme.typography.bodyMedium.copy(
+						color = LocalUiColor.current.titleText,
+						fontSize = MaterialTheme.typography.bodyMedium.fontSize.spScaled
 					),
 					modifier = Modifier
 						.weight(0.35f)
@@ -136,9 +136,10 @@ fun HighestExpenseCard(
 						currencyCode = LocalCurrency.current.countryCode
 					),
 					overflow = TextOverflow.Ellipsis,
-					style = Typography.bodyMedium.copy(
+					style = MaterialTheme.typography.titleSmall.copy(
+						color = LocalUiColor.current.titleText,
 						fontWeight = FontWeight.SemiBold,
-						fontSize = Typography.bodyMedium.fontSize.spScaled
+						fontSize = MaterialTheme.typography.titleSmall.fontSize.spScaled
 					),
 					modifier = Modifier
 						.weight(0.45f)

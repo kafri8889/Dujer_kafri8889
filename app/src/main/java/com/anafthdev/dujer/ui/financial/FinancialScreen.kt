@@ -44,6 +44,7 @@ import com.anafthdev.dujer.foundation.extension.deviceLocale
 import com.anafthdev.dujer.foundation.extension.get
 import com.anafthdev.dujer.foundation.extension.showDatePicker
 import com.anafthdev.dujer.foundation.extension.toColor
+import com.anafthdev.dujer.foundation.ui.LocalUiColor
 import com.anafthdev.dujer.foundation.window.dpScaled
 import com.anafthdev.dujer.foundation.window.spScaled
 import com.anafthdev.dujer.model.LocalCurrency
@@ -52,7 +53,6 @@ import com.anafthdev.dujer.ui.financial.component.CategoryList
 import com.anafthdev.dujer.ui.financial.component.WalletList
 import com.anafthdev.dujer.ui.financial.data.FinancialAction
 import com.anafthdev.dujer.ui.theme.Inter
-import com.anafthdev.dujer.ui.theme.Typography
 import com.anafthdev.dujer.ui.theme.medium_shape
 import com.anafthdev.dujer.ui.theme.small_shape
 import com.anafthdev.dujer.uicomponent.FinancialTypeSelector
@@ -212,9 +212,10 @@ fun FinancialScreen(
 					id = if (financialAction == FinancialAction.NEW) R.string._new
 					else R.string.edit
 				),
-				style = Typography.headlineSmall.copy(
+				style = MaterialTheme.typography.headlineSmall.copy(
+					color = LocalUiColor.current.headlineText,
 					fontWeight = FontWeight.SemiBold,
-					fontSize = Typography.headlineSmall.fontSize.spScaled
+					fontSize = MaterialTheme.typography.headlineSmall.fontSize.spScaled
 				)
 			)
 			
@@ -225,9 +226,10 @@ fun FinancialScreen(
 			) {
 				Text(
 					text = stringResource(id = R.string.title),
-					style = Typography.bodyLarge.copy(
+					style = MaterialTheme.typography.titleMedium.copy(
+						color = LocalUiColor.current.titleText,
 						fontWeight = FontWeight.Medium,
-						fontSize = Typography.bodyLarge.fontSize.spScaled
+						fontSize = MaterialTheme.typography.titleMedium.fontSize.spScaled
 					),
 					modifier = Modifier
 						.padding(top = 24.dpScaled)
@@ -254,9 +256,10 @@ fun FinancialScreen(
 				
 				Text(
 					text = stringResource(id = R.string.amount),
-					style = Typography.bodyLarge.copy(
+					style = MaterialTheme.typography.titleMedium.copy(
+						color = LocalUiColor.current.titleText,
 						fontWeight = FontWeight.Medium,
-						fontSize = Typography.bodyLarge.fontSize.spScaled
+						fontSize = MaterialTheme.typography.titleMedium.fontSize.spScaled
 					),
 					modifier = Modifier
 						.padding(top = 24.dpScaled)
@@ -286,9 +289,10 @@ fun FinancialScreen(
 								locale = deviceLocale,
 								currencyCode = localCurrency.countryCode
 							),
-							style = Typography.bodyMedium.copy(
+							style = MaterialTheme.typography.bodyMedium.copy(
+								color = LocalUiColor.current.titleText,
 								fontWeight = FontWeight.Medium,
-								fontSize = Typography.bodyMedium.fontSize.spScaled
+								fontSize = MaterialTheme.typography.bodyMedium.fontSize.spScaled
 							)
 						)
 					},
@@ -303,9 +307,10 @@ fun FinancialScreen(
 				
 				Text(
 					text = stringResource(id = R.string.date),
-					style = Typography.bodyLarge.copy(
+					style = MaterialTheme.typography.titleMedium.copy(
+						color = LocalUiColor.current.titleText,
 						fontWeight = FontWeight.Medium,
-						fontSize = Typography.bodyLarge.fontSize.spScaled
+						fontSize = MaterialTheme.typography.titleMedium.fontSize.spScaled
 					),
 					modifier = Modifier
 						.padding(top = 24.dpScaled)
@@ -349,9 +354,10 @@ fun FinancialScreen(
 				
 				Text(
 					text = stringResource(id = R.string.category),
-					style = Typography.bodyLarge.copy(
+					style = MaterialTheme.typography.titleMedium.copy(
+						color = LocalUiColor.current.titleText,
 						fontWeight = FontWeight.Medium,
-						fontSize = Typography.bodyLarge.fontSize.spScaled
+						fontSize = MaterialTheme.typography.titleMedium.fontSize.spScaled
 					),
 					modifier = Modifier
 						.padding(top = 24.dpScaled)
@@ -416,9 +422,10 @@ fun FinancialScreen(
 				
 				Text(
 					text = stringResource(id = R.string.wallet),
-					style = Typography.bodyLarge.copy(
+					style = MaterialTheme.typography.titleMedium.copy(
+						color = LocalUiColor.current.titleText,
 						fontWeight = FontWeight.Medium,
-						fontSize = Typography.bodyLarge.fontSize.spScaled
+						fontSize = MaterialTheme.typography.titleMedium.fontSize.spScaled
 					),
 					modifier = Modifier
 						.padding(top = 24.dpScaled)
@@ -508,9 +515,10 @@ fun FinancialScreen(
 				
 				Text(
 					text = stringResource(id = R.string.type),
-					style = Typography.bodyLarge.copy(
+					style = MaterialTheme.typography.titleMedium.copy(
+						color = LocalUiColor.current.titleText,
 						fontWeight = FontWeight.Medium,
-						fontSize = Typography.bodyLarge.fontSize.spScaled
+						fontSize = MaterialTheme.typography.titleMedium.fontSize.spScaled
 					),
 					modifier = Modifier
 						.padding(top = 24.dpScaled)

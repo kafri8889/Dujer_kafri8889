@@ -44,6 +44,7 @@ import com.anafthdev.dujer.data.db.model.Category
 import com.anafthdev.dujer.data.db.model.Financial
 import com.anafthdev.dujer.foundation.extension.deviceLocale
 import com.anafthdev.dujer.foundation.extension.toColor
+import com.anafthdev.dujer.foundation.ui.LocalUiColor
 import com.anafthdev.dujer.foundation.uiextension.horizontalScroll
 import com.anafthdev.dujer.foundation.window.dpScaled
 import com.anafthdev.dujer.foundation.window.spScaled
@@ -410,6 +411,7 @@ private fun WalletScreenContent(
 					Text(
 						text = stringResource(id = R.string.wallet),
 						style = Typography.titleLarge.copy(
+							color = LocalUiColor.current.headlineText,
 							fontWeight = FontWeight.Bold,
 							fontSize = Typography.titleLarge.fontSize.spScaled
 						)
@@ -488,9 +490,9 @@ private fun WalletScreenContent(
 				) {
 					Text(
 						text = wallet.name,
-						style = MaterialTheme.typography.bodyLarge.copy(
-							fontWeight = FontWeight.SemiBold,
-							fontSize = MaterialTheme.typography.bodyLarge.fontSize.spScaled
+						style = MaterialTheme.typography.titleMedium.copy(
+							color = LocalUiColor.current.titleText,
+							fontSize = MaterialTheme.typography.titleMedium.fontSize.spScaled
 						)
 					)
 					
@@ -508,9 +510,10 @@ private fun WalletScreenContent(
 					maxLines = 1,
 					textAlign = TextAlign.Center,
 					text = balance,
-					style = MaterialTheme.typography.bodyLarge.copy(
+					style = MaterialTheme.typography.titleMedium.copy(
+						color = LocalUiColor.current.titleText,
 						fontWeight = FontWeight.SemiBold,
-						fontSize = MaterialTheme.typography.bodyLarge.fontSize.spScaled
+						fontSize = MaterialTheme.typography.titleMedium.fontSize.spScaled
 					),
 					modifier = Modifier
 						.padding(
@@ -557,6 +560,7 @@ private fun WalletScreenContent(
 							Text(
 								text = stringResource(id = R.string.initial_balance),
 								style = MaterialTheme.typography.bodyMedium.copy(
+									color = LocalUiColor.current.titleText,
 									fontSize = MaterialTheme.typography.bodyMedium.fontSize.spScaled
 								),
 								modifier = Modifier
@@ -567,9 +571,10 @@ private fun WalletScreenContent(
 								maxLines = 1,
 								textAlign = TextAlign.End,
 								text = initialBalance,
-								style = MaterialTheme.typography.bodyMedium.copy(
+								style = MaterialTheme.typography.titleSmall.copy(
+									color = LocalUiColor.current.titleText,
 									fontWeight = FontWeight.Medium,
-									fontSize = MaterialTheme.typography.bodyMedium.fontSize.spScaled
+									fontSize = MaterialTheme.typography.titleSmall.fontSize.spScaled
 								),
 								modifier = Modifier
 									.weight(0.6f)
@@ -590,6 +595,7 @@ private fun WalletScreenContent(
 							Text(
 								text = stringResource(id = R.string.income),
 								style = MaterialTheme.typography.bodyMedium.copy(
+									color = LocalUiColor.current.titleText,
 									fontSize = MaterialTheme.typography.bodyMedium.fontSize.spScaled
 								),
 								modifier = Modifier
@@ -619,6 +625,7 @@ private fun WalletScreenContent(
 							Text(
 								text = stringResource(id = R.string.expenses),
 								style = MaterialTheme.typography.bodyMedium.copy(
+									color = LocalUiColor.current.titleText,
 									fontSize = MaterialTheme.typography.bodyMedium.fontSize.spScaled
 								),
 								modifier = Modifier
@@ -692,8 +699,9 @@ private fun WalletScreenContent(
 				) {
 					Text(
 						text = stringResource(id = R.string.transaction),
-						style = MaterialTheme.typography.bodyLarge.copy(
-							fontSize = MaterialTheme.typography.bodyLarge.fontSize.spScaled
+						style = MaterialTheme.typography.titleMedium.copy(
+							color = LocalUiColor.current.titleText,
+							fontSize = MaterialTheme.typography.titleMedium.fontSize.spScaled
 						)
 					)
 					
@@ -722,8 +730,9 @@ private fun WalletScreenContent(
 							id = if (sortType == SortType.HIGHEST) R.string.highest
 							else R.string.lowest
 						),
-						style = MaterialTheme.typography.bodyLarge.copy(
-							fontSize = MaterialTheme.typography.bodyLarge.fontSize.spScaled
+						style = MaterialTheme.typography.titleMedium.copy(
+							color = LocalUiColor.current.titleText,
+							fontSize = MaterialTheme.typography.titleMedium.fontSize.spScaled
 						)
 					)
 				}

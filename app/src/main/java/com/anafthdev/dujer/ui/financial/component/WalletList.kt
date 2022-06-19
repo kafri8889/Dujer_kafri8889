@@ -21,6 +21,7 @@ import com.anafthdev.dujer.data.db.model.Wallet
 import com.anafthdev.dujer.foundation.extension.deviceLocale
 import com.anafthdev.dujer.foundation.extension.isLightTheme
 import com.anafthdev.dujer.foundation.extension.toColor
+import com.anafthdev.dujer.foundation.ui.LocalUiColor
 import com.anafthdev.dujer.foundation.uiextension.horizontalScroll
 import com.anafthdev.dujer.foundation.uimode.data.LocalUiMode
 import com.anafthdev.dujer.foundation.window.dpScaled
@@ -87,9 +88,10 @@ fun WalletList(
 						text = wallet.name,
 						overflow = TextOverflow.Ellipsis,
 						textAlign = TextAlign.Center,
-						style = MaterialTheme.typography.bodyMedium.copy(
+						style = MaterialTheme.typography.titleSmall.copy(
+							color = LocalUiColor.current.titleText,
 							fontWeight = FontWeight.SemiBold,
-							fontSize = MaterialTheme.typography.bodyMedium.fontSize.spScaled
+							fontSize = MaterialTheme.typography.titleSmall.fontSize.spScaled
 						),
 						modifier = Modifier
 							.padding(2.dpScaled)
@@ -105,6 +107,7 @@ fun WalletList(
 							currencyCode = LocalCurrency.current.countryCode
 						),
 						style = MaterialTheme.typography.bodyMedium.copy(
+							color = LocalUiColor.current.bodyText,
 							fontSize = MaterialTheme.typography.bodyMedium.fontSize.spScaled
 						),
 						modifier = Modifier

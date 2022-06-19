@@ -14,6 +14,7 @@ import androidx.compose.ui.unit.dp
 import com.anafthdev.dujer.data.db.model.Category
 import com.anafthdev.dujer.foundation.extension.isDarkTheme
 import com.anafthdev.dujer.foundation.extension.toColor
+import com.anafthdev.dujer.foundation.ui.LocalUiColor
 import com.anafthdev.dujer.foundation.uimode.data.LocalUiMode
 import com.anafthdev.dujer.foundation.window.dpScaled
 import com.anafthdev.dujer.foundation.window.spScaled
@@ -68,6 +69,7 @@ fun CategoryCard(
 				text = category.name,
 				overflow = TextOverflow.Ellipsis,
 				style = Typography.bodyMedium.copy(
+					color = LocalUiColor.current.titleText,
 					fontSize = Typography.bodyMedium.fontSize.spScaled
 				),
 				modifier = Modifier

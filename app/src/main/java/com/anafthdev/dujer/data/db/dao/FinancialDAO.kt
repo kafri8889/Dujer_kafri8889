@@ -29,6 +29,6 @@ interface FinancialDAO {
 	@Insert(onConflict = OnConflictStrategy.REPLACE)
 	suspend fun insert(vararg financial: Financial)
 	
-	suspend fun getIncome(): Flow<List<Financial>> = getByType(FinancialType.INCOME.ordinal)
-	suspend fun getExpense(): Flow<List<Financial>> = getByType(FinancialType.EXPENSE.ordinal)
+	fun getIncome(): Flow<List<Financial>> = getByType(FinancialType.INCOME.ordinal)
+	fun getExpense(): Flow<List<Financial>> = getByType(FinancialType.EXPENSE.ordinal)
 }
