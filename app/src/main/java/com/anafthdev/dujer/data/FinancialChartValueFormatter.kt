@@ -3,15 +3,11 @@ package com.anafthdev.dujer.data
 import com.anafthdev.dujer.foundation.extension.addStringBefore
 import com.anafthdev.dujer.foundation.extension.endsWithNumber
 import com.anafthdev.dujer.foundation.extension.removeNonDigitChar
-import com.anafthdev.dujer.foundation.extension.takeNonDigitString
-import com.github.mikephil.charting.data.Entry
 import com.github.mikephil.charting.formatter.ValueFormatter
-import com.github.mikephil.charting.utils.ViewPortHandler
 import timber.log.Timber
 import java.text.DecimalFormat
-import kotlin.math.roundToInt
 
-class FinancialLineChartValueFormatter: ValueFormatter() {
+class FinancialChartValueFormatter: ValueFormatter() {
 	
 	private val mSuffix = arrayOf(
 		"",

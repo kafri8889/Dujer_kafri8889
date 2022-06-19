@@ -11,7 +11,7 @@ import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.viewinterop.AndroidView
-import com.anafthdev.dujer.data.FinancialLineChartValueFormatter
+import com.anafthdev.dujer.data.FinancialChartValueFormatter
 import com.anafthdev.dujer.foundation.extension.isDarkTheme
 import com.anafthdev.dujer.foundation.uimode.data.LocalUiMode
 import com.anafthdev.dujer.foundation.window.dpScaled
@@ -62,7 +62,7 @@ fun IncomeExpenseLineChart(
 					yAxisLeft.textSize = 14f
 					yAxisLeft.axisMinimum = 0f
 					yAxisLeft.axisLineColor = Color.TRANSPARENT
-					yAxisLeft.valueFormatter = FinancialLineChartValueFormatter()
+					yAxisLeft.valueFormatter = FinancialChartValueFormatter()
 					yAxisLeft.setDrawGridLines(true)
 					yAxisLeft.setPosition(YAxis.YAxisLabelPosition.OUTSIDE_CHART)
 					yAxisLeft.enableGridDashedLine(12f, 12f, 0f)
