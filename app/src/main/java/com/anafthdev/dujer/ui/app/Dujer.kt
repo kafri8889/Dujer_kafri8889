@@ -122,6 +122,7 @@ fun DujerApp() {
 			LocalUiColor provides UiColor(
 				headlineText = if (isSystemInDarkTheme) black09 else black02,
 				titleText = if (isSystemInDarkTheme) black08 else black03,
+				normalText = if (isSystemInDarkTheme) black10 else black01,
 				bodyText = if (isSystemInDarkTheme) black07 else black05,
 				labelText = if (isSystemInDarkTheme) black06 else black06
 			),

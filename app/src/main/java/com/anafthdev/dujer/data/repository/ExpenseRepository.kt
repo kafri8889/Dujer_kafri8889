@@ -3,13 +3,14 @@ package com.anafthdev.dujer.data.repository
 import com.anafthdev.dujer.data.db.AppDatabase
 import com.anafthdev.dujer.data.db.model.Financial
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.distinctUntilChanged
 
 class ExpenseRepository(
 	private val appDatabase: AppDatabase
 ) {
 	
-	suspend fun getExpense(): Flow<List<Financial>> {
-		return appDatabase.financialDAO().getExpense()
+	fun getExpense(): Flow<List<Financial>> {
+		return appDatabase.financialDAO().getExpense().distinctUntilChanged()
 	}
 	
 	suspend fun newExpense(vararg financial: Financial) {

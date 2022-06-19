@@ -699,8 +699,9 @@ private fun WalletScreenContent(
 				) {
 					Text(
 						text = stringResource(id = R.string.transaction),
-						style = MaterialTheme.typography.bodyLarge.copy(
-							fontSize = MaterialTheme.typography.bodyLarge.fontSize.spScaled
+						style = MaterialTheme.typography.titleMedium.copy(
+							color = LocalUiColor.current.titleText,
+							fontSize = MaterialTheme.typography.titleMedium.fontSize.spScaled
 						)
 					)
 					

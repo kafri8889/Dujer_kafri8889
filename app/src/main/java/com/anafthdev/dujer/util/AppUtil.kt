@@ -14,9 +14,9 @@ object AppUtil {
 	const val ONE_YEAR_IN_MILLIS = 31557600000
 	const val ONE_MONTH_IN_MILLIS = 2629800000
 	
-	val shortMonths: Array<String> = DateFormatSymbols(deviceLocale).shortMonths
+	val shortMonths: Array<String> = DateFormatSymbols.getInstance(deviceLocale).shortMonths
 	
-	val longMonths: Array<String> = DateFormatSymbols(deviceLocale).months
+	val longMonths: Array<String> = DateFormatSymbols.getInstance(deviceLocale).months
 	
 	fun Any?.toast(context: Context, length: Int = Toast.LENGTH_SHORT) {
 		Handler(Looper.getMainLooper()).post {
