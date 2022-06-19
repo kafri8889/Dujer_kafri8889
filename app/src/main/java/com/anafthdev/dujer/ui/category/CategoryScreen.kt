@@ -25,6 +25,7 @@ import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
@@ -41,10 +42,8 @@ import com.anafthdev.dujer.data.CategoryIcons
 import com.anafthdev.dujer.data.DujerDestination
 import com.anafthdev.dujer.data.FinancialType
 import com.anafthdev.dujer.data.db.model.Category
-import com.anafthdev.dujer.foundation.common.FocusHandler
-import com.anafthdev.dujer.foundation.common.detectGesture
-import com.anafthdev.dujer.foundation.common.freeFocusOnClickOutside
 import com.anafthdev.dujer.foundation.extension.*
+import com.anafthdev.dujer.foundation.ui.LocalUiColor
 import com.anafthdev.dujer.foundation.uimode.data.LocalUiMode
 import com.anafthdev.dujer.foundation.window.dpScaled
 import com.anafthdev.dujer.foundation.window.spScaled
@@ -85,7 +84,6 @@ fun CategoryScreen(
 	
 	val categoryViewModel = hiltViewModel<CategoryViewModel>()
 	
-	val focusHandler = remember { FocusHandler(focusManager) }
 	val categoryNameFocusRequester = remember { FocusRequester() }
 	
 	val scope = rememberCoroutineScope()
@@ -199,7 +197,6 @@ fun CategoryScreen(
 					)
 					.statusBarsPadding()
 					.verticalScroll(rememberScrollState())
-					.detectGesture(focusHandler)
 			) {
 				Box(
 					modifier = Modifier
@@ -219,9 +216,10 @@ fun CategoryScreen(
 					Text(
 						text = if (categoryAction == CategorySwipeAction.EDIT) stringResource(id = R.string.edit_category)
 						else stringResource(id = R.string.new_category),
-						style = Typography.bodyLarge.copy(
+						style = Typography.titleMedium.copy(
+							color = LocalUiColor.current.titleText,
 							fontWeight = FontWeight.Bold,
-							fontSize = Typography.bodyLarge.fontSize.spScaled
+							fontSize = Typography.titleMedium.fontSize.spScaled
 						),
 						modifier = Modifier
 							.align(Alignment.Center)
@@ -309,11 +307,7 @@ fun CategoryScreen(
 							bottom = 16.dpScaled
 						)
 						.fillMaxWidth()
-						.freeFocusOnClickOutside(
-							"categoryName",
-							categoryNameFocusRequester,
-							focusHandler
-						)
+						.focusRequester(categoryNameFocusRequester)
 				)
 				
 				FlowRow(
@@ -402,6 +396,7 @@ fun CategoryScreen(
 							Text(
 								text = stringResource(id = R.string.category),
 								style = Typography.titleLarge.copy(
+									color = LocalUiColor.current.headlineText,
 									fontWeight = FontWeight.Bold,
 									fontSize = Typography.titleLarge.fontSize.spScaled
 								)

@@ -32,9 +32,9 @@ import com.anafthdev.dujer.R
 import com.anafthdev.dujer.data.FinancialType
 import com.anafthdev.dujer.data.db.model.Financial
 import com.anafthdev.dujer.foundation.extension.deviceLocale
-import com.anafthdev.dujer.foundation.extension.getBy
 import com.anafthdev.dujer.foundation.extension.replace
 import com.anafthdev.dujer.foundation.extension.toArray
+import com.anafthdev.dujer.foundation.ui.LocalUiColor
 import com.anafthdev.dujer.foundation.uiextension.horizontalScroll
 import com.anafthdev.dujer.foundation.window.dpScaled
 import com.anafthdev.dujer.foundation.window.spScaled
@@ -56,9 +56,7 @@ import com.github.mikephil.charting.data.Entry
 import com.github.mikephil.charting.data.LineDataSet
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import timber.log.Timber
 import java.util.*
-import kotlin.math.exp
 
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
@@ -191,6 +189,7 @@ fun IncomeExpenseScreen(
 								id = if (type == FinancialType.INCOME) R.string.my_income else R.string.my_spending
 							),
 							style = Typography.titleLarge.copy(
+								color = LocalUiColor.current.titleText,
 								fontWeight = FontWeight.Bold,
 								fontSize = Typography.titleLarge.fontSize.spScaled
 							)

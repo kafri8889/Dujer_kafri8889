@@ -6,6 +6,7 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -16,12 +17,12 @@ import com.anafthdev.dujer.data.db.model.Budget
 import com.anafthdev.dujer.foundation.extension.deviceLocale
 import com.anafthdev.dujer.foundation.extension.roundToInt
 import com.anafthdev.dujer.foundation.extension.toColor
+import com.anafthdev.dujer.foundation.ui.LocalUiColor
 import com.anafthdev.dujer.foundation.uiextension.horizontalScroll
 import com.anafthdev.dujer.foundation.window.dpScaled
 import com.anafthdev.dujer.foundation.window.spScaled
 import com.anafthdev.dujer.model.LocalCurrency
-import com.anafthdev.dujer.ui.theme.black01
-import com.anafthdev.dujer.ui.theme.black04
+import com.anafthdev.dujer.ui.theme.full_shape
 import com.anafthdev.dujer.uicomponent.BudgetProgressIndicator
 import com.anafthdev.dujer.util.CurrencyFormatter
 
@@ -65,7 +66,7 @@ fun BudgetCard(
 					text = budget.category.name,
 					overflow = TextOverflow.Ellipsis,
 					style = MaterialTheme.typography.bodyLarge.copy(
-						color = black04,
+						color = LocalUiColor.current.titleText,
 						fontWeight = FontWeight.Medium,
 						fontSize = MaterialTheme.typography.bodyLarge.fontSize.spScaled
 					),
@@ -86,7 +87,7 @@ fun BudgetCard(
 					overflow = TextOverflow.Ellipsis,
 					textAlign = TextAlign.End,
 					style = MaterialTheme.typography.bodySmall.copy(
-						color = black04,
+						color = LocalUiColor.current.labelText,
 						fontWeight = FontWeight.Medium,
 						fontSize = MaterialTheme.typography.bodySmall.fontSize.spScaled
 					),
@@ -108,6 +109,7 @@ fun BudgetCard(
 				modifier = Modifier
 					.padding(8.dpScaled)
 					.fillMaxWidth()
+					.clip(full_shape)
 			)
 			
 			Row(
@@ -123,7 +125,7 @@ fun BudgetCard(
 					text = stringResource(id = R.string.budget),
 					overflow = TextOverflow.Ellipsis,
 					style = MaterialTheme.typography.bodyMedium.copy(
-						color = black04,
+						color = LocalUiColor.current.bodyText,
 						fontSize = MaterialTheme.typography.bodyMedium.fontSize.spScaled
 					),
 					modifier = Modifier
@@ -140,7 +142,7 @@ fun BudgetCard(
 						currencyCode = LocalCurrency.current.countryCode
 					),
 					style = MaterialTheme.typography.bodyMedium.copy(
-						color = black04,
+						color = LocalUiColor.current.bodyText,
 						fontSize = MaterialTheme.typography.bodyMedium.fontSize.spScaled
 					),
 					modifier = Modifier
@@ -165,7 +167,7 @@ fun BudgetCard(
 					text = stringResource(id = R.string.expenses),
 					overflow = TextOverflow.Ellipsis,
 					style = MaterialTheme.typography.bodyMedium.copy(
-						color = black04,
+						color = LocalUiColor.current.bodyText,
 						fontSize = MaterialTheme.typography.bodyMedium.fontSize.spScaled
 					),
 					modifier = Modifier
@@ -184,7 +186,7 @@ fun BudgetCard(
 						)
 					}",
 					style = MaterialTheme.typography.bodyMedium.copy(
-						color = black04,
+						color = LocalUiColor.current.bodyText,
 						fontSize = MaterialTheme.typography.bodyMedium.fontSize.spScaled
 					),
 					modifier = Modifier
@@ -209,7 +211,7 @@ fun BudgetCard(
 					text = stringResource(id = R.string.remaining),
 					overflow = TextOverflow.Ellipsis,
 					style = MaterialTheme.typography.bodyMedium.copy(
-						color = black01,
+						color = LocalUiColor.current.titleText,
 						fontWeight = FontWeight.Medium,
 						fontSize = MaterialTheme.typography.bodyMedium.fontSize.spScaled
 					),
@@ -227,7 +229,7 @@ fun BudgetCard(
 						currencyCode = LocalCurrency.current.countryCode
 					),
 					style = MaterialTheme.typography.bodyMedium.copy(
-						color = black01,
+						color = LocalUiColor.current.titleText,
 						fontWeight = FontWeight.Medium,
 						fontSize = MaterialTheme.typography.bodyMedium.fontSize.spScaled
 					),

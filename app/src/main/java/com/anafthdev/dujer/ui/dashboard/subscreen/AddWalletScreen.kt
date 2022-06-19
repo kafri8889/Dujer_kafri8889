@@ -20,6 +20,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
@@ -32,12 +33,10 @@ import androidx.compose.ui.text.input.TextFieldValue
 import com.anafthdev.dujer.R
 import com.anafthdev.dujer.data.WalletIcons
 import com.anafthdev.dujer.data.db.model.Wallet
-import com.anafthdev.dujer.foundation.common.FocusHandler
-import com.anafthdev.dujer.foundation.common.detectGesture
-import com.anafthdev.dujer.foundation.common.freeFocusOnClickOutside
 import com.anafthdev.dujer.foundation.extension.deviceLocale
 import com.anafthdev.dujer.foundation.extension.isLightTheme
 import com.anafthdev.dujer.foundation.extension.toColor
+import com.anafthdev.dujer.foundation.ui.LocalUiColor
 import com.anafthdev.dujer.foundation.uimode.data.LocalUiMode
 import com.anafthdev.dujer.foundation.window.dpScaled
 import com.anafthdev.dujer.foundation.window.spScaled
@@ -65,9 +64,6 @@ fun AddWalletScreen(
 	val context = LocalContext.current
 	val focusManager = LocalFocusManager.current
 	
-	val focusHandler = remember { FocusHandler(focusManager) }
-	val walletBalanceFocusRequester = remember { FocusRequester() }
-	
 	var walletName by remember { mutableStateOf("") }
 	var walletTint by remember { mutableStateOf(CategoryTint.tint_1) }
 	var walletIcon by remember { mutableStateOf(WalletIcons.WALLET) }
@@ -94,7 +90,6 @@ fun AddWalletScreen(
 	Column(
 		modifier = Modifier
 			.fillMaxWidth()
-			.detectGesture(focusHandler)
 			.background(
 				if (uiMode.isLightTheme()) MaterialTheme.colorScheme.background
 				else MaterialTheme.colorScheme.surfaceVariant
@@ -119,9 +114,10 @@ fun AddWalletScreen(
 			
 			Text(
 				text = stringResource(id = R.string.new_wallet),
-				style = Typography.bodyLarge.copy(
+				style = Typography.titleMedium.copy(
+					color = LocalUiColor.current.titleText,
 					fontWeight = FontWeight.Bold,
-					fontSize = Typography.bodyLarge.fontSize.spScaled
+					fontSize = Typography.titleMedium.fontSize.spScaled
 				),
 				modifier = Modifier
 					.align(Alignment.Center)
@@ -164,9 +160,10 @@ fun AddWalletScreen(
 		) {
 			Text(
 				text = stringResource(id = R.string.name),
-				style = Typography.bodyLarge.copy(
+				style = Typography.titleMedium.copy(
+					color = LocalUiColor.current.titleText,
 					fontWeight = FontWeight.Medium,
-					fontSize = Typography.bodyLarge.fontSize.spScaled
+					fontSize = Typography.titleMedium.fontSize.spScaled
 				),
 				modifier = Modifier
 					.padding(
@@ -201,18 +198,14 @@ fun AddWalletScreen(
 						bottom = 16.dpScaled
 					)
 					.fillMaxWidth()
-					.freeFocusOnClickOutside(
-						"walletName",
-						walletNameFocusRequester,
-						focusHandler
-					)
 			)
 			
 			Text(
 				text = stringResource(id = R.string.initial_balance),
-				style = Typography.bodyLarge.copy(
+				style = Typography.titleMedium.copy(
+					color = LocalUiColor.current.titleText,
 					fontWeight = FontWeight.Medium,
-					fontSize = Typography.bodyLarge.fontSize.spScaled
+					fontSize = Typography.titleMedium.fontSize.spScaled
 				),
 				modifier = Modifier
 				
@@ -256,11 +249,7 @@ fun AddWalletScreen(
 						bottom = 16.dpScaled
 					)
 					.fillMaxWidth()
-					.freeFocusOnClickOutside(
-					"walletBalance",
-						walletBalanceFocusRequester,
-						focusHandler
-					)
+					.focusRequester(walletNameFocusRequester)
 			)
 			
 			Row(
@@ -279,9 +268,10 @@ fun AddWalletScreen(
 				) {
 					Text(
 						text = stringResource(id = R.string.color),
-						style = Typography.bodyLarge.copy(
+						style = Typography.titleMedium.copy(
+							color = LocalUiColor.current.titleText,
 							fontWeight = FontWeight.Medium,
-							fontSize = Typography.bodyLarge.fontSize.spScaled
+							fontSize = Typography.titleMedium.fontSize.spScaled
 						)
 					)
 					
@@ -347,9 +337,10 @@ fun AddWalletScreen(
 				) {
 					Text(
 						text = stringResource(id = R.string.icon),
-						style = Typography.bodyLarge.copy(
+						style = Typography.titleMedium.copy(
+							color = LocalUiColor.current.titleText,
 							fontWeight = FontWeight.Medium,
-							fontSize = Typography.bodyLarge.fontSize.spScaled
+							fontSize = Typography.titleMedium.fontSize.spScaled
 						)
 					)
 					

@@ -4,7 +4,6 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
-import androidx.compose.material3.Divider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -16,10 +15,10 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextOverflow
 import com.anafthdev.dujer.data.db.model.Category
 import com.anafthdev.dujer.foundation.extension.toColor
+import com.anafthdev.dujer.foundation.ui.LocalUiColor
 import com.anafthdev.dujer.foundation.window.dpScaled
 import com.anafthdev.dujer.foundation.window.spScaled
 import com.anafthdev.dujer.ui.theme.Typography
-import com.anafthdev.dujer.ui.theme.large_shape
 import com.anafthdev.dujer.ui.theme.medium_shape
 import com.anafthdev.dujer.ui.theme.shapes
 
@@ -68,8 +67,9 @@ fun CategoryList(
 				Text(
 					text = category.name,
 					overflow = TextOverflow.Ellipsis,
-					style = Typography.bodyMedium.copy(
-						fontSize = Typography.bodyMedium.fontSize.spScaled
+					style = Typography.titleSmall.copy(
+						color = LocalUiColor.current.titleText,
+						fontSize = Typography.titleSmall.fontSize.spScaled
 					),
 					modifier = Modifier
 						.padding(8.dpScaled)

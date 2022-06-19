@@ -17,11 +17,14 @@ import com.anafthdev.dujer.data.db.model.Category
 import com.anafthdev.dujer.foundation.extension.darkenColor
 import com.anafthdev.dujer.foundation.extension.deviceLocale
 import com.anafthdev.dujer.foundation.extension.toColor
+import com.anafthdev.dujer.foundation.ui.LocalUiColor
 import com.anafthdev.dujer.foundation.uiextension.horizontalScroll
 import com.anafthdev.dujer.foundation.window.dpScaled
 import com.anafthdev.dujer.foundation.window.spScaled
 import com.anafthdev.dujer.model.LocalCurrency
-import com.anafthdev.dujer.ui.theme.*
+import com.anafthdev.dujer.ui.theme.Typography
+import com.anafthdev.dujer.ui.theme.md_theme_light_onSurface
+import com.anafthdev.dujer.ui.theme.md_theme_light_primary
 import com.anafthdev.dujer.util.CurrencyFormatter
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -73,7 +76,7 @@ fun SelectBudgetCategoryCard(
 				Text(
 					text = category.name,
 					style = Typography.bodyMedium.copy(
-						color = black01,
+						color = LocalUiColor.current.titleText,
 						fontWeight = FontWeight.Medium,
 						fontSize = Typography.bodyMedium.fontSize.spScaled
 					),
@@ -93,7 +96,7 @@ fun SelectBudgetCategoryCard(
 					Text(
 						text = stringResource(id = R.string.average_per_month),
 						style = Typography.bodySmall.copy(
-							color = black04,
+							color = LocalUiColor.current.bodyText,
 							fontSize = Typography.bodySmall.fontSize.spScaled
 						),
 						modifier = Modifier
@@ -111,7 +114,7 @@ fun SelectBudgetCategoryCard(
 							currencyCode = LocalCurrency.current.countryCode
 						),
 						style = Typography.bodySmall.copy(
-							color = black04,
+							color = LocalUiColor.current.bodyText,
 							fontSize = Typography.bodySmall.fontSize.spScaled
 						),
 						modifier = Modifier

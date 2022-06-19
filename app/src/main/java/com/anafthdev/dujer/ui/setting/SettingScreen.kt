@@ -32,6 +32,7 @@ import com.anafthdev.dujer.foundation.extension.indexOf
 import com.anafthdev.dujer.foundation.extension.isDarkTheme
 import com.anafthdev.dujer.foundation.localized.LocalizedAction
 import com.anafthdev.dujer.foundation.localized.LocalizedViewModel
+import com.anafthdev.dujer.foundation.ui.LocalUiColor
 import com.anafthdev.dujer.foundation.uimode.UiModeAction
 import com.anafthdev.dujer.foundation.uimode.UiModeViewModel
 import com.anafthdev.dujer.foundation.uimode.data.UiMode
@@ -226,6 +227,7 @@ fun SettingScreen(
 				Text(
 					text = stringResource(id = R.string.setting),
 					style = MaterialTheme.typography.titleLarge.copy(
+						color = LocalUiColor.current.titleText,
 						fontWeight = FontWeight.Bold,
 						fontSize = Typography.titleLarge.fontSize.spScaled
 					)

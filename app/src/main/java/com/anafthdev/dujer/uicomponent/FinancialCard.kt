@@ -18,12 +18,12 @@ import com.anafthdev.dujer.data.db.model.Financial
 import com.anafthdev.dujer.foundation.extension.deviceLocale
 import com.anafthdev.dujer.foundation.extension.isDarkTheme
 import com.anafthdev.dujer.foundation.extension.toColor
+import com.anafthdev.dujer.foundation.ui.LocalUiColor
 import com.anafthdev.dujer.foundation.uiextension.horizontalScroll
 import com.anafthdev.dujer.foundation.uimode.data.LocalUiMode
 import com.anafthdev.dujer.foundation.window.dpScaled
 import com.anafthdev.dujer.foundation.window.spScaled
 import com.anafthdev.dujer.model.LocalCurrency
-import com.anafthdev.dujer.ui.theme.Typography
 import com.anafthdev.dujer.ui.theme.large_shape
 import com.anafthdev.dujer.ui.theme.medium_shape
 import com.anafthdev.dujer.util.CurrencyFormatter
@@ -82,17 +82,19 @@ fun FinancialCard(
 					Text(
 						text = financial.name,
 						maxLines = 2,
-						style = Typography.bodyMedium.copy(
+						style = MaterialTheme.typography.titleSmall.copy(
+							color = LocalUiColor.current.titleText,
 							fontWeight = FontWeight.SemiBold,
-							fontSize = Typography.bodyMedium.fontSize.spScaled
+							fontSize = MaterialTheme.typography.titleSmall.fontSize.spScaled
 						)
 					)
 					
 					Text(
 						text = SimpleDateFormat("dd MMM yyyy", deviceLocale).format(financial.dateCreated),
-						style = Typography.labelSmall.copy(
+						style = MaterialTheme.typography.labelSmall.copy(
+							color = LocalUiColor.current.bodyText,
 							fontWeight = FontWeight.Normal,
-							fontSize = Typography.labelSmall.fontSize.spScaled
+							fontSize = MaterialTheme.typography.labelSmall.fontSize.spScaled
 						),
 						modifier = Modifier
 							.padding(top = 8.dpScaled)
@@ -112,9 +114,10 @@ fun FinancialCard(
 								currencyCode = LocalCurrency.current.countryCode
 							)
 						}",
-						style = Typography.bodyMedium.copy(
+						style = MaterialTheme.typography.titleSmall.copy(
+							color = LocalUiColor.current.titleText,
 							fontWeight = FontWeight.SemiBold,
-							fontSize = Typography.bodyMedium.fontSize.spScaled
+							fontSize = MaterialTheme.typography.titleSmall.fontSize.spScaled
 						),
 						modifier = Modifier
 							.horizontalScroll(
@@ -127,9 +130,10 @@ fun FinancialCard(
 						text = financial.category.name,
 						maxLines = 1,
 						overflow = TextOverflow.Ellipsis,
-						style = Typography.labelSmall.copy(
+						style = MaterialTheme.typography.labelSmall.copy(
+							color = LocalUiColor.current.bodyText,
 							fontWeight = FontWeight.Normal,
-							fontSize = Typography.labelSmall.fontSize.spScaled
+							fontSize = MaterialTheme.typography.labelSmall.fontSize.spScaled
 						),
 						modifier = Modifier
 							.padding(top = 8.dpScaled)

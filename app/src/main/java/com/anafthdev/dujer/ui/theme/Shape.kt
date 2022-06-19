@@ -4,6 +4,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Shapes
 import com.anafthdev.dujer.foundation.window.dpScaled
 
+val no_shape = RoundedCornerShape(0)
 val full_shape = RoundedCornerShape(100)
 val half_full_shape = RoundedCornerShape(50)
 val quarter_shape = RoundedCornerShape(25)

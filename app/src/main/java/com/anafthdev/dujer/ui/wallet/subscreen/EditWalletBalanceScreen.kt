@@ -16,7 +16,6 @@ import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.stringResource
@@ -32,6 +31,7 @@ import com.anafthdev.dujer.data.db.model.Wallet
 import com.anafthdev.dujer.foundation.extension.deviceLocale
 import com.anafthdev.dujer.foundation.extension.isLightTheme
 import com.anafthdev.dujer.foundation.extension.toPositive
+import com.anafthdev.dujer.foundation.ui.LocalUiColor
 import com.anafthdev.dujer.foundation.uimode.data.LocalUiMode
 import com.anafthdev.dujer.foundation.window.dpScaled
 import com.anafthdev.dujer.foundation.window.spScaled
@@ -108,9 +108,10 @@ fun EditWalletBalanceScreen(
 			
 			Text(
 				text = stringResource(id = R.string.edit_balance),
-				style = Typography.bodyLarge.copy(
+				style = Typography.titleMedium.copy(
+					color = LocalUiColor.current.titleText,
 					fontWeight = FontWeight.Bold,
-					fontSize = Typography.bodyLarge.fontSize.spScaled
+					fontSize = Typography.titleMedium.fontSize.spScaled
 				),
 				modifier = Modifier
 					.align(Alignment.Center)
@@ -239,6 +240,7 @@ fun EditWalletBalanceScreen(
 				Text(
 					text = stringResource(id = R.string.change_balance),
 					style = Typography.bodyMedium.copy(
+						color = LocalUiColor.current.titleText,
 						fontWeight = FontWeight.Normal,
 						fontSize = Typography.bodyMedium.fontSize.spScaled
 					)
@@ -250,7 +252,7 @@ fun EditWalletBalanceScreen(
 					Text(
 						text = stringResource(id = R.string.new_transaction_will_be_added),
 						style = Typography.bodySmall.copy(
-							color = Color.Gray,
+							color = LocalUiColor.current.bodyText,
 							fontWeight = FontWeight.Normal,
 							fontSize = Typography.bodySmall.fontSize.spScaled
 						)
@@ -284,6 +286,7 @@ fun EditWalletBalanceScreen(
 			Text(
 				text = stringResource(id = R.string.change_initial_amount),
 				style = Typography.bodyMedium.copy(
+					color = LocalUiColor.current.titleText,
 					fontWeight = FontWeight.Normal,
 					fontSize = Typography.bodyMedium.fontSize.spScaled
 				)

@@ -19,6 +19,7 @@ import androidx.compose.ui.unit.dp
 import com.anafthdev.dujer.R
 import com.anafthdev.dujer.foundation.extension.deviceLocale
 import com.anafthdev.dujer.foundation.extension.isLightTheme
+import com.anafthdev.dujer.foundation.ui.LocalUiColor
 import com.anafthdev.dujer.foundation.uiextension.horizontalScroll
 import com.anafthdev.dujer.foundation.uimode.data.LocalUiMode
 import com.anafthdev.dujer.foundation.window.dpScaled
@@ -73,9 +74,10 @@ fun BudgetCard(
 							id = R.string.budget_for,
 							AppUtil.longMonths[Calendar.getInstance()[Calendar.MONTH]]
 						),
-						style = Typography.bodyMedium.copy(
+						style = Typography.titleSmall.copy(
+							color = LocalUiColor.current.titleText,
 							fontWeight = FontWeight.SemiBold,
-							fontSize = Typography.bodyMedium.fontSize.spScaled
+							fontSize = Typography.titleSmall.fontSize.spScaled
 						),
 						modifier = Modifier
 							.weight(0.46f)
@@ -89,6 +91,7 @@ fun BudgetCard(
 							currencyCode = LocalCurrency.current.countryCode
 						),
 						style = Typography.titleMedium.copy(
+							color = LocalUiColor.current.titleText,
 							fontWeight = FontWeight.Bold,
 							fontSize = Typography.titleMedium.fontSize.spScaled
 						),

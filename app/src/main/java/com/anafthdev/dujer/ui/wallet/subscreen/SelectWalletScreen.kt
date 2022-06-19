@@ -16,6 +16,7 @@ import androidx.compose.ui.text.font.FontWeight
 import com.anafthdev.dujer.R
 import com.anafthdev.dujer.data.db.model.Wallet
 import com.anafthdev.dujer.foundation.extension.isLightTheme
+import com.anafthdev.dujer.foundation.ui.LocalUiColor
 import com.anafthdev.dujer.foundation.uimode.data.LocalUiMode
 import com.anafthdev.dujer.foundation.window.dpScaled
 import com.anafthdev.dujer.foundation.window.spScaled
@@ -53,9 +54,10 @@ fun SelectWalletScreen(
 		
 		Text(
 			text = stringResource(id = R.string.select_wallet),
-			style = Typography.bodyLarge.copy(
+			style = Typography.titleMedium.copy(
+				color = LocalUiColor.current.titleText,
 				fontWeight = FontWeight.Bold,
-				fontSize = Typography.bodyLarge.fontSize.spScaled
+				fontSize = Typography.titleMedium.fontSize.spScaled
 			),
 			modifier = Modifier
 				.padding(

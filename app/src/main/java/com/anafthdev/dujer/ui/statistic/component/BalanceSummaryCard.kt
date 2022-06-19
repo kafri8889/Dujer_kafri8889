@@ -15,6 +15,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import com.anafthdev.dujer.R
 import com.anafthdev.dujer.foundation.extension.deviceLocale
+import com.anafthdev.dujer.foundation.ui.LocalUiColor
 import com.anafthdev.dujer.foundation.uiextension.horizontalScroll
 import com.anafthdev.dujer.foundation.window.dpScaled
 import com.anafthdev.dujer.foundation.window.spScaled
@@ -51,6 +52,7 @@ fun BalanceSummaryCard(
 			Text(
 				text = stringResource(id = R.string.summary),
 				style = MaterialTheme.typography.titleMedium.copy(
+					color = LocalUiColor.current.titleText,
 					fontWeight = FontWeight.SemiBold,
 					fontSize = MaterialTheme.typography.titleMedium.fontSize.spScaled
 				),
@@ -72,6 +74,7 @@ fun BalanceSummaryCard(
 					text = stringResource(id = R.string.income),
 					textAlign = TextAlign.Start,
 					style = MaterialTheme.typography.bodyMedium.copy(
+						color = LocalUiColor.current.titleText,
 						fontSize = MaterialTheme.typography.bodyMedium.fontSize.spScaled
 					),
 					modifier = Modifier
@@ -151,9 +154,10 @@ fun BalanceSummaryCard(
 				Text(
 					text = stringResource(id = R.string.total),
 					textAlign = TextAlign.Start,
-					style = MaterialTheme.typography.bodyMedium.copy(
+					style = MaterialTheme.typography.titleSmall.copy(
+						color = LocalUiColor.current.titleText,
 						fontWeight = FontWeight.Medium,
-						fontSize = MaterialTheme.typography.bodyMedium.fontSize.spScaled
+						fontSize = MaterialTheme.typography.titleSmall.fontSize.spScaled
 					),
 					modifier = Modifier
 						.weight(0.4f)
@@ -166,9 +170,10 @@ fun BalanceSummaryCard(
 						currencyCode = LocalCurrency.current.countryCode
 					),
 					textAlign = TextAlign.End,
-					style = MaterialTheme.typography.bodyMedium.copy(
+					style = MaterialTheme.typography.titleSmall.copy(
+						color = LocalUiColor.current.titleText,
 						fontWeight = FontWeight.Medium,
-						fontSize = MaterialTheme.typography.bodyMedium.fontSize.spScaled
+						fontSize = MaterialTheme.typography.titleSmall.fontSize.spScaled
 					),
 					modifier = Modifier
 						.weight(0.6f)

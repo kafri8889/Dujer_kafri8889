@@ -29,7 +29,9 @@ import com.anafthdev.dujer.data.FinancialType
 import com.anafthdev.dujer.data.db.model.Category
 import com.anafthdev.dujer.data.db.model.Financial
 import com.anafthdev.dujer.foundation.extension.deviceLocale
+import com.anafthdev.dujer.foundation.extension.percentOf
 import com.anafthdev.dujer.foundation.extension.toColor
+import com.anafthdev.dujer.foundation.ui.LocalUiColor
 import com.anafthdev.dujer.foundation.uiextension.horizontalScroll
 import com.anafthdev.dujer.foundation.window.dpScaled
 import com.anafthdev.dujer.foundation.window.spScaled
@@ -89,12 +91,11 @@ fun CategoryTransactionScreen(
 	
 	val percent = remember(financialList, totalIncomeAmount, totalExpenseAmount) {
 		viewModel.percentDecimalFormat.format(
-			totalAmount
-				.div(
-					if (category.type == FinancialType.INCOME) totalIncomeAmount
-					else totalExpenseAmount
+			totalAmount.percentOf(
+					value = if (category.type == FinancialType.INCOME) totalIncomeAmount
+					else totalExpenseAmount,
+					ifNaN = { 0.0 }
 				)
-				.times(100)
 		)
 	}
 	
@@ -151,6 +152,7 @@ fun CategoryTransactionScreen(
 						Text(
 							text = stringResource(id = R.string.transaction),
 							style = Typography.titleLarge.copy(
+								color = LocalUiColor.current.headlineText,
 								fontWeight = FontWeight.Bold,
 								fontSize = Typography.titleLarge.fontSize.spScaled
 							)
@@ -188,8 +190,10 @@ fun CategoryTransactionScreen(
 									maxLines = 2,
 									text = category.name,
 									overflow = TextOverflow.Ellipsis,
-									style = Typography.bodyMedium.copy(
-										fontSize = Typography.bodyMedium.fontSize.spScaled
+									style = Typography.titleSmall.copy(
+										color = LocalUiColor.current.titleText,
+										fontWeight = FontWeight.Medium,
+										fontSize = Typography.titleSmall.fontSize.spScaled
 									),
 									modifier = Modifier
 										.weight(0.45f)
@@ -204,9 +208,10 @@ fun CategoryTransactionScreen(
 										currencyCode = LocalCurrency.current.countryCode
 									),
 									overflow = TextOverflow.Ellipsis,
-									style = Typography.bodyMedium.copy(
+									style = Typography.titleSmall.copy(
+										color = LocalUiColor.current.titleText,
 										fontWeight = FontWeight.SemiBold,
-										fontSize = Typography.bodyMedium.fontSize.spScaled
+										fontSize = Typography.titleSmall.fontSize.spScaled
 									),
 									modifier = Modifier
 										.weight(0.55f)
@@ -228,6 +233,7 @@ fun CategoryTransactionScreen(
 									text = "$percent%",
 									overflow = TextOverflow.Ellipsis,
 									style = Typography.bodySmall.copy(
+										color = LocalUiColor.current.bodyText,
 										fontSize = Typography.bodySmall.fontSize.spScaled
 									),
 									modifier = Modifier
@@ -243,6 +249,7 @@ fun CategoryTransactionScreen(
 									textAlign = TextAlign.End,
 									overflow = TextOverflow.Ellipsis,
 									style = Typography.bodySmall.copy(
+										color = LocalUiColor.current.bodyText,
 										fontSize = Typography.bodySmall.fontSize.spScaled
 									),
 									modifier = Modifier

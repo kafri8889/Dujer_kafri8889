@@ -16,11 +16,14 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.anafthdev.dujer.R
 import com.anafthdev.dujer.foundation.extension.deviceLocale
+import com.anafthdev.dujer.foundation.ui.LocalUiColor
 import com.anafthdev.dujer.foundation.uiextension.horizontalScroll
 import com.anafthdev.dujer.foundation.uiextension.sizeBasedWidth
 import com.anafthdev.dujer.foundation.window.dpScaled
+import com.anafthdev.dujer.foundation.window.spScaled
 import com.anafthdev.dujer.model.LocalCurrency
-import com.anafthdev.dujer.ui.theme.*
+import com.anafthdev.dujer.ui.theme.income_card_background
+import com.anafthdev.dujer.ui.theme.large_shape
 import com.anafthdev.dujer.util.CurrencyFormatter
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -80,9 +83,10 @@ fun IncomeCard(
 					useSymbol = true,
 					currencyCode = LocalCurrency.current.countryCode
 				),
-				style = Typography.bodyMedium.copy(
-					color = black01,
-					fontWeight = FontWeight.Bold
+				style = MaterialTheme.typography.titleSmall.copy(
+					color = LocalUiColor.current.titleText,
+					fontWeight = FontWeight.Bold,
+					fontSize = MaterialTheme.typography.titleSmall.fontSize.spScaled
 				),
 				modifier = Modifier
 					.padding(
@@ -96,9 +100,10 @@ fun IncomeCard(
 			
 			Text(
 				text = stringResource(id = R.string.income),
-				style = Typography.bodySmall.copy(
-					color = black05,
-					fontWeight = FontWeight.Normal
+				style = MaterialTheme.typography.bodySmall.copy(
+					color = LocalUiColor.current.bodyText,
+					fontWeight = FontWeight.Normal,
+					fontSize = MaterialTheme.typography.bodySmall.fontSize.spScaled
 				),
 				modifier = Modifier
 					.padding(
