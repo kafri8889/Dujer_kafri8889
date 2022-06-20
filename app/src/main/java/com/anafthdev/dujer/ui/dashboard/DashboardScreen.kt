@@ -583,10 +583,7 @@ private fun DashboardHomeScreen(
 						onWalletClicked = { wallet ->
 							navController.navigate(
 								DujerDestination.Wallet.createRoute(wallet.id)
-							) {
-								launchSingleTop = true
-								restoreState = true
-							}
+							)
 						}
 					)
 					

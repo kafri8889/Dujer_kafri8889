@@ -14,11 +14,12 @@ import androidx.compose.ui.unit.dp
 import com.anafthdev.dujer.data.db.model.Wallet
 import com.anafthdev.dujer.foundation.extension.deviceLocale
 import com.anafthdev.dujer.foundation.extension.toColor
-import com.anafthdev.dujer.foundation.ui.LocalUiColor
 import com.anafthdev.dujer.foundation.uiextension.horizontalScroll
 import com.anafthdev.dujer.foundation.window.dpScaled
 import com.anafthdev.dujer.foundation.window.spScaled
 import com.anafthdev.dujer.model.LocalCurrency
+import com.anafthdev.dujer.ui.theme.black03
+import com.anafthdev.dujer.ui.theme.black05
 import com.anafthdev.dujer.ui.theme.large_shape
 import com.anafthdev.dujer.util.CurrencyFormatter
 
@@ -71,7 +72,7 @@ fun WalletCard(
 					overflow = TextOverflow.Ellipsis,
 					textAlign = TextAlign.Start,
 					style = MaterialTheme.typography.titleSmall.copy(
-						color = LocalUiColor.current.titleText,
+						color = black03,
 						fontWeight = FontWeight.SemiBold,
 						fontSize = MaterialTheme.typography.titleSmall.fontSize.spScaled
 					),
@@ -90,7 +91,7 @@ fun WalletCard(
 						currencyCode = LocalCurrency.current.countryCode
 					),
 					style = MaterialTheme.typography.bodyMedium.copy(
-						color = LocalUiColor.current.bodyText,
+						color = black05,
 						fontSize = MaterialTheme.typography.bodyMedium.fontSize.spScaled
 					),
 					modifier = Modifier

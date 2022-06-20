@@ -18,8 +18,8 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.anafthdev.dujer.R
 import com.anafthdev.dujer.foundation.extension.deviceLocale
+import com.anafthdev.dujer.foundation.extension.isDarkTheme
 import com.anafthdev.dujer.foundation.extension.isLightTheme
-import com.anafthdev.dujer.foundation.ui.LocalUiColor
 import com.anafthdev.dujer.foundation.uiextension.horizontalScroll
 import com.anafthdev.dujer.foundation.uimode.data.LocalUiMode
 import com.anafthdev.dujer.foundation.window.dpScaled
@@ -75,7 +75,7 @@ fun BudgetCard(
 							AppUtil.longMonths[Calendar.getInstance()[Calendar.MONTH]]
 						),
 						style = Typography.titleSmall.copy(
-							color = LocalUiColor.current.titleText,
+							color = if (uiMode.isDarkTheme()) black09 else black02,
 							fontWeight = FontWeight.SemiBold,
 							fontSize = Typography.titleSmall.fontSize.spScaled
 						),
@@ -91,7 +91,7 @@ fun BudgetCard(
 							currencyCode = LocalCurrency.current.countryCode
 						),
 						style = Typography.titleMedium.copy(
-							color = LocalUiColor.current.titleText,
+							color = if (uiMode.isDarkTheme()) black09 else black02,
 							fontWeight = FontWeight.Bold,
 							fontSize = Typography.titleMedium.fontSize.spScaled
 						),

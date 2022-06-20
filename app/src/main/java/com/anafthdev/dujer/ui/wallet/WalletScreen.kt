@@ -68,7 +68,9 @@ import com.anafthdev.dujer.util.CurrencyFormatter
 import com.github.mikephil.charting.data.PieDataSet
 import com.github.mikephil.charting.data.PieEntry
 import com.github.mikephil.charting.highlight.Highlight
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import timber.log.Timber
 
 @OptIn(ExperimentalMaterialApi::class)
@@ -87,8 +89,11 @@ fun WalletScreen(
 	val state by walletViewModel.state.collectAsState()
 	
 	val wallet = state.wallet
-	val wallets = state.wallets
 	val financial = state.financial
+	
+	val wallets = dujerState.allWallet
+	Timber.i("kliket walet: $wallet")
+	Timber.i("cur walet: $walletID")
 	
 	val scope = rememberCoroutineScope()
 	
@@ -109,18 +114,18 @@ fun WalletScreen(
 	
 	var isDeleteConfirmationPopupShowing by rememberSaveable { mutableStateOf(false) }
 	
-	val incomeTransaction = remember(dujerState.allIncomeTransaction) {
+	val incomeTransaction = remember(dujerState.allIncomeTransaction, wallet.id) {
 		dujerState.allIncomeTransaction.filter { it.walletID == wallet.id }
 	}
-	val expenseTransaction = remember(dujerState.allExpenseTransaction) {
+	val expenseTransaction = remember(dujerState.allExpenseTransaction, wallet.id) {
 		dujerState.allExpenseTransaction.filter { it.walletID == wallet.id }
 	}
 	
-	val incomeAmount = remember(dujerState.allIncomeTransaction) {
-		dujerState.allIncomeTransaction.filter { it.walletID == walletID }.sumOf { it.amount }
+	val incomeAmount = remember(incomeTransaction) {
+		incomeTransaction.sumOf { it.amount }
 	}
-	val expenseAmount = remember(dujerState.allExpenseTransaction) {
-		dujerState.allExpenseTransaction.filter { it.walletID == walletID }.sumOf { it.amount }
+	val expenseAmount = remember(expenseTransaction) {
+		expenseTransaction.sumOf { it.amount }
 	}
 	
 	val hideEditBalanceSheetState = {
@@ -158,9 +163,11 @@ fun WalletScreen(
 	}
 	
 	LaunchedEffect(walletID) {
-		walletViewModel.dispatch(
-			WalletAction.GetWallet(walletID)
-		)
+		withContext(Dispatchers.Main) {
+			walletViewModel.dispatch(
+				WalletAction.GetWallet(walletID)
+			)
+		}
 	}
 	
 	Box(

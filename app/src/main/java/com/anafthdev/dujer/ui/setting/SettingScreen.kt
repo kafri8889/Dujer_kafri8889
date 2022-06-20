@@ -30,6 +30,7 @@ import com.anafthdev.dujer.data.DujerDestination
 import com.anafthdev.dujer.data.preference.Language
 import com.anafthdev.dujer.foundation.extension.indexOf
 import com.anafthdev.dujer.foundation.extension.isDarkTheme
+import com.anafthdev.dujer.foundation.extension.isLightTheme
 import com.anafthdev.dujer.foundation.localized.LocalizedAction
 import com.anafthdev.dujer.foundation.localized.LocalizedViewModel
 import com.anafthdev.dujer.foundation.ui.LocalUiColor
@@ -132,7 +133,10 @@ fun SettingScreen(
 		sheetContent = {
 			Column(
 				modifier = Modifier
-					.background(MaterialTheme.colorScheme.background)
+					.background(
+						if (uiMode.isLightTheme()) MaterialTheme.colorScheme.background
+						else MaterialTheme.colorScheme.surfaceVariant
+					)
 			) {
 				Box(
 					modifier = Modifier

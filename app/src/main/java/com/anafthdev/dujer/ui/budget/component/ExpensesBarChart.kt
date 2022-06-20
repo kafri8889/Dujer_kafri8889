@@ -41,6 +41,7 @@ fun ExpensesBarChart(
 	val barData = remember(barEntries) {
 		BarData(
 			BarDataSet(barEntries, "Budget").apply {
+				valueTextColor = contentColor.toArgb()
 				valueTextSize = 14f
 				valueFormatter = FinancialChartValueFormatter()
 			}

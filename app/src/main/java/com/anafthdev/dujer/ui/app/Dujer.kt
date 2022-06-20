@@ -28,7 +28,6 @@ import com.anafthdev.dujer.data.db.model.Wallet
 import com.anafthdev.dujer.foundation.extension.isDarkTheme
 import com.anafthdev.dujer.foundation.extension.toArray
 import com.anafthdev.dujer.foundation.ui.LocalUiColor
-import com.anafthdev.dujer.foundation.ui.UiColor
 import com.anafthdev.dujer.foundation.uimode.UiModeViewModel
 import com.anafthdev.dujer.foundation.uimode.data.LocalUiMode
 import com.anafthdev.dujer.foundation.window.dpScaled
@@ -119,11 +118,11 @@ fun DujerApp() {
 	) {
 		CompositionLocalProvider(
 			LocalUiMode provides uiMode,
-			LocalUiColor provides UiColor(
+			LocalUiColor provides LocalUiColor.current.copy(
 				headlineText = if (isSystemInDarkTheme) black09 else black02,
 				titleText = if (isSystemInDarkTheme) black08 else black03,
 				normalText = if (isSystemInDarkTheme) black10 else black01,
-				bodyText = if (isSystemInDarkTheme) black07 else black05,
+				bodyText = if (isSystemInDarkTheme) black08 else black05,
 				labelText = if (isSystemInDarkTheme) black06 else black06
 			),
 			LocalCurrency provides currentCurrency,

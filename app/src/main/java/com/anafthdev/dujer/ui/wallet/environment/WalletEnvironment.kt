@@ -47,20 +47,7 @@ class WalletEnvironment @Inject constructor(
 	private val _lastSelectedWalletID = MutableStateFlow(Wallet.default.id)
 	private val lastSelectedWalletID: StateFlow<Int> = _lastSelectedWalletID
 	
-	private val availableWallets: ArrayList<Wallet> = arrayListOf()
-	
 	init {
-		CoroutineScope(dispatcher).launch {
-			appRepository.walletRepository.getAllWallet().collect { wallets ->
-				_selectedWallet.postValue(
-					wallets.find { it.id == lastSelectedWalletID.value } ?: Wallet.cash
-				)
-				
-				availableWallets.clear()
-				availableWallets.addAll(wallets.also { Timber.i(it.toString()) })
-			}
-		}
-		
 		CoroutineScope(Dispatchers.Main).launch {
 			combine(
 				appRepository.getAllFinancial(),
@@ -88,9 +75,6 @@ class WalletEnvironment @Inject constructor(
 				}
 				
 				_availableCategory.emit(categories)
-				_selectedWallet.postValue(
-					availableWallets.find { it.id == triple.second } ?: Wallet.cash
-				)
 				_pieEntry.emit(
 					calculatePieEntry(
 						when (triple.third) {
@@ -134,6 +118,10 @@ class WalletEnvironment @Inject constructor(
 	override suspend fun setWalletID(id: Int) {
 		_lastSelectedWalletID.emit(Wallet.default.id)
 		_lastSelectedWalletID.emit(id)
+		
+		_selectedWallet.postValue(
+			appRepository.walletRepository.get(id) ?: Wallet.cash
+		)
 	}
 	
 	override fun getWallet(): Flow<Wallet> {

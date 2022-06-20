@@ -22,6 +22,7 @@ import com.anafthdev.dujer.foundation.uiextension.sizeBasedWidth
 import com.anafthdev.dujer.foundation.window.dpScaled
 import com.anafthdev.dujer.foundation.window.spScaled
 import com.anafthdev.dujer.model.LocalCurrency
+import com.anafthdev.dujer.ui.theme.black03
 import com.anafthdev.dujer.ui.theme.income_card_background
 import com.anafthdev.dujer.ui.theme.large_shape
 import com.anafthdev.dujer.util.CurrencyFormatter
@@ -84,7 +85,7 @@ fun IncomeCard(
 					currencyCode = LocalCurrency.current.countryCode
 				),
 				style = MaterialTheme.typography.titleSmall.copy(
-					color = LocalUiColor.current.titleText,
+					color = black03,
 					fontWeight = FontWeight.Bold,
 					fontSize = MaterialTheme.typography.titleSmall.fontSize.spScaled
 				),

@@ -6,6 +6,7 @@ import com.anafthdev.dujer.data.db.model.Financial
 import com.anafthdev.dujer.data.repository.app.IAppRepository
 import com.anafthdev.dujer.foundation.common.Quad
 import com.anafthdev.dujer.foundation.di.DiName
+import com.anafthdev.dujer.foundation.extension.averageDouble
 import com.anafthdev.dujer.foundation.extension.deviceLocale
 import com.anafthdev.dujer.foundation.extension.forEachMap
 import com.anafthdev.dujer.foundation.extension.indexOf
@@ -37,6 +38,12 @@ class BudgetEnvironment @Inject constructor(
 	
 	private val _selectedSortType = MutableStateFlow(SortType.A_TO_Z)
 	private val selectedSortType: StateFlow<SortType> = _selectedSortType
+	
+	private val _thisMonthExpenses = MutableStateFlow(0.0)
+	private val thisMonthExpenses: StateFlow<Double> = _thisMonthExpenses
+	
+	private val _averagePerMonthExpense = MutableStateFlow(0.0)
+	private val averagePerMonthExpense: StateFlow<Double> = _averagePerMonthExpense
 	
 	private val _selectedMonth = MutableStateFlow(
 		listOf(0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11)
@@ -70,23 +77,41 @@ class BudgetEnvironment @Inject constructor(
 			}.collect { (budget, financials) ->
 				val filteredFinancials = financials.filter { it.category.id == budget.category.id }
 				val entry = ArrayList(barEntryTemplate)
-				Timber.i("entry bef: $entry")
+				val averageList = arrayListOf<Double>()
 				
-				filteredFinancials
-					.groupBy { monthFormatter.format(it.dateCreated) }
-					.forEachMap { k, v ->
-						val totalAmount = v.sumOf { it.amount }
-						val entryIndex = AppUtil.shortMonths.indexOf { it.contentEquals(k, true) }
-						Timber.i("entry I: $entryIndex")
-						
-						entry[entryIndex] = BarEntry(
-							entryIndex.toFloat(),
-							totalAmount.toFloat()
-						)
-					}
+				val groupedFinancial = filteredFinancials.groupBy { monthFormatter.format(it.dateCreated) }
 				
-				Timber.i("entry af: $entry")
+				groupedFinancial.forEachMap { k, v ->
+					val totalAmount = v.sumOf { it.amount }
+					val entryIndex = AppUtil.shortMonths.indexOf { it.contentEquals(k, true) }
+					Timber.i("entry I: $entryIndex")
+					
+					entry[entryIndex] = BarEntry(
+						entryIndex.toFloat(),
+						totalAmount.toFloat()
+					)
+					
+					averageList.add(totalAmount)
+				}
+				
+				Timber.i("isnan val: $averageList, sum: ${averageList.sum()}, res: ${
+					averageList.sum() / averageList.size
+				}, nan: ${(averageList.sum() / averageList.size).isNaN()}")
+				
 				_barEntries.emit(entry)
+				_thisMonthExpenses.emit(
+					financials
+						.asSequence()
+						.filter { it.category.id == budget.category.id }
+						.filter {
+							monthFormatter.format(it.dateCreated)
+								.equals(monthFormatter.format(System.currentTimeMillis()))
+						}.sumOf { it.amount }
+				)
+				
+				_averagePerMonthExpense.emit(
+					averageList.averageDouble { averageList.average().toInt().toDouble() }
+				)
 			}
 		}
 		
@@ -133,6 +158,14 @@ class BudgetEnvironment @Inject constructor(
 		return selectedSortType
 	}
 	
+	override fun getThisMonthExpenses(): Flow<Double> {
+		return thisMonthExpenses
+	}
+	
+	override fun getAveragePerMonthExpense(): Flow<Double> {
+		return averagePerMonthExpense
+	}
+	
 	override fun getSelectedMonth(): Flow<List<Int>> {
 		return selectedMonth
 	}
@@ -157,6 +190,10 @@ class BudgetEnvironment @Inject constructor(
 		_selectedBudget.emit(
 			appRepository.budgetRepository.get(budget.id) ?: Budget.defalut
 		)
+	}
+	
+	override suspend fun deleteBudget(budget: Budget) {
+		appRepository.budgetRepository.delete(budget)
 	}
 	
 	override suspend fun setSortType(sortType: SortType) {
