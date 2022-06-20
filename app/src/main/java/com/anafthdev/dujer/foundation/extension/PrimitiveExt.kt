@@ -32,6 +32,34 @@ fun Double.toPositive(): Double = if (this <= -1) this * -1 else this
 fun Double.toNegative(): Double = if (this >= 0) this * -1 else this
 
 
+fun Collection<Int>.averageInt(ifNaN: (() -> Double)? = null): Double {
+	var sum = 0.0
+	forEach { sum += it }
+	
+	return (sum / size).let {
+		return@let if (it.isNaN() && ifNaN != null) ifNaN() else it
+	}
+}
+
+fun Collection<Float>.averageFloat(ifNaN: (() -> Double)? = null): Double {
+	var sum = 0.0
+	forEach { sum += it }
+	
+	return (sum / size).let {
+		return@let if (it.isNaN() && ifNaN != null) ifNaN() else it
+	}
+}
+
+fun Collection<Double>.averageDouble(ifNaN: (() -> Double)? = null): Double {
+	var sum = 0.0
+	forEach { sum += it }
+	
+	return (sum / size).let {
+		return@let if (it.isNaN() && ifNaN != null) ifNaN() else it
+	}
+}
+
+
 fun Float.roundToInt(onNaN: (Float) -> Int): Int {
 	return try { roundToInt() } catch (e: Exception) { return onNaN(this) }
 }

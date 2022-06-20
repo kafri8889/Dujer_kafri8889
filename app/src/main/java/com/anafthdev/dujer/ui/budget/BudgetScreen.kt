@@ -31,6 +31,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.TextFieldValue
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.zIndex
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
@@ -40,31 +41,27 @@ import com.anafthdev.dujer.foundation.common.isHide
 import com.anafthdev.dujer.foundation.common.keyboardAsState
 import com.anafthdev.dujer.foundation.extension.deviceLocale
 import com.anafthdev.dujer.foundation.ui.LocalUiColor
-import com.anafthdev.dujer.foundation.uimode.data.LocalUiMode
 import com.anafthdev.dujer.foundation.window.dpScaled
 import com.anafthdev.dujer.foundation.window.spScaled
 import com.anafthdev.dujer.model.LocalCurrency
-import com.anafthdev.dujer.ui.app.LocalDujerState
+import com.anafthdev.dujer.ui.budget.component.DeleteBudgetPopup
 import com.anafthdev.dujer.ui.budget.component.ExpensesBarChart
-import com.anafthdev.dujer.ui.budget.component.FilterSortFinancialPopup
 import com.anafthdev.dujer.ui.theme.Typography
+import com.anafthdev.dujer.uicomponent.FilterSortFinancialPopup
 import com.anafthdev.dujer.uicomponent.SwipeableFinancialCard
 import com.anafthdev.dujer.uicomponent.TopAppBar
 import com.anafthdev.dujer.util.AppUtil.toast
 import com.anafthdev.dujer.util.CurrencyFormatter
 import com.anafthdev.dujer.util.TextFieldCurrencyFormatter
-import timber.log.Timber
 
-@OptIn(ExperimentalComposeUiApi::class)
+@OptIn(ExperimentalComposeUiApi::class, ExperimentalMaterial3Api::class)
 @Composable
 fun BudgetScreen(
 	budgetID: Int,
 	navController: NavController
 ) {
 	
-	val uiMode = LocalUiMode.current
 	val context = LocalContext.current
-	val dujerState = LocalDujerState.current
 	val focusManager = LocalFocusManager.current
 	val localCurrency = LocalCurrency.current
 	val keyboardController = LocalSoftwareKeyboardController.current
@@ -76,13 +73,14 @@ fun BudgetScreen(
 	
 	val budget = state.budget
 	val sortType = state.sortType
-	val selectedMonth = state.selectedMonth
 	val barEntries = state.barEntries
 	val transactions = state.transactions
-	
-	Timber.i("sel mon: ${selectedMonth.toList()}")
+	val selectedMonth = state.selectedMonth
+	val thisMonthExpenses = state.thisMonthExpenses
+	val averagePerMonthExpense = state.averagePerMonthExpenses
 	
 	var isFilterSortFinancialPopupShowed by rememberSaveable { mutableStateOf(false) }
+	var isDeleteBudgetPopupShowed by rememberSaveable { mutableStateOf(false) }
 	var monthlyBudgetDouble by rememberSaveable { mutableStateOf(0.0) }
 	var monthlyBudget by remember { mutableStateOf(TextFieldValue()) }
 	
@@ -110,6 +108,35 @@ fun BudgetScreen(
 	
 	BackHandler {
 		navController.popBackStack()
+	}
+	
+	AnimatedVisibility(
+		visible = isDeleteBudgetPopupShowed,
+		enter = fadeIn(
+			animationSpec = tween(400)
+		),
+		exit = fadeOut(
+			animationSpec = tween(400)
+		),
+		modifier = Modifier
+			.fillMaxSize()
+			.zIndex(2f)
+	) {
+		DeleteBudgetPopup(
+			onDelete = {
+				viewModel.dispatch(
+					BudgetAction.DeleteBudget(budget)
+				)
+				
+				navController.popBackStack()
+			},
+			onCancel = {
+				isDeleteBudgetPopupShowed = false
+			},
+			onClickOutside = {
+				isDeleteBudgetPopupShowed = false
+			}
+		)
 	}
 	
 	AnimatedVisibility(
@@ -199,7 +226,7 @@ fun BudgetScreen(
 							
 							IconButton(
 								onClick = {
-								
+									isDeleteBudgetPopupShowed = true
 								}
 							) {
 								Icon(
@@ -261,6 +288,90 @@ fun BudgetScreen(
 								vertical = 8.dpScaled
 							)
 					)
+					
+					Card(
+						modifier = Modifier
+							.padding(
+								vertical = 8.dpScaled,
+								horizontal = 16.dpScaled
+							)
+					) {
+						Row(
+							verticalAlignment = Alignment.CenterVertically,
+							modifier = Modifier
+								.padding(
+									vertical = 8.dpScaled,
+									horizontal = 16.dpScaled
+								)
+								.fillMaxWidth()
+						) {
+							Text(
+								text = stringResource(id = R.string.this_month),
+								style = MaterialTheme.typography.titleSmall.copy(
+									color = LocalUiColor.current.bodyText,
+									fontSize = MaterialTheme.typography.titleSmall.fontSize.spScaled
+								),
+								modifier = Modifier
+									.weight(0.4f)
+							)
+							
+							Spacer(modifier = Modifier.weight(0.1f))
+							
+							Text(
+								textAlign = TextAlign.End,
+								text = CurrencyFormatter.format(
+									locale = deviceLocale,
+									amount = thisMonthExpenses,
+									currencyCode = LocalCurrency.current.countryCode
+								),
+								style = MaterialTheme.typography.titleSmall.copy(
+									color = LocalUiColor.current.titleText,
+									fontWeight = FontWeight.Medium,
+									fontSize = MaterialTheme.typography.titleSmall.fontSize.spScaled
+								),
+								modifier = Modifier
+									.weight(0.5f)
+							)
+						}
+						
+						Row(
+							verticalAlignment = Alignment.CenterVertically,
+							modifier = Modifier
+								.padding(
+									vertical = 8.dpScaled,
+									horizontal = 16.dpScaled
+								)
+								.fillMaxWidth()
+						) {
+							Text(
+								text = stringResource(id = R.string.average_per_month),
+								style = MaterialTheme.typography.titleSmall.copy(
+									color = LocalUiColor.current.bodyText,
+									fontSize = MaterialTheme.typography.titleSmall.fontSize.spScaled
+								),
+								modifier = Modifier
+									.weight(0.4f)
+							)
+							
+							Spacer(modifier = Modifier.weight(0.1f))
+							
+							Text(
+								textAlign = TextAlign.End,
+								text = CurrencyFormatter.format(
+									locale = deviceLocale,
+									amount = averagePerMonthExpense,
+									currencyCode = LocalCurrency.current.countryCode
+								),
+								style = MaterialTheme.typography.titleSmall.copy(
+									color = LocalUiColor.current.titleText,
+									fontWeight = FontWeight.Medium,
+									fontSize = MaterialTheme.typography.titleSmall.fontSize.spScaled
+								),
+								modifier = Modifier
+									.weight(0.5f)
+							)
+						}
+					}
 					
 					Text(
 						text = stringResource(id = R.string.transaction),

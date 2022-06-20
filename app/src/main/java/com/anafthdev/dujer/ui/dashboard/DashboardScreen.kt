@@ -14,6 +14,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.Add
+import androidx.compose.material.icons.rounded.FilterList
 import androidx.compose.material.icons.rounded.Menu
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
@@ -45,7 +46,6 @@ import com.anafthdev.dujer.data.db.model.Category
 import com.anafthdev.dujer.data.db.model.Financial
 import com.anafthdev.dujer.data.db.model.Wallet
 import com.anafthdev.dujer.foundation.extension.getBy
-import com.anafthdev.dujer.foundation.extension.merge
 import com.anafthdev.dujer.foundation.ui.LocalUiColor
 import com.anafthdev.dujer.foundation.window.dpScaled
 import com.anafthdev.dujer.foundation.window.spScaled
@@ -61,6 +61,7 @@ import com.anafthdev.dujer.ui.theme.expense_color
 import com.anafthdev.dujer.ui.theme.income_color
 import com.anafthdev.dujer.ui.theme.shapes
 import com.anafthdev.dujer.uicomponent.BudgetCard
+import com.anafthdev.dujer.uicomponent.FilterSortFinancialPopup
 import com.anafthdev.dujer.uicomponent.SwipeableFinancialCard
 import com.anafthdev.dujer.uicomponent.TopAppBar
 import com.github.mikephil.charting.data.LineDataSet
@@ -147,7 +148,7 @@ fun DashboardScreen(
 				DashboardContent(
 					state = state,
 					financialScreenSheetState = financialScreenSheetState,
-					dashboardViewModel = dashboardViewModel,
+					viewModel = dashboardViewModel,
 					navController = navController,
 					onTransactionCanDelete = onTransactionCanDelete,
 					onDeleteTransaction = onDeleteTransaction,
@@ -190,7 +191,7 @@ fun DashboardScreen(
 private fun DashboardContent(
 	state: DashboardState,
 	financialScreenSheetState: ModalBottomSheetState,
-	dashboardViewModel: DashboardViewModel,
+	viewModel: DashboardViewModel,
 	navController: NavController,
 	onSettingClicked: () -> Unit,
 	onTransactionCanDelete: () -> Unit,
@@ -204,6 +205,19 @@ private fun DashboardContent(
 	
 	val currentRoute = dashboardNavController.currentDestination?.route
 	
+	val sortType = state.sortType
+	val selectedMonth = state.selectedMonth
+	
+	var showNavRail by rememberSaveable { mutableStateOf(false) }
+	var showFABNewTransaction by rememberSaveable { mutableStateOf(true) }
+	var selectedNavRailItem by rememberSaveable { mutableStateOf(navigationRailItem[0]) }
+	var isFilterSortFinancialPopupShowed by rememberSaveable { mutableStateOf(false) }
+	
+	val menuIconPadding by animateDpAsState(
+		targetValue = if (showNavRail) 16.dpScaled else 0.dpScaled,
+		animationSpec = tween(400)
+	)
+	
 	val showFinancialSheet = {
 		scope.launch { financialScreenSheetState.show() }
 		Unit
@@ -213,15 +227,6 @@ private fun DashboardContent(
 		scope.launch { financialScreenSheetState.hide() }
 		Unit
 	}
-	
-	var showNavRail by rememberSaveable { mutableStateOf(false) }
-	var showFABNewTransaction by rememberSaveable { mutableStateOf(true) }
-	var selectedNavRailItem by rememberSaveable { mutableStateOf(navigationRailItem[0]) }
-	
-	val menuIconPadding by animateDpAsState(
-		targetValue = if (showNavRail) 16.dpScaled else 0.dpScaled,
-		animationSpec = tween(400)
-	)
 	
 	BackHandler {
 		when {
@@ -243,7 +248,44 @@ private fun DashboardContent(
 			.fillMaxSize()
 	) {
 		AnimatedVisibility(
-			visible = showFABNewTransaction,
+			visible = isFilterSortFinancialPopupShowed,
+			enter = fadeIn(
+				animationSpec = tween(400)
+			),
+			exit = fadeOut(
+				animationSpec = tween(400)
+			),
+			modifier = Modifier
+				.fillMaxSize()
+				.zIndex(2f)
+		) {
+			FilterSortFinancialPopup(
+				isVisible = isFilterSortFinancialPopupShowed,
+				sortType = sortType,
+				monthsSelected = selectedMonth,
+				onApply = { mSelectedMonth, mSortBy ->
+					viewModel.dispatch(
+						DashboardAction.SetSortType(mSortBy)
+					)
+					
+					viewModel.dispatch(
+						DashboardAction.SetSelectedMonth(mSelectedMonth)
+					)
+				},
+				onClose = {
+					isFilterSortFinancialPopupShowed = false
+				},
+				onClickOutside = {
+					isFilterSortFinancialPopupShowed = false
+				},
+				modifier = Modifier
+					.systemBarsPadding()
+					.padding(vertical = 24.dpScaled)
+			)
+		}
+		
+		AnimatedVisibility(
+			visible = showFABNewTransaction and !isFilterSortFinancialPopupShowed,
 			enter = scaleIn(
 				animationSpec = tween(200)
 			),
@@ -257,7 +299,7 @@ private fun DashboardContent(
 		) {
 			FloatingActionButton(
 				onClick = {
-					dashboardViewModel.dispatch(
+					viewModel.dispatch(
 						DashboardAction.SetFinancialAction(FinancialAction.NEW)
 					)
 					
@@ -301,15 +343,30 @@ private fun DashboardContent(
 					)
 				)
 				
-				IconButton(
-					onClick = onSettingClicked,
+				Row(
 					modifier = Modifier
+						.padding(end = 8.dpScaled)
 						.align(Alignment.CenterEnd)
 				) {
-					Icon(
-						painter = painterResource(id = R.drawable.ic_setting),
-						contentDescription = null
-					)
+					IconButton(
+						onClick = {
+							isFilterSortFinancialPopupShowed = true
+						},
+					) {
+						Icon(
+							imageVector = Icons.Rounded.FilterList,
+							contentDescription = null
+						)
+					}
+					
+					IconButton(
+						onClick = onSettingClicked,
+					) {
+						Icon(
+							painter = painterResource(id = R.drawable.ic_setting),
+							contentDescription = null
+						)
+					}
 				}
 			}
 			
@@ -364,14 +421,14 @@ private fun DashboardContent(
 					composable(DujerDestination.Dashboard.Home.route) {
 						DashboardHomeScreen(
 							state = state,
-							viewModel = dashboardViewModel,
+							viewModel = viewModel,
 							navController = navController,
 							onFinancialCardClicked = { financial ->
-								dashboardViewModel.dispatch(
+								viewModel.dispatch(
 									DashboardAction.SetFinancialAction(FinancialAction.EDIT)
 								)
 								
-								dashboardViewModel.dispatch(
+								viewModel.dispatch(
 									DashboardAction.SetFinancialID(financial.id)
 								)
 								
@@ -383,7 +440,7 @@ private fun DashboardContent(
 								showFABNewTransaction = !isOpened
 							},
 							onAddWallet = { wallet ->
-								dashboardViewModel.dispatch(
+								viewModel.dispatch(
 									DashboardAction.NewWallet(wallet)
 								)
 							}
@@ -395,11 +452,11 @@ private fun DashboardContent(
 							onFinancialCardDismissToEnd = onDeleteTransaction,
 							onFinancialCardCanDelete = onTransactionCanDelete,
 							onFinancialCardClicked = { financial ->
-								dashboardViewModel.dispatch(
+								viewModel.dispatch(
 									DashboardAction.SetFinancialAction(FinancialAction.EDIT)
 								)
 								
-								dashboardViewModel.dispatch(
+								viewModel.dispatch(
 									DashboardAction.SetFinancialID(financial.id)
 								)
 								
@@ -439,10 +496,10 @@ private fun DashboardHomeScreen(
 	val focusManager = LocalFocusManager.current
 	val keyboardController = LocalSoftwareKeyboardController.current
 	
+	val transactions = state.transactions
+	
 	val wallets = dujerState.allWallet
 	val allBudget = dujerState.allBudget
-	val incomeTransaction = dujerState.allIncomeTransaction
-	val expenseTransaction = dujerState.allExpenseTransaction
 	
 	val highestExpenseCategory = state.highestExpenseCategory
 	val highestExpenseCategoryAmount = state.highestExpenseCategoryAmount
@@ -454,16 +511,22 @@ private fun DashboardHomeScreen(
 		skipHalfExpanded = true
 	)
 	
-	val mixedTransaction = remember(incomeTransaction, expenseTransaction) {
-		incomeTransaction.merge(expenseTransaction).sortedBy { it.dateCreated }
+	val allIncomeTransaction = dujerState.allIncomeTransaction
+	val allExpenseTransaction = dujerState.allExpenseTransaction
+	
+	val incomeTransaction = remember(transactions) {
+		transactions.filter { it.type == FinancialType.INCOME }
+	}
+	val expenseTransaction = remember(transactions) {
+		transactions.filter { it.type == FinancialType.EXPENSE }
 	}
 	
 	val totalAmountBudget = remember(allBudget) { allBudget.sumOf { it.max } }
-	val totalAmountBudgetExpenses = remember(allBudget, expenseTransaction) {
+	val totalAmountBudgetExpenses = remember(allBudget, allExpenseTransaction) {
 		val amount = arrayListOf<Double>()
 		allBudget.forEach { budget ->
 			amount.add(
-				expenseTransaction.filter { it.category.id == budget.category.id }
+				allExpenseTransaction.filter { it.category.id == budget.category.id }
 					.sumOf { it.amount }
 			)
 		}
@@ -583,10 +646,7 @@ private fun DashboardHomeScreen(
 						onWalletClicked = { wallet ->
 							navController.navigate(
 								DujerDestination.Wallet.createRoute(wallet.id)
-							) {
-								launchSingleTop = true
-								restoreState = true
-							}
+							)
 						}
 					)
 					
@@ -633,7 +693,7 @@ private fun DashboardHomeScreen(
 							)
 					) {
 						IncomeCard(
-							income = incomeTransaction.getBy { it.amount }.sum(),
+							income = allIncomeTransaction.getBy { it.amount }.sum(),
 							onClick = {
 								navController.navigate(
 									DujerDestination.IncomeExpense.createRoute(FinancialType.INCOME)
@@ -647,7 +707,7 @@ private fun DashboardHomeScreen(
 						)
 						
 						ExpenseCard(
-							expense = expenseTransaction.getBy { it.amount }.sum(),
+							expense = allExpenseTransaction.getBy { it.amount }.sum(),
 							onClick = {
 								navController.navigate(
 									DujerDestination.IncomeExpense.createRoute(FinancialType.EXPENSE)
@@ -669,7 +729,7 @@ private fun DashboardHomeScreen(
 			}
 			
 			items(
-				items = mixedTransaction,
+				items = transactions,
 				key = { item: Financial -> item.hashCode() }
 			) { financial ->
 				SwipeableFinancialCard(

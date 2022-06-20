@@ -13,19 +13,15 @@ interface IWalletEnvironment {
 
 	val dispatcher: CoroutineDispatcher
 	
-	suspend fun insertFinancial(financial: Financial)
-
-	suspend fun updateWallet(wallet: Wallet)
-	
-	suspend fun deleteWallet(wallet: Wallet)
-	
-	fun getAllWallet(): Flow<List<Wallet>>
-	
 	fun getWallet(): Flow<Wallet>
+	
+	fun getFinancial(): Flow<Financial>
 	
 	fun getSortType(): Flow<SortType>
 	
-	fun getFinancial(): Flow<Financial>
+	fun getSelectedMonth(): Flow<List<Int>>
+	
+	fun getTransactions(): Flow<List<Financial>>
 	
 	fun getPieEntries(): Flow<List<PieEntry>>
 	
@@ -34,11 +30,19 @@ interface IWalletEnvironment {
 	fun getSelectedFinancialType(): Flow<FinancialType>
 	
 	
+	suspend fun insertFinancial(financial: Financial)
+	
+	suspend fun updateWallet(wallet: Wallet)
+	
+	suspend fun deleteWallet(wallet: Wallet)
+	
 	suspend fun setWalletID(id: Int)
 	
 	suspend fun setFinancialID(id: Int)
 	
 	suspend fun setSortType(sortType: SortType)
+	
+	suspend fun setSelectedMonth(selectedMonth: List<Int>)
 	
 	suspend fun setSelectedFinancialType(type: FinancialType)
 	

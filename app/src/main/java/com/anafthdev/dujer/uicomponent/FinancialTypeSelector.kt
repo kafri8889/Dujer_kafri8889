@@ -1,6 +1,5 @@
 package com.anafthdev.dujer.uicomponent
 
-import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -11,6 +10,8 @@ import androidx.compose.ui.text.style.TextAlign
 import com.anafthdev.dujer.R
 import com.anafthdev.dujer.data.FinancialType
 import com.anafthdev.dujer.foundation.common.DelayManager
+import com.anafthdev.dujer.foundation.extension.isDarkTheme
+import com.anafthdev.dujer.foundation.uimode.data.LocalUiMode
 import com.anafthdev.dujer.foundation.window.dpScaled
 import com.anafthdev.dujer.foundation.window.spScaled
 import com.anafthdev.dujer.ui.theme.black01
@@ -26,6 +27,8 @@ fun FinancialTypeSelector(
 	onDoubleClick: () -> Unit = {},
 	onFinancialTypeChanged: (FinancialType) -> Unit
 ) {
+	
+	val isSystemInDarkTheme = LocalUiMode.current.isDarkTheme()
 	
 	val eventCountdownTimer by remember {
 		mutableStateOf(
@@ -75,7 +78,7 @@ fun FinancialTypeSelector(
 						text = stringResource(id = R.string.income),
 						textAlign = TextAlign.Center,
 						style = MaterialTheme.typography.bodyMedium.copy(
-							color = if (isSystemInDarkTheme() and ((selectedFinancialType == FinancialType.INCOME) or selectAll))
+							color = if (isSystemInDarkTheme and ((selectedFinancialType == FinancialType.INCOME) or selectAll))
 								black01 else MaterialTheme.typography.bodyMedium.color,
 							fontSize = MaterialTheme.typography.bodyMedium.fontSize.spScaled
 						)
@@ -123,7 +126,7 @@ fun FinancialTypeSelector(
 						text = stringResource(id = R.string.expenses),
 						textAlign = TextAlign.Center,
 						style = MaterialTheme.typography.bodyMedium.copy(
-							color = if (isSystemInDarkTheme() and ((selectedFinancialType == FinancialType.EXPENSE) or selectAll))
+							color = if (isSystemInDarkTheme and ((selectedFinancialType == FinancialType.EXPENSE) or selectAll))
 								black01 else MaterialTheme.typography.bodyMedium.color,
 							fontSize = MaterialTheme.typography.bodyMedium.fontSize.spScaled
 						)

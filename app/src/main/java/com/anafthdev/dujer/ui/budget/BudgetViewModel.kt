@@ -57,6 +57,26 @@ class BudgetViewModel @Inject constructor(
 		}
 		
 		viewModelScope.launch(environment.dispatcher) {
+			environment.getThisMonthExpenses().collect { expenses ->
+				setState {
+					copy(
+						thisMonthExpenses = expenses
+					)
+				}
+			}
+		}
+		
+		viewModelScope.launch(environment.dispatcher) {
+			environment.getAveragePerMonthExpense().collect { expenses ->
+				setState {
+					copy(
+						averagePerMonthExpenses = expenses
+					)
+				}
+			}
+		}
+		
+		viewModelScope.launch(environment.dispatcher) {
 			environment.getSelectedMonth().collect { months ->
 				setState {
 					copy(
@@ -77,6 +97,11 @@ class BudgetViewModel @Inject constructor(
 			is BudgetAction.UpdateBudget -> {
 				viewModelScope.launch(environment.dispatcher) {
 					environment.updateBudget(action.budget)
+				}
+			}
+			is BudgetAction.DeleteBudget -> {
+				viewModelScope.launch(environment.dispatcher) {
+					environment.deleteBudget(action.budget)
 				}
 			}
 			is BudgetAction.SetSortType -> {

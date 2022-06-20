@@ -9,6 +9,7 @@ import com.anafthdev.dujer.data.db.model.Category
 import com.anafthdev.dujer.data.db.model.Financial
 import com.anafthdev.dujer.data.db.model.Wallet
 import com.anafthdev.dujer.data.repository.app.IAppRepository
+import com.anafthdev.dujer.foundation.common.financial_sorter.FinancialSorter
 import com.anafthdev.dujer.foundation.di.DiName
 import com.anafthdev.dujer.foundation.extension.getBy
 import com.github.mikephil.charting.data.PieEntry
@@ -23,11 +24,9 @@ import javax.inject.Named
 
 class WalletEnvironment @Inject constructor(
 	@Named(DiName.DISPATCHER_IO) override val dispatcher: CoroutineDispatcher,
+	private val financialSorter: FinancialSorter,
 	private val appRepository: IAppRepository
 ): IWalletEnvironment {
-	
-	private val _sortType = MutableStateFlow(SortType.HIGHEST)
-	private val sortType: StateFlow<SortType> = _sortType
 	
 	private val _selectedWallet = MutableLiveData(Wallet.cash)
 	private val selectedWallet: LiveData<Wallet> = _selectedWallet
@@ -41,23 +40,39 @@ class WalletEnvironment @Inject constructor(
 	private val _selectedFinancialType = MutableStateFlow(FinancialType.INCOME)
 	private val selectedFinancialType: StateFlow<FinancialType> = _selectedFinancialType
 	
+	private val _selectedSortType = MutableStateFlow(SortType.A_TO_Z)
+	private val selectedSortType: StateFlow<SortType> = _selectedSortType
+	
+	private val _selectedMonth = MutableStateFlow(
+		listOf(0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11)
+	)
+	private val selectedMonth: StateFlow<List<Int>> = _selectedMonth
+	
+	private val _transactions = MutableStateFlow(emptyList<Financial>())
+	private val transactions: StateFlow<List<Financial>> = _transactions
+	
 	private val _pieEntry = MutableStateFlow(emptyList<PieEntry>())
 	private val pieEntry: StateFlow<List<PieEntry>> = _pieEntry
 	
 	private val _lastSelectedWalletID = MutableStateFlow(Wallet.default.id)
 	private val lastSelectedWalletID: StateFlow<Int> = _lastSelectedWalletID
 	
-	private val availableWallets: ArrayList<Wallet> = arrayListOf()
-	
 	init {
-		CoroutineScope(dispatcher).launch {
-			appRepository.walletRepository.getAllWallet().collect { wallets ->
-				_selectedWallet.postValue(
-					wallets.find { it.id == lastSelectedWalletID.value } ?: Wallet.cash
+		CoroutineScope(Dispatchers.Main).launch {
+			combine(
+				selectedMonth,
+				selectedSortType,
+				appRepository.getAllFinancial()
+			) { month, sortType, financials ->
+				Triple(month, sortType, financials)
+			}.collect { (month, sortType, financials) ->
+				_transactions.emit(
+					financialSorter.beginSort(
+						sortType = sortType,
+						selectedMonth = month,
+						financials = financials
+					)
 				)
-				
-				availableWallets.clear()
-				availableWallets.addAll(wallets.also { Timber.i(it.toString()) })
 			}
 		}
 		
@@ -88,9 +103,6 @@ class WalletEnvironment @Inject constructor(
 				}
 				
 				_availableCategory.emit(categories)
-				_selectedWallet.postValue(
-					availableWallets.find { it.id == triple.second } ?: Wallet.cash
-				)
 				_pieEntry.emit(
 					calculatePieEntry(
 						when (triple.third) {
@@ -127,13 +139,13 @@ class WalletEnvironment @Inject constructor(
 		appRepository.walletRepository.deleteWallet(wallet)
 	}
 	
-	override fun getAllWallet(): Flow<List<Wallet>> {
-		return appRepository.walletRepository.getAllWallet()
-	}
-	
 	override suspend fun setWalletID(id: Int) {
 		_lastSelectedWalletID.emit(Wallet.default.id)
 		_lastSelectedWalletID.emit(id)
+		
+		_selectedWallet.postValue(
+			appRepository.walletRepository.get(id) ?: Wallet.cash
+		)
 	}
 	
 	override fun getWallet(): Flow<Wallet> {
@@ -141,7 +153,15 @@ class WalletEnvironment @Inject constructor(
 	}
 	
 	override fun getSortType(): Flow<SortType> {
-		return sortType
+		return selectedSortType
+	}
+	
+	override fun getSelectedMonth(): Flow<List<Int>> {
+		return selectedMonth
+	}
+	
+	override fun getTransactions(): Flow<List<Financial>> {
+		return transactions
 	}
 	
 	override suspend fun setFinancialID(id: Int) {
@@ -151,7 +171,11 @@ class WalletEnvironment @Inject constructor(
 	}
 	
 	override suspend fun setSortType(sortType: SortType) {
-		_sortType.emit(sortType)
+		_selectedSortType.emit(sortType)
+	}
+	
+	override suspend fun setSelectedMonth(selectedMonth: List<Int>) {
+		_selectedMonth.emit(selectedMonth)
 	}
 	
 	override suspend fun setSelectedFinancialType(type: FinancialType) {

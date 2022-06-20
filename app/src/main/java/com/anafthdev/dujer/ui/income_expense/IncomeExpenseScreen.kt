@@ -46,7 +46,6 @@ import com.anafthdev.dujer.ui.financial.FinancialScreen
 import com.anafthdev.dujer.ui.financial.data.FinancialAction
 import com.anafthdev.dujer.ui.income_expense.component.IncomeExpenseLineChart
 import com.anafthdev.dujer.ui.theme.Typography
-import com.anafthdev.dujer.ui.theme.black04
 import com.anafthdev.dujer.ui.theme.extra_large_shape
 import com.anafthdev.dujer.uicomponent.SwipeableFinancialCard
 import com.anafthdev.dujer.uicomponent.TopAppBar
@@ -179,7 +178,6 @@ fun IncomeExpenseScreen(
 						) {
 							Icon(
 								imageVector = Icons.Rounded.ArrowBack,
-								tint = black04,
 								contentDescription = null
 							)
 						}

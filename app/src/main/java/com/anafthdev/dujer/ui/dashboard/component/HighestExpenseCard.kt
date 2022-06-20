@@ -7,6 +7,7 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -22,8 +23,9 @@ import com.anafthdev.dujer.foundation.uiextension.horizontalScroll
 import com.anafthdev.dujer.foundation.window.dpScaled
 import com.anafthdev.dujer.foundation.window.spScaled
 import com.anafthdev.dujer.model.LocalCurrency
+import com.anafthdev.dujer.ui.theme.black01
+import com.anafthdev.dujer.ui.theme.black03
 import com.anafthdev.dujer.ui.theme.large_shape
-import com.anafthdev.dujer.ui.theme.md_theme_light_secondaryContainer
 import com.anafthdev.dujer.util.AppUtil
 import com.anafthdev.dujer.util.CurrencyFormatter
 import java.util.*
@@ -43,7 +45,7 @@ fun HighestExpenseCard(
 			defaultElevation = 0.dp
 		),
 		colors = CardDefaults.cardColors(
-			containerColor = md_theme_light_secondaryContainer
+			containerColor = Color(0xFFFFE6AD)
 		),
 		onClick = onClick,
 		modifier = modifier
@@ -61,7 +63,7 @@ fun HighestExpenseCard(
 				Text(
 					text = stringResource(id = R.string.highest_expense),
 					style = MaterialTheme.typography.titleSmall.copy(
-						color = LocalUiColor.current.titleText,
+						color = black01,
 						fontWeight = FontWeight.SemiBold,
 						fontSize = MaterialTheme.typography.titleSmall.fontSize.spScaled
 					),
@@ -77,7 +79,7 @@ fun HighestExpenseCard(
 					textAlign = TextAlign.End,
 					text = AppUtil.longMonths[Calendar.getInstance()[Calendar.MONTH]],
 					style = MaterialTheme.typography.titleSmall.copy(
-						color = LocalUiColor.current.titleText,
+						color = black03,
 						fontWeight = FontWeight.SemiBold,
 						fontSize = MaterialTheme.typography.titleSmall.fontSize.spScaled
 					),

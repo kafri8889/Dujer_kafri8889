@@ -4,10 +4,12 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.asFlow
 import com.anafthdev.dujer.data.FinancialType
+import com.anafthdev.dujer.data.SortType
 import com.anafthdev.dujer.data.db.model.Category
 import com.anafthdev.dujer.data.db.model.Financial
 import com.anafthdev.dujer.data.db.model.Wallet
 import com.anafthdev.dujer.data.repository.app.IAppRepository
+import com.anafthdev.dujer.foundation.common.financial_sorter.FinancialSorter
 import com.anafthdev.dujer.foundation.di.DiName
 import com.anafthdev.dujer.foundation.extension.forEachMap
 import com.anafthdev.dujer.foundation.extension.getBy
@@ -17,12 +19,14 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 import javax.inject.Named
 
 class DashboardEnvironment @Inject constructor(
 	@Named(DiName.DISPATCHER_IO) override val dispatcher: CoroutineDispatcher,
+	private val financialSorter: FinancialSorter,
 	private val appRepository: IAppRepository
 ): IDashboardEnvironment {
 	
@@ -32,6 +36,17 @@ class DashboardEnvironment @Inject constructor(
 	private val _financialAction = MutableLiveData(FinancialAction.NEW)
 	private val financialAction: LiveData<String> = _financialAction
 	
+	private val _selectedSortType = MutableStateFlow(SortType.A_TO_Z)
+	private val selectedSortType: StateFlow<SortType> = _selectedSortType
+	
+	private val _selectedMonth = MutableStateFlow(
+		listOf(0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11)
+	)
+	private val selectedMonth: StateFlow<List<Int>> = _selectedMonth
+	
+	private val _transactions = MutableStateFlow(emptyList<Financial>())
+	private val transactions: StateFlow<List<Financial>> = _transactions
+	
 	private val _highestExpenseCategory = MutableStateFlow(Category.default)
 	private val highestExpenseCategory: StateFlow<Category> = _highestExpenseCategory
 	
@@ -39,6 +54,24 @@ class DashboardEnvironment @Inject constructor(
 	private val highestExpenseCategoryAmount: StateFlow<Double> = _highestExpenseCategoryAmount
 	
 	init {
+		CoroutineScope(dispatcher).launch {
+			combine(
+				selectedMonth,
+				selectedSortType,
+				appRepository.getAllFinancial()
+			) { month, sortType, financials ->
+				Triple(month, sortType, financials)
+			}.collect { (month, sortType, financials) ->
+				_transactions.emit(
+					financialSorter.beginSort(
+						sortType = sortType,
+						selectedMonth = month,
+						financials = financials
+					)
+				)
+			}
+		}
+		
 		CoroutineScope(dispatcher).launch {
 			appRepository.getAllFinancial().collect { financialList ->
 				var highest = Category.default.id to 0.0
@@ -65,19 +98,31 @@ class DashboardEnvironment @Inject constructor(
 		}
 	}
 	
-	override suspend fun getFinancial(): Flow<Financial> {
+	override fun getFinancial(): Flow<Financial> {
 		return financial.asFlow()
 	}
 	
-	override suspend fun getFinancialAction(): Flow<String> {
+	override fun getFinancialAction(): Flow<String> {
 		return financialAction.asFlow()
 	}
 	
-	override suspend fun getHighestExpenseCategory(): Flow<Category> {
+	override fun getSortType(): Flow<SortType> {
+		return selectedSortType
+	}
+	
+	override fun getSelectedMonth(): Flow<List<Int>> {
+		return selectedMonth
+	}
+	
+	override fun getTransactions(): Flow<List<Financial>> {
+		return transactions
+	}
+	
+	override fun getHighestExpenseCategory(): Flow<Category> {
 		return highestExpenseCategory
 	}
 	
-	override suspend fun getHighestExpenseCategoryAmount(): Flow<Double> {
+	override fun getHighestExpenseCategoryAmount(): Flow<Double> {
 		return highestExpenseCategoryAmount
 	}
 	
@@ -87,6 +132,14 @@ class DashboardEnvironment @Inject constructor(
 	
 	override suspend fun insertWallet(wallet: Wallet) {
 		appRepository.walletRepository.insertWallet(wallet)
+	}
+	
+	override suspend fun setSortType(sortType: SortType) {
+		_selectedSortType.emit(sortType)
+	}
+	
+	override suspend fun setSelectedMonth(selectedMonth: List<Int>) {
+		_selectedMonth.emit(selectedMonth)
 	}
 	
 	override fun setFinancialAction(action: String) {

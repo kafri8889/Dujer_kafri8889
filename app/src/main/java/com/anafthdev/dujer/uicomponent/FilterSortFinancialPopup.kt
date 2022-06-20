@@ -1,4 +1,4 @@
-package com.anafthdev.dujer.ui.budget.component
+package com.anafthdev.dujer.uicomponent
 
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.background
@@ -18,6 +18,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import com.anafthdev.dujer.R
 import com.anafthdev.dujer.data.SortType
+import com.anafthdev.dujer.foundation.extension.gridItems
 import com.anafthdev.dujer.foundation.extension.isLightTheme
 import com.anafthdev.dujer.foundation.ui.LocalUiColor
 import com.anafthdev.dujer.foundation.uimode.data.LocalUiMode
@@ -42,14 +43,14 @@ fun FilterSortFinancialPopup(
 		SortType.A_TO_Z to stringResource(id = R.string.a_to_z),
 		SortType.Z_TO_A to stringResource(id = R.string.z_to_a),
 		SortType.LATEST to stringResource(id = R.string.latest),
-		SortType.LOWEST to stringResource(id = R.string.longest),
+		SortType.LONGEST to stringResource(id = R.string.longest),
 		SortType.LOWEST_AMOUNT to stringResource(id = R.string.lowest_amount),
 		SortType.HIGHEST_AMOUNT to stringResource(id = R.string.highest_amount),
 	)
 	
 	val uiMode = LocalUiMode.current
 	
-	val months = remember { AppUtil.longMonths }
+	val months = remember { AppUtil.shortMonths }
 	
 	BackHandler(isVisible) {
 		onClose()
@@ -105,9 +106,10 @@ fun FilterSortFinancialPopup(
 							)
 					)
 				}
-
-				items(
-					items = months
+				
+				gridItems(
+					items = months,
+					nColumns = 2
 				) { month ->
 					val monthIndex = remember {
 						when (month.uppercase()) {
@@ -135,10 +137,12 @@ fun FilterSortFinancialPopup(
 								val isChecked = monthIndex !in monthsSelected
 								
 								onApply(
-									monthsSelected.toMutableList().apply {
-										if (isChecked) add(monthIndex)
-										else remove(monthIndex)
-									},
+									monthsSelected
+										.toMutableList()
+										.apply {
+											if (isChecked) add(monthIndex)
+											else remove(monthIndex)
+										},
 									sortType
 								)
 							}
@@ -158,7 +162,7 @@ fun FilterSortFinancialPopup(
 								)
 							}
 						)
-
+						
 						Text(
 							text = month,
 							style = MaterialTheme.typography.titleSmall.copy(
@@ -170,6 +174,73 @@ fun FilterSortFinancialPopup(
 						)
 					}
 				}
+
+//				items(
+//					items = months
+//				) { month ->
+//					val monthIndex = remember {
+//						when (month.uppercase()) {
+//							months[0].uppercase() -> 0
+//							months[1].uppercase() -> 1
+//							months[2].uppercase() -> 2
+//							months[3].uppercase() -> 3
+//							months[4].uppercase() -> 4
+//							months[5].uppercase() -> 5
+//							months[6].uppercase() -> 6
+//							months[7].uppercase() -> 7
+//							months[8].uppercase() -> 8
+//							months[9].uppercase() -> 9
+//							months[10].uppercase() -> 10
+//							months[11].uppercase() -> 11
+//							else -> -1
+//						}
+//					}
+//
+//					Row(
+//						verticalAlignment = Alignment.CenterVertically,
+//						modifier = Modifier
+//							.fillMaxWidth()
+//							.clickable {
+//								val isChecked = monthIndex !in monthsSelected
+//
+//								onApply(
+//									monthsSelected
+//										.toMutableList()
+//										.apply {
+//											if (isChecked) add(monthIndex)
+//											else remove(monthIndex)
+//										},
+//									sortType
+//								)
+//							}
+//							.padding(
+//								horizontal = 16.dpScaled
+//							)
+//					) {
+//						Checkbox(
+//							checked = monthIndex in monthsSelected,
+//							onCheckedChange = { isChecked ->
+//								onApply(
+//									monthsSelected.toMutableList().apply {
+//										if (isChecked) add(monthIndex)
+//										else remove(monthIndex)
+//									},
+//									sortType
+//								)
+//							}
+//						)
+//
+//						Text(
+//							text = month,
+//							style = MaterialTheme.typography.titleSmall.copy(
+//								color = LocalUiColor.current.normalText,
+//								fontSize = MaterialTheme.typography.titleSmall.fontSize.spScaled
+//							),
+//							modifier = Modifier
+//								.padding(start = 8.dpScaled)
+//						)
+//					}
+//				}
 
 				item {
 					Text(
