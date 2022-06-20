@@ -42,7 +42,7 @@ fun FilterSortFinancialPopup(
 		SortType.A_TO_Z to stringResource(id = R.string.a_to_z),
 		SortType.Z_TO_A to stringResource(id = R.string.z_to_a),
 		SortType.LATEST to stringResource(id = R.string.latest),
-		SortType.LOWEST to stringResource(id = R.string.longest),
+		SortType.LONGEST to stringResource(id = R.string.longest),
 		SortType.LOWEST_AMOUNT to stringResource(id = R.string.lowest_amount),
 		SortType.HIGHEST_AMOUNT to stringResource(id = R.string.highest_amount),
 	)
