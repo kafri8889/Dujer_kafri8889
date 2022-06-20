@@ -44,6 +44,7 @@
     <string name="my_income">My Income</string>
     <string name="no_result">No result</string>
     <string name="remaining">Remaining</string>
+    <string name="all_income">All income</string>
     <string name="this_month">This month</string>
     <string name="dark_theme">Dark theme</string>
     <string name="income_for">Income for %1$s</string>
@@ -56,6 +57,7 @@
     <string name="your_income">Your income</string>
     <string name="my_spending">My Spending</string>
     <string name="see_details">See Details</string>
+    <string name="all_expenses">All expenses</string>
     <string name="edit_balance">Edit balance</string>
     <string name="add_expenses">Add expenses</string>
     <string name="new_category">New category</string>

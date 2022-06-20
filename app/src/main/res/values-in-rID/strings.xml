@@ -44,6 +44,7 @@
     <string name="my_income">Pemasukan saya</string>
     <string name="no_result">Tidak ada hasil</string>
     <string name="remaining">Tersisa</string>
+    <string name="all_income">Semua pemasukan</string>
     <string name="this_month">Bulan ini</string>
     <string name="dark_theme">Tema gelap</string>
     <string name="income_for">Pemasukan untuk %1$s</string>
@@ -56,6 +57,7 @@
     <string name="your_income">Pemasukan kamu</string>
     <string name="my_spending">Pengeluaran saya</string>
     <string name="see_details">See Details</string>
+    <string name="all_expenses">Semua pengeluaran</string>
     <string name="edit_balance">Edit saldo</string>
     <string name="add_expenses">Tambah pengeluaran</string>
     <string name="new_category">Kategori baru</string>
