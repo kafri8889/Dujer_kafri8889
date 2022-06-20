@@ -44,6 +44,7 @@
     <string name="my_income">My Income</string>
     <string name="no_result">No result</string>
     <string name="remaining">Remaining</string>
+    <string name="this_month">This month</string>
     <string name="dark_theme">Dark theme</string>
     <string name="income_for">Income for %1$s</string>
     <string name="budget_for">Budget for %1$s</string>
@@ -64,6 +65,7 @@
     <string name="category_name">Category name</string>
     <string name="your_expenses">Your expenses</string>
     <string name="delete_wallet">Delete wallet</string>
+    <string name="delete_budget">Delete budget</string>
     <string name="n_transaction">%1$s Transaction</string>
     <string name="changes_saved">Changes saved</string>
     <string name="lowest_amount">Lowest amount</string>
@@ -95,6 +97,7 @@
     <string name="biometric_authentication">Biometric Authentication</string>
     <string name="display_and_configuration">Display and configuration</string>
     <string name="delete_wallet_confirmation">Are you sure you want to delete this wallet?</string>
+    <string name="delete_budget_confirmation">Are you sure you want to delete this budget?</string>
     <string name="wallet_name_cannot_be_empty">Wallet name cannot be empty</string>
     <string name="choose_your_budget_category">Choose your budget category</string>
     <string name="new_transaction_will_be_added">New transaction will be added</string>
