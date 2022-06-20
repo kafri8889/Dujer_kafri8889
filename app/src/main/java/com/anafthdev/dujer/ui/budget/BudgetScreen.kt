@@ -46,8 +46,8 @@ import com.anafthdev.dujer.foundation.window.spScaled
 import com.anafthdev.dujer.model.LocalCurrency
 import com.anafthdev.dujer.ui.budget.component.DeleteBudgetPopup
 import com.anafthdev.dujer.ui.budget.component.ExpensesBarChart
-import com.anafthdev.dujer.ui.budget.component.FilterSortFinancialPopup
 import com.anafthdev.dujer.ui.theme.Typography
+import com.anafthdev.dujer.uicomponent.FilterSortFinancialPopup
 import com.anafthdev.dujer.uicomponent.SwipeableFinancialCard
 import com.anafthdev.dujer.uicomponent.TopAppBar
 import com.anafthdev.dujer.util.AppUtil.toast

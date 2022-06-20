@@ -16,31 +16,11 @@ class WalletViewModel @Inject constructor(
 ) {
 	
 	init {
-		viewModelScope.launch(environment.dispatcher) {
-			environment.getSortType().collect { type ->
-				setState {
-					copy(
-						sortType = type
-					)
-				}
-			}
-		}
-		
 		viewModelScope.launch {
 			environment.getWallet().collect { wallet ->
 				setState {
 					copy(
 						wallet = wallet
-					)
-				}
-			}
-		}
-		
-		viewModelScope.launch {
-			environment.getAllWallet().collect { wallets ->
-				setState {
-					copy(
-						wallets = wallets.sortedBy { it.id }
 					)
 				}
 			}
@@ -61,6 +41,36 @@ class WalletViewModel @Inject constructor(
 				setState {
 					copy(
 						selectedFinancialType = type
+					)
+				}
+			}
+		}
+		
+		viewModelScope.launch(environment.dispatcher) {
+			environment.getTransactions().collect { transactions ->
+				setState {
+					copy(
+						transactions = transactions
+					)
+				}
+			}
+		}
+		
+		viewModelScope.launch(environment.dispatcher) {
+			environment.getSortType().collect { type ->
+				setState {
+					copy(
+						sortType = type
+					)
+				}
+			}
+		}
+		
+		viewModelScope.launch(environment.dispatcher) {
+			environment.getSelectedMonth().collect { months ->
+				setState {
+					copy(
+						selectedMonth = months
 					)
 				}
 			}
@@ -122,6 +132,11 @@ class WalletViewModel @Inject constructor(
 			is WalletAction.SetSortType -> {
 				viewModelScope.launch(environment.dispatcher) {
 					environment.setSortType(action.sortType)
+				}
+			}
+			is WalletAction.SetSelectedMonth -> {
+				viewModelScope.launch(environment.dispatcher) {
+					environment.setSelectedMonth(action.selectedMonth)
 				}
 			}
 		}

@@ -41,6 +41,36 @@ class DashboardViewModel @Inject constructor(
 		}
 		
 		viewModelScope.launch(environment.dispatcher) {
+			environment.getTransactions().collect { transactions ->
+				setState {
+					copy(
+						transactions = transactions
+					)
+				}
+			}
+		}
+		
+		viewModelScope.launch(environment.dispatcher) {
+			environment.getSortType().collect { type ->
+				setState {
+					copy(
+						sortType = type
+					)
+				}
+			}
+		}
+		
+		viewModelScope.launch(environment.dispatcher) {
+			environment.getSelectedMonth().collect { months ->
+				setState {
+					copy(
+						selectedMonth = months
+					)
+				}
+			}
+		}
+		
+		viewModelScope.launch(environment.dispatcher) {
 			environment.getHighestExpenseCategory().collect { category ->
 				setState {
 					copy(
@@ -76,6 +106,16 @@ class DashboardViewModel @Inject constructor(
 			is DashboardAction.SetFinancialAction -> {
 				viewModelScope.launch(environment.dispatcher) {
 					environment.setFinancialAction(action.action)
+				}
+			}
+			is DashboardAction.SetSortType -> {
+				viewModelScope.launch(environment.dispatcher) {
+					environment.setSortType(action.sortType)
+				}
+			}
+			is DashboardAction.SetSelectedMonth -> {
+				viewModelScope.launch(environment.dispatcher) {
+					environment.setSelectedMonth(action.selectedMonth)
 				}
 			}
 		}

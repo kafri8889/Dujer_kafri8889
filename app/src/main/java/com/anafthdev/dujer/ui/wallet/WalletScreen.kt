@@ -17,7 +17,7 @@ import androidx.compose.material.ModalBottomSheetValue
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.ArrowBack
 import androidx.compose.material.icons.rounded.ArrowDropDown
-import androidx.compose.material.icons.rounded.ArrowLeft
+import androidx.compose.material.icons.rounded.FilterList
 import androidx.compose.material.rememberModalBottomSheetState
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -39,7 +39,6 @@ import androidx.navigation.NavController
 import com.anafthdev.dujer.R
 import com.anafthdev.dujer.data.DujerDestination
 import com.anafthdev.dujer.data.FinancialType
-import com.anafthdev.dujer.data.SortType
 import com.anafthdev.dujer.data.db.model.Category
 import com.anafthdev.dujer.data.db.model.Financial
 import com.anafthdev.dujer.foundation.extension.deviceLocale
@@ -59,10 +58,7 @@ import com.anafthdev.dujer.ui.theme.medium_shape
 import com.anafthdev.dujer.ui.wallet.component.DeleteWalletPopup
 import com.anafthdev.dujer.ui.wallet.subscreen.EditBalanceBottomSheet
 import com.anafthdev.dujer.ui.wallet.subscreen.SelectWalletBottomSheet
-import com.anafthdev.dujer.uicomponent.FinancialBottomSheet
-import com.anafthdev.dujer.uicomponent.FinancialTypeSelector
-import com.anafthdev.dujer.uicomponent.SwipeableFinancialCard
-import com.anafthdev.dujer.uicomponent.TopAppBar
+import com.anafthdev.dujer.uicomponent.*
 import com.anafthdev.dujer.util.ColorTemplate
 import com.anafthdev.dujer.util.CurrencyFormatter
 import com.github.mikephil.charting.data.PieDataSet
@@ -84,16 +80,16 @@ fun WalletScreen(
 	
 	val dujerState = LocalDujerState.current
 	
-	val walletViewModel = hiltViewModel<WalletViewModel>()
+	val viewModel = hiltViewModel<WalletViewModel>()
 	
-	val state by walletViewModel.state.collectAsState()
+	val state by viewModel.state.collectAsState()
 	
 	val wallet = state.wallet
 	val financial = state.financial
+	val sortType = state.sortType
+	val selectedMonth = state.selectedMonth
 	
 	val wallets = dujerState.allWallet
-	Timber.i("kliket walet: $wallet")
-	Timber.i("cur walet: $walletID")
 	
 	val scope = rememberCoroutineScope()
 	
@@ -113,6 +109,7 @@ fun WalletScreen(
 	)
 	
 	var isDeleteConfirmationPopupShowing by rememberSaveable { mutableStateOf(false) }
+	var isFilterSortFinancialPopupShowed by rememberSaveable { mutableStateOf(false) }
 	
 	val incomeTransaction = remember(dujerState.allIncomeTransaction, wallet.id) {
 		dujerState.allIncomeTransaction.filter { it.walletID == wallet.id }
@@ -164,7 +161,7 @@ fun WalletScreen(
 	
 	LaunchedEffect(walletID) {
 		withContext(Dispatchers.Main) {
-			walletViewModel.dispatch(
+			viewModel.dispatch(
 				WalletAction.GetWallet(walletID)
 			)
 		}
@@ -175,6 +172,43 @@ fun WalletScreen(
 			.fillMaxSize()
 			.background(MaterialTheme.colorScheme.background)
 	) {
+		AnimatedVisibility(
+			visible = isFilterSortFinancialPopupShowed,
+			enter = fadeIn(
+				animationSpec = tween(400)
+			),
+			exit = fadeOut(
+				animationSpec = tween(400)
+			),
+			modifier = Modifier
+				.fillMaxSize()
+				.zIndex(2f)
+		) {
+			FilterSortFinancialPopup(
+				isVisible = isFilterSortFinancialPopupShowed,
+				sortType = sortType,
+				monthsSelected = selectedMonth,
+				onApply = { mSelectedMonth, mSortBy ->
+					viewModel.dispatch(
+						WalletAction.SetSortType(mSortBy)
+					)
+					
+					viewModel.dispatch(
+						WalletAction.SetSelectedMonth(mSelectedMonth)
+					)
+				},
+				onClose = {
+					isFilterSortFinancialPopupShowed = false
+				},
+				onClickOutside = {
+					isFilterSortFinancialPopupShowed = false
+				},
+				modifier = Modifier
+					.systemBarsPadding()
+					.padding(vertical = 24.dpScaled)
+			)
+		}
+		
 		AnimatedVisibility(
 			visible = isDeleteConfirmationPopupShowing,
 			enter = fadeIn(
@@ -189,7 +223,7 @@ fun WalletScreen(
 		) {
 			DeleteWalletPopup(
 				onDelete = {
-					walletViewModel.dispatch(
+					viewModel.dispatch(
 						WalletAction.DeleteWallet(
 							wallet
 						)
@@ -218,7 +252,7 @@ fun WalletScreen(
 				wallets = wallets,
 				onWalletSelected = { wallet ->
 					hideSelectWalletSheetState()
-					walletViewModel.dispatch(
+					viewModel.dispatch(
 						WalletAction.GetWallet(wallet.id)
 					)
 				}
@@ -228,7 +262,7 @@ fun WalletScreen(
 					wallet = wallet,
 					onCancel = hideEditBalanceSheetState,
 					onSave = { mWallet, financial ->
-						walletViewModel.dispatch(
+						viewModel.dispatch(
 							WalletAction.UpdateWallet(
 								mWallet.copy(
 									balance = (((mWallet.initialBalance + incomeAmount) - expenseAmount)).also {
@@ -239,7 +273,7 @@ fun WalletScreen(
 						)
 						
 						if (financial.id != Financial.default.id) {
-							walletViewModel.dispatch(
+							viewModel.dispatch(
 								WalletAction.InsertFinancial(financial)
 							)
 						}
@@ -250,7 +284,7 @@ fun WalletScreen(
 					WalletScreenContent(
 						state = state,
 						navController = navController,
-						walletViewModel = walletViewModel,
+						viewModel = viewModel,
 						incomeTransaction = incomeTransaction,
 						expenseTransaction = expenseTransaction,
 						onTransactionCanDelete = onTransactionCanDelete,
@@ -261,6 +295,9 @@ fun WalletScreen(
 						onDeleteWallet = {
 							isDeleteConfirmationPopupShowing = true
 						},
+						onFilterClicked = {
+							isFilterSortFinancialPopupShowed = true
+						}
 					)
 				}
 			}
@@ -273,22 +310,23 @@ fun WalletScreen(
 private fun WalletScreenContent(
 	state: WalletState,
 	navController: NavController,
-	walletViewModel: WalletViewModel,
+	viewModel: WalletViewModel,
 	incomeTransaction: List<Financial>,
 	expenseTransaction: List<Financial>,
-	onDeleteWallet: () -> Unit,
 	onShowFinancialSheet: () ->Unit,
 	onShowEditBalanceSheet: () ->Unit,
 	onShowSelectWalletSheet: () ->Unit,
+	onDeleteWallet: () -> Unit,
+	onDeleteTransaction: (Financial) -> Unit,
 	onTransactionCanDelete: () -> Unit,
-	onDeleteTransaction: (Financial) -> Unit
+	onFilterClicked: () -> Unit
 ) {
 	
 	val context = LocalContext.current
 	val localCurrency = LocalCurrency.current
 	
 	val wallet = state.wallet
-	val sortType = state.sortType
+	val transactions = state.transactions
 	val pieEntries = state.pieEntries
 	val availableCategory = state.availableCategory
 	val selectedFinancialType = state.selectedFinancialType
@@ -315,28 +353,10 @@ private fun WalletScreenContent(
 			currencyCode = localCurrency.countryCode
 		)
 	}
-	val financialList = remember(
-		sortType,
-		incomeTransaction,
-		expenseTransaction,
-		selectedFinancialType
-	) {
-		val list = when (selectedFinancialType) {
-			FinancialType.INCOME -> incomeTransaction
-			FinancialType.EXPENSE -> expenseTransaction
-			else -> incomeTransaction + expenseTransaction
-		}
-		
-		return@remember when (sortType) {
-			SortType.HIGHEST -> list.sortedByDescending { it.amount }
-			SortType.LOWEST -> list.sortedBy { it.amount }
-			else -> list.sortedBy { it.dateCreated }
-		}
-	}
 	
 	val categories = remember(availableCategory) { availableCategory }
-	val financialsForSelectedCategory = remember(financialList, selectedCategory) {
-		financialList.filter { it.category.id == selectedCategory.id }
+	val financialsForSelectedCategory = remember(transactions, selectedCategory) {
+		transactions.filter { it.category.id == selectedCategory.id }
 	}
 	
 	val pieDataSet = remember(pieEntries) {
@@ -378,8 +398,8 @@ private fun WalletScreenContent(
 		selectedPieColor = Color.Transparent
 	}
 	
-	LaunchedEffect(financialList) {
-		walletViewModel.dispatch(
+	LaunchedEffect(transactions) {
+		viewModel.dispatch(
 			WalletAction.GetWallet(wallet.id)
 		)
 	}
@@ -658,12 +678,12 @@ private fun WalletScreenContent(
 					selectedFinancialType = selectedFinancialType,
 					onFinancialTypeChanged = { type ->
 						resetPieChart()
-						walletViewModel.dispatch(
+						viewModel.dispatch(
 							WalletAction.SetSelectedFinancialType(type)
 						)
 					},
 					onDoubleClick = {
-						walletViewModel.dispatch(
+						viewModel.dispatch(
 							WalletAction.SetSelectedFinancialType(FinancialType.ALL)
 						)
 					},
@@ -715,39 +735,21 @@ private fun WalletScreenContent(
 					Spacer(modifier = Modifier.weight(1f))
 					
 					IconButton(
-						onClick = {
-							walletViewModel.dispatch(
-								WalletAction.SetSortType(
-									if (sortType == SortType.HIGHEST) SortType.LOWEST
-									else SortType.HIGHEST
-								)
-							)
-						},
+						onClick = onFilterClicked,
 						modifier = Modifier
 							.padding(2.dpScaled)
 					) {
 						Icon(
-							imageVector = Icons.Rounded.ArrowLeft,
+							imageVector = Icons.Rounded.FilterList,
 							contentDescription = null
 						)
 					}
-					
-					Text(
-						text = stringResource(
-							id = if (sortType == SortType.HIGHEST) R.string.highest
-							else R.string.lowest
-						),
-						style = MaterialTheme.typography.titleMedium.copy(
-							color = LocalUiColor.current.titleText,
-							fontSize = MaterialTheme.typography.titleMedium.fontSize.spScaled
-						)
-					)
 				}
 			}
 		}
 		
 		items(
-			items = financialList,
+			items = transactions,
 			key = { item: Financial -> item.hashCode() }
 		) { financial ->
 			SwipeableFinancialCard(
@@ -755,7 +757,7 @@ private fun WalletScreenContent(
 				onCanDelete = onTransactionCanDelete,
 				onDismissToEnd = { onDeleteTransaction(financial) },
 				onClick = {
-					walletViewModel.dispatch(
+					viewModel.dispatch(
 						WalletAction.GetFinancial(financial.id)
 					)
 					

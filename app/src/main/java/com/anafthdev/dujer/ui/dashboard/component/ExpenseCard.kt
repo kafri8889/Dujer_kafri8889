@@ -100,9 +100,9 @@ fun ExpenseCard(
 			)
 			
 			Text(
-				text = stringResource(id = R.string.expenses),
+				text = stringResource(id = R.string.all_expenses),
 				style = MaterialTheme.typography.bodySmall.copy(
-					color = LocalUiColor.current.bodyText,
+					color = LocalUiColor.current.titleText,
 					fontWeight = FontWeight.Normal,
 					fontSize = MaterialTheme.typography.bodySmall.fontSize.spScaled
 				),

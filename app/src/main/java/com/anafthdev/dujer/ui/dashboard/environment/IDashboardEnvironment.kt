@@ -1,5 +1,6 @@
 package com.anafthdev.dujer.ui.dashboard.environment
 
+import com.anafthdev.dujer.data.SortType
 import com.anafthdev.dujer.data.db.model.Category
 import com.anafthdev.dujer.data.db.model.Financial
 import com.anafthdev.dujer.data.db.model.Wallet
@@ -10,18 +11,29 @@ interface IDashboardEnvironment {
 	
 	val dispatcher: CoroutineDispatcher
 	
-	suspend fun getFinancial(): Flow<Financial>
+	fun getFinancial(): Flow<Financial>
 	
-	suspend fun getFinancialAction(): Flow<String>
+	fun getFinancialAction(): Flow<String>
 	
-	suspend fun getHighestExpenseCategory(): Flow<Category>
+	fun getSortType(): Flow<SortType>
 	
-	suspend fun getHighestExpenseCategoryAmount(): Flow<Double>
+	fun getSelectedMonth(): Flow<List<Int>>
+	
+	fun getTransactions(): Flow<List<Financial>>
+	
+	fun getHighestExpenseCategory(): Flow<Category>
+	
+	fun getHighestExpenseCategoryAmount(): Flow<Double>
 	
 	
 	suspend fun setFinancialID(id: Int)
 	
 	suspend fun insertWallet(wallet: Wallet)
+	
+	suspend fun setSortType(sortType: SortType)
+	
+	suspend fun setSelectedMonth(selectedMonth: List<Int>)
+	
 	
 	fun setFinancialAction(action: String)
 	

@@ -5,6 +5,7 @@ import com.anafthdev.dujer.data.db.model.Budget
 import com.anafthdev.dujer.data.db.model.Financial
 import com.anafthdev.dujer.data.repository.app.IAppRepository
 import com.anafthdev.dujer.foundation.common.Quad
+import com.anafthdev.dujer.foundation.common.financial_sorter.FinancialSorter
 import com.anafthdev.dujer.foundation.di.DiName
 import com.anafthdev.dujer.foundation.extension.averageDouble
 import com.anafthdev.dujer.foundation.extension.deviceLocale
@@ -26,12 +27,11 @@ import javax.inject.Named
 
 class BudgetEnvironment @Inject constructor(
 	@Named(DiName.DISPATCHER_IO) override val dispatcher: CoroutineDispatcher,
+	private val financialSorter: FinancialSorter,
 	private val appRepository: IAppRepository
 ): IBudgetEnvironment {
 	
 	private val monthFormatter = SimpleDateFormat("MMM", deviceLocale)
-	private val longMonthFormatter = SimpleDateFormat("MMMM", deviceLocale)
-	private val months = AppUtil.longMonths
 	
 	private val _selectedBudget = MutableStateFlow(Budget.defalut)
 	private val selectedBudget: StateFlow<Budget> = _selectedBudget
@@ -124,27 +124,16 @@ class BudgetEnvironment @Inject constructor(
 			) { month, budget, sortType, financials ->
 				Quad(month, budget, sortType, financials)
 			}.collect { (month, budget, sortType, financials) ->
-				val filteredFinancials = financials
-					.asSequence()
-					.filter { it.category.id == budget.category.id }
-					.filter {
-						getMonthIndex(
-							longMonthFormatter.format(it.dateCreated)
-						).also {
-							Timber.i("mon index: $it")
-						} in month
-					}.toList()
+				val filteredFinancials = financials.filter {
+					it.category.id == budget.category.id
+				}
 				
 				_transactions.emit(
-					when (sortType) {
-						SortType.A_TO_Z -> filteredFinancials.sortedBy { it.name }
-						SortType.Z_TO_A -> filteredFinancials.sortedByDescending { it.name }
-						SortType.LATEST -> filteredFinancials.sortedByDescending { it.dateCreated }
-						SortType.LONGEST -> filteredFinancials.sortedBy { it.dateCreated }
-						SortType.LOWEST_AMOUNT -> filteredFinancials.sortedBy { it.amount }
-						SortType.HIGHEST_AMOUNT -> filteredFinancials.sortedByDescending { it.amount }
-						else -> filteredFinancials
-					}
+					financialSorter.beginSort(
+						sortType = sortType,
+						selectedMonth = month,
+						financials = filteredFinancials
+					)
 				)
 			}
 		}
@@ -202,25 +191,6 @@ class BudgetEnvironment @Inject constructor(
 	
 	override suspend fun setSelectedMonth(selectedMonth: List<Int>) {
 		_selectedMonth.emit(selectedMonth)
-	}
-	
-	private fun getMonthIndex(longMonthString: String): Int {
-		Timber.i("mnths: $longMonthString")
-		return when (longMonthString.uppercase()) {
-			months[0].uppercase() -> 0
-			months[1].uppercase() -> 1
-			months[2].uppercase() -> 2
-			months[3].uppercase() -> 3
-			months[4].uppercase() -> 4
-			months[5].uppercase() -> 5
-			months[6].uppercase() -> 6
-			months[7].uppercase() -> 7
-			months[8].uppercase() -> 8
-			months[9].uppercase() -> 9
-			months[10].uppercase() -> 10
-			months[11].uppercase() -> 11
-			else -> -1
-		}
 	}
 	
 }
