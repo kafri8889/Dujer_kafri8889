@@ -3,7 +3,6 @@ package com.anafthdev.dujer.ui
 import android.os.Bundle
 import androidx.activity.compose.setContent
 import androidx.biometric.BiometricPrompt
-import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.core.view.WindowCompat
 import androidx.lifecycle.lifecycleScope
 import com.anafthdev.dujer.BuildConfig
@@ -25,7 +24,6 @@ class MainActivity : LocalizedActivity() {
 	
 	private lateinit var biometricManager: BiometricManager
 	
-	@OptIn(ExperimentalFoundationApi::class)
 	override fun onCreate(savedInstanceState: Bundle?) {
 		super.onCreate(savedInstanceState)
 		if (BuildConfig.DEBUG) {

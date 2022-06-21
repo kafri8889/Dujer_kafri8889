@@ -8,11 +8,20 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.platform.LocalContext
 import com.anafthdev.dujer.foundation.extension.deviceLocale
 import java.text.DateFormatSymbols
+import java.util.*
 
 object AppUtil {
 	
 	const val ONE_YEAR_IN_MILLIS = 31557600000
 	const val ONE_MONTH_IN_MILLIS = 2629800000
+	
+	val publicCalendar: Calendar = Calendar.getInstance()
+	
+	val minFilterYear = publicCalendar.apply {
+		set(Calendar.YEAR, 2000)
+	}.timeInMillis
+	
+	val filterDateDefault = minFilterYear to System.currentTimeMillis()
 	
 	val shortMonths: Array<String> = DateFormatSymbols.getInstance(deviceLocale).shortMonths
 	

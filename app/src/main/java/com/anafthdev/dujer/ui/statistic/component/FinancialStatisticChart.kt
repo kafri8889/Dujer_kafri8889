@@ -1,6 +1,8 @@
 package com.anafthdev.dujer.ui.statistic.component
 
 import android.graphics.Color
+import android.text.SpannableString
+import android.text.style.ForegroundColorSpan
 import androidx.compose.animation.*
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -17,9 +19,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.core.content.res.ResourcesCompat
 import com.anafthdev.dujer.R
-import com.anafthdev.dujer.data.FinancialType
 import com.anafthdev.dujer.data.db.model.Category
-import com.anafthdev.dujer.data.db.model.Financial
 import com.anafthdev.dujer.foundation.extension.isDarkTheme
 import com.anafthdev.dujer.foundation.extension.isDefault
 import com.anafthdev.dujer.foundation.uimode.data.LocalUiMode
@@ -32,19 +32,16 @@ import com.github.mikephil.charting.data.PieDataSet
 import com.github.mikephil.charting.data.PieEntry
 import com.github.mikephil.charting.highlight.Highlight
 import com.github.mikephil.charting.listener.OnChartValueSelectedListener
-import timber.log.Timber
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun FinancialStatisticChart(
 	isDataSetEmpty: Boolean,
 	dataSet: PieDataSet,
-	financialType: FinancialType,
 	category: Category,
-	financialsForSelectedCategory: List<Financial>,
 	selectedColor: androidx.compose.ui.graphics.Color,
 	modifier: Modifier = Modifier,
-	onPieDataSelected: (PieEntry?, Highlight?) -> Unit,
+	onPieDataSelected: (Highlight, Int) -> Unit,
 	onNothingSelected: () -> Unit
 ) {
 	
@@ -55,6 +52,11 @@ fun FinancialStatisticChart(
 	val background = MaterialTheme.colorScheme.background
 	
 	var selectedCategory by remember { mutableStateOf(Category.default) }
+	var selectedEntry by remember {
+		mutableStateOf(
+			PieEntry(0f, "", Category.default.id to 0.0)
+		)
+	}
 	var showSelectedCategory by remember { mutableStateOf(false) }
 	
 	val pieChart = remember {
@@ -89,7 +91,7 @@ fun FinancialStatisticChart(
 			.padding(4.dpScaled)
 	) {
 		AndroidView(
-			factory = { _ ->
+			factory = {
 				pieChart.apply {
 					holeRadius = 60f
 					rotationAngle = 0f
@@ -103,7 +105,6 @@ fun FinancialStatisticChart(
 					setEntryLabelColor(pieLabelColor)
 					setDrawEntryLabels(false)
 					setUsePercentValues(true)
-					setHoleColor(background.toArgb())
 					setCenterTextTypeface(
 						ResourcesCompat.getFont(
 							context,
@@ -114,9 +115,12 @@ fun FinancialStatisticChart(
 			},
 			update = { mPieChart ->
 				mPieChart.setOnChartValueSelectedListener(object : OnChartValueSelectedListener {
-					override fun onValueSelected(e: Entry?, h: Highlight?) {
-						Timber.i("selekted entri: $e, $h")
-						onPieDataSelected((e as PieEntry), h)
+					override fun onValueSelected(e: Entry, h: Highlight) {
+						selectedEntry = e as PieEntry
+						onPieDataSelected(
+							h,
+							(selectedEntry.data as Pair<*, *>).first as Int
+						)
 					}
 					
 					override fun onNothingSelected() {
@@ -128,8 +132,12 @@ fun FinancialStatisticChart(
 					if (!isDataSetEmpty) 10f else 0f
 				)
 				
-				mPieChart.centerText = if (isDataSetEmpty) context.getString(R.string.no_data) else ""
 				mPieChart.data = PieData(dataSet)
+				mPieChart.centerText = SpannableString(if (isDataSetEmpty) context.getString(R.string.no_data) else "").apply {
+					setSpan(ForegroundColorSpan(pieLabelColor), 0, this.length, SpannableString.SPAN_EXCLUSIVE_EXCLUSIVE)
+				}
+				
+				mPieChart.setHoleColor(background.toArgb())
 				mPieChart.invalidate()
 			},
 			modifier = Modifier
@@ -160,7 +168,7 @@ fun FinancialStatisticChart(
 			StatisticCategoryCard(
 				color = selectedColor,
 				category = selectedCategory,
-				totalAmount = financialsForSelectedCategory.sumOf { it.amount }
+				totalAmount = (selectedEntry.data as Pair<*, *>).second as Double
 			)
 		}
 	}

@@ -4,7 +4,7 @@ import com.anafthdev.dujer.data.SortType
 import com.anafthdev.dujer.data.db.model.Budget
 import com.anafthdev.dujer.data.db.model.Financial
 import com.anafthdev.dujer.data.repository.app.IAppRepository
-import com.anafthdev.dujer.foundation.common.Quad
+import com.anafthdev.dujer.foundation.common.Quint
 import com.anafthdev.dujer.foundation.common.financial_sorter.FinancialSorter
 import com.anafthdev.dujer.foundation.di.DiName
 import com.anafthdev.dujer.foundation.extension.averageDouble
@@ -38,6 +38,9 @@ class BudgetEnvironment @Inject constructor(
 	
 	private val _selectedSortType = MutableStateFlow(SortType.A_TO_Z)
 	private val selectedSortType: StateFlow<SortType> = _selectedSortType
+	
+	private val _filterDate = MutableStateFlow(AppUtil.filterDateDefault)
+	private val filterDate: StateFlow<Pair<Long, Long>> = _filterDate
 	
 	private val _thisMonthExpenses = MutableStateFlow(0.0)
 	private val thisMonthExpenses: StateFlow<Double> = _thisMonthExpenses
@@ -118,12 +121,13 @@ class BudgetEnvironment @Inject constructor(
 		CoroutineScope(dispatcher).launch {
 			combine(
 				selectedMonth,
+				filterDate,
 				selectedBudget,
 				selectedSortType,
 				appRepository.getAllFinancial()
-			) { month, budget, sortType, financials ->
-				Quad(month, budget, sortType, financials)
-			}.collect { (month, budget, sortType, financials) ->
+			) { month, date, budget, sortType, financials ->
+				Quint(month, date, budget, sortType, financials)
+			}.collect { (month, date, budget, sortType, financials) ->
 				val filteredFinancials = financials.filter {
 					it.category.id == budget.category.id
 				}
@@ -131,6 +135,7 @@ class BudgetEnvironment @Inject constructor(
 				_transactions.emit(
 					financialSorter.beginSort(
 						sortType = sortType,
+						filterDate = date,
 						selectedMonth = month,
 						financials = filteredFinancials
 					)
@@ -145,6 +150,10 @@ class BudgetEnvironment @Inject constructor(
 	
 	override fun getSortType(): Flow<SortType> {
 		return selectedSortType
+	}
+	
+	override fun getFilterDate(): Flow<Pair<Long, Long>> {
+		return filterDate
 	}
 	
 	override fun getThisMonthExpenses(): Flow<Double> {
@@ -187,6 +196,10 @@ class BudgetEnvironment @Inject constructor(
 	
 	override suspend fun setSortType(sortType: SortType) {
 		_selectedSortType.emit(sortType)
+	}
+	
+	override suspend fun setFilterDate(date: Pair<Long, Long>) {
+		_filterDate.emit(date)
 	}
 	
 	override suspend fun setSelectedMonth(selectedMonth: List<Int>) {

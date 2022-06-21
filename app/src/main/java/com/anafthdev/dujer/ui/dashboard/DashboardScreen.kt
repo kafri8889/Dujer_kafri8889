@@ -206,6 +206,7 @@ private fun DashboardContent(
 	val currentRoute = dashboardNavController.currentDestination?.route
 	
 	val sortType = state.sortType
+	val filterDate = state.filterDate
 	val selectedMonth = state.selectedMonth
 	
 	var showNavRail by rememberSaveable { mutableStateOf(false) }
@@ -262,8 +263,9 @@ private fun DashboardContent(
 			FilterSortFinancialPopup(
 				isVisible = isFilterSortFinancialPopupShowed,
 				sortType = sortType,
+				filterDate = filterDate,
 				monthsSelected = selectedMonth,
-				onApply = { mSelectedMonth, mSortBy ->
+				onApply = { mSelectedMonth, mSortBy, date ->
 					viewModel.dispatch(
 						DashboardAction.SetSortType(mSortBy)
 					)
@@ -271,6 +273,12 @@ private fun DashboardContent(
 					viewModel.dispatch(
 						DashboardAction.SetSelectedMonth(mSelectedMonth)
 					)
+					
+					if (date != null) {
+						viewModel.dispatch(
+							DashboardAction.SetFilterDate(date)
+						)
+					}
 				},
 				onClose = {
 					isFilterSortFinancialPopupShowed = false

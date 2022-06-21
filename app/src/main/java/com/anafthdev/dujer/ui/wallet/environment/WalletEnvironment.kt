@@ -9,9 +9,11 @@ import com.anafthdev.dujer.data.db.model.Category
 import com.anafthdev.dujer.data.db.model.Financial
 import com.anafthdev.dujer.data.db.model.Wallet
 import com.anafthdev.dujer.data.repository.app.IAppRepository
+import com.anafthdev.dujer.foundation.common.Quad
 import com.anafthdev.dujer.foundation.common.financial_sorter.FinancialSorter
 import com.anafthdev.dujer.foundation.di.DiName
 import com.anafthdev.dujer.foundation.extension.getBy
+import com.anafthdev.dujer.util.AppUtil
 import com.github.mikephil.charting.data.PieEntry
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.Flow
@@ -48,6 +50,9 @@ class WalletEnvironment @Inject constructor(
 	)
 	private val selectedMonth: StateFlow<List<Int>> = _selectedMonth
 	
+	private val _filterDate = MutableStateFlow(AppUtil.filterDateDefault)
+	private val filterDate: StateFlow<Pair<Long, Long>> = _filterDate
+	
 	private val _transactions = MutableStateFlow(emptyList<Financial>())
 	private val transactions: StateFlow<List<Financial>> = _transactions
 	
@@ -61,14 +66,16 @@ class WalletEnvironment @Inject constructor(
 		CoroutineScope(Dispatchers.Main).launch {
 			combine(
 				selectedMonth,
+				filterDate,
 				selectedSortType,
 				appRepository.getAllFinancial()
-			) { month, sortType, financials ->
-				Triple(month, sortType, financials)
-			}.collect { (month, sortType, financials) ->
+			) { month, date, sortType, financials ->
+				Quad(month, date, sortType, financials)
+			}.collect { (month, date, sortType, financials) ->
 				_transactions.emit(
 					financialSorter.beginSort(
 						sortType = sortType,
+						filterDate = date,
 						selectedMonth = month,
 						financials = financials
 					)
@@ -83,32 +90,32 @@ class WalletEnvironment @Inject constructor(
 				selectedFinancialType
 			) { financials, walletID, financialType ->
 				Triple(financials, walletID, financialType)
-			}.collect { triple ->
-				val incomeList = triple.first.filter {
-					(it.walletID == triple.second) and (it.type == FinancialType.INCOME)
+			}.collect { (financials, walletID, type) ->
+				val incomeList = financials.filter {
+					(it.walletID == walletID) and (it.type == FinancialType.INCOME)
 				}
 				
-				val expenseList = triple.first.filter {
-					(it.walletID == triple.second) and (it.type == FinancialType.EXPENSE)
+				val expenseList = financials.filter {
+					(it.walletID == walletID) and (it.type == FinancialType.EXPENSE)
 				}
 				
-				val categories = when (triple.third) {
+				val categories = when (type) {
 					FinancialType.INCOME -> incomeList.getBy {
 						it.category
 					}.distinctBy { it.id }
 					FinancialType.EXPENSE ->  expenseList.getBy {
 						it.category
 					}.distinctBy { it.id }
-					else -> triple.first.getBy { it.category }.distinctBy { it.id }
+					else -> financials.getBy { it.category }.distinctBy { it.id }
 				}
 				
 				_availableCategory.emit(categories)
 				_pieEntry.emit(
 					calculatePieEntry(
-						when (triple.third) {
+						when (type) {
 							FinancialType.INCOME -> incomeList
 							FinancialType.EXPENSE -> expenseList
-							else -> triple.first
+							else -> financials
 						},
 						categories
 					)
@@ -156,6 +163,10 @@ class WalletEnvironment @Inject constructor(
 		return selectedSortType
 	}
 	
+	override fun getFilterDate(): Flow<Pair<Long, Long>> {
+		return filterDate
+	}
+	
 	override fun getSelectedMonth(): Flow<List<Int>> {
 		return selectedMonth
 	}
@@ -172,6 +183,10 @@ class WalletEnvironment @Inject constructor(
 	
 	override suspend fun setSortType(sortType: SortType) {
 		_selectedSortType.emit(sortType)
+	}
+	
+	override suspend fun setFilterDate(date: Pair<Long, Long>) {
+		_filterDate.emit(date)
 	}
 	
 	override suspend fun setSelectedMonth(selectedMonth: List<Int>) {
@@ -214,10 +229,12 @@ class WalletEnvironment @Inject constructor(
 		}
 		
 		groupedFinancialAndCategory.forEach { (category, financials) ->
+			val amount = financials.sumOf { it.amount }
 			entries.add(
 				PieEntry(
-					financials.sumOf { it.amount }.toFloat(),
-					category.name
+					amount.toFloat(),
+					category.name,
+					category.id to amount
 				)
 			)
 		}

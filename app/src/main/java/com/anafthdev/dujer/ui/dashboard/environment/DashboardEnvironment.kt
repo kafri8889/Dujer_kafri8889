@@ -9,11 +9,13 @@ import com.anafthdev.dujer.data.db.model.Category
 import com.anafthdev.dujer.data.db.model.Financial
 import com.anafthdev.dujer.data.db.model.Wallet
 import com.anafthdev.dujer.data.repository.app.IAppRepository
+import com.anafthdev.dujer.foundation.common.Quad
 import com.anafthdev.dujer.foundation.common.financial_sorter.FinancialSorter
 import com.anafthdev.dujer.foundation.di.DiName
 import com.anafthdev.dujer.foundation.extension.forEachMap
 import com.anafthdev.dujer.foundation.extension.getBy
 import com.anafthdev.dujer.ui.financial.data.FinancialAction
+import com.anafthdev.dujer.util.AppUtil
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
@@ -44,6 +46,9 @@ class DashboardEnvironment @Inject constructor(
 	)
 	private val selectedMonth: StateFlow<List<Int>> = _selectedMonth
 	
+	private val _filterDate = MutableStateFlow(AppUtil.filterDateDefault)
+	private val filterDate: StateFlow<Pair<Long, Long>> = _filterDate
+	
 	private val _transactions = MutableStateFlow(emptyList<Financial>())
 	private val transactions: StateFlow<List<Financial>> = _transactions
 	
@@ -57,14 +62,16 @@ class DashboardEnvironment @Inject constructor(
 		CoroutineScope(dispatcher).launch {
 			combine(
 				selectedMonth,
+				filterDate,
 				selectedSortType,
 				appRepository.getAllFinancial()
-			) { month, sortType, financials ->
-				Triple(month, sortType, financials)
-			}.collect { (month, sortType, financials) ->
+			) { month, year, sortType, financials ->
+				Quad(month, year, sortType, financials)
+			}.collect { (month, year, sortType, financials) ->
 				_transactions.emit(
 					financialSorter.beginSort(
 						sortType = sortType,
+						filterDate = year,
 						selectedMonth = month,
 						financials = financials
 					)
@@ -110,6 +117,10 @@ class DashboardEnvironment @Inject constructor(
 		return selectedSortType
 	}
 	
+	override fun getFilterDate(): Flow<Pair<Long, Long>> {
+		return filterDate
+	}
+	
 	override fun getSelectedMonth(): Flow<List<Int>> {
 		return selectedMonth
 	}
@@ -136,6 +147,10 @@ class DashboardEnvironment @Inject constructor(
 	
 	override suspend fun setSortType(sortType: SortType) {
 		_selectedSortType.emit(sortType)
+	}
+	
+	override suspend fun setFilterDate(date: Pair<Long, Long>) {
+		_filterDate.emit(date)
 	}
 	
 	override suspend fun setSelectedMonth(selectedMonth: List<Int>) {

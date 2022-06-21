@@ -67,6 +67,16 @@ class WalletViewModel @Inject constructor(
 		}
 		
 		viewModelScope.launch(environment.dispatcher) {
+			environment.getFilterDate().collect { date ->
+				setState {
+					copy(
+						filterDate = date
+					)
+				}
+			}
+		}
+		
+		viewModelScope.launch(environment.dispatcher) {
 			environment.getSelectedMonth().collect { months ->
 				setState {
 					copy(
@@ -137,6 +147,11 @@ class WalletViewModel @Inject constructor(
 			is WalletAction.SetSelectedMonth -> {
 				viewModelScope.launch(environment.dispatcher) {
 					environment.setSelectedMonth(action.selectedMonth)
+				}
+			}
+			is WalletAction.SetFilterDate -> {
+				viewModelScope.launch(environment.dispatcher) {
+					environment.setFilterDate(action.filterDate)
 				}
 			}
 		}

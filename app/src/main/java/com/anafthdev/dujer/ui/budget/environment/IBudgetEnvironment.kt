@@ -15,6 +15,8 @@ interface IBudgetEnvironment {
 	
 	fun getSortType(): Flow<SortType>
 	
+	fun getFilterDate(): Flow<Pair<Long, Long>>
+	
 	fun getThisMonthExpenses(): Flow<Double>
 	
 	fun getAveragePerMonthExpense(): Flow<Double>
@@ -32,6 +34,8 @@ interface IBudgetEnvironment {
 	suspend fun deleteBudget(budget: Budget)
 	
 	suspend fun setSortType(sortType: SortType)
+	
+	suspend fun setFilterDate(date: Pair<Long, Long>)
 	
 	suspend fun setSelectedMonth(selectedMonth: List<Int>)
 	

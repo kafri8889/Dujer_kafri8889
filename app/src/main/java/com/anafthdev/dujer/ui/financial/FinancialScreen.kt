@@ -1,7 +1,6 @@
 package com.anafthdev.dujer.ui.financial
 
 import android.annotation.SuppressLint
-import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.expandVertically
@@ -40,14 +39,15 @@ import com.anafthdev.dujer.data.FinancialType
 import com.anafthdev.dujer.data.db.model.Category
 import com.anafthdev.dujer.data.db.model.Financial
 import com.anafthdev.dujer.data.db.model.Wallet
+import com.anafthdev.dujer.foundation.common.showDatePicker
 import com.anafthdev.dujer.foundation.extension.deviceLocale
 import com.anafthdev.dujer.foundation.extension.get
-import com.anafthdev.dujer.foundation.extension.showDatePicker
 import com.anafthdev.dujer.foundation.extension.toColor
 import com.anafthdev.dujer.foundation.ui.LocalUiColor
 import com.anafthdev.dujer.foundation.window.dpScaled
 import com.anafthdev.dujer.foundation.window.spScaled
 import com.anafthdev.dujer.model.LocalCurrency
+import com.anafthdev.dujer.ui.MainActivity
 import com.anafthdev.dujer.ui.app.LocalDujerState
 import com.anafthdev.dujer.ui.financial.component.CategoryList
 import com.anafthdev.dujer.ui.financial.component.WalletList
@@ -62,6 +62,7 @@ import com.anafthdev.dujer.util.CurrencyFormatter
 import com.anafthdev.dujer.util.TextFieldCurrencyFormatter
 import timber.log.Timber
 import java.text.SimpleDateFormat
+import java.util.*
 import kotlin.random.Random
 
 @SuppressLint("RememberReturnType")
@@ -92,6 +93,7 @@ fun FinancialScreen(
 	var financialCategory: Category by remember { mutableStateOf(Category.default) }
 	var financialType: FinancialType by remember { mutableStateOf(FinancialType.INCOME) }
 	
+	val calendar = remember { Calendar.getInstance() }
 	val textFieldDateFocusRequester = remember { FocusRequester() }
 	val textFieldCategoryFocusRequester = remember { FocusRequester() }
 	val textFieldWalletFocusRequester = remember { FocusRequester() }
@@ -158,8 +160,11 @@ fun FinancialScreen(
 	DisposableEffect(dateFocusRequesterHasFocus) {
 		onDispose {
 			if (dateFocusRequesterHasFocus) {
-				(context as AppCompatActivity).showDatePicker(
+				(context as MainActivity).showDatePicker(
 					selection = financialDate,
+					min = calendar.apply {
+						set(Calendar.YEAR, 2000)
+					}.timeInMillis,
 					onPick = { timeInMillis ->
 						financialDate = timeInMillis
 						focusManager.moveFocus(FocusDirection.Next)

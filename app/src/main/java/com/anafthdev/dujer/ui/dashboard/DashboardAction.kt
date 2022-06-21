@@ -8,5 +8,6 @@ sealed class DashboardAction {
 	data class SetFinancialID(val id: Int): DashboardAction()
 	data class SetFinancialAction(val action: String): DashboardAction()
 	data class SetSortType(val sortType: SortType): DashboardAction()
+	data class SetFilterDate(val filterDate: Pair<Long, Long>): DashboardAction()
 	data class SetSelectedMonth(val selectedMonth: List<Int>): DashboardAction()
 }

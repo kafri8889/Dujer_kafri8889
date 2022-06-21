@@ -11,21 +11,22 @@ import javax.inject.Inject
 class FinancialSorter @Inject constructor() {
 	
 	private val monthFormatter = SimpleDateFormat("MMM", deviceLocale)
-	private val longMonthFormatter = SimpleDateFormat("MMMM", deviceLocale)
 	private val months = AppUtil.shortMonths
 	
 	fun beginSort(
 		sortType: SortType,
+		filterDate: Pair<Long, Long>,
 		selectedMonth: List<Int>,
 		financials: List<Financial>
 	): List<Financial> {
+		val dateRange = filterDate.first..filterDate.second
 		val filteredFinancials = financials
+			.asSequence()
+			.filter { it.dateCreated in dateRange }
 			.filter {
 				getMonthIndex(
 					monthFormatter.format(it.dateCreated)
-				).also {
-					Timber.i("mon index: $it")
-				} in selectedMonth
+				) in selectedMonth
 			}.toList()
 		
 		return when (sortType) {

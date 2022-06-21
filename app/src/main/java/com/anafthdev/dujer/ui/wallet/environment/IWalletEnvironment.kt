@@ -19,6 +19,8 @@ interface IWalletEnvironment {
 	
 	fun getSortType(): Flow<SortType>
 	
+	fun getFilterDate(): Flow<Pair<Long, Long>>
+	
 	fun getSelectedMonth(): Flow<List<Int>>
 	
 	fun getTransactions(): Flow<List<Financial>>
@@ -41,6 +43,8 @@ interface IWalletEnvironment {
 	suspend fun setFinancialID(id: Int)
 	
 	suspend fun setSortType(sortType: SortType)
+	
+	suspend fun setFilterDate(date: Pair<Long, Long>)
 	
 	suspend fun setSelectedMonth(selectedMonth: List<Int>)
 	

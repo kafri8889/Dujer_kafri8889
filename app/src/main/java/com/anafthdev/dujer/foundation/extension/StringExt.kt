@@ -17,6 +17,22 @@ fun String.takeNonDigitString(): String {
 }
 
 /**
+ * take a string that is a number
+ *
+ * ex:
+ * val s = "123a456b"
+ * s.takeDigitString() => "123456"
+ * @author kafri8889
+ */
+fun String.takeDigitString(): String {
+	var builder = ""
+	
+	forEach { if (it.isDigit()) builder += it }
+	
+	return builder
+}
+
+/**
  * remove non digit char
  *
  * ex:
@@ -97,6 +113,7 @@ fun String.endsWithNumber(): Boolean = this[this.lastIndex].isDigit()
 
 /**
  * add a new string before the given index
+ * @author kafri8889
  */
 fun String.addStringBefore(s: String, index: Int): String {
 	val result = StringBuilder()
