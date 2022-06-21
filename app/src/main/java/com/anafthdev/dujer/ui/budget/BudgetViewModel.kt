@@ -57,6 +57,16 @@ class BudgetViewModel @Inject constructor(
 		}
 		
 		viewModelScope.launch(environment.dispatcher) {
+			environment.getFilterDate().collect { date ->
+				setState {
+					copy(
+						filterDate = date
+					)
+				}
+			}
+		}
+		
+		viewModelScope.launch(environment.dispatcher) {
 			environment.getThisMonthExpenses().collect { expenses ->
 				setState {
 					copy(
@@ -112,6 +122,11 @@ class BudgetViewModel @Inject constructor(
 			is BudgetAction.SetSelectedMonth -> {
 				viewModelScope.launch(environment.dispatcher) {
 					environment.setSelectedMonth(action.months)
+				}
+			}
+			is BudgetAction.SetFilterDate -> {
+				viewModelScope.launch(environment.dispatcher) {
+					environment.setFilterDate(action.filterDate)
 				}
 			}
 		}

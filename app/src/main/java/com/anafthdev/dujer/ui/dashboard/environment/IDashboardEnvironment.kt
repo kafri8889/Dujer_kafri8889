@@ -17,6 +17,8 @@ interface IDashboardEnvironment {
 	
 	fun getSortType(): Flow<SortType>
 	
+	fun getFilterDate(): Flow<Pair<Long, Long>>
+	
 	fun getSelectedMonth(): Flow<List<Int>>
 	
 	fun getTransactions(): Flow<List<Financial>>
@@ -31,6 +33,8 @@ interface IDashboardEnvironment {
 	suspend fun insertWallet(wallet: Wallet)
 	
 	suspend fun setSortType(sortType: SortType)
+	
+	suspend fun setFilterDate(date: Pair<Long, Long>)
 	
 	suspend fun setSelectedMonth(selectedMonth: List<Int>)
 	

@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
+    <string name="end">Akhir</string>
     <string name="_new">Baru</string>
     <string name="cash">Cash</string>
     <string name="edit">Edit</string>
@@ -10,6 +11,7 @@
     <string name="name">Nama</string>
     <string name="icon">Ikon</string>
     <string name="sort">Sortir</string>
+    <string name="start">Mulai</string>
     <string name="close">Tutup</string>
     <string name="apply">Terapkan</string>
     <string name="total">Total</string>
@@ -74,6 +76,7 @@
     <string name="highest_amount">Jumlah tertinggi</string>
     <string name="bio_auth_title">Verifikasi</string>
     <string name="change_balance">Ubah saldo</string>
+    <string name="invalid_format">Format tidak sah!</string>
     <string name="finance_removed">Keuangan dihapus</string>
     <string name="change_currency">Ganti mata uang</string>
     <string name="current_balance">Saldo saat ini</string>

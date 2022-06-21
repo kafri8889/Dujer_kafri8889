@@ -29,6 +29,7 @@ import com.anafthdev.dujer.foundation.extension.toColor
 import com.anafthdev.dujer.foundation.ui.LocalUiColor
 import com.anafthdev.dujer.foundation.window.dpScaled
 import com.anafthdev.dujer.foundation.window.spScaled
+import com.anafthdev.dujer.ui.app.LocalDujerState
 import com.anafthdev.dujer.ui.statistic.component.*
 import com.anafthdev.dujer.ui.statistic.data.PercentValueFormatter
 import com.anafthdev.dujer.ui.theme.Typography
@@ -38,7 +39,6 @@ import com.anafthdev.dujer.util.ColorTemplate
 import com.github.mikephil.charting.data.PieDataSet
 import com.github.mikephil.charting.data.PieEntry
 import com.github.mikephil.charting.highlight.Highlight
-import timber.log.Timber
 
 @Composable
 fun StatisticScreen(
@@ -47,6 +47,7 @@ fun StatisticScreen(
 ) {
 	
 	val context = LocalContext.current
+	val dujerState = LocalDujerState.current
 	val config = LocalConfiguration.current
 	
 	val statisticViewModel = hiltViewModel<StatisticViewModel>()
@@ -60,13 +61,17 @@ fun StatisticScreen(
 	val availableCategory = state.availableCategory
 	val selectedFinancialType = state.selectedFinancialType
 	
+	val allCategory = dujerState.allCategory
+	
 	var selectedCategory by remember { mutableStateOf(Category.default) }
 	var selectedPieColor by remember { mutableStateOf(androidx.compose.ui.graphics.Color.Transparent) }
 	var isDataSetEmpty by remember { mutableStateOf(false) }
 	
 	val pieColors = remember { mutableStateListOf<Int>() }
-	val financialsForSelectedCategory = remember(incomeTransaction, expenseTransaction, selectedCategory) {
-		incomeTransaction.merge(expenseTransaction).filter { it.category.id == selectedCategory.id }
+	val financialAmountForSelectedCategory = remember(incomeTransaction, expenseTransaction, selectedCategory) {
+		incomeTransaction.merge(expenseTransaction)
+			.filter { it.category.id == selectedCategory.id }
+			.sumOf { it.amount }
 	}
 	
 	val totalIncomeAmount = remember(incomeTransaction) {
@@ -188,22 +193,16 @@ fun StatisticScreen(
 					isDataSetEmpty = isDataSetEmpty,
 					category = selectedCategory,
 					selectedColor = selectedPieColor,
-					financialType = selectedFinancialType,
-					financialsForSelectedCategory = financialsForSelectedCategory,
-					onPieDataSelected = { entry: PieEntry?, highlight: Highlight? ->
-						val category = if (availableCategory.isNotEmpty()) availableCategory[highlight?.x?.toInt() ?: -1]
-						else Category.default
+					onPieDataSelected = { highlight: Highlight, categoryID ->
+						val category = allCategory.find { it.id == categoryID } ?: Category.default
 						
 						selectedCategory = category
 						selectedPieColor = try {
-							pieColors[highlight?.x?.toInt() ?: -1].toColor()
+							pieColors[highlight.x.toInt()].toColor()
 						} catch (e: Exception) {
 							// TODO: ganti warna
 							androidx.compose.ui.graphics.Color.Transparent
 						}
-						
-						Timber.i("entry: $entry, highlight: $highlight")
-						Timber.i("selected category: $category")
 					},
 					onNothingSelected = {
 						selectedCategory = Category.default

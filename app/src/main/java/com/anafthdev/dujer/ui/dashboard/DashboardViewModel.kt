@@ -61,6 +61,16 @@ class DashboardViewModel @Inject constructor(
 		}
 		
 		viewModelScope.launch(environment.dispatcher) {
+			environment.getFilterDate().collect { date ->
+				setState {
+					copy(
+						filterDate = date
+					)
+				}
+			}
+		}
+		
+		viewModelScope.launch(environment.dispatcher) {
 			environment.getSelectedMonth().collect { months ->
 				setState {
 					copy(
@@ -116,6 +126,11 @@ class DashboardViewModel @Inject constructor(
 			is DashboardAction.SetSelectedMonth -> {
 				viewModelScope.launch(environment.dispatcher) {
 					environment.setSelectedMonth(action.selectedMonth)
+				}
+			}
+			is DashboardAction.SetFilterDate -> {
+				viewModelScope.launch(environment.dispatcher) {
+					environment.setFilterDate(action.filterDate)
 				}
 			}
 		}

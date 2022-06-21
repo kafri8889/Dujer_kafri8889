@@ -87,6 +87,7 @@ fun WalletScreen(
 	val wallet = state.wallet
 	val financial = state.financial
 	val sortType = state.sortType
+	val filterDate = state.filterDate
 	val selectedMonth = state.selectedMonth
 	
 	val wallets = dujerState.allWallet
@@ -187,8 +188,9 @@ fun WalletScreen(
 			FilterSortFinancialPopup(
 				isVisible = isFilterSortFinancialPopupShowed,
 				sortType = sortType,
+				filterDate = filterDate,
 				monthsSelected = selectedMonth,
-				onApply = { mSelectedMonth, mSortBy ->
+				onApply = { mSelectedMonth, mSortBy, date ->
 					viewModel.dispatch(
 						WalletAction.SetSortType(mSortBy)
 					)
@@ -196,6 +198,12 @@ fun WalletScreen(
 					viewModel.dispatch(
 						WalletAction.SetSelectedMonth(mSelectedMonth)
 					)
+					
+					if (date != null) {
+						viewModel.dispatch(
+							WalletAction.SetFilterDate(date)
+						)
+					}
 				},
 				onClose = {
 					isFilterSortFinancialPopupShowed = false
@@ -323,6 +331,7 @@ private fun WalletScreenContent(
 ) {
 	
 	val context = LocalContext.current
+	val dujerState = LocalDujerState.current
 	val localCurrency = LocalCurrency.current
 	
 	val wallet = state.wallet
@@ -330,6 +339,8 @@ private fun WalletScreenContent(
 	val pieEntries = state.pieEntries
 	val availableCategory = state.availableCategory
 	val selectedFinancialType = state.selectedFinancialType
+	
+	val allCategory = dujerState.allCategory
 	
 	val pieColors = remember { mutableStateListOf<Int>() }
 	var selectedPieColor by remember { mutableStateOf(Color.Transparent) }
@@ -352,11 +363,6 @@ private fun WalletScreenContent(
 			useSymbol = true,
 			currencyCode = localCurrency.countryCode
 		)
-	}
-	
-	val categories = remember(availableCategory) { availableCategory }
-	val financialsForSelectedCategory = remember(transactions, selectedCategory) {
-		transactions.filter { it.category.id == selectedCategory.id }
 	}
 	
 	val pieDataSet = remember(pieEntries) {
@@ -696,23 +702,17 @@ private fun WalletScreenContent(
 					isDataSetEmpty = isDataSetEmpty,
 					category = selectedCategory,
 					selectedColor = selectedPieColor,
-					financialType = selectedFinancialType,
-					financialsForSelectedCategory = financialsForSelectedCategory,
 					onNothingSelected = resetPieChart,
-					onPieDataSelected = { entry: PieEntry?, highlight: Highlight? ->
-						val category = if (categories.isNotEmpty()) categories[highlight?.x?.toInt() ?: -1]
-						else Category.default
+					onPieDataSelected = { highlight: Highlight, categoryID ->
+						val category = allCategory.find { it.id == categoryID } ?: Category.default
 						
 						selectedCategory = category
 						selectedPieColor = try {
-							pieColors[highlight?.x?.toInt() ?: -1].toColor()
+							pieColors[highlight.x.toInt()].toColor()
 						} catch (e: Exception) {
 							// TODO: ganti warna
 							Color.Transparent
 						}
-						
-						Timber.i("entry: $entry, highlight: $highlight")
-						Timber.i("selected category: $category")
 					},
 					modifier = Modifier
 						.padding(8.dpScaled)

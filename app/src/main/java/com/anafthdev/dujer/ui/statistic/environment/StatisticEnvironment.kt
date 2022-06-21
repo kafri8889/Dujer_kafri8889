@@ -158,10 +158,12 @@ class StatisticEnvironment @Inject constructor(
 		}
 		
 		groupedFinancialAndCategory.forEach { (category, financials) ->
+			val amount = financials.sumOf { it.amount }
 			entries.add(
 				PieEntry(
-					financials.sumOf { it.amount }.toFloat(),
-					category.name
+					amount.toFloat(),
+					category.name,
+					category.id to amount
 				)
 			)
 		}
