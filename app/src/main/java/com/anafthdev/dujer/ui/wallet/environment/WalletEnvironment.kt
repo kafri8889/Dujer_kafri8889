@@ -4,12 +4,13 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.asFlow
 import com.anafthdev.dujer.data.FinancialType
+import com.anafthdev.dujer.data.GroupType
 import com.anafthdev.dujer.data.SortType
 import com.anafthdev.dujer.data.db.model.Category
 import com.anafthdev.dujer.data.db.model.Financial
 import com.anafthdev.dujer.data.db.model.Wallet
 import com.anafthdev.dujer.data.repository.app.IAppRepository
-import com.anafthdev.dujer.foundation.common.Quad
+import com.anafthdev.dujer.foundation.common.Quint
 import com.anafthdev.dujer.foundation.common.financial_sorter.FinancialSorter
 import com.anafthdev.dujer.foundation.di.DiName
 import com.anafthdev.dujer.foundation.extension.getBy
@@ -45,6 +46,9 @@ class WalletEnvironment @Inject constructor(
 	private val _selectedSortType = MutableStateFlow(SortType.A_TO_Z)
 	private val selectedSortType: StateFlow<SortType> = _selectedSortType
 	
+	private val _selectedGroupType = MutableStateFlow(GroupType.DEFAULT)
+	private val selectedGroupType: StateFlow<GroupType> = _selectedGroupType
+	
 	private val _selectedMonth = MutableStateFlow(
 		listOf(0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11)
 	)
@@ -68,18 +72,20 @@ class WalletEnvironment @Inject constructor(
 				selectedMonth,
 				filterDate,
 				selectedSortType,
+				selectedGroupType,
 				appRepository.getAllFinancial()
-			) { month, date, sortType, financials ->
-				Quad(month, date, sortType, financials)
-			}.collect { (month, date, sortType, financials) ->
-				_transactions.emit(
-					financialSorter.beginSort(
-						sortType = sortType,
-						filterDate = date,
-						selectedMonth = month,
-						financials = financials
-					)
-				)
+			) { month, date, sortType, groupType, financials ->
+				Quint(month, date, sortType, groupType, financials)
+			}.collect { (month, date, sortType, groupType, financials) ->
+//				_transactions.emit(
+//					financialSorter.beginSort(
+//						sortType = sortType,
+//						groupType = groupType,
+//						filterDate = date,
+//						selectedMonth = month,
+//						financials = financials
+//					)
+//				)
 			}
 		}
 		
@@ -163,6 +169,10 @@ class WalletEnvironment @Inject constructor(
 		return selectedSortType
 	}
 	
+	override fun getGroupType(): Flow<GroupType> {
+		return selectedGroupType
+	}
+	
 	override fun getFilterDate(): Flow<Pair<Long, Long>> {
 		return filterDate
 	}
@@ -183,6 +193,10 @@ class WalletEnvironment @Inject constructor(
 	
 	override suspend fun setSortType(sortType: SortType) {
 		_selectedSortType.emit(sortType)
+	}
+	
+	override suspend fun setGroupType(groupType: GroupType) {
+		_selectedGroupType.emit(groupType)
 	}
 	
 	override suspend fun setFilterDate(date: Pair<Long, Long>) {

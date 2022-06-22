@@ -8,6 +8,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.platform.LocalContext
 import com.anafthdev.dujer.foundation.extension.deviceLocale
 import java.text.DateFormatSymbols
+import java.text.SimpleDateFormat
 import java.util.*
 
 object AppUtil {
@@ -26,6 +27,8 @@ object AppUtil {
 	val shortMonths: Array<String> = DateFormatSymbols.getInstance(deviceLocale).shortMonths
 	
 	val longMonths: Array<String> = DateFormatSymbols.getInstance(deviceLocale).months
+	
+	val dateFormatter = SimpleDateFormat("dd-MMM-yyyy", deviceLocale)
 	
 	fun Any?.toast(context: Context, length: Int = Toast.LENGTH_SHORT) {
 		Handler(Looper.getMainLooper()).post {

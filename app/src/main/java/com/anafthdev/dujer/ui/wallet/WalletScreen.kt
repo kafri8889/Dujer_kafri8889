@@ -87,6 +87,7 @@ fun WalletScreen(
 	val wallet = state.wallet
 	val financial = state.financial
 	val sortType = state.sortType
+	val groupType = state.groupType
 	val filterDate = state.filterDate
 	val selectedMonth = state.selectedMonth
 	
@@ -188,15 +189,20 @@ fun WalletScreen(
 			FilterSortFinancialPopup(
 				isVisible = isFilterSortFinancialPopupShowed,
 				sortType = sortType,
+				groupType = groupType,
 				filterDate = filterDate,
 				monthsSelected = selectedMonth,
-				onApply = { mSelectedMonth, mSortBy, date ->
+				onApply = { mSelectedMonth, mSortBy, mGroupType, date ->
 					viewModel.dispatch(
 						WalletAction.SetSortType(mSortBy)
 					)
 					
 					viewModel.dispatch(
 						WalletAction.SetSelectedMonth(mSelectedMonth)
+					)
+					
+					viewModel.dispatch(
+						WalletAction.SetGroupType(mGroupType)
 					)
 					
 					if (date != null) {

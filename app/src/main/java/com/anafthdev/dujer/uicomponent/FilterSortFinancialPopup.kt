@@ -21,11 +21,13 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.TextFieldValue
 import com.anafthdev.dujer.R
+import com.anafthdev.dujer.data.GroupType
 import com.anafthdev.dujer.data.SortType
 import com.anafthdev.dujer.foundation.common.TextFieldDateFormatter
 import com.anafthdev.dujer.foundation.common.showDatePicker
 import com.anafthdev.dujer.foundation.extension.gridItems
 import com.anafthdev.dujer.foundation.extension.isLightTheme
+import com.anafthdev.dujer.foundation.extension.uppercaseFirstWord
 import com.anafthdev.dujer.foundation.ui.LocalUiColor
 import com.anafthdev.dujer.foundation.uimode.data.LocalUiMode
 import com.anafthdev.dujer.foundation.window.dpScaled
@@ -41,11 +43,12 @@ import java.util.*
 fun FilterSortFinancialPopup(
 	isVisible: Boolean,
 	sortType: SortType,
+	groupType: GroupType,
 	filterDate: Pair<Long, Long>,
 	monthsSelected: List<Int>,
 	modifier: Modifier = Modifier,
 	onClose: () -> Unit,
-	onApply: (monthsSelected: List<Int>, sortBy: SortType, filterDate: Pair<Long, Long>?) -> Unit,
+	onApply: (monthsSelected: List<Int>, sortBy: SortType, groupBy: GroupType, filterDate: Pair<Long, Long>?) -> Unit,
 	onClickOutside: () -> Unit
 ) {
 	val activity = (LocalContext.current as MainActivity)
@@ -73,7 +76,6 @@ fun FilterSortFinancialPopup(
 			)
 		)
 	}
-	Timber.i("star det: ${startDate.text}")
 	
 	var endDate by remember {
 		mutableStateOf(
@@ -104,6 +106,7 @@ fun FilterSortFinancialPopup(
 		onApply(
 			monthsSelected,
 			sortType,
+			groupType,
 			date
 		)
 		
@@ -328,6 +331,7 @@ fun FilterSortFinancialPopup(
 											else remove(monthIndex)
 										},
 									sortType,
+									groupType,
 									selectedFilterDate
 								)
 							}
@@ -344,6 +348,7 @@ fun FilterSortFinancialPopup(
 										else remove(monthIndex)
 									},
 									sortType,
+									groupType,
 									selectedFilterDate
 								)
 							}
@@ -351,6 +356,63 @@ fun FilterSortFinancialPopup(
 						
 						Text(
 							text = month,
+							style = MaterialTheme.typography.titleSmall.copy(
+								color = LocalUiColor.current.normalText,
+								fontSize = MaterialTheme.typography.titleSmall.fontSize.spScaled
+							),
+							modifier = Modifier
+								.padding(start = 8.dpScaled)
+						)
+					}
+				}
+				
+				item {
+					Text(
+						text = stringResource(id = R.string.group),
+						style = MaterialTheme.typography.titleMedium.copy(
+							color = LocalUiColor.current.normalText,
+							fontWeight = FontWeight.SemiBold,
+							fontSize = MaterialTheme.typography.titleMedium.fontSize.spScaled
+						),
+						modifier = Modifier
+							.padding(
+								top = 16.dpScaled,
+								start = 16.dpScaled
+							)
+					)
+				}
+				
+				items(GroupType.values()) { type ->
+					Row(
+						verticalAlignment = Alignment.CenterVertically,
+						modifier = Modifier
+							.fillMaxWidth()
+							.clickable {
+								onApply(
+									monthsSelected,
+									sortType,
+									type,
+									selectedFilterDate
+								)
+							}
+							.padding(
+								horizontal = 16.dpScaled
+							)
+					) {
+						RadioButton(
+							selected = groupType == type,
+							onClick = {
+								onApply(
+									monthsSelected,
+									sortType,
+									type,
+									selectedFilterDate
+								)
+							}
+						)
+						
+						Text(
+							text = type.name.uppercaseFirstWord(true),
 							style = MaterialTheme.typography.titleSmall.copy(
 								color = LocalUiColor.current.normalText,
 								fontSize = MaterialTheme.typography.titleSmall.fontSize.spScaled
@@ -388,6 +450,7 @@ fun FilterSortFinancialPopup(
 								onApply(
 									monthsSelected,
 									selection.first,
+									groupType,
 									selectedFilterDate
 								)
 							}
@@ -401,6 +464,7 @@ fun FilterSortFinancialPopup(
 								onApply(
 									monthsSelected,
 									selection.first,
+									groupType,
 									selectedFilterDate
 								)
 							}

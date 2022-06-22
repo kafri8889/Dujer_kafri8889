@@ -1,9 +1,12 @@
 package com.anafthdev.dujer.foundation.common.financial_sorter
 
-import com.anafthdev.dujer.data.SortType
+import android.icu.util.Calendar
+import com.anafthdev.dujer.data.*
 import com.anafthdev.dujer.data.db.model.Financial
 import com.anafthdev.dujer.foundation.extension.deviceLocale
+import com.anafthdev.dujer.foundation.extension.forEachMap
 import com.anafthdev.dujer.util.AppUtil
+import com.anafthdev.dujer.util.AppUtil.dateFormatter
 import timber.log.Timber
 import java.text.SimpleDateFormat
 import javax.inject.Inject
@@ -13,13 +16,28 @@ class FinancialSorter @Inject constructor() {
 	private val monthFormatter = SimpleDateFormat("MMM", deviceLocale)
 	private val months = AppUtil.shortMonths
 	
+	private val calendar = Calendar.getInstance()
+	
 	fun beginSort(
 		sortType: SortType,
+		groupType: GroupType,
 		filterDate: Pair<Long, Long>,
 		selectedMonth: List<Int>,
 		financials: List<Financial>
-	): List<Financial> {
-		val dateRange = filterDate.first..filterDate.second
+	): FinancialGroupData {
+		val optimizedStartDate = calendar.apply {
+			timeInMillis = filterDate.first
+			set(Calendar.HOUR_OF_DAY, 23)
+			set(Calendar.MINUTE, 59)
+		}.timeInMillis
+		
+		val optimizedEndDate = calendar.apply {
+			timeInMillis = filterDate.second
+			set(Calendar.HOUR_OF_DAY, 23)
+			set(Calendar.MINUTE, 59)
+		}.timeInMillis
+		
+		val dateRange = optimizedStartDate..optimizedEndDate
 		val filteredFinancials = financials
 			.asSequence()
 			.filter { it.dateCreated in dateRange }
@@ -29,14 +47,55 @@ class FinancialSorter @Inject constructor() {
 				) in selectedMonth
 			}.toList()
 		
+		val data = group(sortType, groupType, filteredFinancials)
+		
+		return FinancialGroupData(
+			type = groupType,
+			data = data
+		)
+	}
+	
+	private fun group(
+		sortType: SortType,
+		groupType: GroupType,
+		financials: List<Financial>
+	): FinancialGroup {
+		return when (groupType) {
+			GroupType.DEFAULT -> FinancialGroupDefault(sort(sortType, financials))
+			GroupType.DAY -> {
+				val result = arrayListOf<FinancialGroupDayItem>()
+				val groupedFinancial = financials.groupBy {
+					dateFormatter.format(it.dateCreated)
+				}
+				
+				groupedFinancial.forEachMap { day, value ->
+					result.add(
+						FinancialGroupDayItem(
+							timeInMillis = dateFormatter.parse(day)?.time ?: 0,
+							financials = sort(sortType, value)
+						)
+					)
+				}
+				
+				FinancialGroupDay(result, financials)
+			}
+			// TODO: grup lain
+			else -> FinancialGroupDefault(financials)
+		}
+	}
+	
+	private fun sort(
+		sortType: SortType,
+		financials: List<Financial>
+	): List<Financial> {
 		return when (sortType) {
-			SortType.A_TO_Z -> filteredFinancials.sortedBy { it.name }
-			SortType.Z_TO_A -> filteredFinancials.sortedByDescending { it.name }
-			SortType.LATEST -> filteredFinancials.sortedByDescending { it.dateCreated }
-			SortType.LONGEST -> filteredFinancials.sortedBy { it.dateCreated }
-			SortType.LOWEST_AMOUNT -> filteredFinancials.sortedBy { it.amount }
-			SortType.HIGHEST_AMOUNT -> filteredFinancials.sortedByDescending { it.amount }
-			else -> filteredFinancials
+			SortType.A_TO_Z -> financials.sortedBy { it.name }
+			SortType.Z_TO_A -> financials.sortedByDescending { it.name }
+			SortType.LATEST -> financials.sortedByDescending { it.dateCreated }
+			SortType.LONGEST -> financials.sortedBy { it.dateCreated }
+			SortType.LOWEST_AMOUNT -> financials.sortedBy { it.amount }
+			SortType.HIGHEST_AMOUNT -> financials.sortedByDescending { it.amount }
+			else -> financials
 		}
 	}
 	

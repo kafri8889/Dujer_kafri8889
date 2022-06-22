@@ -61,6 +61,16 @@ class DashboardViewModel @Inject constructor(
 		}
 		
 		viewModelScope.launch(environment.dispatcher) {
+			environment.getGroupType().collect { type ->
+				setState {
+					copy(
+						groupType = type
+					)
+				}
+			}
+		}
+		
+		viewModelScope.launch(environment.dispatcher) {
 			environment.getFilterDate().collect { date ->
 				setState {
 					copy(
@@ -131,6 +141,11 @@ class DashboardViewModel @Inject constructor(
 			is DashboardAction.SetFilterDate -> {
 				viewModelScope.launch(environment.dispatcher) {
 					environment.setFilterDate(action.filterDate)
+				}
+			}
+			is DashboardAction.SetGroupType -> {
+				viewModelScope.launch(environment.dispatcher) {
+					environment.setGroupType(action.groupType)
 				}
 			}
 		}

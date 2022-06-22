@@ -8,7 +8,6 @@ import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CornerSize
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
@@ -32,7 +31,6 @@ import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
-import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -62,8 +60,8 @@ import com.anafthdev.dujer.ui.theme.income_color
 import com.anafthdev.dujer.ui.theme.shapes
 import com.anafthdev.dujer.uicomponent.BudgetCard
 import com.anafthdev.dujer.uicomponent.FilterSortFinancialPopup
-import com.anafthdev.dujer.uicomponent.SwipeableFinancialCard
 import com.anafthdev.dujer.uicomponent.TopAppBar
+import com.anafthdev.dujer.uicomponent.swipeableFinancialCard
 import com.github.mikephil.charting.data.LineDataSet
 import com.google.accompanist.navigation.animation.AnimatedNavHost
 import com.google.accompanist.navigation.animation.composable
@@ -84,8 +82,6 @@ fun DashboardScreen(
 	onTransactionCanDelete: () -> Unit,
 	onDeleteTransaction: (Financial) -> Unit
 ) {
-	
-	val context = LocalContext.current
 	
 	val dashboardViewModel = hiltViewModel<DashboardViewModel>()
 	
@@ -206,6 +202,7 @@ private fun DashboardContent(
 	val currentRoute = dashboardNavController.currentDestination?.route
 	
 	val sortType = state.sortType
+	val groupType = state.groupType
 	val filterDate = state.filterDate
 	val selectedMonth = state.selectedMonth
 	
@@ -263,15 +260,20 @@ private fun DashboardContent(
 			FilterSortFinancialPopup(
 				isVisible = isFilterSortFinancialPopupShowed,
 				sortType = sortType,
+				groupType = groupType,
 				filterDate = filterDate,
 				monthsSelected = selectedMonth,
-				onApply = { mSelectedMonth, mSortBy, date ->
+				onApply = { mSelectedMonth, mSortBy, mGroupType, date ->
 					viewModel.dispatch(
 						DashboardAction.SetSortType(mSortBy)
 					)
 					
 					viewModel.dispatch(
 						DashboardAction.SetSelectedMonth(mSelectedMonth)
+					)
+					
+					viewModel.dispatch(
+						DashboardAction.SetGroupType(mGroupType)
 					)
 					
 					if (date != null) {
@@ -522,11 +524,15 @@ private fun DashboardHomeScreen(
 	val allIncomeTransaction = dujerState.allIncomeTransaction
 	val allExpenseTransaction = dujerState.allExpenseTransaction
 	
-	val incomeTransaction = remember(transactions) {
-		transactions.filter { it.type == FinancialType.INCOME }
+	val transactionFinancials = remember(transactions) {
+		transactions.data.rawFinancials
 	}
-	val expenseTransaction = remember(transactions) {
-		transactions.filter { it.type == FinancialType.EXPENSE }
+	
+	val incomeTransaction = remember(transactionFinancials) {
+		transactionFinancials.filter { it.type == FinancialType.INCOME }
+	}
+	val expenseTransaction = remember(transactionFinancials) {
+		transactionFinancials.filter { it.type == FinancialType.EXPENSE }
 	}
 	
 	val totalAmountBudget = remember(allBudget) { allBudget.sumOf { it.max } }
@@ -736,20 +742,12 @@ private fun DashboardHomeScreen(
 				}
 			}
 			
-			items(
-				items = transactions,
-				key = { item: Financial -> item.hashCode() }
-			) { financial ->
-				SwipeableFinancialCard(
-					financial = financial,
-					onCanDelete = onFinancialCardCanDelete,
-					onDismissToEnd = { onFinancialCardDismissToEnd(financial) },
-					onClick = { onFinancialCardClicked(financial) },
-					modifier = Modifier
-						.padding(horizontal = 12.dpScaled)
-						.testTag("SwipeableFinancialCard")
-				)
-			}
+			swipeableFinancialCard(
+				data = transactions,
+				onFinancialCardCanDelete = onFinancialCardCanDelete,
+				onFinancialCardDismissToEnd = { onFinancialCardDismissToEnd(it) },
+				onFinancialCardClicked = { onFinancialCardClicked(it) },
+			)
 			
 			item {
 				// fab size: 56 dp, fab bottom padding: 24 dp, card to fab padding: 16 dp = 96 dp

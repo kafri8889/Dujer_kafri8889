@@ -3,13 +3,15 @@ package com.anafthdev.dujer.ui.dashboard.environment
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.asFlow
+import com.anafthdev.dujer.data.FinancialGroupData
 import com.anafthdev.dujer.data.FinancialType
+import com.anafthdev.dujer.data.GroupType
 import com.anafthdev.dujer.data.SortType
 import com.anafthdev.dujer.data.db.model.Category
 import com.anafthdev.dujer.data.db.model.Financial
 import com.anafthdev.dujer.data.db.model.Wallet
 import com.anafthdev.dujer.data.repository.app.IAppRepository
-import com.anafthdev.dujer.foundation.common.Quad
+import com.anafthdev.dujer.foundation.common.Quint
 import com.anafthdev.dujer.foundation.common.financial_sorter.FinancialSorter
 import com.anafthdev.dujer.foundation.di.DiName
 import com.anafthdev.dujer.foundation.extension.forEachMap
@@ -41,6 +43,9 @@ class DashboardEnvironment @Inject constructor(
 	private val _selectedSortType = MutableStateFlow(SortType.A_TO_Z)
 	private val selectedSortType: StateFlow<SortType> = _selectedSortType
 	
+	private val _selectedGroupType = MutableStateFlow(GroupType.DEFAULT)
+	private val selectedGroupType: StateFlow<GroupType> = _selectedGroupType
+	
 	private val _selectedMonth = MutableStateFlow(
 		listOf(0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11)
 	)
@@ -49,8 +54,8 @@ class DashboardEnvironment @Inject constructor(
 	private val _filterDate = MutableStateFlow(AppUtil.filterDateDefault)
 	private val filterDate: StateFlow<Pair<Long, Long>> = _filterDate
 	
-	private val _transactions = MutableStateFlow(emptyList<Financial>())
-	private val transactions: StateFlow<List<Financial>> = _transactions
+	private val _transactions = MutableStateFlow(FinancialGroupData.default)
+	private val transactions: StateFlow<FinancialGroupData> = _transactions
 	
 	private val _highestExpenseCategory = MutableStateFlow(Category.default)
 	private val highestExpenseCategory: StateFlow<Category> = _highestExpenseCategory
@@ -64,13 +69,15 @@ class DashboardEnvironment @Inject constructor(
 				selectedMonth,
 				filterDate,
 				selectedSortType,
+				selectedGroupType,
 				appRepository.getAllFinancial()
-			) { month, year, sortType, financials ->
-				Quad(month, year, sortType, financials)
-			}.collect { (month, year, sortType, financials) ->
+			) { month, year, sortType, groupType, financials ->
+				Quint(month, year, sortType, groupType, financials)
+			}.collect { (month, year, sortType, groupType, financials) ->
 				_transactions.emit(
 					financialSorter.beginSort(
 						sortType = sortType,
+						groupType = groupType,
 						filterDate = year,
 						selectedMonth = month,
 						financials = financials
@@ -117,6 +124,10 @@ class DashboardEnvironment @Inject constructor(
 		return selectedSortType
 	}
 	
+	override fun getGroupType(): Flow<GroupType> {
+		return selectedGroupType
+	}
+	
 	override fun getFilterDate(): Flow<Pair<Long, Long>> {
 		return filterDate
 	}
@@ -125,7 +136,7 @@ class DashboardEnvironment @Inject constructor(
 		return selectedMonth
 	}
 	
-	override fun getTransactions(): Flow<List<Financial>> {
+	override fun getTransactions(): Flow<FinancialGroupData> {
 		return transactions
 	}
 	
@@ -147,6 +158,10 @@ class DashboardEnvironment @Inject constructor(
 	
 	override suspend fun setSortType(sortType: SortType) {
 		_selectedSortType.emit(sortType)
+	}
+	
+	override suspend fun setGroupType(groupType: GroupType) {
+		_selectedGroupType.emit(groupType)
 	}
 	
 	override suspend fun setFilterDate(date: Pair<Long, Long>) {

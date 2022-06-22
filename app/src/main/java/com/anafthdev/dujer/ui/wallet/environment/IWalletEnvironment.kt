@@ -1,6 +1,7 @@
 package com.anafthdev.dujer.ui.wallet.environment
 
 import com.anafthdev.dujer.data.FinancialType
+import com.anafthdev.dujer.data.GroupType
 import com.anafthdev.dujer.data.SortType
 import com.anafthdev.dujer.data.db.model.Category
 import com.anafthdev.dujer.data.db.model.Financial
@@ -18,6 +19,8 @@ interface IWalletEnvironment {
 	fun getFinancial(): Flow<Financial>
 	
 	fun getSortType(): Flow<SortType>
+	
+	fun getGroupType(): Flow<GroupType>
 	
 	fun getFilterDate(): Flow<Pair<Long, Long>>
 	
@@ -43,6 +46,8 @@ interface IWalletEnvironment {
 	suspend fun setFinancialID(id: Int)
 	
 	suspend fun setSortType(sortType: SortType)
+	
+	suspend fun setGroupType(groupType: GroupType)
 	
 	suspend fun setFilterDate(date: Pair<Long, Long>)
 	

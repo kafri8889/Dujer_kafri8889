@@ -1,5 +1,6 @@
 package com.anafthdev.dujer.ui.budget.environment
 
+import com.anafthdev.dujer.data.GroupType
 import com.anafthdev.dujer.data.SortType
 import com.anafthdev.dujer.data.db.model.Budget
 import com.anafthdev.dujer.data.db.model.Financial
@@ -14,6 +15,8 @@ interface IBudgetEnvironment {
 	fun getBudget(): Flow<Budget>
 	
 	fun getSortType(): Flow<SortType>
+	
+	fun getGroupType(): Flow<GroupType>
 	
 	fun getFilterDate(): Flow<Pair<Long, Long>>
 	
@@ -34,6 +37,8 @@ interface IBudgetEnvironment {
 	suspend fun deleteBudget(budget: Budget)
 	
 	suspend fun setSortType(sortType: SortType)
+	
+	suspend fun setGroupType(groupType: GroupType)
 	
 	suspend fun setFilterDate(date: Pair<Long, Long>)
 	

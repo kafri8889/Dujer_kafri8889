@@ -1,5 +1,7 @@
 package com.anafthdev.dujer.ui.dashboard.environment
 
+import com.anafthdev.dujer.data.FinancialGroupData
+import com.anafthdev.dujer.data.GroupType
 import com.anafthdev.dujer.data.SortType
 import com.anafthdev.dujer.data.db.model.Category
 import com.anafthdev.dujer.data.db.model.Financial
@@ -17,11 +19,13 @@ interface IDashboardEnvironment {
 	
 	fun getSortType(): Flow<SortType>
 	
+	fun getGroupType(): Flow<GroupType>
+	
 	fun getFilterDate(): Flow<Pair<Long, Long>>
 	
 	fun getSelectedMonth(): Flow<List<Int>>
 	
-	fun getTransactions(): Flow<List<Financial>>
+	fun getTransactions(): Flow<FinancialGroupData>
 	
 	fun getHighestExpenseCategory(): Flow<Category>
 	
@@ -33,6 +37,8 @@ interface IDashboardEnvironment {
 	suspend fun insertWallet(wallet: Wallet)
 	
 	suspend fun setSortType(sortType: SortType)
+	
+	suspend fun setGroupType(groupType: GroupType)
 	
 	suspend fun setFilterDate(date: Pair<Long, Long>)
 	

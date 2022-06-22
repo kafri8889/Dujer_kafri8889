@@ -2,6 +2,7 @@
 <resources>
 
     <string name="end">Akhir</string>
+    <string name="day">Hari</string>
     <string name="_new">Baru</string>
     <string name="cash">Cash</string>
     <string name="edit">Edit</string>
@@ -11,6 +12,10 @@
     <string name="name">Nama</string>
     <string name="icon">Ikon</string>
     <string name="sort">Sortir</string>
+    <string name="week">Minggu</string>
+    <string name="year">Tahun</string>
+    <string name="month">Bulan</string>
+    <string name="group">Grup</string>
     <string name="start">Mulai</string>
     <string name="close">Tutup</string>
     <string name="apply">Terapkan</string>
@@ -36,6 +41,7 @@
     <string name="balance">Saldo</string>
     <string name="setting">Pengaturan</string>
     <string name="no_data">Tidak ada data</string>
+    <string name="_default">Bawaan</string>
     <string name="security">Keamanan</string>
     <string name="expenses">Pengeluaran</string>
     <string name="category">Kategori</string>

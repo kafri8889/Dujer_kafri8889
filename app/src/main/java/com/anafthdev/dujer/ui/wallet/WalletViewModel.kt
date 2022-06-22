@@ -67,6 +67,16 @@ class WalletViewModel @Inject constructor(
 		}
 		
 		viewModelScope.launch(environment.dispatcher) {
+			environment.getGroupType().collect { type ->
+				setState {
+					copy(
+						groupType = type
+					)
+				}
+			}
+		}
+		
+		viewModelScope.launch(environment.dispatcher) {
 			environment.getFilterDate().collect { date ->
 				setState {
 					copy(
@@ -152,6 +162,11 @@ class WalletViewModel @Inject constructor(
 			is WalletAction.SetFilterDate -> {
 				viewModelScope.launch(environment.dispatcher) {
 					environment.setFilterDate(action.filterDate)
+				}
+			}
+			is WalletAction.SetGroupType -> {
+				viewModelScope.launch(environment.dispatcher) {
+					environment.setGroupType(action.groupType)
 				}
 			}
 		}

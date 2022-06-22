@@ -73,6 +73,7 @@ fun BudgetScreen(
 	
 	val budget = state.budget
 	val sortType = state.sortType
+	val groupType = state.groupType
 	val filterDate = state.filterDate
 	val barEntries = state.barEntries
 	val transactions = state.transactions
@@ -155,15 +156,20 @@ fun BudgetScreen(
 		FilterSortFinancialPopup(
 			isVisible = isFilterSortFinancialPopupShowed,
 			sortType = sortType,
+			groupType = groupType,
 			filterDate = filterDate,
 			monthsSelected = selectedMonth,
-			onApply = { mSelectedMonth, mSortBy, date ->
+			onApply = { mSelectedMonth, mSortBy, mGroupType, date ->
 				viewModel.dispatch(
 					BudgetAction.SetSortType(mSortBy)
 				)
 				
 				viewModel.dispatch(
 					BudgetAction.SetSelectedMonth(mSelectedMonth)
+				)
+				
+				viewModel.dispatch(
+					BudgetAction.SetGroupType(mGroupType)
 				)
 				
 				if (date != null) {
