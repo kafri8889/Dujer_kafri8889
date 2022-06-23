@@ -1,5 +1,6 @@
 package com.anafthdev.dujer.data
 
+import com.anafthdev.dujer.data.db.model.Category
 import com.anafthdev.dujer.data.db.model.Financial
 
 sealed interface FinancialGroup {
@@ -28,12 +29,23 @@ data class FinancialGroupDefault(
 ): FinancialGroup
 
 
-data class FinancialGroupDay(
-	val items: List<FinancialGroupDayItem>,
+data class FinancialGroupDate(
+	val items: List<FinancialGroupDateItem>,
 	override val rawFinancials: List<Financial>
 ): FinancialGroup
 
-data class FinancialGroupDayItem(
+data class FinancialGroupDateItem(
 	val timeInMillis: Long,
+	val financials: List<Financial>
+)
+
+
+data class FinancialGroupCategory(
+	val items: List<FinancialGroupCategoryItem>,
+	override val rawFinancials: List<Financial>
+): FinancialGroup
+
+data class FinancialGroupCategoryItem(
+	val category: Category,
 	val financials: List<Financial>
 )

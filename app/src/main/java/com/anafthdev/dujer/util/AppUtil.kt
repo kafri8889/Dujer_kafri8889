@@ -28,7 +28,10 @@ object AppUtil {
 	
 	val longMonths: Array<String> = DateFormatSymbols.getInstance(deviceLocale).months
 	
-	val dateFormatter = SimpleDateFormat("dd-MMM-yyyy", deviceLocale)
+	val dateFormatter = SimpleDateFormat("dd MMM yyyy", deviceLocale)
+	val monthYearFormatter = SimpleDateFormat("MMM yyyy", deviceLocale)
+	val monthFormatter = SimpleDateFormat("MMM", deviceLocale)
+	val yearFormatter = SimpleDateFormat("yyyy", deviceLocale)
 	
 	fun Any?.toast(context: Context, length: Int = Toast.LENGTH_SHORT) {
 		Handler(Looper.getMainLooper()).post {

@@ -747,6 +747,11 @@ private fun DashboardHomeScreen(
 				onFinancialCardCanDelete = onFinancialCardCanDelete,
 				onFinancialCardDismissToEnd = { onFinancialCardDismissToEnd(it) },
 				onFinancialCardClicked = { onFinancialCardClicked(it) },
+				onNavigateCategoryClicked = { category ->
+					navController.navigate(
+						DujerDestination.CategoryTransaction.createRoute(category.id)
+					)
+				}
 			)
 			
 			item {

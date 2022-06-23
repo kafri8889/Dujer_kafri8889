@@ -2,18 +2,19 @@ package com.anafthdev.dujer.foundation.common.financial_sorter
 
 import android.icu.util.Calendar
 import com.anafthdev.dujer.data.*
+import com.anafthdev.dujer.data.db.model.Category
 import com.anafthdev.dujer.data.db.model.Financial
-import com.anafthdev.dujer.foundation.extension.deviceLocale
 import com.anafthdev.dujer.foundation.extension.forEachMap
 import com.anafthdev.dujer.util.AppUtil
 import com.anafthdev.dujer.util.AppUtil.dateFormatter
+import com.anafthdev.dujer.util.AppUtil.monthFormatter
+import com.anafthdev.dujer.util.AppUtil.monthYearFormatter
+import com.anafthdev.dujer.util.AppUtil.yearFormatter
 import timber.log.Timber
-import java.text.SimpleDateFormat
 import javax.inject.Inject
 
 class FinancialSorter @Inject constructor() {
 	
-	private val monthFormatter = SimpleDateFormat("MMM", deviceLocale)
 	private val months = AppUtil.shortMonths
 	
 	private val calendar = Calendar.getInstance()
@@ -47,7 +48,7 @@ class FinancialSorter @Inject constructor() {
 				) in selectedMonth
 			}.toList()
 		
-		val data = group(sortType, groupType, filteredFinancials)
+		val data = groupAndSort(sortType, groupType, filteredFinancials)
 		
 		return FinancialGroupData(
 			type = groupType,
@@ -55,29 +56,55 @@ class FinancialSorter @Inject constructor() {
 		)
 	}
 	
-	private fun group(
+	// TODO: sort juga pas udah di grup
+	private fun groupAndSort(
 		sortType: SortType,
 		groupType: GroupType,
 		financials: List<Financial>
 	): FinancialGroup {
 		return when (groupType) {
 			GroupType.DEFAULT -> FinancialGroupDefault(sort(sortType, financials))
-			GroupType.DAY -> {
-				val result = arrayListOf<FinancialGroupDayItem>()
-				val groupedFinancial = financials.groupBy {
-					dateFormatter.format(it.dateCreated)
+			GroupType.DAY, GroupType.MONTH, GroupType.YEAR -> {
+				val formatter = when (groupType) {
+					GroupType.DAY -> dateFormatter
+					GroupType.MONTH -> monthYearFormatter
+					GroupType.YEAR -> yearFormatter
+					else -> throw RuntimeException("no formatter set")
 				}
 				
-				groupedFinancial.forEachMap { day, value ->
+				val result = arrayListOf<FinancialGroupDateItem>()
+				val groupedFinancial = financials.groupBy {
+					formatter.format(it.dateCreated)
+				}
+				
+				groupedFinancial.forEachMap { key, value ->
 					result.add(
-						FinancialGroupDayItem(
-							timeInMillis = dateFormatter.parse(day)?.time ?: 0,
+						FinancialGroupDateItem(
+							timeInMillis = formatter.parse(key)?.time ?: 0,
 							financials = sort(sortType, value)
 						)
 					)
 				}
 				
-				FinancialGroupDay(result, financials)
+				FinancialGroupDate(result, financials)
+			}
+			GroupType.CATEGORY -> {
+				val result = arrayListOf<FinancialGroupCategoryItem>()
+				val availableCategory = financials.map { it.category }
+				val groupedFinancial = financials.groupBy {
+					it.category.id
+				}
+				
+				groupedFinancial.forEachMap { key, value ->
+					result.add(
+						FinancialGroupCategoryItem(
+							category = availableCategory.find { it.id == key } ?: Category.default,
+							financials = sort(sortType, value)
+						)
+					)
+				}
+				
+				FinancialGroupCategory(result, financials)
 			}
 			// TODO: grup lain
 			else -> FinancialGroupDefault(financials)
