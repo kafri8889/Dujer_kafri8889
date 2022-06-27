@@ -1,6 +1,5 @@
 package com.anafthdev.dujer.foundation.common.financial_sorter
 
-import android.icu.util.Calendar
 import com.anafthdev.dujer.data.*
 import com.anafthdev.dujer.data.db.model.Category
 import com.anafthdev.dujer.data.db.model.Financial
@@ -11,6 +10,7 @@ import com.anafthdev.dujer.util.AppUtil.monthFormatter
 import com.anafthdev.dujer.util.AppUtil.monthYearFormatter
 import com.anafthdev.dujer.util.AppUtil.yearFormatter
 import timber.log.Timber
+import java.util.*
 import javax.inject.Inject
 
 class FinancialSorter @Inject constructor() {
@@ -56,7 +56,6 @@ class FinancialSorter @Inject constructor() {
 		)
 	}
 	
-	// TODO: sort juga pas udah di grup
 	private fun groupAndSort(
 		sortType: SortType,
 		groupType: GroupType,
@@ -86,7 +85,17 @@ class FinancialSorter @Inject constructor() {
 					)
 				}
 				
-				FinancialGroupDate(result, financials)
+				val sortedResult = when (sortType) {
+					SortType.A_TO_Z -> result.sortedByDescending { it.timeInMillis }
+					SortType.Z_TO_A -> result.sortedByDescending { it.timeInMillis }
+					SortType.LATEST -> result.sortedByDescending { it.timeInMillis }
+					SortType.LONGEST -> result.sortedBy { it.timeInMillis }
+					SortType.LOWEST_AMOUNT -> result.sortedByDescending { it.timeInMillis }
+					SortType.HIGHEST_AMOUNT -> result.sortedByDescending { it.timeInMillis }
+					else -> result
+				}
+				
+				FinancialGroupDate(sortedResult, financials)
 			}
 			GroupType.CATEGORY -> {
 				val result = arrayListOf<FinancialGroupCategoryItem>()
@@ -104,10 +113,85 @@ class FinancialSorter @Inject constructor() {
 					)
 				}
 				
-				FinancialGroupCategory(result, financials)
+				val sortedResult = when (sortType) {
+					SortType.A_TO_Z -> result.sortedBy { it.category.name }
+					SortType.Z_TO_A -> result.sortedByDescending { it.category.name }
+					SortType.LATEST -> result.sortedBy { it.category.name }
+					SortType.LONGEST -> result.sortedBy { it.category.name }
+					SortType.LOWEST_AMOUNT -> result.sortedBy { it.category.name }
+					SortType.HIGHEST_AMOUNT -> result.sortedBy { it.category.name }
+					else -> result
+				}
+				
+				FinancialGroupCategory(sortedResult, financials)
 			}
-			// TODO: grup lain
-			else -> FinancialGroupDefault(financials)
+//			GroupType.WEEK -> {
+//				val result = arrayListOf<FinancialGroupWeekItem>()
+//
+//				// Start date, Stop date
+//				var daysInWeekList = arrayListOf<Pair<Long, Long>>()
+//				val firstDayOfMonthCalendar = Calendar.getInstance().apply {
+//					this.timeInMillis = financials.minOf { it.dateCreated }
+//					set(Calendar.DAY_OF_MONTH, 1)
+//				}
+//
+//				val firstOfMonth = LocalDate.fromCalendarFields(firstDayOfMonthCalendar)
+//				val firstOfNextMonth = firstOfMonth.plusMonths(1)
+//				var firstDateInGrid = firstOfMonth.withDayOfWeek(DateTimeConstants.SUNDAY)
+//
+//				// If getting the next start of week instead of desired week's start, adjust backwards.
+//				if ( firstDateInGrid.isAfter(firstOfMonth) ) {
+//					firstDateInGrid = firstDateInGrid.minusWeeks(1)
+//				}
+//
+//				var weekStart = firstDateInGrid
+//				var weekStop: LocalDate
+//				var weekNumber = 0
+//
+//				do {
+//					weekNumber += 1
+//					weekStop = weekStart.plusDays(6)
+//					daysInWeekList.add(weekStart.toDate().time to weekStop.toDate().time)
+//					weekStart = weekStop.plusDays(1)
+//				} while (weekStop.isBefore(firstOfNextMonth))
+//
+//				result.apply {
+//					for (week in 0..4) {
+//						val startDate = daysInWeekList[week].first
+//						val stopDate = daysInWeekList[week].second
+//						val dateRange = startDate..stopDate
+//						val value = financials
+//							.map {
+//								it to Calendar.getInstance().apply {
+//									this.timeInMillis = it.dateCreated
+//									set(Calendar.HOUR_OF_DAY, 23)
+//									set(Calendar.MINUTE, 59)
+//									set(Calendar.SECOND, 59)
+//								}.timeInMillis
+//							}
+//							.filter {
+//								it.second in dateRange
+//							}
+//
+//						Timber.i("valyu: $value")
+//						Timber.i("valyu formt: ${
+//							financials.map { dateFormatter.format(it.dateCreated) }
+//						} in ${dateFormatter.format(startDate)}..${dateFormatter.format(stopDate)}")
+//						Timber.i("valyu ril: ${financials.map { it.dateCreated }} in $startDate..$stopDate")
+//
+//						add(
+//							FinancialGroupWeekItem(
+//								week = week,
+//								from = startDate,
+//								to = stopDate,
+//								financials = value.map { it.first }
+//							)
+//						)
+//					}
+//				}
+//
+//				return FinancialGroupWeek(result, financials)
+//			}
 		}
 	}
 	

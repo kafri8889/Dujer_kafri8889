@@ -2,6 +2,8 @@ package com.anafthdev.dujer.foundation.extension
 
 fun <T> Int.lastIndexOf(list: Collection<T>) = this == list.size - 1
 
+fun <T> Collection<T>.toArrayList(): ArrayList<T> = ArrayList(this)
+
 /**
  * list = [[1, 2, 3], [1, 2, 3]]
  * group -> [[1, 1], [2, 2], [3, 3]]

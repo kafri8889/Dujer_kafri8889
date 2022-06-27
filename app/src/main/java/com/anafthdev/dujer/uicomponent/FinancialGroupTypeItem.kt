@@ -154,6 +154,62 @@ fun LazyListScope.swipeableFinancialCard(
 				}
 			}
 		}
+//		GroupType.WEEK -> {
+//			items(
+//				items = (data.data as FinancialGroupWeek).items,
+//				key = { item: FinancialGroupWeekItem -> item.hashCode() }
+//			) { item ->
+//				Row(
+//					verticalAlignment = Alignment.CenterVertically,
+//					horizontalArrangement = Arrangement.End,
+//					modifier = Modifier
+//						.padding(
+//							top = 8.dpScaled,
+//							start = 16.dpScaled,
+//							end = 16.dpScaled
+//						)
+//						.fillMaxWidth()
+//				) {
+//					Text(
+//						text = stringResource(
+//							id = R.string.week_n,
+//							item.week.toString()
+//						),
+//						style = MaterialTheme.typography.titleMedium.copy(
+//							color = LocalUiColor.current.normalText,
+//							fontWeight = FontWeight.SemiBold,
+//							fontSize = MaterialTheme.typography.titleMedium.fontSize.spScaled
+//						)
+//					)
+//
+//					Spacer(modifier = Modifier.weight(1f))
+//
+//					Text(
+//						text = "${
+//							dateFormatter.format(item.from)
+//						} - ${dateFormatter.format(item.to)}",
+//						style = MaterialTheme.typography.bodySmall.copy(
+//							color = LocalUiColor.current.labelText,
+//							fontSize = MaterialTheme.typography.bodySmall.fontSize.spScaled
+//						)
+//					)
+//				}
+//
+//				for (financial in item.financials) {
+//					key(financial.hashCode()) {
+//						SwipeableFinancialCard(
+//							financial = financial,
+//							onCanDelete = onFinancialCardCanDelete,
+//							onDismissToEnd = { onFinancialCardDismissToEnd(financial) },
+//							onClick = { onFinancialCardClicked(financial) },
+//							modifier = Modifier
+//								.padding(horizontal = 12.dpScaled)
+//								.testTag("SwipeableFinancialCard")
+//						)
+//					}
+//				}
+//			}
+//		}
 	}
 	
 

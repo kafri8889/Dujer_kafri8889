@@ -49,3 +49,21 @@ data class FinancialGroupCategoryItem(
 	val category: Category,
 	val financials: List<Financial>
 )
+
+data class FinancialGroupWeek(
+	val items: List<FinancialGroupWeekItem>,
+	override val rawFinancials: List<Financial>
+): FinancialGroup
+
+/**
+ * @param week week in month
+ * @param from time in millis
+ * @param to time in millis
+ * @param financials the financials
+ */
+data class FinancialGroupWeekItem(
+	val week: Int,
+	val from: Long,
+	val to: Long,
+	val financials: List<Financial>
+)

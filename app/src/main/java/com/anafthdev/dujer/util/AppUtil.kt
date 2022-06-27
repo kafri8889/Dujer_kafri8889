@@ -13,8 +13,10 @@ import java.util.*
 
 object AppUtil {
 	
-	const val ONE_YEAR_IN_MILLIS = 31557600000
-	const val ONE_MONTH_IN_MILLIS = 2629800000
+	const val ONE_YEAR_IN_MILLIS = 31_557_600_000
+	const val ONE_MONTH_IN_MILLIS = 2_629_800_000
+	const val ONE_DAY_IN_MILLIS = 86_400_000
+	const val ONE_HOUR_IN_MILLIS = 3_600_000
 	
 	val publicCalendar: Calendar = Calendar.getInstance()
 	
