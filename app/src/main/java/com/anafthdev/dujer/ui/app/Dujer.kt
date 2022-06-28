@@ -189,7 +189,18 @@ fun DujerApp() {
 						IncomeExpenseScreen(
 							navController = navController,
 							type = FinancialType.values()[type],
-							dujerViewModel = dujerViewModel
+							onTransactionCanDelete = {
+								dujerViewModel.dispatch(
+									DujerAction.Vibrate(100)
+								)
+							},
+							onDeleteTransaction = { financial ->
+								dujerViewModel.dispatch(
+									DujerAction.DeleteFinancial(
+										financial.toArray()
+									)
+								)
+							}
 						)
 					}
 					

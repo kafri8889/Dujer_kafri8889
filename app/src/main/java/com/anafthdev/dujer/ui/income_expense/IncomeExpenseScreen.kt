@@ -1,10 +1,13 @@
 package com.anafthdev.dujer.ui.income_expense
 
 import androidx.activity.compose.BackHandler
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CornerSize
 import androidx.compose.material.ExperimentalMaterialApi
@@ -12,63 +15,63 @@ import androidx.compose.material.ModalBottomSheetLayout
 import androidx.compose.material.ModalBottomSheetValue
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.ArrowBack
+import androidx.compose.material.icons.rounded.FilterList
 import androidx.compose.material.rememberModalBottomSheetState
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.*
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.zIndex
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.anafthdev.dujer.R
+import com.anafthdev.dujer.data.DujerDestination
 import com.anafthdev.dujer.data.FinancialType
 import com.anafthdev.dujer.data.db.model.Financial
 import com.anafthdev.dujer.foundation.extension.deviceLocale
 import com.anafthdev.dujer.foundation.extension.replace
-import com.anafthdev.dujer.foundation.extension.toArray
 import com.anafthdev.dujer.foundation.ui.LocalUiColor
 import com.anafthdev.dujer.foundation.uiextension.horizontalScroll
 import com.anafthdev.dujer.foundation.window.dpScaled
 import com.anafthdev.dujer.foundation.window.spScaled
 import com.anafthdev.dujer.model.LocalCurrency
-import com.anafthdev.dujer.ui.app.DujerAction
-import com.anafthdev.dujer.ui.app.DujerViewModel
 import com.anafthdev.dujer.ui.app.LocalDujerState
 import com.anafthdev.dujer.ui.financial.FinancialScreen
 import com.anafthdev.dujer.ui.financial.data.FinancialAction
 import com.anafthdev.dujer.ui.income_expense.component.IncomeExpenseLineChart
 import com.anafthdev.dujer.ui.theme.Typography
 import com.anafthdev.dujer.ui.theme.extra_large_shape
-import com.anafthdev.dujer.uicomponent.SwipeableFinancialCard
+import com.anafthdev.dujer.uicomponent.FilterSortFinancialPopup
 import com.anafthdev.dujer.uicomponent.TopAppBar
-import com.anafthdev.dujer.util.AppUtil
+import com.anafthdev.dujer.uicomponent.swipeableFinancialCard
 import com.anafthdev.dujer.util.CurrencyFormatter
 import com.github.mikephil.charting.data.Entry
 import com.github.mikephil.charting.data.LineDataSet
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import java.util.*
 
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun IncomeExpenseScreen(
 	navController: NavController,
 	type: FinancialType,
-	dujerViewModel: DujerViewModel
+	onTransactionCanDelete: () -> Unit,
+	onDeleteTransaction: (Financial) -> Unit
 ) {
 	
 	val context = LocalContext.current
 	val dujerState = LocalDujerState.current
 	
-	val incomeExpenseViewModel = hiltViewModel<IncomeExpenseViewModel>()
+	val viewModel = hiltViewModel<IncomeExpenseViewModel>()
 	
 	val scope = rememberCoroutineScope { Dispatchers.Main }
 	val financialScreenSheetState = rememberModalBottomSheetState(
@@ -76,19 +79,36 @@ fun IncomeExpenseScreen(
 		skipHalfExpanded = true
 	)
 	
-	val state by incomeExpenseViewModel.state.collectAsState()
+	val state by viewModel.state.collectAsState()
 	
 	val financial = state.financial
+	val sortType = state.sortType
+	val groupType = state.groupType
+	val filterDate = state.filterDate
+	val selectedMonth = state.selectedMonth
+	val transactions = state.transactions
+	
+	var isFilterSortFinancialPopupShowed by rememberSaveable { mutableStateOf(false) }
 	
 	// TODO: Filter transaksi by bulan?
-	val incomeTransaction = dujerState.allIncomeTransaction
-	val expenseTransaction = dujerState.allExpenseTransaction
-	
-	val incomeBalance = remember(incomeTransaction) {
-		incomeTransaction.sumOf { it.amount }
+	val transactionFinancials = remember(transactions) {
+		transactions.data.rawFinancials
 	}
-	val expenseBalance = remember(expenseTransaction) {
-		expenseTransaction.sumOf { it.amount }
+	
+	val incomeTransaction = remember(transactionFinancials) {
+		transactionFinancials.filter { it.type == FinancialType.INCOME }
+	}
+	val expenseTransaction = remember(transactionFinancials) {
+		transactionFinancials.filter { it.type == FinancialType.EXPENSE }
+	}
+	
+	val incomeBalance = remember(dujerState.allIncomeTransaction) {
+		dujerState.allIncomeTransaction
+			.sumOf { it.amount }
+	}
+	val expenseBalance = remember(dujerState.allExpenseTransaction) {
+		dujerState.allExpenseTransaction
+			.sumOf { it.amount }
 	}
 	
 	val incomeLineChartEntry = remember {
@@ -98,12 +118,12 @@ fun IncomeExpenseScreen(
 		mutableStateListOf<Entry>()
 	}
 	
-	val hideSheet = {
+	val hideFinancialSheet = {
 		scope.launch { financialScreenSheetState.hide() }
 		Unit
 	}
 	
-	val showSheet = {
+	val showFinancialSheet = {
 		scope.launch { financialScreenSheetState.show() }
 		Unit
 	}
@@ -128,7 +148,7 @@ fun IncomeExpenseScreen(
 	)
 	
 	LaunchedEffect(incomeTransaction, expenseTransaction) {
-		val (incomeEntry, expenseEntry) = incomeExpenseViewModel.calculateEntry(
+		val (incomeEntry, expenseEntry) = viewModel.calculateEntry(
 			incomeList = incomeTransaction,
 			expenseList = expenseTransaction
 		)
@@ -139,8 +159,57 @@ fun IncomeExpenseScreen(
 	
 	BackHandler(
 		enabled = financialScreenSheetState.isVisible,
-		onBack = hideSheet
+		onBack = hideFinancialSheet
 	)
+	
+	AnimatedVisibility(
+		visible = isFilterSortFinancialPopupShowed,
+		enter = fadeIn(
+			animationSpec = tween(400)
+		),
+		exit = fadeOut(
+			animationSpec = tween(400)
+		),
+		modifier = Modifier
+			.fillMaxSize()
+			.zIndex(2f)
+	) {
+		FilterSortFinancialPopup(
+			isVisible = isFilterSortFinancialPopupShowed,
+			sortType = sortType,
+			groupType = groupType,
+			filterDate = filterDate,
+			monthsSelected = selectedMonth,
+			onApply = { mSelectedMonth, mSortBy, mGroupType, date ->
+				viewModel.dispatch(
+					IncomeExpenseAction.SetSortType(mSortBy)
+				)
+				
+				viewModel.dispatch(
+					IncomeExpenseAction.SetSelectedMonth(mSelectedMonth)
+				)
+				
+				viewModel.dispatch(
+					IncomeExpenseAction.SetGroupType(mGroupType)
+				)
+				
+				if (date != null) {
+					viewModel.dispatch(
+						IncomeExpenseAction.SetFilterDate(date)
+					)
+				}
+			},
+			onClose = {
+				isFilterSortFinancialPopupShowed = false
+			},
+			onClickOutside = {
+				isFilterSortFinancialPopupShowed = false
+			},
+			modifier = Modifier
+				.systemBarsPadding()
+				.padding(vertical = 24.dpScaled)
+		)
+	}
 	
 	ModalBottomSheetLayout(
 		scrimColor = Color.Unspecified,
@@ -150,8 +219,8 @@ fun IncomeExpenseScreen(
 				isScreenVisible = financialScreenSheetState.isVisible,
 				financial = financial,
 				financialAction = FinancialAction.EDIT,
-				onBack = hideSheet,
-				onSave = hideSheet
+				onBack = hideFinancialSheet,
+				onSave = hideFinancialSheet
 			)
 		}
 	) {
@@ -192,6 +261,20 @@ fun IncomeExpenseScreen(
 								fontSize = Typography.titleLarge.fontSize.spScaled
 							)
 						)
+						
+						IconButton(
+							onClick = {
+								isFilterSortFinancialPopupShowed = true
+							},
+							modifier = Modifier
+								.padding(end = 8.dpScaled)
+								.align(Alignment.CenterEnd)
+						) {
+							Icon(
+								imageVector = Icons.Rounded.FilterList,
+								contentDescription = null
+							)
+						}
 					}
 					
 					IncomeExpenseLineChart(
@@ -225,8 +308,7 @@ fun IncomeExpenseScreen(
 							) {
 								Text(
 									text = stringResource(
-										id = if (type == FinancialType.INCOME) R.string.income_for else R.string.expenses_for,
-										AppUtil.longMonths[Calendar.getInstance()[Calendar.MONTH]]
+										id = if (type == FinancialType.INCOME) R.string.all_income else R.string.all_expenses
 									),
 									style = Typography.bodyMedium.copy(
 										color = Color.White,
@@ -277,34 +359,52 @@ fun IncomeExpenseScreen(
 				}
 			}
 			
-			items(
-				items = if (type == FinancialType.INCOME) incomeTransaction else expenseTransaction,
-				key = { item: Financial -> item.hashCode() }
-			) { financial ->
-				SwipeableFinancialCard(
-					financial = financial,
-					onDismissToEnd = {
-						dujerViewModel.dispatch(
-							DujerAction.DeleteFinancial(financial.toArray())
-						)
-					},
-					onCanDelete = {
-						dujerViewModel.dispatch(
-							DujerAction.Vibrate(100)
-						)
-					},
-					onClick = {
-						incomeExpenseViewModel.dispatch(
-							IncomeExpenseAction.SetFinancialID(financial.id)
-						)
-						
-						showSheet()
-					},
-					modifier = Modifier
-						.padding(horizontal = 8.dpScaled)
-						.testTag("SwipeableFinancialCard")
-				)
-			}
+			swipeableFinancialCard(
+				data = transactions,
+				onFinancialCardCanDelete = onTransactionCanDelete,
+				onFinancialCardDismissToEnd = { onDeleteTransaction(it) },
+				onFinancialCardClicked = {
+					viewModel.dispatch(
+						IncomeExpenseAction.SetFinancialID(financial.id)
+					)
+					
+					showFinancialSheet()
+				},
+				onNavigateCategoryClicked = { category ->
+					navController.navigate(
+						DujerDestination.CategoryTransaction.createRoute(category.id)
+					)
+				}
+			)
+			
+//			items(
+//				items = if (type == FinancialType.INCOME) incomeTransaction else expenseTransaction,
+//				key = { item: Financial -> item.hashCode() }
+//			) { financial ->
+//				SwipeableFinancialCard(
+//					financial = financial,
+//					onDismissToEnd = {
+//						dujerViewModel.dispatch(
+//							DujerAction.DeleteFinancial(financial.toArray())
+//						)
+//					},
+//					onCanDelete = {
+//						dujerViewModel.dispatch(
+//							DujerAction.Vibrate(100)
+//						)
+//					},
+//					onClick = {
+//						viewModel.dispatch(
+//							IncomeExpenseAction.SetFinancialID(financial.id)
+//						)
+//
+//						showSheet()
+//					},
+//					modifier = Modifier
+//						.padding(horizontal = 8.dpScaled)
+//						.testTag("SwipeableFinancialCard")
+//				)
+//			}
 		}
 	}
 }

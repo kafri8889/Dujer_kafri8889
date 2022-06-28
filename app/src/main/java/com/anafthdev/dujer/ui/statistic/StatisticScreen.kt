@@ -187,7 +187,6 @@ fun StatisticScreen(
 						)
 				)
 				
-				// TODO: Selected cateogryyy
 				FinancialStatisticChart(
 					dataSet = pieDataSet,
 					isDataSetEmpty = isDataSetEmpty,
@@ -199,10 +198,7 @@ fun StatisticScreen(
 						selectedCategory = category
 						selectedPieColor = try {
 							pieColors[highlight.x.toInt()].toColor()
-						} catch (e: Exception) {
-							// TODO: ganti warna
-							androidx.compose.ui.graphics.Color.Transparent
-						}
+						} catch (e: Exception) { androidx.compose.ui.graphics.Color.Transparent }
 					},
 					onNothingSelected = {
 						selectedCategory = Category.default

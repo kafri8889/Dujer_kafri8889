@@ -715,10 +715,7 @@ private fun WalletScreenContent(
 						selectedCategory = category
 						selectedPieColor = try {
 							pieColors[highlight.x.toInt()].toColor()
-						} catch (e: Exception) {
-							// TODO: ganti warna
-							Color.Transparent
-						}
+						} catch (e: Exception) { Color.Transparent }
 					},
 					modifier = Modifier
 						.padding(8.dpScaled)
