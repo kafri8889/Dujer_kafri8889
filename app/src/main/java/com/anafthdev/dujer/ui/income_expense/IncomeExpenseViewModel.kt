@@ -2,16 +2,14 @@ package com.anafthdev.dujer.ui.income_expense
 
 import androidx.lifecycle.viewModelScope
 import com.anafthdev.dujer.data.db.model.Financial
+import com.anafthdev.dujer.foundation.common.AppUtil
 import com.anafthdev.dujer.foundation.extension.deviceLocale
 import com.anafthdev.dujer.foundation.extension.forEachMap
 import com.anafthdev.dujer.foundation.extension.indexOf
 import com.anafthdev.dujer.foundation.viewmodel.StatefulViewModel
 import com.anafthdev.dujer.ui.income_expense.environment.IIncomeExpenseEnvironment
-import com.anafthdev.dujer.util.AppUtil
 import com.github.mikephil.charting.data.Entry
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
 import javax.inject.Inject
@@ -47,6 +45,56 @@ class IncomeExpenseViewModel @Inject constructor(
 				}
 			}
 		}
+		
+		viewModelScope.launch(environment.dispatcher) {
+			environment.getTransactions().collect { transactions ->
+				setState {
+					copy(
+						transactions = transactions
+					)
+				}
+			}
+		}
+		
+		viewModelScope.launch(environment.dispatcher) {
+			environment.getSortType().collect { type ->
+				setState {
+					copy(
+						sortType = type
+					)
+				}
+			}
+		}
+		
+		viewModelScope.launch(environment.dispatcher) {
+			environment.getGroupType().collect { type ->
+				setState {
+					copy(
+						groupType = type
+					)
+				}
+			}
+		}
+		
+		viewModelScope.launch(environment.dispatcher) {
+			environment.getFilterDate().collect { date ->
+				setState {
+					copy(
+						filterDate = date
+					)
+				}
+			}
+		}
+		
+		viewModelScope.launch(environment.dispatcher) {
+			environment.getSelectedMonth().collect { months ->
+				setState {
+					copy(
+						selectedMonth = months
+					)
+				}
+			}
+		}
 	}
 	
 	override fun dispatch(action: IncomeExpenseAction) {
@@ -54,6 +102,26 @@ class IncomeExpenseViewModel @Inject constructor(
 			is IncomeExpenseAction.SetFinancialID -> {
 				viewModelScope.launch(environment.dispatcher) {
 					environment.setFinancialID(action.id)
+				}
+			}
+			is IncomeExpenseAction.SetSortType -> {
+				viewModelScope.launch(environment.dispatcher) {
+					environment.setSortType(action.sortType)
+				}
+			}
+			is IncomeExpenseAction.SetSelectedMonth -> {
+				viewModelScope.launch(environment.dispatcher) {
+					environment.setSelectedMonth(action.selectedMonth)
+				}
+			}
+			is IncomeExpenseAction.SetFilterDate -> {
+				viewModelScope.launch(environment.dispatcher) {
+					environment.setFilterDate(action.filterDate)
+				}
+			}
+			is IncomeExpenseAction.SetGroupType -> {
+				viewModelScope.launch(environment.dispatcher) {
+					environment.setGroupType(action.groupType)
 				}
 			}
 		}

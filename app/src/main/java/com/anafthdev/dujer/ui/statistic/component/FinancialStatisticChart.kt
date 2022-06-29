@@ -32,6 +32,7 @@ import com.github.mikephil.charting.data.PieDataSet
 import com.github.mikephil.charting.data.PieEntry
 import com.github.mikephil.charting.highlight.Highlight
 import com.github.mikephil.charting.listener.OnChartValueSelectedListener
+import timber.log.Timber
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -117,10 +118,14 @@ fun FinancialStatisticChart(
 				mPieChart.setOnChartValueSelectedListener(object : OnChartValueSelectedListener {
 					override fun onValueSelected(e: Entry, h: Highlight) {
 						selectedEntry = e as PieEntry
-						onPieDataSelected(
-							h,
-							(selectedEntry.data as Pair<*, *>).first as Int
-						)
+						try {
+							onPieDataSelected(
+								h,
+								(selectedEntry.data as Pair<*, *>).first as Int
+							)
+						} catch (e: Exception) {
+							Timber.i("no data")
+						}
 					}
 					
 					override fun onNothingSelected() {

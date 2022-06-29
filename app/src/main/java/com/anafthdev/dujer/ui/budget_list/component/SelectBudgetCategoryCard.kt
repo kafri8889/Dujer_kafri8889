@@ -14,6 +14,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import com.anafthdev.dujer.R
 import com.anafthdev.dujer.data.db.model.Category
+import com.anafthdev.dujer.foundation.common.CurrencyFormatter
 import com.anafthdev.dujer.foundation.extension.darkenColor
 import com.anafthdev.dujer.foundation.extension.deviceLocale
 import com.anafthdev.dujer.foundation.extension.toColor
@@ -22,7 +23,6 @@ import com.anafthdev.dujer.foundation.window.dpScaled
 import com.anafthdev.dujer.foundation.window.spScaled
 import com.anafthdev.dujer.model.LocalCurrency
 import com.anafthdev.dujer.ui.theme.*
-import com.anafthdev.dujer.util.CurrencyFormatter
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable

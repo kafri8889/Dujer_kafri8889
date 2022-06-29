@@ -9,7 +9,6 @@ import com.anafthdev.dujer.data.db.model.Category
 import com.anafthdev.dujer.data.db.model.Financial
 import com.anafthdev.dujer.data.db.model.Wallet
 import com.anafthdev.dujer.data.repository.app.AppRepository
-import com.anafthdev.dujer.foundation.common.vibrator.VibratorManager
 import com.anafthdev.dujer.foundation.di.DiName
 import com.anafthdev.dujer.model.Currency
 import com.anafthdev.dujer.ui.app.DujerAction.DeleteCategory
@@ -22,7 +21,6 @@ import javax.inject.Named
 
 class DujerEnvironment @Inject constructor(
 	@Named(DiName.DISPATCHER_IO) override val dispatcher: CoroutineDispatcher,
-	private val vibratorManager: VibratorManager,
 	private val appRepository: AppRepository,
 	private val appDatastore: AppDatastore,
 ): IDujerEnvironment {
@@ -96,10 +94,6 @@ class DujerEnvironment @Inject constructor(
 	
 	override suspend fun undoCategory() {
 		appRepository.categoryRepository.insert(*categoryTemp.toTypedArray())
-	}
-	
-	override fun vibrate(millis: Long) {
-		vibratorManager.vibrate(millis)
 	}
 	
 }

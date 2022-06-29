@@ -3,19 +3,24 @@ package com.anafthdev.dujer.ui.dashboard.environment
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.asFlow
+import com.anafthdev.dujer.data.FinancialGroupData
 import com.anafthdev.dujer.data.FinancialType
+import com.anafthdev.dujer.data.GroupType
 import com.anafthdev.dujer.data.SortType
 import com.anafthdev.dujer.data.db.model.Category
 import com.anafthdev.dujer.data.db.model.Financial
 import com.anafthdev.dujer.data.db.model.Wallet
 import com.anafthdev.dujer.data.repository.app.IAppRepository
-import com.anafthdev.dujer.foundation.common.Quad
+import com.anafthdev.dujer.foundation.common.AppUtil
+import com.anafthdev.dujer.foundation.common.Quint
 import com.anafthdev.dujer.foundation.common.financial_sorter.FinancialSorter
 import com.anafthdev.dujer.foundation.di.DiName
+import com.anafthdev.dujer.foundation.extension.deviceLocale
 import com.anafthdev.dujer.foundation.extension.forEachMap
 import com.anafthdev.dujer.foundation.extension.getBy
+import com.anafthdev.dujer.foundation.extension.indexOf
 import com.anafthdev.dujer.ui.financial.data.FinancialAction
-import com.anafthdev.dujer.util.AppUtil
+import com.github.mikephil.charting.data.Entry
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
@@ -23,6 +28,8 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.launch
+import timber.log.Timber
+import java.text.SimpleDateFormat
 import javax.inject.Inject
 import javax.inject.Named
 
@@ -41,6 +48,9 @@ class DashboardEnvironment @Inject constructor(
 	private val _selectedSortType = MutableStateFlow(SortType.A_TO_Z)
 	private val selectedSortType: StateFlow<SortType> = _selectedSortType
 	
+	private val _selectedGroupType = MutableStateFlow(GroupType.DEFAULT)
+	private val selectedGroupType: StateFlow<GroupType> = _selectedGroupType
+	
 	private val _selectedMonth = MutableStateFlow(
 		listOf(0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11)
 	)
@@ -49,8 +59,8 @@ class DashboardEnvironment @Inject constructor(
 	private val _filterDate = MutableStateFlow(AppUtil.filterDateDefault)
 	private val filterDate: StateFlow<Pair<Long, Long>> = _filterDate
 	
-	private val _transactions = MutableStateFlow(emptyList<Financial>())
-	private val transactions: StateFlow<List<Financial>> = _transactions
+	private val _transactions = MutableStateFlow(FinancialGroupData.default)
+	private val transactions: StateFlow<FinancialGroupData> = _transactions
 	
 	private val _highestExpenseCategory = MutableStateFlow(Category.default)
 	private val highestExpenseCategory: StateFlow<Category> = _highestExpenseCategory
@@ -58,24 +68,39 @@ class DashboardEnvironment @Inject constructor(
 	private val _highestExpenseCategoryAmount = MutableStateFlow(0.0)
 	private val highestExpenseCategoryAmount: StateFlow<Double> = _highestExpenseCategoryAmount
 	
+	private val _incomeEntry = MutableStateFlow(entryTemp.toList())
+	private val incomeEntry: StateFlow<List<Entry>> = _incomeEntry
+	
+	private val _expenseEntry = MutableStateFlow(entryTemp.toList())
+	private val expenseEntry: StateFlow<List<Entry>> = _expenseEntry
+	
 	init {
 		CoroutineScope(dispatcher).launch {
 			combine(
 				selectedMonth,
 				filterDate,
 				selectedSortType,
+				selectedGroupType,
 				appRepository.getAllFinancial()
-			) { month, year, sortType, financials ->
-				Quad(month, year, sortType, financials)
-			}.collect { (month, year, sortType, financials) ->
-				_transactions.emit(
-					financialSorter.beginSort(
-						sortType = sortType,
-						filterDate = year,
-						selectedMonth = month,
-						financials = financials
-					)
+			) { month, year, sortType, groupType, financials ->
+				Quint(month, year, sortType, groupType, financials)
+			}.collect { (month, year, sortType, groupType, financials) ->
+				val income = financials.filter { it.type == FinancialType.INCOME }
+				val expense = financials.filter { it.type == FinancialType.EXPENSE }
+				Timber.i("ingkom: $income")
+				val transaction = financialSorter.beginSort(
+					sortType = sortType,
+					groupType = groupType,
+					filterDate = year,
+					selectedMonth = month,
+					financials = financials
 				)
+				
+				val (incomeEntry, expenseEntry) = getLineDataSetEntry(income, expense)
+				
+				_incomeEntry.emit(incomeEntry)
+				_expenseEntry.emit(expenseEntry)
+				_transactions.emit(transaction)
 			}
 		}
 		
@@ -117,6 +142,10 @@ class DashboardEnvironment @Inject constructor(
 		return selectedSortType
 	}
 	
+	override fun getGroupType(): Flow<GroupType> {
+		return selectedGroupType
+	}
+	
 	override fun getFilterDate(): Flow<Pair<Long, Long>> {
 		return filterDate
 	}
@@ -125,7 +154,7 @@ class DashboardEnvironment @Inject constructor(
 		return selectedMonth
 	}
 	
-	override fun getTransactions(): Flow<List<Financial>> {
+	override fun getTransactions(): Flow<FinancialGroupData> {
 		return transactions
 	}
 	
@@ -135,6 +164,14 @@ class DashboardEnvironment @Inject constructor(
 	
 	override fun getHighestExpenseCategoryAmount(): Flow<Double> {
 		return highestExpenseCategoryAmount
+	}
+	
+	override fun getIncomeEntry(): Flow<List<Entry>> {
+		return incomeEntry
+	}
+	
+	override fun getExpenseEntry(): Flow<List<Entry>> {
+		return expenseEntry
 	}
 	
 	override suspend fun setFinancialID(id: Int) {
@@ -149,6 +186,10 @@ class DashboardEnvironment @Inject constructor(
 		_selectedSortType.emit(sortType)
 	}
 	
+	override suspend fun setGroupType(groupType: GroupType) {
+		_selectedGroupType.emit(groupType)
+	}
+	
 	override suspend fun setFilterDate(date: Pair<Long, Long>) {
 		_filterDate.emit(date)
 	}
@@ -161,4 +202,57 @@ class DashboardEnvironment @Inject constructor(
 		_financialAction.postValue(action)
 	}
 	
+	fun getLineDataSetEntry(
+		incomeList: List<Financial>,
+		expenseList: List<Financial>
+	): Pair<List<Entry>, List<Entry>> {
+		val monthFormatter = SimpleDateFormat("MMM", deviceLocale)
+		
+		val incomeListEntry = ArrayList(entryTemp)
+		val expenseListEntry = ArrayList(entryTemp)
+		
+		val monthGroupIncomeList = incomeList.groupBy { monthFormatter.format(it.dateCreated) }
+		val monthGroupExpenseList = expenseList.groupBy { monthFormatter.format(it.dateCreated) }
+		
+		monthGroupIncomeList.forEachMap { k, v ->
+			val totalAmount = v.sumOf { it.amount }
+			val entryIndex = AppUtil.shortMonths.indexOf { it.contentEquals(k, true) }
+			
+			incomeListEntry[entryIndex] = Entry(
+				entryIndex.toFloat(),
+				totalAmount.toFloat(),
+				totalAmount
+			)
+		}
+		
+		monthGroupExpenseList.forEachMap { k, v ->
+			val totalAmount = v.sumOf { it.amount }
+			val entryIndex = AppUtil.shortMonths.indexOf { it.contentEquals(k, true) }
+			
+			expenseListEntry[entryIndex] = Entry(
+				entryIndex.toFloat(),
+				totalAmount.toFloat(),
+				totalAmount
+			)
+		}
+		
+		return incomeListEntry to expenseListEntry
+	}
+	
+	companion object {
+		val entryTemp = arrayListOf<Entry>().apply {
+			add(Entry(0f, 0f, 0.0))
+			add(Entry(1f, 0f, 0.0))
+			add(Entry(2f, 0f, 0.0))
+			add(Entry(3f, 0f, 0.0))
+			add(Entry(4f, 0f, 0.0))
+			add(Entry(5f, 0f, 0.0))
+			add(Entry(6f, 0f, 0.0))
+			add(Entry(7f, 0f, 0.0))
+			add(Entry(8f, 0f, 0.0))
+			add(Entry(9f, 0f, 0.0))
+			add(Entry(10f, 0f, 0.0))
+			add(Entry(11f, 0f, 0.0))
+		}
+	}
 }

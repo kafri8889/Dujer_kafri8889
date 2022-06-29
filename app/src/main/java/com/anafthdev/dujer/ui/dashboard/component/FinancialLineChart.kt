@@ -12,13 +12,13 @@ import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.viewinterop.AndroidView
 import com.anafthdev.dujer.data.FinancialChartValueFormatter
+import com.anafthdev.dujer.foundation.common.AppUtil
 import com.anafthdev.dujer.foundation.extension.isDarkTheme
 import com.anafthdev.dujer.foundation.uimode.data.LocalUiMode
 import com.anafthdev.dujer.foundation.window.dpScaled
 import com.anafthdev.dujer.model.LocalCurrency
 import com.anafthdev.dujer.ui.theme.black04
 import com.anafthdev.dujer.ui.theme.black09
-import com.anafthdev.dujer.util.AppUtil
 import com.anafthdev.dujer.view.MultiLineChartMarkerView
 import com.github.mikephil.charting.charts.LineChart
 import com.github.mikephil.charting.components.XAxis

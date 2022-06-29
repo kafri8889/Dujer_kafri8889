@@ -1,5 +1,7 @@
 package com.anafthdev.dujer.data.db.model
 
+import android.os.Parcel
+import android.os.Parcelable
 import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.PrimaryKey
@@ -16,7 +18,18 @@ data class Financial(
 	@ColumnInfo(name = "category") var category: Category,
 	@ColumnInfo(name = "currency") var currency: Currency,
 	@ColumnInfo(name = "dateCreated") var dateCreated: Long,
-) {
+): Parcelable {
+	constructor(parcel: Parcel) : this(
+		parcel.readInt(),
+		parcel.readString()!!,
+		parcel.readDouble(),
+		FinancialType.values()[parcel.readInt()],
+		parcel.readInt(),
+		parcel.readParcelable(Category::class.java.classLoader)!!,
+		parcel.readParcelable(Currency::class.java.classLoader)!!,
+		parcel.readLong()
+	)
+	
 	override fun hashCode(): Int {
 		return super.hashCode()
 			.plus(id)
@@ -44,7 +57,22 @@ data class Financial(
 		return true
 	}
 	
-	companion object {
+	override fun writeToParcel(parcel: Parcel, flags: Int) {
+		parcel.writeInt(id)
+		parcel.writeString(name)
+		parcel.writeDouble(amount)
+		parcel.writeInt(type.ordinal)
+		parcel.writeInt(walletID)
+		parcel.writeParcelable(category, flags)
+		parcel.writeParcelable(currency, flags)
+		parcel.writeLong(dateCreated)
+	}
+	
+	override fun describeContents(): Int {
+		return 0
+	}
+	
+	companion object CREATOR : Parcelable.Creator<Financial> {
 		val default = Financial(
 			id = 0,
 			name = "",
@@ -55,5 +83,13 @@ data class Financial(
 			currency = Currency.DOLLAR,
 			dateCreated = System.currentTimeMillis()
 		)
+		
+		override fun createFromParcel(parcel: Parcel): Financial {
+			return Financial(parcel)
+		}
+		
+		override fun newArray(size: Int): Array<Financial?> {
+			return arrayOfNulls(size)
+		}
 	}
 }

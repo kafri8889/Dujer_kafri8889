@@ -1,7 +1,7 @@
 package com.anafthdev.dujer.ui.chart
 
-import androidx.lifecycle.viewModelScope
 import com.anafthdev.dujer.data.db.model.Financial
+import com.anafthdev.dujer.foundation.common.AppUtil
 import com.anafthdev.dujer.foundation.extension.deviceLocale
 import com.anafthdev.dujer.foundation.extension.forEachMap
 import com.anafthdev.dujer.foundation.extension.indexOf
@@ -9,10 +9,7 @@ import com.anafthdev.dujer.foundation.extension.isPositive
 import com.anafthdev.dujer.foundation.viewmodel.StatefulViewModel
 import com.anafthdev.dujer.ui.chart.environment.IChartEnvironment
 import com.anafthdev.dujer.uicomponent.charting.bar.model.BarData
-import com.anafthdev.dujer.util.AppUtil
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.flow.combine
-import kotlinx.coroutines.launch
 import timber.log.Timber
 import java.text.SimpleDateFormat
 import java.util.*

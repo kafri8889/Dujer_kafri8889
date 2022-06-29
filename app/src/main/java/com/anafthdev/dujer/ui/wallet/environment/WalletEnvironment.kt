@@ -3,17 +3,20 @@ package com.anafthdev.dujer.ui.wallet.environment
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.asFlow
+import com.anafthdev.dujer.data.FinancialGroupData
 import com.anafthdev.dujer.data.FinancialType
+import com.anafthdev.dujer.data.GroupType
 import com.anafthdev.dujer.data.SortType
 import com.anafthdev.dujer.data.db.model.Category
 import com.anafthdev.dujer.data.db.model.Financial
 import com.anafthdev.dujer.data.db.model.Wallet
 import com.anafthdev.dujer.data.repository.app.IAppRepository
-import com.anafthdev.dujer.foundation.common.Quad
+import com.anafthdev.dujer.foundation.common.AppUtil
+import com.anafthdev.dujer.foundation.common.Hexad
 import com.anafthdev.dujer.foundation.common.financial_sorter.FinancialSorter
 import com.anafthdev.dujer.foundation.di.DiName
+import com.anafthdev.dujer.foundation.extension.combine
 import com.anafthdev.dujer.foundation.extension.getBy
-import com.anafthdev.dujer.util.AppUtil
 import com.github.mikephil.charting.data.PieEntry
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.Flow
@@ -45,6 +48,9 @@ class WalletEnvironment @Inject constructor(
 	private val _selectedSortType = MutableStateFlow(SortType.A_TO_Z)
 	private val selectedSortType: StateFlow<SortType> = _selectedSortType
 	
+	private val _selectedGroupType = MutableStateFlow(GroupType.DEFAULT)
+	private val selectedGroupType: StateFlow<GroupType> = _selectedGroupType
+	
 	private val _selectedMonth = MutableStateFlow(
 		listOf(0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11)
 	)
@@ -53,8 +59,8 @@ class WalletEnvironment @Inject constructor(
 	private val _filterDate = MutableStateFlow(AppUtil.filterDateDefault)
 	private val filterDate: StateFlow<Pair<Long, Long>> = _filterDate
 	
-	private val _transactions = MutableStateFlow(emptyList<Financial>())
-	private val transactions: StateFlow<List<Financial>> = _transactions
+	private val _transactions = MutableStateFlow(FinancialGroupData.default)
+	private val transactions: StateFlow<FinancialGroupData> = _transactions
 	
 	private val _pieEntry = MutableStateFlow(emptyList<PieEntry>())
 	private val pieEntry: StateFlow<List<PieEntry>> = _pieEntry
@@ -65,19 +71,23 @@ class WalletEnvironment @Inject constructor(
 	init {
 		CoroutineScope(Dispatchers.Main).launch {
 			combine(
+				lastSelectedWalletID,
 				selectedMonth,
 				filterDate,
 				selectedSortType,
+				selectedGroupType,
 				appRepository.getAllFinancial()
-			) { month, date, sortType, financials ->
-				Quad(month, date, sortType, financials)
-			}.collect { (month, date, sortType, financials) ->
+			) { id, month, date, sortType, groupType, financials ->
+				Hexad(id, month, date, sortType, groupType, financials)
+			}.collect { (id, month, date, sortType, groupType, financials) ->
+				val mFinancials = financials.filter { it.walletID == id }
 				_transactions.emit(
 					financialSorter.beginSort(
 						sortType = sortType,
+						groupType = groupType,
 						filterDate = date,
 						selectedMonth = month,
-						financials = financials
+						financials = mFinancials
 					)
 				)
 			}
@@ -163,6 +173,10 @@ class WalletEnvironment @Inject constructor(
 		return selectedSortType
 	}
 	
+	override fun getGroupType(): Flow<GroupType> {
+		return selectedGroupType
+	}
+	
 	override fun getFilterDate(): Flow<Pair<Long, Long>> {
 		return filterDate
 	}
@@ -171,7 +185,7 @@ class WalletEnvironment @Inject constructor(
 		return selectedMonth
 	}
 	
-	override fun getTransactions(): Flow<List<Financial>> {
+	override fun getTransactions(): Flow<FinancialGroupData> {
 		return transactions
 	}
 	
@@ -183,6 +197,10 @@ class WalletEnvironment @Inject constructor(
 	
 	override suspend fun setSortType(sortType: SortType) {
 		_selectedSortType.emit(sortType)
+	}
+	
+	override suspend fun setGroupType(groupType: GroupType) {
+		_selectedGroupType.emit(groupType)
 	}
 	
 	override suspend fun setFilterDate(date: Pair<Long, Long>) {

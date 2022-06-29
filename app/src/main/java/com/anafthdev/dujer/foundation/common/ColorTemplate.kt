@@ -1,4 +1,4 @@
-package com.anafthdev.dujer.util
+package com.anafthdev.dujer.foundation.common
 
 import android.graphics.Color
 import java.util.*

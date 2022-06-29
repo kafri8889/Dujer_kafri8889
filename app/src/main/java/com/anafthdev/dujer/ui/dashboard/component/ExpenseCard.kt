@@ -15,6 +15,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.anafthdev.dujer.R
+import com.anafthdev.dujer.foundation.common.CurrencyFormatter
 import com.anafthdev.dujer.foundation.extension.deviceLocale
 import com.anafthdev.dujer.foundation.ui.LocalUiColor
 import com.anafthdev.dujer.foundation.uiextension.horizontalScroll
@@ -25,7 +26,6 @@ import com.anafthdev.dujer.model.LocalCurrency
 import com.anafthdev.dujer.ui.theme.black03
 import com.anafthdev.dujer.ui.theme.expense_card_background
 import com.anafthdev.dujer.ui.theme.large_shape
-import com.anafthdev.dujer.util.CurrencyFormatter
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable

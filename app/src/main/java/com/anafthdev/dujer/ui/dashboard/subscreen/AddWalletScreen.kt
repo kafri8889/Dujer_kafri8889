@@ -33,6 +33,9 @@ import androidx.compose.ui.text.input.TextFieldValue
 import com.anafthdev.dujer.R
 import com.anafthdev.dujer.data.WalletIcons
 import com.anafthdev.dujer.data.db.model.Wallet
+import com.anafthdev.dujer.foundation.common.AppUtil.toast
+import com.anafthdev.dujer.foundation.common.CurrencyFormatter
+import com.anafthdev.dujer.foundation.common.TextFieldCurrencyFormatter
 import com.anafthdev.dujer.foundation.extension.deviceLocale
 import com.anafthdev.dujer.foundation.extension.isLightTheme
 import com.anafthdev.dujer.foundation.extension.toColor
@@ -43,9 +46,6 @@ import com.anafthdev.dujer.foundation.window.spScaled
 import com.anafthdev.dujer.model.CategoryTint
 import com.anafthdev.dujer.model.LocalCurrency
 import com.anafthdev.dujer.ui.theme.*
-import com.anafthdev.dujer.util.AppUtil.toast
-import com.anafthdev.dujer.util.CurrencyFormatter
-import com.anafthdev.dujer.util.TextFieldCurrencyFormatter
 import com.google.accompanist.flowlayout.FlowCrossAxisAlignment
 import com.google.accompanist.flowlayout.FlowMainAxisAlignment
 import com.google.accompanist.flowlayout.FlowRow

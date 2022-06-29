@@ -1,5 +1,7 @@
 package com.anafthdev.dujer.model
 
+import android.os.Parcel
+import android.os.Parcelable
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
 import com.google.gson.Gson
@@ -10,11 +12,33 @@ import com.google.gson.Gson
 data class CategoryTint(
 	val iconTint: Int,
 	val backgroundTint: Int
-) {
+): Parcelable {
+	
+	constructor(parcel: Parcel) : this(
+		parcel.readInt(),
+		parcel.readInt()
+	)
 	
 	fun toJSON(): String = Gson().toJson(this)
 	
-	companion object {
+	override fun writeToParcel(parcel: Parcel, flags: Int) {
+		parcel.writeInt(iconTint)
+		parcel.writeInt(backgroundTint)
+	}
+	
+	override fun describeContents(): Int {
+		return 0
+	}
+	
+	companion object CREATOR : Parcelable.Creator<CategoryTint> {
+		
+		override fun createFromParcel(parcel: Parcel): CategoryTint {
+			return CategoryTint(parcel)
+		}
+		
+		override fun newArray(size: Int): Array<CategoryTint?> {
+			return arrayOfNulls(size)
+		}
 		
 		val transaction = CategoryTint(
 			iconTint = Color(0xFF8A8A8A).toArgb(),

@@ -7,7 +7,9 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.*
 import androidx.compose.material3.Icon
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -26,35 +28,21 @@ fun SwipeableCategory(
 	category: Category,
 	modifier: Modifier = Modifier,
 	onClick: () -> Unit,
-	onCanDelete: () -> Unit,
 	onDismissToEnd: () -> Unit,
 	onDismissToStart: () -> Unit
 ) {
 	// TODO: Swipe kiri buat edit
-	var canDelete by remember { mutableStateOf(false) }
-	
 	val dismissState = rememberDismissState(
 		confirmStateChange = {
 			when (it) {
-				DismissValue.DismissedToStart -> onDismissToStart().also {
-					canDelete = false
-				}
+				DismissValue.DismissedToStart -> onDismissToStart()
 				DismissValue.DismissedToEnd -> onDismissToEnd()
-				else -> canDelete = false
+				else -> {}
 			}
 			
 			true
 		}
 	)
-	
-	if (
-		((2 * dismissState.progress.fraction) >= 1f) and
-		((dismissState.targetValue == DismissValue.DismissedToEnd) or (dismissState.targetValue == DismissValue.DismissedToStart)) and
-		!canDelete
-	) {
-		onCanDelete()
-		canDelete = true
-	}
 	
 	LaunchedEffect(dismissState.isDismissed(DismissDirection.EndToStart)) {
 		dismissState.reset()

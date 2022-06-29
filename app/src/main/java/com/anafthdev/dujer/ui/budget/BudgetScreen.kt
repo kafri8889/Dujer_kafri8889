@@ -9,22 +9,25 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material.ExperimentalMaterialApi
+import androidx.compose.material.ModalBottomSheetLayout
+import androidx.compose.material.ModalBottomSheetValue
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.ArrowBack
 import androidx.compose.material.icons.rounded.FilterList
+import androidx.compose.material.rememberModalBottomSheetState
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
-import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -36,7 +39,11 @@ import androidx.compose.ui.zIndex
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.anafthdev.dujer.R
+import com.anafthdev.dujer.data.DujerDestination
 import com.anafthdev.dujer.data.db.model.Financial
+import com.anafthdev.dujer.foundation.common.AppUtil.toast
+import com.anafthdev.dujer.foundation.common.CurrencyFormatter
+import com.anafthdev.dujer.foundation.common.TextFieldCurrencyFormatter
 import com.anafthdev.dujer.foundation.common.isHide
 import com.anafthdev.dujer.foundation.common.keyboardAsState
 import com.anafthdev.dujer.foundation.extension.deviceLocale
@@ -46,19 +53,101 @@ import com.anafthdev.dujer.foundation.window.spScaled
 import com.anafthdev.dujer.model.LocalCurrency
 import com.anafthdev.dujer.ui.budget.component.DeleteBudgetPopup
 import com.anafthdev.dujer.ui.budget.component.ExpensesBarChart
+import com.anafthdev.dujer.ui.financial.FinancialScreen
+import com.anafthdev.dujer.ui.financial.data.FinancialAction
 import com.anafthdev.dujer.ui.theme.Typography
 import com.anafthdev.dujer.uicomponent.FilterSortFinancialPopup
-import com.anafthdev.dujer.uicomponent.SwipeableFinancialCard
 import com.anafthdev.dujer.uicomponent.TopAppBar
-import com.anafthdev.dujer.util.AppUtil.toast
-import com.anafthdev.dujer.util.CurrencyFormatter
-import com.anafthdev.dujer.util.TextFieldCurrencyFormatter
+import com.anafthdev.dujer.uicomponent.swipeableFinancialCard
+import kotlinx.coroutines.launch
 
-@OptIn(ExperimentalComposeUiApi::class, ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalComposeUiApi::class, ExperimentalMaterial3Api::class,
+	ExperimentalMaterialApi::class
+)
 @Composable
 fun BudgetScreen(
 	budgetID: Int,
-	navController: NavController
+	navController: NavController,
+	onDeleteTransaction: (Financial) -> Unit
+) {
+	
+	val viewModel = hiltViewModel<BudgetViewModel>()
+	
+	val state by viewModel.state.collectAsState()
+	
+	val financial = state.financial
+	
+	val scope = rememberCoroutineScope()
+	val financialScreenSheetState = rememberModalBottomSheetState(
+		initialValue = ModalBottomSheetValue.Hidden,
+		skipHalfExpanded = true
+	)
+	
+	val hideFinancialSheetState = {
+		scope.launch { financialScreenSheetState.hide() }
+		Unit
+	}
+	
+	val showFinancialSheetState = {
+		scope.launch { financialScreenSheetState.show() }
+		Unit
+	}
+	
+	BackHandler {
+		when {
+			financialScreenSheetState.isVisible -> hideFinancialSheetState()
+			else -> navController.popBackStack()
+		}
+	}
+	
+	ModalBottomSheetLayout(
+		scrimColor = Color.Unspecified,
+		sheetState = financialScreenSheetState,
+		sheetContent = {
+			FinancialScreen(
+				isScreenVisible = financialScreenSheetState.isVisible,
+				financial = financial,
+				financialAction = FinancialAction.EDIT,
+				onBack = {
+					scope.launch {
+						financialScreenSheetState.hide()
+					}
+				},
+				onSave = {
+					scope.launch {
+						financialScreenSheetState.hide()
+					}
+				}
+			)
+		}
+	) {
+		BudgetScreenContent(
+			budgetID = budgetID,
+			navController = navController,
+			viewModel = viewModel,
+			state = state,
+			onDeleteTransaction = onDeleteTransaction,
+			onFinancialCardClicked = { financial ->
+				viewModel.dispatch(
+					BudgetAction.GetFinancial(financial.id)
+				)
+				
+				showFinancialSheetState()
+			}
+		)
+	}
+	
+}
+
+@OptIn(ExperimentalComposeUiApi::class, ExperimentalMaterial3Api::class)
+@Composable
+private fun BudgetScreenContent(
+	budgetID: Int,
+	navController: NavController,
+	viewModel: BudgetViewModel,
+	state: BudgetState,
+	onDeleteTransaction: (Financial) -> Unit,
+	onFinancialCardClicked: (Financial) -> Unit
 ) {
 	
 	val context = LocalContext.current
@@ -66,13 +155,11 @@ fun BudgetScreen(
 	val localCurrency = LocalCurrency.current
 	val keyboardController = LocalSoftwareKeyboardController.current
 	
-	val viewModel = hiltViewModel<BudgetViewModel>()
-	
-	val state by viewModel.state.collectAsState()
 	val keyboardState by keyboardAsState()
 	
 	val budget = state.budget
 	val sortType = state.sortType
+	val groupType = state.groupType
 	val filterDate = state.filterDate
 	val barEntries = state.barEntries
 	val transactions = state.transactions
@@ -105,10 +192,6 @@ fun BudgetScreen(
 	
 	LaunchedEffect(keyboardState) {
 		if (keyboardState.isHide()) focusManager.clearFocus(force = true)
-	}
-	
-	BackHandler {
-		navController.popBackStack()
 	}
 	
 	AnimatedVisibility(
@@ -155,15 +238,20 @@ fun BudgetScreen(
 		FilterSortFinancialPopup(
 			isVisible = isFilterSortFinancialPopupShowed,
 			sortType = sortType,
+			groupType = groupType,
 			filterDate = filterDate,
 			monthsSelected = selectedMonth,
-			onApply = { mSelectedMonth, mSortBy, date ->
+			onApply = { mSelectedMonth, mSortBy, mGroupType, date ->
 				viewModel.dispatch(
 					BudgetAction.SetSortType(mSortBy)
 				)
 				
 				viewModel.dispatch(
 					BudgetAction.SetSelectedMonth(mSelectedMonth)
+				)
+				
+				viewModel.dispatch(
+					BudgetAction.SetGroupType(mGroupType)
 				)
 				
 				if (date != null) {
@@ -393,22 +481,16 @@ fun BudgetScreen(
 				}
 			}
 			
-			items(
-				items = transactions,
-				key = { item: Financial -> item.hashCode() }
-			) { financial ->
-				SwipeableFinancialCard(
-					financial = financial,
-					onCanDelete = {},
-					onDismissToEnd = {  },
-					onClick = {
-					
-					},
-					modifier = Modifier
-						.padding(horizontal = 12.dpScaled)
-						.testTag("SwipeableFinancialCard")
-				)
-			}
+			swipeableFinancialCard(
+				data = transactions,
+				onFinancialCardDismissToEnd = onDeleteTransaction,
+				onFinancialCardClicked = onFinancialCardClicked,
+				onNavigateCategoryClicked = { category ->
+					navController.navigate(
+						DujerDestination.CategoryTransaction.createRoute(category.id)
+					)
+				}
+			)
 			
 			item {
 				Spacer(
@@ -451,5 +533,4 @@ fun BudgetScreen(
 			)
 		}
 	}
-	
 }

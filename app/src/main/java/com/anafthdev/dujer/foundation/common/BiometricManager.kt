@@ -6,7 +6,7 @@ import androidx.biometric.BiometricPrompt
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.FragmentActivity
 import com.anafthdev.dujer.R
-import com.anafthdev.dujer.util.AppUtil.toast
+import com.anafthdev.dujer.foundation.common.AppUtil.toast
 
 class BiometricManager(
 	private val activity: FragmentActivity

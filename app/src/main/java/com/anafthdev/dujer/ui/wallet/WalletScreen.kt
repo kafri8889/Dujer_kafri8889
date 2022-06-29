@@ -10,7 +10,6 @@ import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.ModalBottomSheetValue
@@ -27,7 +26,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -41,6 +39,8 @@ import com.anafthdev.dujer.data.DujerDestination
 import com.anafthdev.dujer.data.FinancialType
 import com.anafthdev.dujer.data.db.model.Category
 import com.anafthdev.dujer.data.db.model.Financial
+import com.anafthdev.dujer.foundation.common.ColorTemplate
+import com.anafthdev.dujer.foundation.common.CurrencyFormatter
 import com.anafthdev.dujer.foundation.extension.deviceLocale
 import com.anafthdev.dujer.foundation.extension.toColor
 import com.anafthdev.dujer.foundation.ui.LocalUiColor
@@ -59,8 +59,6 @@ import com.anafthdev.dujer.ui.wallet.component.DeleteWalletPopup
 import com.anafthdev.dujer.ui.wallet.subscreen.EditBalanceBottomSheet
 import com.anafthdev.dujer.ui.wallet.subscreen.SelectWalletBottomSheet
 import com.anafthdev.dujer.uicomponent.*
-import com.anafthdev.dujer.util.ColorTemplate
-import com.anafthdev.dujer.util.CurrencyFormatter
 import com.github.mikephil.charting.data.PieDataSet
 import com.github.mikephil.charting.data.PieEntry
 import com.github.mikephil.charting.highlight.Highlight
@@ -74,7 +72,6 @@ import timber.log.Timber
 fun WalletScreen(
 	walletID: Int,
 	navController: NavController,
-	onTransactionCanDelete: () -> Unit,
 	onDeleteTransaction: (Financial) -> Unit
 ) {
 	
@@ -87,6 +84,7 @@ fun WalletScreen(
 	val wallet = state.wallet
 	val financial = state.financial
 	val sortType = state.sortType
+	val groupType = state.groupType
 	val filterDate = state.filterDate
 	val selectedMonth = state.selectedMonth
 	
@@ -186,17 +184,23 @@ fun WalletScreen(
 				.zIndex(2f)
 		) {
 			FilterSortFinancialPopup(
+				showFilterMonth = false,
 				isVisible = isFilterSortFinancialPopupShowed,
 				sortType = sortType,
+				groupType = groupType,
 				filterDate = filterDate,
 				monthsSelected = selectedMonth,
-				onApply = { mSelectedMonth, mSortBy, date ->
+				onApply = { mSelectedMonth, mSortBy, mGroupType, date ->
 					viewModel.dispatch(
 						WalletAction.SetSortType(mSortBy)
 					)
 					
 					viewModel.dispatch(
 						WalletAction.SetSelectedMonth(mSelectedMonth)
+					)
+					
+					viewModel.dispatch(
+						WalletAction.SetGroupType(mGroupType)
 					)
 					
 					if (date != null) {
@@ -295,7 +299,6 @@ fun WalletScreen(
 						viewModel = viewModel,
 						incomeTransaction = incomeTransaction,
 						expenseTransaction = expenseTransaction,
-						onTransactionCanDelete = onTransactionCanDelete,
 						onDeleteTransaction = onDeleteTransaction,
 						onShowFinancialSheet = showFinancialSheetState,
 						onShowEditBalanceSheet = showEditBalanceSheetState,
@@ -326,7 +329,6 @@ private fun WalletScreenContent(
 	onShowSelectWalletSheet: () ->Unit,
 	onDeleteWallet: () -> Unit,
 	onDeleteTransaction: (Financial) -> Unit,
-	onTransactionCanDelete: () -> Unit,
 	onFilterClicked: () -> Unit
 ) {
 	
@@ -337,7 +339,6 @@ private fun WalletScreenContent(
 	val wallet = state.wallet
 	val transactions = state.transactions
 	val pieEntries = state.pieEntries
-	val availableCategory = state.availableCategory
 	val selectedFinancialType = state.selectedFinancialType
 	
 	val allCategory = dujerState.allCategory
@@ -709,10 +710,7 @@ private fun WalletScreenContent(
 						selectedCategory = category
 						selectedPieColor = try {
 							pieColors[highlight.x.toInt()].toColor()
-						} catch (e: Exception) {
-							// TODO: ganti warna
-							Color.Transparent
-						}
+						} catch (e: Exception) { Color.Transparent }
 					},
 					modifier = Modifier
 						.padding(8.dpScaled)
@@ -748,25 +746,21 @@ private fun WalletScreenContent(
 			}
 		}
 		
-		items(
-			items = transactions,
-			key = { item: Financial -> item.hashCode() }
-		) { financial ->
-			SwipeableFinancialCard(
-				financial = financial,
-				onCanDelete = onTransactionCanDelete,
-				onDismissToEnd = { onDeleteTransaction(financial) },
-				onClick = {
-					viewModel.dispatch(
-						WalletAction.GetFinancial(financial.id)
-					)
-					
-					onShowFinancialSheet()
-				},
-				modifier = Modifier
-					.padding(horizontal = 12.dpScaled)
-					.testTag("SwipeableFinancialCard")
-			)
-		}
+		swipeableFinancialCard(
+			data = transactions,
+			onFinancialCardDismissToEnd = { onDeleteTransaction(it) },
+			onFinancialCardClicked = { financial ->
+				viewModel.dispatch(
+					WalletAction.GetFinancial(financial.id)
+				)
+				
+				onShowFinancialSheet()
+			},
+			onNavigateCategoryClicked = { category ->
+				navController.navigate(
+					DujerDestination.CategoryTransaction.createRoute(category.id)
+				)
+			}
+		)
 	}
 }

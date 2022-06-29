@@ -39,8 +39,4 @@ interface IDujerEnvironment {
 	
 	suspend fun undoCategory()
 	
-	
-	
-	fun vibrate(millis: Long)
-	
 }

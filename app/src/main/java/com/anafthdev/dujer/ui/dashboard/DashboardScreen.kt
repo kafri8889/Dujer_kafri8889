@@ -3,19 +3,18 @@ package com.anafthdev.dujer.ui.dashboard
 import android.app.Activity
 import androidx.activity.compose.BackHandler
 import androidx.compose.animation.*
-import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.LazyListState
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.CornerSize
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.Add
 import androidx.compose.material.icons.rounded.FilterList
-import androidx.compose.material.icons.rounded.Menu
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -32,7 +31,6 @@ import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
-import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -62,30 +60,21 @@ import com.anafthdev.dujer.ui.theme.income_color
 import com.anafthdev.dujer.ui.theme.shapes
 import com.anafthdev.dujer.uicomponent.BudgetCard
 import com.anafthdev.dujer.uicomponent.FilterSortFinancialPopup
-import com.anafthdev.dujer.uicomponent.SwipeableFinancialCard
 import com.anafthdev.dujer.uicomponent.TopAppBar
+import com.anafthdev.dujer.uicomponent.swipeableFinancialCard
 import com.github.mikephil.charting.data.LineDataSet
-import com.google.accompanist.navigation.animation.AnimatedNavHost
-import com.google.accompanist.navigation.animation.composable
-import com.google.accompanist.navigation.animation.rememberAnimatedNavController
+import com.google.accompanist.pager.ExperimentalPagerApi
+import com.google.accompanist.pager.HorizontalPager
+import com.google.accompanist.pager.rememberPagerState
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
-
-private val navigationRailItem = listOf(
-	R.string.dashboard to R.drawable.ic_dashboard,
-	R.string.chart to R.drawable.ic_chart,
-	R.string.export to R.drawable.ic_export
-)
 
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun DashboardScreen(
 	navController: NavController,
-	onTransactionCanDelete: () -> Unit,
 	onDeleteTransaction: (Financial) -> Unit
 ) {
-	
-	val context = LocalContext.current
 	
 	val dashboardViewModel = hiltViewModel<DashboardViewModel>()
 	
@@ -150,7 +139,6 @@ fun DashboardScreen(
 					financialScreenSheetState = financialScreenSheetState,
 					viewModel = dashboardViewModel,
 					navController = navController,
-					onTransactionCanDelete = onTransactionCanDelete,
 					onDeleteTransaction = onDeleteTransaction,
 					onSettingClicked = {
 						navController.navigate(DujerDestination.Setting.route) {
@@ -185,7 +173,7 @@ fun DashboardScreen(
 }
 
 @OptIn(ExperimentalMaterialApi::class,
-	ExperimentalAnimationApi::class
+	ExperimentalAnimationApi::class, ExperimentalPagerApi::class
 )
 @Composable
 private fun DashboardContent(
@@ -194,30 +182,23 @@ private fun DashboardContent(
 	viewModel: DashboardViewModel,
 	navController: NavController,
 	onSettingClicked: () -> Unit,
-	onTransactionCanDelete: () -> Unit,
 	onDeleteTransaction: (Financial) -> Unit
 ) {
 	
 	val context = LocalContext.current
 	
-	val scope = rememberCoroutineScope()
-	val dashboardNavController = rememberAnimatedNavController()
-	
-	val currentRoute = dashboardNavController.currentDestination?.route
-	
 	val sortType = state.sortType
+	val groupType = state.groupType
 	val filterDate = state.filterDate
 	val selectedMonth = state.selectedMonth
 	
-	var showNavRail by rememberSaveable { mutableStateOf(false) }
-	var showFABNewTransaction by rememberSaveable { mutableStateOf(true) }
-	var selectedNavRailItem by rememberSaveable { mutableStateOf(navigationRailItem[0]) }
-	var isFilterSortFinancialPopupShowed by rememberSaveable { mutableStateOf(false) }
+	val scope = rememberCoroutineScope()
 	
-	val menuIconPadding by animateDpAsState(
-		targetValue = if (showNavRail) 16.dpScaled else 0.dpScaled,
-		animationSpec = tween(400)
-	)
+	val dashboardPagerState = rememberPagerState()
+	val homeLazyListState = rememberLazyListState()
+	
+	var showFABNewTransaction by rememberSaveable { mutableStateOf(true) }
+	var isFilterSortFinancialPopupShowed by rememberSaveable { mutableStateOf(false) }
 	
 	val showFinancialSheet = {
 		scope.launch { financialScreenSheetState.show() }
@@ -229,16 +210,15 @@ private fun DashboardContent(
 		Unit
 	}
 	
+	LaunchedEffect(dashboardPagerState.currentPage) {
+		homeLazyListState.animateScrollToItem(0)
+	}
+	
 	BackHandler {
 		when {
 			financialScreenSheetState.isVisible -> hideFinancialSheet()
-			showNavRail -> showNavRail = false
-			currentRoute != DujerDestination.Dashboard.Home.route -> {
-				selectedNavRailItem = navigationRailItem[0]
-				popupDashboardNavigation(
-					toRoute = DujerDestination.Dashboard.Home.route,
-					dashboardNavController = dashboardNavController
-				)
+			dashboardPagerState.currentPage != 0 -> {
+				scope.launch { dashboardPagerState.animateScrollToPage(0) }
 			}
 			else -> (context as Activity).finish()
 		}
@@ -263,15 +243,20 @@ private fun DashboardContent(
 			FilterSortFinancialPopup(
 				isVisible = isFilterSortFinancialPopupShowed,
 				sortType = sortType,
+				groupType = groupType,
 				filterDate = filterDate,
 				monthsSelected = selectedMonth,
-				onApply = { mSelectedMonth, mSortBy, date ->
+				onApply = { mSelectedMonth, mSortBy, mGroupType, date ->
 					viewModel.dispatch(
 						DashboardAction.SetSortType(mSortBy)
 					)
 					
 					viewModel.dispatch(
 						DashboardAction.SetSelectedMonth(mSelectedMonth)
+					)
+					
+					viewModel.dispatch(
+						DashboardAction.SetGroupType(mGroupType)
 					)
 					
 					if (date != null) {
@@ -328,20 +313,6 @@ private fun DashboardContent(
 				.systemBarsPadding()
 		) {
 			TopAppBar {
-				IconButton(
-					onClick = {
-						showNavRail = !showNavRail
-					},
-					modifier = Modifier
-						.padding(menuIconPadding)
-						.align(Alignment.CenterStart)
-				) {
-					Icon(
-						imageVector = Icons.Rounded.Menu,
-						contentDescription = null
-					)
-				}
-				
 				Text(
 					text = stringResource(id = R.string.dashboard),
 					style = Typography.titleLarge.copy(
@@ -356,15 +327,25 @@ private fun DashboardContent(
 						.padding(end = 8.dpScaled)
 						.align(Alignment.CenterEnd)
 				) {
-					IconButton(
-						onClick = {
-							isFilterSortFinancialPopupShowed = true
-						},
-					) {
-						Icon(
-							imageVector = Icons.Rounded.FilterList,
-							contentDescription = null
+					AnimatedVisibility(
+						visible = dashboardPagerState.currentPage == 0,
+						enter = scaleIn(
+							animationSpec = tween(800)
+						),
+						exit = scaleOut(
+							animationSpec = tween(800)
 						)
+					) {
+						IconButton(
+							onClick = {
+								isFilterSortFinancialPopupShowed = true
+							},
+						) {
+							Icon(
+								imageVector = Icons.Rounded.FilterList,
+								contentDescription = null
+							)
+						}
 					}
 					
 					IconButton(
@@ -378,109 +359,53 @@ private fun DashboardContent(
 				}
 			}
 			
-			Row(
+			HorizontalPager(
+				count = 2,
+				state = dashboardPagerState,
 				modifier = Modifier
 					.fillMaxWidth()
-			) {
-				DashboardNavigationRail(
-					visible = showNavRail,
-					selectedItem = selectedNavRailItem,
-					items = navigationRailItem,
-					onItemSelected = { pair ->
-						selectedNavRailItem = pair
-						
-						when (pair.first) {
-							navigationRailItem[0].first -> {
-								popupDashboardNavigation(
-									toRoute = DujerDestination.Dashboard.Home.route,
-									dashboardNavController = dashboardNavController
-								)
-							}
-							navigationRailItem[1].first -> {
-								popupDashboardNavigation(
-									toRoute = DujerDestination.Dashboard.Chart.route,
-									dashboardNavController = dashboardNavController
-								)
-							}
-							navigationRailItem[2].first -> {
-								popupDashboardNavigation(
-									toRoute = DujerDestination.Dashboard.Export.route,
-									dashboardNavController = dashboardNavController
-								)
-							}
+			) { page ->
+				when (page) {
+					0 -> DashboardHomeScreen(
+						state = state,
+						homeLazyListState = homeLazyListState,
+						navController = navController,
+						onFinancialCardClicked = { financial ->
+							viewModel.dispatch(
+								DashboardAction.SetFinancialAction(FinancialAction.EDIT)
+							)
+							
+							viewModel.dispatch(
+								DashboardAction.SetFinancialID(financial.id)
+							)
+							
+							showFinancialSheet()
+						},
+						onFinancialCardDismissToEnd = onDeleteTransaction,
+						onWalletSheetOpened = { isOpened ->
+							showFABNewTransaction = !isOpened
+						},
+						onAddWallet = { wallet ->
+							viewModel.dispatch(
+								DashboardAction.NewWallet(wallet)
+							)
 						}
-					}
-				)
-				
-				AnimatedNavHost(
-					navController = dashboardNavController,
-					startDestination = DujerDestination.Dashboard.Home.route,
-					enterTransition = {
-						slideIntoContainer(
-							towards = AnimatedContentScope.SlideDirection.Down
-						)
-					},
-					popEnterTransition = {
-						slideIntoContainer(
-							towards = AnimatedContentScope.SlideDirection.Up
-						)
-					}
-				) {
-					composable(DujerDestination.Dashboard.Home.route) {
-						DashboardHomeScreen(
-							state = state,
-							viewModel = viewModel,
-							navController = navController,
-							onFinancialCardClicked = { financial ->
-								viewModel.dispatch(
-									DashboardAction.SetFinancialAction(FinancialAction.EDIT)
-								)
-								
-								viewModel.dispatch(
-									DashboardAction.SetFinancialID(financial.id)
-								)
-								
-								showFinancialSheet()
-							},
-							onFinancialCardDismissToEnd = onDeleteTransaction,
-							onFinancialCardCanDelete = onTransactionCanDelete,
-							onWalletSheetOpened = { isOpened ->
-								showFABNewTransaction = !isOpened
-							},
-							onAddWallet = { wallet ->
-								viewModel.dispatch(
-									DashboardAction.NewWallet(wallet)
-								)
-							}
-						)
-					}
-					
-					composable(DujerDestination.Dashboard.Chart.route) {
-						ChartScreen(
-							onFinancialCardDismissToEnd = onDeleteTransaction,
-							onFinancialCardCanDelete = onTransactionCanDelete,
-							onFinancialCardClicked = { financial ->
-								viewModel.dispatch(
-									DashboardAction.SetFinancialAction(FinancialAction.EDIT)
-								)
-								
-								viewModel.dispatch(
-									DashboardAction.SetFinancialID(financial.id)
-								)
-								
-								showFinancialSheet()
-							},
-							onBudgetCardClicked = {
-								navController.navigate(DujerDestination.BudgetList.route)
-							},
-						)
-					}
-					
-					composable(DujerDestination.Dashboard.Export.route) {
-					
-					}
+					)
+					1 -> ChartScreen(
+						onFinancialCardDismissToEnd = onDeleteTransaction,
+						onFinancialCardClicked = { financial ->
+							viewModel.dispatch(
+								DashboardAction.SetFinancialAction(FinancialAction.EDIT)
+							)
+							
+							viewModel.dispatch(
+								DashboardAction.SetFinancialID(financial.id)
+							)
+							
+							showFinancialSheet()
+						}
+					)
 				}
-				
 			}
 		}
 	}
@@ -490,9 +415,8 @@ private fun DashboardContent(
 @Composable
 private fun DashboardHomeScreen(
 	state: DashboardState,
-	viewModel: DashboardViewModel,
+	homeLazyListState: LazyListState,
 	navController: NavController,
-	onFinancialCardCanDelete: () -> Unit,
 	onFinancialCardDismissToEnd: (Financial) -> Unit,
 	onFinancialCardClicked: (Financial) -> Unit,
 	onWalletSheetOpened: (Boolean) -> Unit,
@@ -511,6 +435,8 @@ private fun DashboardHomeScreen(
 	
 	val highestExpenseCategory = state.highestExpenseCategory
 	val highestExpenseCategoryAmount = state.highestExpenseCategoryAmount
+	val incomeEntry = state.incomeEntry
+	val expenseEntry = state.expenseEntry
 	
 	val scope = rememberCoroutineScope()
 	
@@ -521,14 +447,7 @@ private fun DashboardHomeScreen(
 	
 	val allIncomeTransaction = dujerState.allIncomeTransaction
 	val allExpenseTransaction = dujerState.allExpenseTransaction
-	
-	val incomeTransaction = remember(transactions) {
-		transactions.filter { it.type == FinancialType.INCOME }
-	}
-	val expenseTransaction = remember(transactions) {
-		transactions.filter { it.type == FinancialType.EXPENSE }
-	}
-	
+
 	val totalAmountBudget = remember(allBudget) { allBudget.sumOf { it.max } }
 	val totalAmountBudgetExpenses = remember(allBudget, allExpenseTransaction) {
 		val amount = arrayListOf<Double>()
@@ -544,43 +463,39 @@ private fun DashboardHomeScreen(
 	
 	val walletNameFocusRequester by remember { mutableStateOf(FocusRequester()) }
 	
-	val incomeLineDataset by remember {
-		mutableStateOf(
-			LineDataSet(
-				emptyList(),
-				context.getString(R.string.income)
-			).apply {
-				lineWidth = 2.5f
-				cubicIntensity = .2f
-				mode = LineDataSet.Mode.CUBIC_BEZIER
-				color = income_color.toArgb()
-				setDrawValues(false)
-				setDrawFilled(false)
-				setDrawCircles(false)
-				setCircleColor(income_color.toArgb())
-				setDrawHorizontalHighlightIndicator(false)
-			}
-		)
-	}
+	val incomeLineDataset by rememberUpdatedState(
+		newValue = LineDataSet(
+			incomeEntry,
+			context.getString(R.string.income)
+		).apply {
+			lineWidth = 2.5f
+			cubicIntensity = .2f
+			mode = LineDataSet.Mode.CUBIC_BEZIER
+			color = income_color.toArgb()
+			setDrawValues(false)
+			setDrawFilled(false)
+			setDrawCircles(false)
+			setCircleColor(income_color.toArgb())
+			setDrawHorizontalHighlightIndicator(false)
+		}
+	)
 	
-	val expenseLineDataset by remember {
-		mutableStateOf(
-			LineDataSet(
-				emptyList(),
-				context.getString(R.string.expenses)
-			).apply {
-				lineWidth = 2.5f
-				cubicIntensity = .2f
-				mode = LineDataSet.Mode.CUBIC_BEZIER
-				color = expense_color.toArgb()
-				setDrawValues(false)
-				setDrawFilled(false)
-				setDrawCircles(false)
-				setCircleColor(expense_color.toArgb())
-				setDrawHorizontalHighlightIndicator(false)
-			}
-		)
-	}
+	val expenseLineDataset by rememberUpdatedState(
+		newValue = LineDataSet(
+			expenseEntry,
+			context.getString(R.string.expenses)
+		).apply {
+			lineWidth = 2.5f
+			cubicIntensity = .2f
+			mode = LineDataSet.Mode.CUBIC_BEZIER
+			color = expense_color.toArgb()
+			setDrawValues(false)
+			setDrawFilled(false)
+			setDrawCircles(false)
+			setCircleColor(expense_color.toArgb())
+			setDrawHorizontalHighlightIndicator(false)
+		}
+	)
 	
 	val hideAddWalletSheet = {
 		scope.launch { addWalletSheetState.hide() }
@@ -590,16 +505,6 @@ private fun DashboardHomeScreen(
 	val showAddWalletSheet = {
 		scope.launch { addWalletSheetState.show() }
 		Unit
-	}
-	
-	LaunchedEffect(incomeTransaction, expenseTransaction) {
-		val (incomeEntry, expenseEntry) = viewModel.getLineDataSetEntry(
-			incomeList = incomeTransaction,
-			expenseList = expenseTransaction
-		)
-		
-		incomeLineDataset.values = incomeEntry
-		expenseLineDataset.values = expenseEntry
 	}
 	
 	LaunchedEffect(addWalletSheetState.isVisible) {
@@ -640,7 +545,9 @@ private fun DashboardHomeScreen(
 			)
 		}
 	) {
-		LazyColumn {
+		LazyColumn(
+			state = homeLazyListState
+		) {
 			
 			item {
 				Column(
@@ -736,20 +643,16 @@ private fun DashboardHomeScreen(
 				}
 			}
 			
-			items(
-				items = transactions,
-				key = { item: Financial -> item.hashCode() }
-			) { financial ->
-				SwipeableFinancialCard(
-					financial = financial,
-					onCanDelete = onFinancialCardCanDelete,
-					onDismissToEnd = { onFinancialCardDismissToEnd(financial) },
-					onClick = { onFinancialCardClicked(financial) },
-					modifier = Modifier
-						.padding(horizontal = 12.dpScaled)
-						.testTag("SwipeableFinancialCard")
-				)
-			}
+			swipeableFinancialCard(
+				data = transactions,
+				onFinancialCardDismissToEnd = { onFinancialCardDismissToEnd(it) },
+				onFinancialCardClicked = { onFinancialCardClicked(it) },
+				onNavigateCategoryClicked = { category ->
+					navController.navigate(
+						DujerDestination.CategoryTransaction.createRoute(category.id)
+					)
+				}
+			)
 			
 			item {
 				// fab size: 56 dp, fab bottom padding: 24 dp, card to fab padding: 16 dp = 96 dp
@@ -760,21 +663,5 @@ private fun DashboardHomeScreen(
 				)
 			}
 		}
-	}
-}
-
-internal fun popupDashboardNavigation(
-	toRoute: String,
-	dashboardNavController: NavController
-) {
-	dashboardNavController.navigate(toRoute) {
-		dashboardNavController.graph.startDestinationRoute?.let { route ->
-			popUpTo(route) {
-				saveState = true
-			}
-		}
-		
-		restoreState = true
-		launchSingleTop = true
 	}
 }

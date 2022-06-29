@@ -16,6 +16,17 @@ class BudgetViewModel @Inject constructor(
 ) {
 	
 	init {
+		
+		viewModelScope.launch(environment.dispatcher) {
+			environment.getFinancial().collect { financial ->
+				setState {
+					copy(
+						financial = financial
+					)
+				}
+			}
+		}
+		
 		viewModelScope.launch(environment.dispatcher) {
 			environment.getBudget().collect { budget ->
 				setState {
@@ -51,6 +62,16 @@ class BudgetViewModel @Inject constructor(
 				setState {
 					copy(
 						sortType = type
+					)
+				}
+			}
+		}
+		
+		viewModelScope.launch(environment.dispatcher) {
+			environment.getGroupType().collect { type ->
+				setState {
+					copy(
+						groupType = type
 					)
 				}
 			}
@@ -127,6 +148,17 @@ class BudgetViewModel @Inject constructor(
 			is BudgetAction.SetFilterDate -> {
 				viewModelScope.launch(environment.dispatcher) {
 					environment.setFilterDate(action.filterDate)
+				}
+			}
+			is BudgetAction.SetGroupType -> {
+				viewModelScope.launch(environment.dispatcher) {
+					environment.setGroupType(action.groupType)
+				}
+			}
+			
+			is BudgetAction.GetFinancial -> {
+				viewModelScope.launch(environment.dispatcher) {
+					environment.setFinancialID(action.id)
 				}
 			}
 		}
