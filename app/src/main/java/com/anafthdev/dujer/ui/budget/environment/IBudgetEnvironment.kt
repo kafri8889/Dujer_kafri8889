@@ -1,5 +1,6 @@
 package com.anafthdev.dujer.ui.budget.environment
 
+import com.anafthdev.dujer.data.FinancialGroupData
 import com.anafthdev.dujer.data.GroupType
 import com.anafthdev.dujer.data.SortType
 import com.anafthdev.dujer.data.db.model.Budget
@@ -11,6 +12,8 @@ import kotlinx.coroutines.flow.Flow
 interface IBudgetEnvironment {
 	
 	val dispatcher: CoroutineDispatcher
+	
+	fun getFinancial(): Flow<Financial>
 	
 	fun getBudget(): Flow<Budget>
 	
@@ -28,7 +31,9 @@ interface IBudgetEnvironment {
 	
 	fun getBarEntries(): Flow<List<BarEntry>>
 	
-	fun getTransactions(): Flow<List<Financial>>
+	fun getTransactions(): Flow<FinancialGroupData>
+	
+	suspend fun setFinancialID(id: Int)
 	
 	suspend fun setBudget(id: Int)
 	

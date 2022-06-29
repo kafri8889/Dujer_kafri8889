@@ -310,7 +310,19 @@ fun DujerApp() {
 						
 						BudgetScreen(
 							budgetID = budgetID,
-							navController = navController
+							navController = navController,
+							onTransactionCanDelete = {
+								viewModel.dispatch(
+									DujerAction.Vibrate(100)
+								)
+							},
+							onDeleteTransaction = { financial ->
+								viewModel.dispatch(
+									DujerAction.DeleteFinancial(
+										financial.toArray()
+									)
+								)
+							}
 						)
 					}
 					

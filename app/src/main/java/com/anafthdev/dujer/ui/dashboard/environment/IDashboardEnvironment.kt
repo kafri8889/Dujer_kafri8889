@@ -6,6 +6,7 @@ import com.anafthdev.dujer.data.SortType
 import com.anafthdev.dujer.data.db.model.Category
 import com.anafthdev.dujer.data.db.model.Financial
 import com.anafthdev.dujer.data.db.model.Wallet
+import com.github.mikephil.charting.data.Entry
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.Flow
 
@@ -30,6 +31,10 @@ interface IDashboardEnvironment {
 	fun getHighestExpenseCategory(): Flow<Category>
 	
 	fun getHighestExpenseCategoryAmount(): Flow<Double>
+	
+	fun getIncomeEntry(): Flow<List<Entry>>
+	
+	fun getExpenseEntry(): Flow<List<Entry>>
 	
 	
 	suspend fun setFinancialID(id: Int)

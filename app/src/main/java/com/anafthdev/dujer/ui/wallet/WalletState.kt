@@ -1,5 +1,6 @@
 package com.anafthdev.dujer.ui.wallet
 
+import com.anafthdev.dujer.data.FinancialGroupData
 import com.anafthdev.dujer.data.FinancialType
 import com.anafthdev.dujer.data.GroupType
 import com.anafthdev.dujer.data.SortType
@@ -16,7 +17,7 @@ data class WalletState(
 	val groupType: GroupType = GroupType.DEFAULT,
 	val filterDate: Pair<Long, Long> = AppUtil.filterDateDefault,
 	val selectedMonth: List<Int> = listOf(0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11),
-	val transactions: List<Financial> = emptyList(),
+	val transactions: FinancialGroupData = FinancialGroupData.default,
 	val pieEntries: List<PieEntry> = emptyList(),
 	val availableCategory: List<Category> = emptyList(),
 	val selectedFinancialType: FinancialType = FinancialType.INCOME

@@ -6,7 +6,9 @@ import com.anafthdev.dujer.data.SortType
 import com.anafthdev.dujer.data.db.model.Category
 import com.anafthdev.dujer.data.db.model.Financial
 import com.anafthdev.dujer.foundation.common.AppUtil
+import com.anafthdev.dujer.ui.dashboard.environment.DashboardEnvironment
 import com.anafthdev.dujer.ui.financial.data.FinancialAction
+import com.github.mikephil.charting.data.Entry
 
 data class DashboardState(
 	val financial: Financial = Financial.default,
@@ -17,5 +19,7 @@ data class DashboardState(
 	val selectedMonth: List<Int> = listOf(0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11),
 	val transactions: FinancialGroupData = FinancialGroupData.default,
 	val highestExpenseCategory: Category = Category.default,
-	val highestExpenseCategoryAmount: Double = 0.0
+	val highestExpenseCategoryAmount: Double = 0.0,
+	val incomeEntry: List<Entry> = DashboardEnvironment.entryTemp,
+	val expenseEntry: List<Entry> = DashboardEnvironment.entryTemp
 )

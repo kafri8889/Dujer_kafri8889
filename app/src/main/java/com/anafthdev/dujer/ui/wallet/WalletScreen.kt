@@ -10,7 +10,6 @@ import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.ModalBottomSheetValue
@@ -27,7 +26,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -187,6 +185,7 @@ fun WalletScreen(
 				.zIndex(2f)
 		) {
 			FilterSortFinancialPopup(
+				showFilterMonth = false,
 				isVisible = isFilterSortFinancialPopupShowed,
 				sortType = sortType,
 				groupType = groupType,
@@ -343,7 +342,6 @@ private fun WalletScreenContent(
 	val wallet = state.wallet
 	val transactions = state.transactions
 	val pieEntries = state.pieEntries
-	val availableCategory = state.availableCategory
 	val selectedFinancialType = state.selectedFinancialType
 	
 	val allCategory = dujerState.allCategory
@@ -751,25 +749,22 @@ private fun WalletScreenContent(
 			}
 		}
 		
-		items(
-			items = transactions,
-			key = { item: Financial -> item.hashCode() }
-		) { financial ->
-			SwipeableFinancialCard(
-				financial = financial,
-				onCanDelete = onTransactionCanDelete,
-				onDismissToEnd = { onDeleteTransaction(financial) },
-				onClick = {
-					viewModel.dispatch(
-						WalletAction.GetFinancial(financial.id)
-					)
-					
-					onShowFinancialSheet()
-				},
-				modifier = Modifier
-					.padding(horizontal = 12.dpScaled)
-					.testTag("SwipeableFinancialCard")
-			)
-		}
+		swipeableFinancialCard(
+			data = transactions,
+			onFinancialCardCanDelete = onTransactionCanDelete,
+			onFinancialCardDismissToEnd = { onDeleteTransaction(it) },
+			onFinancialCardClicked = { financial ->
+				viewModel.dispatch(
+					WalletAction.GetFinancial(financial.id)
+				)
+				
+				onShowFinancialSheet()
+			},
+			onNavigateCategoryClicked = { category ->
+				navController.navigate(
+					DujerDestination.CategoryTransaction.createRoute(category.id)
+				)
+			}
+		)
 	}
 }

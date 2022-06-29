@@ -1,5 +1,6 @@
 package com.anafthdev.dujer.ui.budget.environment
 
+import com.anafthdev.dujer.data.FinancialGroupData
 import com.anafthdev.dujer.data.GroupType
 import com.anafthdev.dujer.data.SortType
 import com.anafthdev.dujer.data.db.model.Budget
@@ -34,6 +35,9 @@ class BudgetEnvironment @Inject constructor(
 	
 	private val monthFormatter = SimpleDateFormat("MMM", deviceLocale)
 	
+	private val _selectedFinancial = MutableStateFlow(Financial.default)
+	private val selectedFinancial: StateFlow<Financial> = _selectedFinancial
+	
 	private val _selectedBudget = MutableStateFlow(Budget.defalut)
 	private val selectedBudget: StateFlow<Budget> = _selectedBudget
 	
@@ -60,8 +64,8 @@ class BudgetEnvironment @Inject constructor(
 	private val _barEntries = MutableStateFlow(emptyList<BarEntry>())
 	private val barEntries: StateFlow<List<BarEntry>> = _barEntries
 	
-	private val _transactions = MutableStateFlow(emptyList<Financial>())
-	private val transactions: StateFlow<List<Financial>> = _transactions
+	private val _transactions = MutableStateFlow(FinancialGroupData.default)
+	private val transactions: StateFlow<FinancialGroupData> = _transactions
 	
 	private val barEntryTemplate = arrayListOf<BarEntry>().apply {
 		for (i in 0..11) {
@@ -137,17 +141,21 @@ class BudgetEnvironment @Inject constructor(
 					it.category.id == budget.category.id
 				}
 				
-//				_transactions.emit(
-//					financialSorter.beginSort(
-//						sortType = sortType,
-//						groupType = groupType,
-//						filterDate = date,
-//						selectedMonth = month,
-//						financials = filteredFinancials
-//					)
-//				)
+				_transactions.emit(
+					financialSorter.beginSort(
+						sortType = sortType,
+						groupType = groupType,
+						filterDate = date,
+						selectedMonth = month,
+						financials = filteredFinancials
+					)
+				)
 			}
 		}
+	}
+	
+	override fun getFinancial(): Flow<Financial> {
+		return selectedFinancial
 	}
 	
 	override fun getBudget(): Flow<Budget> {
@@ -182,8 +190,14 @@ class BudgetEnvironment @Inject constructor(
 		return barEntries
 	}
 	
-	override fun getTransactions(): Flow<List<Financial>> {
+	override fun getTransactions(): Flow<FinancialGroupData> {
 		return transactions
+	}
+	
+	override suspend fun setFinancialID(id: Int) {
+		_selectedFinancial.emit(
+			appRepository.get(id) ?: Financial.default
+		)
 	}
 	
 	override suspend fun setBudget(id: Int) {

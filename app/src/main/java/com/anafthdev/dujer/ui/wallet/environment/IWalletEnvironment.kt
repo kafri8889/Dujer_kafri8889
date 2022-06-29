@@ -1,5 +1,6 @@
 package com.anafthdev.dujer.ui.wallet.environment
 
+import com.anafthdev.dujer.data.FinancialGroupData
 import com.anafthdev.dujer.data.FinancialType
 import com.anafthdev.dujer.data.GroupType
 import com.anafthdev.dujer.data.SortType
@@ -26,7 +27,7 @@ interface IWalletEnvironment {
 	
 	fun getSelectedMonth(): Flow<List<Int>>
 	
-	fun getTransactions(): Flow<List<Financial>>
+	fun getTransactions(): Flow<FinancialGroupData>
 	
 	fun getPieEntries(): Flow<List<PieEntry>>
 	

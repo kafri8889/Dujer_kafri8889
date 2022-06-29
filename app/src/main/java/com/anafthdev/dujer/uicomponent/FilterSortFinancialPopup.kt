@@ -47,6 +47,9 @@ fun FilterSortFinancialPopup(
 	filterDate: Pair<Long, Long>,
 	monthsSelected: List<Int>,
 	modifier: Modifier = Modifier,
+	showGroup: Boolean = true,
+	showFilterMonth: Boolean = true,
+	showFilterDate: Boolean = true,
 	onClose: () -> Unit,
 	onApply: (monthsSelected: List<Int>, sortBy: SortType, groupBy: GroupType, filterDate: Pair<Long, Long>?) -> Unit,
 	onClickOutside: () -> Unit
@@ -163,13 +166,217 @@ fun FilterSortFinancialPopup(
 				modifier = Modifier
 					.padding(bottom = ButtonDefaults.MinHeight + 8.dpScaled)
 			) {
-				item {
-					Column(
-						modifier = Modifier
-							.fillMaxWidth()
-					) {
+				if (showFilterDate) {
+					item {
+						Column(
+							modifier = Modifier
+								.fillMaxWidth()
+						) {
+							Text(
+								text = stringResource(id = R.string.filter),
+								style = MaterialTheme.typography.titleMedium.copy(
+									color = LocalUiColor.current.normalText,
+									fontWeight = FontWeight.SemiBold,
+									fontSize = MaterialTheme.typography.titleMedium.fontSize.spScaled
+								),
+								modifier = Modifier
+									.padding(
+										top = 16.dpScaled,
+										start = 16.dpScaled
+									)
+							)
+							
+							Text(
+								text = stringResource(id = R.string.start),
+								style = MaterialTheme.typography.titleSmall.copy(
+									color = LocalUiColor.current.normalText,
+									fontWeight = FontWeight.Medium,
+									fontSize = MaterialTheme.typography.titleSmall.fontSize.spScaled
+								),
+								modifier = Modifier
+									.padding(
+										top = 16.dpScaled,
+										start = 24.dpScaled
+									)
+							)
+							
+							DateTextField(
+								value = startDate,
+								onValueChange = {
+									startDate = it
+								},
+								trailingIcon = {
+									IconButton(
+										onClick = {
+											activity.showDatePicker(
+												min = calendar.apply {
+													set(Calendar.YEAR, 2000)
+												}.timeInMillis
+											) { timeInMillis ->
+												startDate = startDate.copy(
+													text = TextFieldDateFormatter.format(timeInMillis)
+												)
+											}
+										}
+									) {
+										Icon(
+											painter = painterResource(id = R.drawable.ic_calendar),
+											contentDescription = null
+										)
+									}
+								},
+								modifier = Modifier
+									.padding(
+										top = 8.dpScaled,
+										start = 24.dpScaled
+									)
+							)
+							
+							Text(
+								text = stringResource(id = R.string.end),
+								style = MaterialTheme.typography.titleSmall.copy(
+									color = LocalUiColor.current.normalText,
+									fontWeight = FontWeight.Medium,
+									fontSize = MaterialTheme.typography.titleSmall.fontSize.spScaled
+								),
+								modifier = Modifier
+									.padding(
+										top = 16.dpScaled,
+										start = 24.dpScaled
+									)
+							)
+							
+							DateTextField(
+								value = endDate,
+								onValueChange = {
+									endDate = it
+								},
+								trailingIcon = {
+									IconButton(
+										onClick = {
+											activity.showDatePicker(
+												min = calendar.apply {
+													set(Calendar.YEAR, 2000)
+												}.timeInMillis
+											) { timeInMillis ->
+												endDate = endDate.copy(
+													text = TextFieldDateFormatter.format(timeInMillis)
+												)
+											}
+										}
+									) {
+										Icon(
+											painter = painterResource(id = R.drawable.ic_calendar),
+											contentDescription = null
+										)
+									}
+								},
+								modifier = Modifier
+									.padding(
+										top = 8.dpScaled,
+										start = 24.dpScaled
+									)
+							)
+							
+							AnimatedVisibility(
+								visible = !isFilterDateValid,
+								modifier = Modifier
+									.padding(
+										vertical = 8.dpScaled,
+										horizontal = 24.dpScaled
+									)
+							) {
+								Text(
+									text = stringResource(id = R.string.invalid_format),
+									style = MaterialTheme.typography.titleSmall.copy(
+										color = MaterialTheme.colorScheme.error,
+										fontWeight = FontWeight.Medium,
+										fontSize = MaterialTheme.typography.titleSmall.fontSize.spScaled
+									)
+								)
+							}
+						}
+					}
+				}
+				
+				if (showFilterMonth) {
+					gridItems(
+						items = months,
+						nColumns = 2
+					) { month ->
+						val monthIndex = remember {
+							when (month.uppercase()) {
+								months[0].uppercase() -> 0
+								months[1].uppercase() -> 1
+								months[2].uppercase() -> 2
+								months[3].uppercase() -> 3
+								months[4].uppercase() -> 4
+								months[5].uppercase() -> 5
+								months[6].uppercase() -> 6
+								months[7].uppercase() -> 7
+								months[8].uppercase() -> 8
+								months[9].uppercase() -> 9
+								months[10].uppercase() -> 10
+								months[11].uppercase() -> 11
+								else -> -1
+							}
+						}
+						
+						Row(
+							verticalAlignment = Alignment.CenterVertically,
+							modifier = Modifier
+								.fillMaxWidth()
+								.clickable {
+									val isChecked = monthIndex !in monthsSelected
+									
+									onApply(
+										monthsSelected
+											.toMutableList()
+											.apply {
+												if (isChecked) add(monthIndex)
+												else remove(monthIndex)
+											},
+										sortType,
+										groupType,
+										selectedFilterDate
+									)
+								}
+								.padding(
+									horizontal = 16.dpScaled
+								)
+						) {
+							Checkbox(
+								checked = monthIndex in monthsSelected,
+								onCheckedChange = { isChecked ->
+									onApply(
+										monthsSelected.toMutableList().apply {
+											if (isChecked) add(monthIndex)
+											else remove(monthIndex)
+										},
+										sortType,
+										groupType,
+										selectedFilterDate
+									)
+								}
+							)
+							
+							Text(
+								text = month,
+								style = MaterialTheme.typography.titleSmall.copy(
+									color = LocalUiColor.current.normalText,
+									fontSize = MaterialTheme.typography.titleSmall.fontSize.spScaled
+								),
+								modifier = Modifier
+									.padding(start = 8.dpScaled)
+							)
+						}
+					}
+				}
+				
+				if (showGroup) {
+					item {
 						Text(
-							text = stringResource(id = R.string.filter),
+							text = stringResource(id = R.string.group),
 							style = MaterialTheme.typography.titleMedium.copy(
 								color = LocalUiColor.current.normalText,
 								fontWeight = FontWeight.SemiBold,
@@ -181,245 +388,47 @@ fun FilterSortFinancialPopup(
 									start = 16.dpScaled
 								)
 						)
-						
-						Text(
-							text = stringResource(id = R.string.start),
-							style = MaterialTheme.typography.titleSmall.copy(
-								color = LocalUiColor.current.normalText,
-								fontWeight = FontWeight.Medium,
-								fontSize = MaterialTheme.typography.titleSmall.fontSize.spScaled
-							),
-							modifier = Modifier
-								.padding(
-									top = 16.dpScaled,
-									start = 24.dpScaled
-								)
-						)
-						
-						DateTextField(
-							value = startDate,
-							onValueChange = {
-								startDate = it
-							},
-							trailingIcon = {
-								IconButton(
-									onClick = {
-										activity.showDatePicker(
-											min = calendar.apply {
-												set(Calendar.YEAR, 2000)
-											}.timeInMillis
-										) { timeInMillis ->
-											startDate = startDate.copy(
-												text = TextFieldDateFormatter.format(timeInMillis)
-											)
-										}
-									}
-								) {
-									Icon(
-										painter = painterResource(id = R.drawable.ic_calendar),
-										contentDescription = null
-									)
-								}
-							},
-							modifier = Modifier
-								.padding(
-									top = 8.dpScaled,
-									start = 24.dpScaled
-								)
-						)
-						
-						Text(
-							text = stringResource(id = R.string.end),
-							style = MaterialTheme.typography.titleSmall.copy(
-								color = LocalUiColor.current.normalText,
-								fontWeight = FontWeight.Medium,
-								fontSize = MaterialTheme.typography.titleSmall.fontSize.spScaled
-							),
-							modifier = Modifier
-								.padding(
-									top = 16.dpScaled,
-									start = 24.dpScaled
-								)
-						)
-						
-						DateTextField(
-							value = endDate,
-							onValueChange = {
-								endDate = it
-							},
-							trailingIcon = {
-								IconButton(
-									onClick = {
-										activity.showDatePicker(
-											min = calendar.apply {
-												set(Calendar.YEAR, 2000)
-											}.timeInMillis
-										) { timeInMillis ->
-											endDate = endDate.copy(
-												text = TextFieldDateFormatter.format(timeInMillis)
-											)
-										}
-									}
-								) {
-									Icon(
-										painter = painterResource(id = R.drawable.ic_calendar),
-										contentDescription = null
-									)
-								}
-							},
-							modifier = Modifier
-								.padding(
-									top = 8.dpScaled,
-									start = 24.dpScaled
-								)
-						)
-						
-						AnimatedVisibility(
-							visible = !isFilterDateValid,
-							modifier = Modifier
-								.padding(
-									vertical = 8.dpScaled,
-									horizontal = 24.dpScaled
-								)
-						) {
-							Text(
-								text = stringResource(id = R.string.invalid_format),
-								style = MaterialTheme.typography.titleSmall.copy(
-									color = MaterialTheme.colorScheme.error,
-									fontWeight = FontWeight.Medium,
-									fontSize = MaterialTheme.typography.titleSmall.fontSize.spScaled
-								)
-							)
-						}
-					}
-				}
-				
-				gridItems(
-					items = months,
-					nColumns = 2
-				) { month ->
-					val monthIndex = remember {
-						when (month.uppercase()) {
-							months[0].uppercase() -> 0
-							months[1].uppercase() -> 1
-							months[2].uppercase() -> 2
-							months[3].uppercase() -> 3
-							months[4].uppercase() -> 4
-							months[5].uppercase() -> 5
-							months[6].uppercase() -> 6
-							months[7].uppercase() -> 7
-							months[8].uppercase() -> 8
-							months[9].uppercase() -> 9
-							months[10].uppercase() -> 10
-							months[11].uppercase() -> 11
-							else -> -1
-						}
 					}
 					
-					Row(
-						verticalAlignment = Alignment.CenterVertically,
-						modifier = Modifier
-							.fillMaxWidth()
-							.clickable {
-								val isChecked = monthIndex !in monthsSelected
-								
-								onApply(
-									monthsSelected
-										.toMutableList()
-										.apply {
-											if (isChecked) add(monthIndex)
-											else remove(monthIndex)
-										},
-									sortType,
-									groupType,
-									selectedFilterDate
-								)
-							}
-							.padding(
-								horizontal = 16.dpScaled
-							)
-					) {
-						Checkbox(
-							checked = monthIndex in monthsSelected,
-							onCheckedChange = { isChecked ->
-								onApply(
-									monthsSelected.toMutableList().apply {
-										if (isChecked) add(monthIndex)
-										else remove(monthIndex)
-									},
-									sortType,
-									groupType,
-									selectedFilterDate
-								)
-							}
-						)
-						
-						Text(
-							text = month,
-							style = MaterialTheme.typography.titleSmall.copy(
-								color = LocalUiColor.current.normalText,
-								fontSize = MaterialTheme.typography.titleSmall.fontSize.spScaled
-							),
+					items(GroupType.values()) { type ->
+						Row(
+							verticalAlignment = Alignment.CenterVertically,
 							modifier = Modifier
-								.padding(start = 8.dpScaled)
-						)
-					}
-				}
-				
-				item {
-					Text(
-						text = stringResource(id = R.string.group),
-						style = MaterialTheme.typography.titleMedium.copy(
-							color = LocalUiColor.current.normalText,
-							fontWeight = FontWeight.SemiBold,
-							fontSize = MaterialTheme.typography.titleMedium.fontSize.spScaled
-						),
-						modifier = Modifier
-							.padding(
-								top = 16.dpScaled,
-								start = 16.dpScaled
-							)
-					)
-				}
-				
-				items(GroupType.values()) { type ->
-					Row(
-						verticalAlignment = Alignment.CenterVertically,
-						modifier = Modifier
-							.fillMaxWidth()
-							.clickable {
-								onApply(
-									monthsSelected,
-									sortType,
-									type,
-									selectedFilterDate
+								.fillMaxWidth()
+								.clickable {
+									onApply(
+										monthsSelected,
+										sortType,
+										type,
+										selectedFilterDate
+									)
+								}
+								.padding(
+									horizontal = 16.dpScaled
 								)
-							}
-							.padding(
-								horizontal = 16.dpScaled
+						) {
+							RadioButton(
+								selected = groupType == type,
+								onClick = {
+									onApply(
+										monthsSelected,
+										sortType,
+										type,
+										selectedFilterDate
+									)
+								}
 							)
-					) {
-						RadioButton(
-							selected = groupType == type,
-							onClick = {
-								onApply(
-									monthsSelected,
-									sortType,
-									type,
-									selectedFilterDate
-								)
-							}
-						)
-						
-						Text(
-							text = type.name.uppercaseFirstWord(true),
-							style = MaterialTheme.typography.titleSmall.copy(
-								color = LocalUiColor.current.normalText,
-								fontSize = MaterialTheme.typography.titleSmall.fontSize.spScaled
-							),
-							modifier = Modifier
-								.padding(start = 8.dpScaled)
-						)
+							
+							Text(
+								text = type.name.uppercaseFirstWord(true),
+								style = MaterialTheme.typography.titleSmall.copy(
+									color = LocalUiColor.current.normalText,
+									fontSize = MaterialTheme.typography.titleSmall.fontSize.spScaled
+								),
+								modifier = Modifier
+									.padding(start = 8.dpScaled)
+							)
+						}
 					}
 				}
 
