@@ -91,12 +91,14 @@ fun DujerApp() {
 	LaunchedEffect(effect) {
 		when (effect) {
 			is DujerEffect.DeleteFinancial -> {
+				snackbarHostState.currentSnackbarData?.dismiss()
 				snackbarHostState.showSnackbar(
 					message = "${context.getString(R.string.finance_removed)} \"${(effect as DujerEffect.DeleteFinancial).financial.name}\"",
 					duration = SnackbarDuration.Short
 				)
 			}
 			is DujerEffect.DeleteCategory -> {
+				snackbarHostState.currentSnackbarData?.dismiss()
 				snackbarHostState.showSnackbar(
 					message = "${context.getString(R.string.category_removed)} \"${(effect as DujerEffect.DeleteCategory).category.name}\"",
 					duration = SnackbarDuration.Short

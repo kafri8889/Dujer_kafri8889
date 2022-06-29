@@ -39,6 +39,7 @@ import com.anafthdev.dujer.data.DujerDestination
 import com.anafthdev.dujer.data.FinancialType
 import com.anafthdev.dujer.data.db.model.Category
 import com.anafthdev.dujer.data.db.model.Financial
+import com.anafthdev.dujer.foundation.common.AppUtil.toast
 import com.anafthdev.dujer.foundation.common.ColorTemplate
 import com.anafthdev.dujer.foundation.common.CurrencyFormatter
 import com.anafthdev.dujer.foundation.extension.deviceLocale
@@ -75,6 +76,7 @@ fun WalletScreen(
 	onDeleteTransaction: (Financial) -> Unit
 ) {
 	
+	val context = LocalContext.current
 	val dujerState = LocalDujerState.current
 	
 	val viewModel = hiltViewModel<WalletViewModel>()
@@ -241,6 +243,7 @@ fun WalletScreen(
 						)
 					)
 					
+					context.getString(R.string.wallet_deleted).toast(context)
 					navController.popBackStack()
 				},
 				onCancel = {

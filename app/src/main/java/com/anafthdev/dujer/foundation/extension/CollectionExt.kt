@@ -134,24 +134,3 @@ fun <T> Collection<T>.get(predicate: (T) -> Boolean): T? {
 	
 	return null
 }
-
-/**
- * example:
- * data class Model(var a: Int, var b: Int)
- * val models = listOf(
- *		Model(1, 1),
- *		Model(2, 2),
- *		Model(3, 3),
- *	)
- * println(models.applyElement { it.copy(a = 6) }.toTypedArray().contentToString())
- *
- * result: [Model(a=6, b=1), Model(a=6, b=2), Model(a=6, b=3)]
- */
-fun <T> Collection<T>.applyElement(element: (T) -> T): List<T> {
-	val result = arrayListOf<T>()
-	this.forEach { t ->
-		result.add(element(t))
-	}
-	
-	return result
-}

@@ -4,7 +4,6 @@ import androidx.lifecycle.viewModelScope
 import com.anafthdev.dujer.data.FinancialType
 import com.anafthdev.dujer.data.db.model.Category
 import com.anafthdev.dujer.data.db.model.Financial
-import com.anafthdev.dujer.foundation.extension.applyElement
 import com.anafthdev.dujer.foundation.extension.get
 import com.anafthdev.dujer.foundation.viewmodel.StatefulViewModel
 import com.anafthdev.dujer.ui.category.environment.ICategoryEnvironment
@@ -43,7 +42,7 @@ class CategoryViewModel @Inject constructor(
 		categories: List<Category>
 	) {
 		environment.updateFinancial(
-			*financialList.applyElement { financial ->
+			*financialList.map { financial ->
 				financial.copy(
 					category = categories.get { it.id == financial.category.id } ?:
 					if (financial.type == FinancialType.INCOME) Category.otherIncome else Category.otherExpense
@@ -63,7 +62,7 @@ class CategoryViewModel @Inject constructor(
 		Timber.i("filtered list: $filteredFinancial")
 		
 		environment.updateFinancial(
-			*filteredFinancial.applyElement { financial ->
+			*filteredFinancial.map { financial ->
 				financial.copy(
 					category = if (financial.type == FinancialType.INCOME) Category.otherIncome
 					else Category.otherExpense

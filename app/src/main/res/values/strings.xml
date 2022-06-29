@@ -86,6 +86,7 @@
     <string name="bio_auth_title">Verification</string>
     <string name="change_balance">Change balance</string>
     <string name="invalid_format">Invalid format!</string>
+    <string name="wallet_deleted">Wallet deleted</string>
     <string name="finance_removed">Finance removed</string>
     <string name="change_currency">Change currency</string>
     <string name="current_balance">Current balance</string>

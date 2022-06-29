@@ -5,7 +5,6 @@ import com.anafthdev.dujer.data.FinancialType
 import com.anafthdev.dujer.data.db.model.Category
 import com.anafthdev.dujer.data.db.model.Financial
 import com.anafthdev.dujer.data.db.model.Wallet
-import com.anafthdev.dujer.foundation.extension.applyElement
 import com.anafthdev.dujer.foundation.extension.merge
 import com.anafthdev.dujer.foundation.viewmodel.StatefulViewModel
 import com.anafthdev.dujer.model.Currency
@@ -72,48 +71,42 @@ class DujerViewModel @Inject constructor(
 		}
 		
 		viewModelScope.launch(environment.dispatcher) {
-			environment.getAllWallet()
-				.combine(environment.getAllFinancial()) { wallets, financials ->
-					wallets to financials
-				}.collect { (wallets, financials) ->
-					setState {
-						copy(
-							allWallet = wallets,
-							allIncomeTransaction = financials.filter { it.type == FinancialType.INCOME },
-							allExpenseTransaction = financials.filter { it.type == FinancialType.EXPENSE },
-						)
-					}
-					
-					val updatedWallet = arrayListOf<Wallet>()
-
-					wallets.forEach { wallet ->
-						val incomeTransaction = financials.filter {
-							(it.type == FinancialType.INCOME) and (it.walletID == wallet.id)
-						}.sumOf { it.amount }
-
-						val expenseTransaction = financials.filter {
-							(it.type == FinancialType.EXPENSE) and (it.walletID == wallet.id)
-						}.sumOf { it.amount }
-
-						updatedWallet.add(
-							wallet.copy(
-								balance = wallet.initialBalance + incomeTransaction - expenseTransaction
-							)
-						)
-					}
-
-					environment.updateWallet(*updatedWallet.toTypedArray())
+			combine(
+				environment.getAllWallet(),
+				environment.getAllFinancial()
+			) { wallets, financials ->
+				wallets to financials
+			}.collect { (wallets, financials) ->
+				listenDeletedWallet(wallets, financials)
+				setState {
+					copy(
+						allWallet = wallets,
+						allIncomeTransaction = financials.filter { it.type == FinancialType.INCOME },
+						allExpenseTransaction = financials.filter { it.type == FinancialType.EXPENSE },
+					)
 				}
+					
+				val updatedWallet = arrayListOf<Wallet>()
+
+				wallets.forEach { wallet ->
+					val incomeTransaction = financials.filter {
+						(it.type == FinancialType.INCOME) and (it.walletID == wallet.id)
+					}.sumOf { it.amount }
+					
+					val expenseTransaction = financials.filter {
+						(it.type == FinancialType.EXPENSE) and (it.walletID == wallet.id)
+					}.sumOf { it.amount }
+					
+					updatedWallet.add(
+						wallet.copy(
+							balance = wallet.initialBalance + incomeTransaction - expenseTransaction
+						)
+					)
+				}
+
+				environment.updateWallet(*updatedWallet.toTypedArray())
+			}
 		}
-	}
-	
-	private suspend fun changeFinancialCurrency(financialList: List<Financial>, currency: Currency) {
-		environment.updateFinancial(
-			*financialList
-				.filter { it.currency.countryCode != currency.countryCode }
-				.applyElement { it.copy(currency = currency) }
-				.toTypedArray()
-		)
 	}
 	
 	override fun dispatch(action: DujerAction) {
@@ -151,6 +144,28 @@ class DujerViewModel @Inject constructor(
 				}
 			}
 		}
+	}
+	
+	private suspend fun changeFinancialCurrency(financialList: List<Financial>, currency: Currency) {
+		environment.updateFinancial(
+			*financialList
+				.filter { it.currency.countryCode != currency.countryCode }
+				.map { it.copy(currency = currency) }
+				.toTypedArray()
+		)
+	}
+	
+	private suspend fun listenDeletedWallet(wallets: List<Wallet>, financials: List<Financial>) {
+		val walletIDs = wallets.map { it.id }
+		val filteredFinancials = financials.filterNot {
+			it.walletID in walletIDs
+		}
+		
+		environment.updateFinancial(
+			*filteredFinancials.map {
+				it.copy(walletID = Wallet.cash.id)
+			}.toTypedArray()
+		)
 	}
 	
 }

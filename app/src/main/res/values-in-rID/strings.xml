@@ -86,6 +86,7 @@
     <string name="bio_auth_title">Verifikasi</string>
     <string name="change_balance">Ubah saldo</string>
     <string name="invalid_format">Format tidak sah!</string>
+    <string name="wallet_deleted">Dompet dihapus</string>
     <string name="finance_removed">Keuangan dihapus</string>
     <string name="change_currency">Ganti mata uang</string>
     <string name="current_balance">Saldo saat ini</string>
