@@ -43,7 +43,10 @@ import com.anafthdev.dujer.data.DujerDestination
 import com.anafthdev.dujer.data.FinancialType
 import com.anafthdev.dujer.data.db.model.Category
 import com.anafthdev.dujer.foundation.common.AppUtil.toast
-import com.anafthdev.dujer.foundation.extension.*
+import com.anafthdev.dujer.foundation.extension.isLightTheme
+import com.anafthdev.dujer.foundation.extension.lastIndexOf
+import com.anafthdev.dujer.foundation.extension.removeFirstAndLastWhitespace
+import com.anafthdev.dujer.foundation.extension.toArray
 import com.anafthdev.dujer.foundation.ui.LocalUiColor
 import com.anafthdev.dujer.foundation.uimode.data.LocalUiMode
 import com.anafthdev.dujer.foundation.window.dpScaled
@@ -148,7 +151,7 @@ fun CategoryScreen(
 	}
 	
 	LaunchedEffect(dujerState.allCategory) {
-		val categoryIDs = categories.getBy { it.id }
+		val categoryIDs = categories.map { it.id }
 		val financialList = dujerState.allIncomeTransaction + dujerState.allExpenseTransaction
 		
 		categoryViewModel.listenDeletedCategory(financialList, categoryIDs)

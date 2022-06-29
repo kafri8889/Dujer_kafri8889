@@ -8,7 +8,6 @@ import com.anafthdev.dujer.data.repository.app.IAppRepository
 import com.anafthdev.dujer.foundation.common.Quad
 import com.anafthdev.dujer.foundation.di.DiName
 import com.anafthdev.dujer.foundation.extension.deviceLocale
-import com.anafthdev.dujer.foundation.extension.getBy
 import com.github.mikephil.charting.data.PieEntry
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.Flow
@@ -84,9 +83,9 @@ class StatisticEnvironment @Inject constructor(
 						)
 				}
 				
-				val categories = (if (quad.third == FinancialType.INCOME) incomeList.getBy {
+				val categories = (if (quad.third == FinancialType.INCOME) incomeList.map {
 					it.category
-				} else expenseList.getBy { it.category }).distinctBy { it.id }
+				} else expenseList.map { it.category }).distinctBy { it.id }
 				
 				_availableCategory.emit(categories)
 				_incomeTransaction.emit(incomeList)

@@ -22,7 +22,6 @@ import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.Dp
-import com.anafthdev.dujer.foundation.extension.getBy
 import com.anafthdev.dujer.foundation.extension.join
 import com.anafthdev.dujer.foundation.extension.toDp
 import com.anafthdev.dujer.foundation.window.dpScaled
@@ -53,7 +52,7 @@ fun BarChart(
 	
 	val density = LocalDensity.current
 	
-	val yDataPoints = barDataSets.getBy { it.barData }.join().getBy { it.y }
+	val yDataPoints = barDataSets.map { it.barData }.join().map { it.y }
 	
 	val maxDataPoints = (yDataPoints.maxOrNull() ?: 1f)
 	val minDataPoints = (yDataPoints.minOrNull() ?: 0f)

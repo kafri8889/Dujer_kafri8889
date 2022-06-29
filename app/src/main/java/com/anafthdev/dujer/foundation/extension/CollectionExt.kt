@@ -136,16 +136,6 @@ fun <T> Collection<T>.get(predicate: (T) -> Boolean): T? {
 }
 
 /**
- * Returns a list element from given collection
- * @author kafri8889
- */
-inline fun <T, U> Collection<T>.getBy(selector: (T) -> U): List<U> {
-	val result = ArrayList<U>()
-	for (v in this) { result.add(selector(v)) }
-	return result
-}
-
-/**
  * example:
  * data class Model(var a: Int, var b: Int)
  * val models = listOf(

@@ -16,7 +16,6 @@ import com.anafthdev.dujer.foundation.common.Hexad
 import com.anafthdev.dujer.foundation.common.financial_sorter.FinancialSorter
 import com.anafthdev.dujer.foundation.di.DiName
 import com.anafthdev.dujer.foundation.extension.combine
-import com.anafthdev.dujer.foundation.extension.getBy
 import com.github.mikephil.charting.data.PieEntry
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.Flow
@@ -110,13 +109,13 @@ class WalletEnvironment @Inject constructor(
 				}
 				
 				val categories = when (type) {
-					FinancialType.INCOME -> incomeList.getBy {
+					FinancialType.INCOME -> incomeList.map {
 						it.category
 					}.distinctBy { it.id }
-					FinancialType.EXPENSE ->  expenseList.getBy {
+					FinancialType.EXPENSE ->  expenseList.map {
 						it.category
 					}.distinctBy { it.id }
-					else -> financials.getBy { it.category }.distinctBy { it.id }
+					else -> financials.map { it.category }.distinctBy { it.id }
 				}
 				
 				_availableCategory.emit(categories)

@@ -43,7 +43,6 @@ import com.anafthdev.dujer.data.FinancialType
 import com.anafthdev.dujer.data.db.model.Category
 import com.anafthdev.dujer.data.db.model.Financial
 import com.anafthdev.dujer.data.db.model.Wallet
-import com.anafthdev.dujer.foundation.extension.getBy
 import com.anafthdev.dujer.foundation.ui.LocalUiColor
 import com.anafthdev.dujer.foundation.window.dpScaled
 import com.anafthdev.dujer.foundation.window.spScaled
@@ -608,7 +607,7 @@ private fun DashboardHomeScreen(
 							)
 					) {
 						IncomeCard(
-							income = allIncomeTransaction.getBy { it.amount }.sum(),
+							income = allIncomeTransaction.sumOf { it.amount },
 							onClick = {
 								navController.navigate(
 									DujerDestination.IncomeExpense.createRoute(FinancialType.INCOME)
@@ -622,7 +621,7 @@ private fun DashboardHomeScreen(
 						)
 						
 						ExpenseCard(
-							expense = allExpenseTransaction.getBy { it.amount }.sum(),
+							expense = allExpenseTransaction.sumOf { it.amount },
 							onClick = {
 								navController.navigate(
 									DujerDestination.IncomeExpense.createRoute(FinancialType.EXPENSE)

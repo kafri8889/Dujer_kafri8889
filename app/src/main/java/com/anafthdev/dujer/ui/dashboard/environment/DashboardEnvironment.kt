@@ -17,7 +17,6 @@ import com.anafthdev.dujer.foundation.common.financial_sorter.FinancialSorter
 import com.anafthdev.dujer.foundation.di.DiName
 import com.anafthdev.dujer.foundation.extension.deviceLocale
 import com.anafthdev.dujer.foundation.extension.forEachMap
-import com.anafthdev.dujer.foundation.extension.getBy
 import com.anafthdev.dujer.foundation.extension.indexOf
 import com.anafthdev.dujer.ui.financial.data.FinancialAction
 import com.github.mikephil.charting.data.Entry
@@ -108,7 +107,7 @@ class DashboardEnvironment @Inject constructor(
 			appRepository.getAllFinancial().collect { financialList ->
 				var highest = Category.default.id to 0.0
 				val financials = financialList.filter { it.type == FinancialType.EXPENSE }
-				val categories = financials.getBy { it.category }
+				val categories = financials.map { it.category }
 				val groupedFinancial = financials.groupBy { it.category.id }
 				
 				groupedFinancial.forEachMap { categoryID, list ->
