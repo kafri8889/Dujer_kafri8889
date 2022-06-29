@@ -17,7 +17,7 @@ import java.io.File
 
 object CSVWriter  {
 	
-	val saveDir: File = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOCUMENTS)
+	val SAVE_DIR: File = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOCUMENTS)
 	
 	fun writeFinancial(
 		context: Context,
@@ -26,6 +26,7 @@ object CSVWriter  {
 		wallets: List<Wallet>,
 		financials: List<Financial>
 	): Boolean {
+		val saveDir = SAVE_DIR
 		if (!saveDir.exists()) saveDir.mkdirs()
 		
 		val file = File("${saveDir.absolutePath}/$fileName")
@@ -38,7 +39,9 @@ object CSVWriter  {
 				return false
 			}
 			
-			csvWriter().open(file) {
+			csvWriter {
+				delimiter = ','
+			}.open(file) {
 				
 				// Add header
 				writeRow(

@@ -124,7 +124,7 @@ fun SettingScreen(
 		),
 		BasicPreference(
 			title = stringResource(id = R.string.export),
-			summary = CSVWriter.saveDir.path,
+			summary = CSVWriter.SAVE_DIR.path,
 			iconResId = R.drawable.ic_export,
 			category = stringResource(id = R.string.other),
 		)
