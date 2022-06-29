@@ -358,15 +358,25 @@ private fun DashboardContent(
 						.padding(end = 8.dpScaled)
 						.align(Alignment.CenterEnd)
 				) {
-					IconButton(
-						onClick = {
-							isFilterSortFinancialPopupShowed = true
-						},
-					) {
-						Icon(
-							imageVector = Icons.Rounded.FilterList,
-							contentDescription = null
+					AnimatedVisibility(
+						visible = currentRoute == DujerDestination.Dashboard.Home.route,
+						enter = scaleIn(
+							animationSpec = tween(800)
+						),
+						exit = scaleOut(
+							animationSpec = tween(800)
 						)
+					) {
+						IconButton(
+							onClick = {
+								isFilterSortFinancialPopupShowed = true
+							},
+						) {
+							Icon(
+								imageVector = Icons.Rounded.FilterList,
+								contentDescription = null
+							)
+						}
 					}
 					
 					IconButton(
@@ -471,10 +481,7 @@ private fun DashboardContent(
 								)
 								
 								showFinancialSheet()
-							},
-							onBudgetCardClicked = {
-								navController.navigate(DujerDestination.BudgetList.route)
-							},
+							}
 						)
 					}
 					

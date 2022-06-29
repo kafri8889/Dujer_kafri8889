@@ -36,11 +36,7 @@ import com.anafthdev.dujer.foundation.window.spScaled
 import com.anafthdev.dujer.model.LocalCurrency
 import com.anafthdev.dujer.ui.app.LocalDujerState
 import com.anafthdev.dujer.ui.chart.data.MonthBarChartFormatter
-import com.anafthdev.dujer.ui.theme.Typography
-import com.anafthdev.dujer.ui.theme.expense_color
-import com.anafthdev.dujer.ui.theme.extra_large_shape
-import com.anafthdev.dujer.ui.theme.income_color
-import com.anafthdev.dujer.uicomponent.BudgetCard
+import com.anafthdev.dujer.ui.theme.*
 import com.anafthdev.dujer.uicomponent.SwipeableFinancialCard
 import com.anafthdev.dujer.uicomponent.YearSelector
 import com.anafthdev.dujer.uicomponent.charting.bar.BarChart
@@ -50,6 +46,7 @@ import com.anafthdev.dujer.uicomponent.charting.bar.data.BarDataSet
 import com.anafthdev.dujer.uicomponent.charting.bar.model.BarData
 import com.anafthdev.dujer.uicomponent.charting.bar.rememberBarChartState
 import com.anafthdev.dujer.util.AppUtil
+import com.anafthdev.dujer.util.AppUtil.yearFormatter
 import com.anafthdev.dujer.util.CurrencyFormatter
 import kotlinx.coroutines.delay
 import java.util.*
@@ -57,7 +54,6 @@ import java.util.*
 @OptIn(ExperimentalAnimationApi::class)
 @Composable
 fun ChartScreen(
-	onBudgetCardClicked: () -> Unit,
 	onFinancialCardCanDelete: () -> Unit,
 	onFinancialCardDismissToEnd: (Financial) -> Unit,
 	onFinancialCardClicked: (Financial) -> Unit
@@ -76,7 +72,6 @@ fun ChartScreen(
 	
 	val state by chartViewModel.state.collectAsState()
 	
-	val allBudget = dujerState.allBudget
 	val incomeTransaction = dujerState.allIncomeTransaction
 	val expenseTransaction = dujerState.allExpenseTransaction
 	
@@ -85,31 +80,51 @@ fun ChartScreen(
 	
 	var selectedYear by remember { mutableStateOf(System.currentTimeMillis()) }
 	var selectedBarDataGroup by remember { mutableStateOf(Calendar.getInstance()[Calendar.MONTH]) }
+	
 	val lazyListValue = remember(
 		selectedYear,
 		selectedBarDataGroup,
 		incomeTransaction,
 		expenseTransaction
 	) {
-		incomeTransaction.merge(
-			expenseTransaction
-		).filter {
+		incomeTransaction.merge(expenseTransaction)
+			.asSequence()
+			.filter { yearFormatter.format(it.dateCreated) == yearFormatter.format(selectedYear) }
+			.filter {
 			chartViewModel.monthFormatter.format(
 				it.dateCreated
 			) == chartViewModel.monthFormatter.format(chartViewModel.getTimeInMillis(selectedBarDataGroup))
-		}
+		}.toList()
 	}
-	val totalAmountBudget = remember(allBudget) { allBudget.sumOf { it.max } }
-	val totalAmountBudgetExpenses = remember(allBudget, expenseTransaction) {
-		val amount = arrayListOf<Double>()
-		allBudget.forEach { budget ->
-			amount.add(
-				expenseTransaction.filter { it.category.id == budget.category.id }
-					.sumOf { it.amount }
-			)
-		}
-		
-		amount.sum()
+	
+	val incomeAmount = remember(
+		selectedYear,
+		selectedBarDataGroup,
+		incomeTransaction
+	) {
+		incomeTransaction
+			.asSequence()
+			.filter { yearFormatter.format(it.dateCreated) == yearFormatter.format(selectedYear) }
+			.filter {
+				chartViewModel.monthFormatter.format(
+					it.dateCreated
+				) == chartViewModel.monthFormatter.format(chartViewModel.getTimeInMillis(selectedBarDataGroup))
+			}.sumOf { it.amount }
+	}
+	
+	val expenseAmount = remember(
+		selectedYear,
+		selectedBarDataGroup,
+		expenseTransaction
+	) {
+		expenseTransaction
+			.asSequence()
+			.filter { yearFormatter.format(it.dateCreated) == yearFormatter.format(selectedYear) }
+			.filter {
+				chartViewModel.monthFormatter.format(
+					it.dateCreated
+				) == chartViewModel.monthFormatter.format(chartViewModel.getTimeInMillis(selectedBarDataGroup))
+			}.sumOf { it.amount }
 	}
 	
 	var enterBarChartAnimOffset by remember {
@@ -203,6 +218,14 @@ fun ChartScreen(
 								selectedXAxisLineAnimationSpec = spring(
 									stiffness = Spring.StiffnessVeryLow,
 									dampingRatio = Spring.DampingRatioHighBouncy
+								),
+								selectedYAxisTextStyle = MaterialTheme.typography.bodySmall.copy(
+									color = black10,
+									fontSize = MaterialTheme.typography.bodySmall.fontSize.spScaled
+								),
+								unSelectedYAxisTextStyle = MaterialTheme.typography.bodySmall.copy(
+									color = black10,
+									fontSize = MaterialTheme.typography.bodySmall.fontSize.spScaled
 								)
 							),
 							BarChartDefault.barStyle(
@@ -213,6 +236,14 @@ fun ChartScreen(
 								selectedXAxisLineAnimationSpec = spring(
 									stiffness = Spring.StiffnessVeryLow,
 									dampingRatio = Spring.DampingRatioHighBouncy
+								),
+								selectedYAxisTextStyle = MaterialTheme.typography.bodySmall.copy(
+									color = black10,
+									fontSize = MaterialTheme.typography.bodySmall.fontSize.spScaled
+								),
+								unSelectedYAxisTextStyle = MaterialTheme.typography.bodySmall.copy(
+									color = black10,
+									fontSize = MaterialTheme.typography.bodySmall.fontSize.spScaled
 								)
 							)
 						),
@@ -225,17 +256,6 @@ fun ChartScreen(
 							)
 					)
 				}
-				
-				BudgetCard(
-					totalExpense = totalAmountBudgetExpenses,
-					totalBudget = totalAmountBudget,
-					onClick = onBudgetCardClicked,
-					modifier = Modifier
-						.padding(
-							vertical = 4.dpScaled,
-							horizontal = 8.dpScaled
-						)
-				)
 				
 				Column(
 					modifier = Modifier
@@ -282,13 +302,7 @@ fun ChartScreen(
 							Text(
 								text = CurrencyFormatter.format(
 									locale = deviceLocale,
-									amount = incomeTransaction.filter {
-										chartViewModel.monthFormatter.format(
-											it.dateCreated
-										) == chartViewModel.monthFormatter.format(
-											chartViewModel.getTimeInMillis(selectedBarDataGroup)
-										)
-									}.sumOf { it.amount },
+									amount = incomeAmount,
 									currencyCode = LocalCurrency.current.countryCode
 								),
 								style = Typography.titleMedium.copy(
@@ -331,13 +345,7 @@ fun ChartScreen(
 							Text(
 								text = CurrencyFormatter.format(
 									locale = deviceLocale,
-									amount = expenseTransaction.filter {
-										chartViewModel.monthFormatter.format(
-											it.dateCreated
-										) == chartViewModel.monthFormatter.format(
-											chartViewModel.getTimeInMillis(selectedBarDataGroup)
-										)
-									}.sumOf { it.amount },
+									amount = expenseAmount,
 									currencyCode = LocalCurrency.current.countryCode
 								),
 								style = Typography.titleMedium.copy(
