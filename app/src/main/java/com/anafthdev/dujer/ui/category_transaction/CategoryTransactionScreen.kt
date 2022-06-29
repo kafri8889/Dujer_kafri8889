@@ -50,7 +50,6 @@ import kotlinx.coroutines.launch
 fun CategoryTransactionScreen(
 	categoryID: Int,
 	navController: NavController,
-	onTransactionCanDelete: () -> Unit,
 	onDeleteTransaction: (Financial) -> Unit
 ) {
 	
@@ -277,7 +276,6 @@ fun CategoryTransactionScreen(
 			) { financial ->
 				SwipeableFinancialCard(
 					financial = financial,
-					onCanDelete = onTransactionCanDelete,
 					onDismissToEnd = { onDeleteTransaction(financial) },
 					onClick = {
 						viewModel.dispatch(

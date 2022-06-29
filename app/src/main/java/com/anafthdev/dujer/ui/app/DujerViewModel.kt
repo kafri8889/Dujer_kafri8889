@@ -62,12 +62,7 @@ class DujerViewModel @Inject constructor(
 		}
 		
 		viewModelScope.launch(environment.dispatcher) {
-			combine(
-				environment.getAllBudget(),
-				environment.getAllFinancial()
-			) { budgets, financials ->
-				budgets to financials
-			}.collect { (budgets, financials) ->
+			environment.getAllBudget().collect { budgets ->
 				setState {
 					copy(
 						allBudget = budgets
@@ -128,11 +123,6 @@ class DujerViewModel @Inject constructor(
 					if (action.type == UndoType.Financial) {
 						environment.undoFinancial()
 					} else environment.undoCategory()
-				}
-			}
-			is DujerAction.Vibrate -> {
-				viewModelScope.launch {
-					environment.vibrate(action.durationInMillis)
 				}
 			}
 			is DujerAction.InsertWallet -> {

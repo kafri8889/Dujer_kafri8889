@@ -7,7 +7,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.*
 import androidx.compose.material3.Icon
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -25,32 +25,18 @@ fun SwipeableFinancialCard(
 	financial: Financial,
 	modifier: Modifier = Modifier,
 	onDismissToEnd: () -> Unit,
-	onClick: () -> Unit,
-	onCanDelete: () -> Unit
+	onClick: () -> Unit
 ) {
-	
-	var canDelete by remember { mutableStateOf(false) }
 	
 	val dismissState = rememberDismissState(
 		confirmStateChange = {
 			if (it == DismissValue.DismissedToEnd) {
 				onDismissToEnd()
-			} else {
-				canDelete = false
 			}
 			
 			true
 		}
 	)
-	
-	if (
-		((2 * dismissState.progress.fraction) >= 1f) and
-		(dismissState.targetValue == DismissValue.DismissedToEnd) and
-		!canDelete
-	) {
-		onCanDelete()
-		canDelete = true
-	}
 	
 	SwipeToDismiss(
 		state = dismissState,

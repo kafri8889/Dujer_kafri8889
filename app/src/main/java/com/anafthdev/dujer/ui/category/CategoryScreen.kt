@@ -425,11 +425,6 @@ fun CategoryScreen(
 								DujerDestination.CategoryTransaction.createRoute(item.id)
 							)
 						},
-						onCanDelete = {
-							dujerViewModel.dispatch(
-								DujerAction.Vibrate(100)
-							)
-						},
 						onDismissToStart = {
 							categoryViewModel.dispatch(
 								CategoryAction.Get(

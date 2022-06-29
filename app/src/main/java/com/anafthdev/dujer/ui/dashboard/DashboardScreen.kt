@@ -73,7 +73,6 @@ import kotlinx.coroutines.launch
 @Composable
 fun DashboardScreen(
 	navController: NavController,
-	onTransactionCanDelete: () -> Unit,
 	onDeleteTransaction: (Financial) -> Unit
 ) {
 	
@@ -140,7 +139,6 @@ fun DashboardScreen(
 					financialScreenSheetState = financialScreenSheetState,
 					viewModel = dashboardViewModel,
 					navController = navController,
-					onTransactionCanDelete = onTransactionCanDelete,
 					onDeleteTransaction = onDeleteTransaction,
 					onSettingClicked = {
 						navController.navigate(DujerDestination.Setting.route) {
@@ -184,7 +182,6 @@ private fun DashboardContent(
 	viewModel: DashboardViewModel,
 	navController: NavController,
 	onSettingClicked: () -> Unit,
-	onTransactionCanDelete: () -> Unit,
 	onDeleteTransaction: (Financial) -> Unit
 ) {
 	
@@ -372,7 +369,6 @@ private fun DashboardContent(
 					0 -> DashboardHomeScreen(
 						state = state,
 						homeLazyListState = homeLazyListState,
-						viewModel = viewModel,
 						navController = navController,
 						onFinancialCardClicked = { financial ->
 							viewModel.dispatch(
@@ -386,7 +382,6 @@ private fun DashboardContent(
 							showFinancialSheet()
 						},
 						onFinancialCardDismissToEnd = onDeleteTransaction,
-						onFinancialCardCanDelete = onTransactionCanDelete,
 						onWalletSheetOpened = { isOpened ->
 							showFABNewTransaction = !isOpened
 						},
@@ -398,7 +393,6 @@ private fun DashboardContent(
 					)
 					1 -> ChartScreen(
 						onFinancialCardDismissToEnd = onDeleteTransaction,
-						onFinancialCardCanDelete = onTransactionCanDelete,
 						onFinancialCardClicked = { financial ->
 							viewModel.dispatch(
 								DashboardAction.SetFinancialAction(FinancialAction.EDIT)
@@ -422,9 +416,7 @@ private fun DashboardContent(
 private fun DashboardHomeScreen(
 	state: DashboardState,
 	homeLazyListState: LazyListState,
-	viewModel: DashboardViewModel,
 	navController: NavController,
-	onFinancialCardCanDelete: () -> Unit,
 	onFinancialCardDismissToEnd: (Financial) -> Unit,
 	onFinancialCardClicked: (Financial) -> Unit,
 	onWalletSheetOpened: (Boolean) -> Unit,
@@ -653,7 +645,6 @@ private fun DashboardHomeScreen(
 			
 			swipeableFinancialCard(
 				data = transactions,
-				onFinancialCardCanDelete = onFinancialCardCanDelete,
 				onFinancialCardDismissToEnd = { onFinancialCardDismissToEnd(it) },
 				onFinancialCardClicked = { onFinancialCardClicked(it) },
 				onNavigateCategoryClicked = { category ->

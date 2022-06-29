@@ -7,7 +7,6 @@ import com.anafthdev.dujer.ui.app.data.UndoType
 
 sealed class DujerAction {
 	data class Undo(val type: UndoType): DujerAction()
-	data class Vibrate(val durationInMillis: Long): DujerAction()
 	data class InsertWallet(val wallet: Wallet): DujerAction()
 	data class DeleteFinancial(val financials: Array<out Financial>): DujerAction() {
 		override fun equals(other: Any?): Boolean {

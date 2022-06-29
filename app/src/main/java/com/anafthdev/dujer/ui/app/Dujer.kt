@@ -161,11 +161,6 @@ fun DujerApp() {
 					composable(DujerDestination.Dashboard.route) {
 						DashboardScreen(
 							navController = navController,
-							onTransactionCanDelete = {
-								viewModel.dispatch(
-									DujerAction.Vibrate(100)
-								)
-							},
 							onDeleteTransaction = { financial ->
 								viewModel.dispatch(
 									DujerAction.DeleteFinancial(
@@ -189,11 +184,6 @@ fun DujerApp() {
 						IncomeExpenseScreen(
 							navController = navController,
 							type = FinancialType.values()[type],
-							onTransactionCanDelete = {
-								viewModel.dispatch(
-									DujerAction.Vibrate(100)
-								)
-							},
 							onDeleteTransaction = { financial ->
 								viewModel.dispatch(
 									DujerAction.DeleteFinancial(
@@ -239,11 +229,6 @@ fun DujerApp() {
 						WalletScreen(
 							walletID = id,
 							navController = navController,
-							onTransactionCanDelete = {
-								viewModel.dispatch(
-									DujerAction.Vibrate(100)
-								)
-							},
 							onDeleteTransaction = { financial ->
 								viewModel.dispatch(
 									DujerAction.DeleteFinancial(
@@ -283,11 +268,6 @@ fun DujerApp() {
 						CategoryTransactionScreen(
 							categoryID = categoryID,
 							navController = navController,
-							onTransactionCanDelete = {
-								viewModel.dispatch(
-									DujerAction.Vibrate(100)
-								)
-							},
 							onDeleteTransaction = { financial ->
 								viewModel.dispatch(
 									DujerAction.DeleteFinancial(
@@ -311,11 +291,6 @@ fun DujerApp() {
 						BudgetScreen(
 							budgetID = budgetID,
 							navController = navController,
-							onTransactionCanDelete = {
-								viewModel.dispatch(
-									DujerAction.Vibrate(100)
-								)
-							},
 							onDeleteTransaction = { financial ->
 								viewModel.dispatch(
 									DujerAction.DeleteFinancial(

@@ -68,7 +68,6 @@ import kotlinx.coroutines.launch
 fun BudgetScreen(
 	budgetID: Int,
 	navController: NavController,
-	onTransactionCanDelete: () -> Unit,
 	onDeleteTransaction: (Financial) -> Unit
 ) {
 	
@@ -127,7 +126,6 @@ fun BudgetScreen(
 			navController = navController,
 			viewModel = viewModel,
 			state = state,
-			onTransactionCanDelete = onTransactionCanDelete,
 			onDeleteTransaction = onDeleteTransaction,
 			onFinancialCardClicked = { financial ->
 				viewModel.dispatch(
@@ -148,7 +146,6 @@ private fun BudgetScreenContent(
 	navController: NavController,
 	viewModel: BudgetViewModel,
 	state: BudgetState,
-	onTransactionCanDelete: () -> Unit,
 	onDeleteTransaction: (Financial) -> Unit,
 	onFinancialCardClicked: (Financial) -> Unit
 ) {
@@ -486,7 +483,6 @@ private fun BudgetScreenContent(
 			
 			swipeableFinancialCard(
 				data = transactions,
-				onFinancialCardCanDelete = onTransactionCanDelete,
 				onFinancialCardDismissToEnd = onDeleteTransaction,
 				onFinancialCardClicked = onFinancialCardClicked,
 				onNavigateCategoryClicked = { category ->

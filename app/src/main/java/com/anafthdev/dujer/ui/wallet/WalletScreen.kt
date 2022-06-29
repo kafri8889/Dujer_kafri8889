@@ -72,7 +72,6 @@ import timber.log.Timber
 fun WalletScreen(
 	walletID: Int,
 	navController: NavController,
-	onTransactionCanDelete: () -> Unit,
 	onDeleteTransaction: (Financial) -> Unit
 ) {
 	
@@ -300,7 +299,6 @@ fun WalletScreen(
 						viewModel = viewModel,
 						incomeTransaction = incomeTransaction,
 						expenseTransaction = expenseTransaction,
-						onTransactionCanDelete = onTransactionCanDelete,
 						onDeleteTransaction = onDeleteTransaction,
 						onShowFinancialSheet = showFinancialSheetState,
 						onShowEditBalanceSheet = showEditBalanceSheetState,
@@ -331,7 +329,6 @@ private fun WalletScreenContent(
 	onShowSelectWalletSheet: () ->Unit,
 	onDeleteWallet: () -> Unit,
 	onDeleteTransaction: (Financial) -> Unit,
-	onTransactionCanDelete: () -> Unit,
 	onFilterClicked: () -> Unit
 ) {
 	
@@ -751,7 +748,6 @@ private fun WalletScreenContent(
 		
 		swipeableFinancialCard(
 			data = transactions,
-			onFinancialCardCanDelete = onTransactionCanDelete,
 			onFinancialCardDismissToEnd = { onDeleteTransaction(it) },
 			onFinancialCardClicked = { financial ->
 				viewModel.dispatch(

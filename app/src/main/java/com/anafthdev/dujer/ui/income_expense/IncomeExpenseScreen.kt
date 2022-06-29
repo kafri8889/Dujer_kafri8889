@@ -64,7 +64,6 @@ import kotlinx.coroutines.launch
 fun IncomeExpenseScreen(
 	navController: NavController,
 	type: FinancialType,
-	onTransactionCanDelete: () -> Unit,
 	onDeleteTransaction: (Financial) -> Unit
 ) {
 	
@@ -361,7 +360,6 @@ fun IncomeExpenseScreen(
 			
 			swipeableFinancialCard(
 				data = transactions,
-				onFinancialCardCanDelete = onTransactionCanDelete,
 				onFinancialCardDismissToEnd = { onDeleteTransaction(it) },
 				onFinancialCardClicked = {
 					viewModel.dispatch(

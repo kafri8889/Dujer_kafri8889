@@ -54,7 +54,6 @@ import java.util.*
 @OptIn(ExperimentalAnimationApi::class)
 @Composable
 fun ChartScreen(
-	onFinancialCardCanDelete: () -> Unit,
 	onFinancialCardDismissToEnd: (Financial) -> Unit,
 	onFinancialCardClicked: (Financial) -> Unit
 ) {
@@ -385,7 +384,6 @@ fun ChartScreen(
 		) { financial ->
 			SwipeableFinancialCard(
 				financial = financial,
-				onCanDelete = onFinancialCardCanDelete,
 				onClick = { onFinancialCardClicked(financial) },
 				onDismissToEnd = { onFinancialCardDismissToEnd(financial) },
 				modifier = Modifier
