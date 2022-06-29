@@ -37,6 +37,7 @@ import com.anafthdev.dujer.R
 import com.anafthdev.dujer.data.DujerDestination
 import com.anafthdev.dujer.data.FinancialType
 import com.anafthdev.dujer.data.db.model.Financial
+import com.anafthdev.dujer.foundation.common.CurrencyFormatter
 import com.anafthdev.dujer.foundation.extension.deviceLocale
 import com.anafthdev.dujer.foundation.extension.replace
 import com.anafthdev.dujer.foundation.ui.LocalUiColor
@@ -53,7 +54,6 @@ import com.anafthdev.dujer.ui.theme.extra_large_shape
 import com.anafthdev.dujer.uicomponent.FilterSortFinancialPopup
 import com.anafthdev.dujer.uicomponent.TopAppBar
 import com.anafthdev.dujer.uicomponent.swipeableFinancialCard
-import com.anafthdev.dujer.util.CurrencyFormatter
 import com.github.mikephil.charting.data.Entry
 import com.github.mikephil.charting.data.LineDataSet
 import kotlinx.coroutines.Dispatchers

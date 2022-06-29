@@ -6,7 +6,7 @@ import com.anafthdev.dujer.data.SortType
 import com.anafthdev.dujer.data.db.model.Category
 import com.anafthdev.dujer.data.db.model.Financial
 import com.anafthdev.dujer.data.db.model.Wallet
-import com.anafthdev.dujer.util.AppUtil
+import com.anafthdev.dujer.foundation.common.AppUtil
 import com.github.mikephil.charting.data.PieEntry
 
 data class WalletState(

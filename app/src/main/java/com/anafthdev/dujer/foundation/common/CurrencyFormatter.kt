@@ -1,4 +1,4 @@
-package com.anafthdev.dujer.util
+package com.anafthdev.dujer.foundation.common
 
 import com.anafthdev.dujer.data.Locale.ARABIC_ALGERIAN
 import com.anafthdev.dujer.data.Locale.ARABIC_BAHRAIN

@@ -23,6 +23,7 @@
     <string name="color">Color</string>
     <string name="title">Title</string>
     <string name="chart">Chart</string>
+    <string name="other">Other</string>
     <string name="week_n">Week-%1$s</string>
     <string name="a_to_z">A to Z</string>
     <string name="z_to_a">Z to A</string>
@@ -80,6 +81,7 @@
     <string name="n_transaction">%1$s Transaction</string>
     <string name="changes_saved">Changes saved</string>
     <string name="lowest_amount">Lowest amount</string>
+    <string name="saved_to_path">Saved to %1$s</string>
     <string name="highest_amount">Highest amount</string>
     <string name="bio_auth_title">Verification</string>
     <string name="change_balance">Change balance</string>
@@ -96,6 +98,7 @@
     <string name="language_summary">Select the language you use</string>
     <string name="average_per_month">Average per month</string>
     <string name="available_balance">Available balance</string>
+    <string name="export_successful">Export successful</string>
     <string name="currency_format_note">We format currency using your device Locale, some formats may not be suitable.</string>
     <string name="select_your_language">Select your language</string>
     <string name="bio_auth_description">Verify that this is you</string>

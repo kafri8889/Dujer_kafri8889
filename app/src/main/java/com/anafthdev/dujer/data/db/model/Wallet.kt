@@ -1,5 +1,7 @@
 package com.anafthdev.dujer.data.db.model
 
+import android.os.Parcel
+import android.os.Parcelable
 import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.PrimaryKey
@@ -18,8 +20,40 @@ data class Wallet(
 	@ColumnInfo(name = "iconID") var iconID: Int,
 	@ColumnInfo(name = "tint") val tint: CategoryTint,
 	@ColumnInfo(name = "defaultWallet") val defaultWallet: Boolean,
-) {
-	companion object {
+): Parcelable {
+	constructor(parcel: Parcel) : this(
+		parcel.readInt(),
+		parcel.readString()!!,
+		parcel.readDouble(),
+		parcel.readDouble(),
+		parcel.readInt(),
+		parcel.readParcelable(CategoryTint::class.java.classLoader)!!,
+		parcel.readByte() != 0.toByte()
+	)
+	
+	override fun writeToParcel(parcel: Parcel, flags: Int) {
+		parcel.writeInt(id)
+		parcel.writeString(name)
+		parcel.writeDouble(initialBalance)
+		parcel.writeDouble(balance)
+		parcel.writeInt(iconID)
+		parcel.writeParcelable(tint, flags)
+		parcel.writeByte(if (defaultWallet) 1 else 0)
+	}
+	
+	override fun describeContents(): Int {
+		return 0
+	}
+	
+	companion object CREATOR : Parcelable.Creator<Wallet> {
+		override fun createFromParcel(parcel: Parcel): Wallet {
+			return Wallet(parcel)
+		}
+		
+		override fun newArray(size: Int): Array<Wallet?> {
+			return arrayOfNulls(size)
+		}
+		
 		val default = Wallet(
 			id = 0,
 			name = "",
@@ -40,4 +74,5 @@ data class Wallet(
 			defaultWallet = true
 		)
 	}
+	
 }

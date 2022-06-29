@@ -21,11 +21,11 @@ import androidx.compose.ui.text.style.TextAlign
 import com.anafthdev.dujer.data.*
 import com.anafthdev.dujer.data.db.model.Category
 import com.anafthdev.dujer.data.db.model.Financial
+import com.anafthdev.dujer.foundation.common.AppUtil
+import com.anafthdev.dujer.foundation.common.AppUtil.dateFormatter
 import com.anafthdev.dujer.foundation.ui.LocalUiColor
 import com.anafthdev.dujer.foundation.window.dpScaled
 import com.anafthdev.dujer.foundation.window.spScaled
-import com.anafthdev.dujer.util.AppUtil
-import com.anafthdev.dujer.util.AppUtil.dateFormatter
 
 /**
  * @param data data

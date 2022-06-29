@@ -5,8 +5,8 @@ import com.anafthdev.dujer.data.GroupType
 import com.anafthdev.dujer.data.SortType
 import com.anafthdev.dujer.data.db.model.Category
 import com.anafthdev.dujer.data.db.model.Financial
+import com.anafthdev.dujer.foundation.common.AppUtil
 import com.anafthdev.dujer.ui.financial.data.FinancialAction
-import com.anafthdev.dujer.util.AppUtil
 
 data class DashboardState(
 	val financial: Financial = Financial.default,

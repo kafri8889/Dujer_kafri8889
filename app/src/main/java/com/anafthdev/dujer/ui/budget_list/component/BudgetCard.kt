@@ -14,6 +14,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import com.anafthdev.dujer.R
 import com.anafthdev.dujer.data.db.model.Budget
+import com.anafthdev.dujer.foundation.common.CurrencyFormatter
 import com.anafthdev.dujer.foundation.extension.deviceLocale
 import com.anafthdev.dujer.foundation.extension.roundToInt
 import com.anafthdev.dujer.foundation.extension.toColor
@@ -26,7 +27,6 @@ import com.anafthdev.dujer.ui.theme.black05
 import com.anafthdev.dujer.ui.theme.black06
 import com.anafthdev.dujer.ui.theme.full_shape
 import com.anafthdev.dujer.uicomponent.BudgetProgressIndicator
-import com.anafthdev.dujer.util.CurrencyFormatter
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable

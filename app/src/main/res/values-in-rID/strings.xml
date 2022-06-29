@@ -23,6 +23,7 @@
     <string name="color">Warna</string>
     <string name="title">Judul</string>
     <string name="chart">Grafik</string>
+    <string name="other">Lainnya</string>
     <string name="week_n">Minggu-%1$s</string>
     <string name="a_to_z">A ke Z</string>
     <string name="z_to_a">Z ke A</string>
@@ -80,6 +81,7 @@
     <string name="n_transaction">%1$s Transaksi</string>
     <string name="changes_saved">Perubahan disimpan</string>
     <string name="lowest_amount">Jumlah terendah</string>
+    <string name="saved_to_path">Disimpan di %1$s</string>
     <string name="highest_amount">Jumlah tertinggi</string>
     <string name="bio_auth_title">Verifikasi</string>
     <string name="change_balance">Ubah saldo</string>
@@ -96,6 +98,7 @@
     <string name="language_summary">Pilih bahasa yang kamu gunakan</string>
     <string name="average_per_month">Rata-rata per bulan</string>
     <string name="available_balance">Saldo tersedia</string>
+    <string name="export_successful">Ekspor berhasil</string>
     <string name="currency_format_note">Kami memformat mata uang menggunakan Locale perangkat Anda, beberapa format mungkin tidak sesuai.</string>
     <string name="select_your_language">Pilih bahasa mu</string>
     <string name="bio_auth_description">Verifikasi bahwa ini adalah Anda</string>

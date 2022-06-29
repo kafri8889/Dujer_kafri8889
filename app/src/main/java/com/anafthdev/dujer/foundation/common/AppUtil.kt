@@ -1,4 +1,4 @@
-package com.anafthdev.dujer.util
+package com.anafthdev.dujer.foundation.common
 
 import android.content.Context
 import android.os.Handler
@@ -30,6 +30,7 @@ object AppUtil {
 	
 	val longMonths: Array<String> = DateFormatSymbols.getInstance(deviceLocale).months
 	
+	val timeFormatter = SimpleDateFormat("dd MMM yyyy HH:mm:ss", deviceLocale)
 	val dateFormatter = SimpleDateFormat("dd MMM yyyy", deviceLocale)
 	val monthYearFormatter = SimpleDateFormat("MMM yyyy", deviceLocale)
 	val monthFormatter = SimpleDateFormat("MMM", deviceLocale)

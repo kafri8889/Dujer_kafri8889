@@ -28,6 +28,7 @@ import com.anafthdev.dujer.R
 import com.anafthdev.dujer.data.FinancialType
 import com.anafthdev.dujer.data.db.model.Category
 import com.anafthdev.dujer.data.db.model.Financial
+import com.anafthdev.dujer.foundation.common.CurrencyFormatter
 import com.anafthdev.dujer.foundation.extension.deviceLocale
 import com.anafthdev.dujer.foundation.extension.percentOf
 import com.anafthdev.dujer.foundation.extension.toColor
@@ -42,7 +43,6 @@ import com.anafthdev.dujer.uicomponent.DashedDivider
 import com.anafthdev.dujer.uicomponent.FinancialBottomSheet
 import com.anafthdev.dujer.uicomponent.SwipeableFinancialCard
 import com.anafthdev.dujer.uicomponent.TopAppBar
-import com.anafthdev.dujer.util.CurrencyFormatter
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterialApi::class)

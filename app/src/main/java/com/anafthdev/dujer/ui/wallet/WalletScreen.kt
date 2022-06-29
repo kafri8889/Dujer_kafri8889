@@ -41,6 +41,8 @@ import com.anafthdev.dujer.data.DujerDestination
 import com.anafthdev.dujer.data.FinancialType
 import com.anafthdev.dujer.data.db.model.Category
 import com.anafthdev.dujer.data.db.model.Financial
+import com.anafthdev.dujer.foundation.common.ColorTemplate
+import com.anafthdev.dujer.foundation.common.CurrencyFormatter
 import com.anafthdev.dujer.foundation.extension.deviceLocale
 import com.anafthdev.dujer.foundation.extension.toColor
 import com.anafthdev.dujer.foundation.ui.LocalUiColor
@@ -59,8 +61,6 @@ import com.anafthdev.dujer.ui.wallet.component.DeleteWalletPopup
 import com.anafthdev.dujer.ui.wallet.subscreen.EditBalanceBottomSheet
 import com.anafthdev.dujer.ui.wallet.subscreen.SelectWalletBottomSheet
 import com.anafthdev.dujer.uicomponent.*
-import com.anafthdev.dujer.util.ColorTemplate
-import com.anafthdev.dujer.util.CurrencyFormatter
 import com.github.mikephil.charting.data.PieDataSet
 import com.github.mikephil.charting.data.PieEntry
 import com.github.mikephil.charting.highlight.Highlight

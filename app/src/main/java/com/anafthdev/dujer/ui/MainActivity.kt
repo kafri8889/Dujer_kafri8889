@@ -2,13 +2,19 @@ package com.anafthdev.dujer.ui
 
 import android.os.Bundle
 import androidx.activity.compose.setContent
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.biometric.BiometricPrompt
 import androidx.core.view.WindowCompat
 import androidx.lifecycle.lifecycleScope
 import com.anafthdev.dujer.BuildConfig
 import com.anafthdev.dujer.data.datastore.AppDatastore
+import com.anafthdev.dujer.data.db.model.Financial
+import com.anafthdev.dujer.data.db.model.Wallet
+import com.anafthdev.dujer.foundation.common.AppUtil.toast
 import com.anafthdev.dujer.foundation.common.BiometricManager
+import com.anafthdev.dujer.foundation.common.csv.CSVWriter
 import com.anafthdev.dujer.foundation.localized.LocalizedActivity
+import com.anafthdev.dujer.model.Currency
 import com.anafthdev.dujer.ui.app.DujerApp
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Dispatchers
@@ -23,6 +29,26 @@ class MainActivity : LocalizedActivity() {
 	@Inject lateinit var appDatastore: AppDatastore
 	
 	private lateinit var biometricManager: BiometricManager
+	
+	val exportFinancialDataBundle = Bundle()
+	
+	val permissionLauncher = registerForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) { result ->
+		if (result.all { it.value }) {
+			val fileName = exportFinancialDataBundle.getString("fileName", "financial-export")
+			val localCurrency = exportFinancialDataBundle.getParcelable("currency") ?: Currency.DOLLAR
+			val wallets = exportFinancialDataBundle.getParcelableArrayList<Wallet>("wallets") ?: emptyList()
+			val financials = exportFinancialDataBundle.getParcelableArrayList<Financial>("financials") ?: emptyList()
+			
+			CSVWriter.writeFinancial(
+				this,
+				fileName,
+				localCurrency,
+				wallets.toList(),
+				financials.toList()
+			)
+		}
+		else "Permission denied, export canceled!".toast(this)
+	}
 	
 	override fun onCreate(savedInstanceState: Bundle?) {
 		super.onCreate(savedInstanceState)

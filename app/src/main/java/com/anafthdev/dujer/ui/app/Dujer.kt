@@ -59,10 +59,10 @@ fun DujerApp() {
 	val context = LocalContext.current
 	val lifecycleOwner = LocalLifecycleOwner.current
 	
-	val dujerViewModel = hiltViewModel<DujerViewModel>()
+	val viewModel = hiltViewModel<DujerViewModel>()
 	val uiModeViewModel = hiltViewModel<UiModeViewModel>()
 	
-	val state by dujerViewModel.state.collectAsState()
+	val state by viewModel.state.collectAsState()
 	val uiModeState by uiModeViewModel.state.collectAsState()
 	
 	val currentCurrency = state.currentCurrency
@@ -75,14 +75,14 @@ fun DujerApp() {
 	val systemUiController = rememberSystemUiController()
 	val snackbarHostState = remember { SnackbarHostState() }
 	
-	val effect by dujerViewModel.effect.collectAsState(
+	val effect by viewModel.effect.collectAsState(
 		initial = DujerEffect.Nothing,
 		context = Dispatchers.Main
 	)
 	
 	LaunchedEffect(lifecycleOwner) {
 		lifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
-			dujerViewModel.dispatch(
+			viewModel.dispatch(
 				DujerAction.InsertWallet(Wallet.cash)
 			)
 		}
@@ -138,7 +138,7 @@ fun DujerApp() {
 							CustomSnackbar(
 								snackbarData = snackbarData,
 								onCancel = {
-									dujerViewModel.dispatch(
+									viewModel.dispatch(
 										DujerAction.Undo(dataCanReturned)
 									)
 								}
@@ -162,12 +162,12 @@ fun DujerApp() {
 						DashboardScreen(
 							navController = navController,
 							onTransactionCanDelete = {
-								dujerViewModel.dispatch(
+								viewModel.dispatch(
 									DujerAction.Vibrate(100)
 								)
 							},
 							onDeleteTransaction = { financial ->
-								dujerViewModel.dispatch(
+								viewModel.dispatch(
 									DujerAction.DeleteFinancial(
 										financial.toArray()
 									)
@@ -190,12 +190,12 @@ fun DujerApp() {
 							navController = navController,
 							type = FinancialType.values()[type],
 							onTransactionCanDelete = {
-								dujerViewModel.dispatch(
+								viewModel.dispatch(
 									DujerAction.Vibrate(100)
 								)
 							},
 							onDeleteTransaction = { financial ->
-								dujerViewModel.dispatch(
+								viewModel.dispatch(
 									DujerAction.DeleteFinancial(
 										financial.toArray()
 									)
@@ -222,7 +222,7 @@ fun DujerApp() {
 							id = id,
 							action = action,
 							navController = navController,
-							dujerViewModel = dujerViewModel
+							dujerViewModel = viewModel
 						)
 					}
 					
@@ -240,12 +240,12 @@ fun DujerApp() {
 							walletID = id,
 							navController = navController,
 							onTransactionCanDelete = {
-								dujerViewModel.dispatch(
+								viewModel.dispatch(
 									DujerAction.Vibrate(100)
 								)
 							},
 							onDeleteTransaction = { financial ->
-								dujerViewModel.dispatch(
+								viewModel.dispatch(
 									DujerAction.DeleteFinancial(
 										financial.toArray()
 									)
@@ -284,12 +284,12 @@ fun DujerApp() {
 							categoryID = categoryID,
 							navController = navController,
 							onTransactionCanDelete = {
-								dujerViewModel.dispatch(
+								viewModel.dispatch(
 									DujerAction.Vibrate(100)
 								)
 							},
 							onDeleteTransaction = { financial ->
-								dujerViewModel.dispatch(
+								viewModel.dispatch(
 									DujerAction.DeleteFinancial(
 										financial.toArray()
 									)

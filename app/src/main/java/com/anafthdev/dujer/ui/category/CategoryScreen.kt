@@ -42,6 +42,7 @@ import com.anafthdev.dujer.data.CategoryIcons
 import com.anafthdev.dujer.data.DujerDestination
 import com.anafthdev.dujer.data.FinancialType
 import com.anafthdev.dujer.data.db.model.Category
+import com.anafthdev.dujer.foundation.common.AppUtil.toast
 import com.anafthdev.dujer.foundation.extension.*
 import com.anafthdev.dujer.foundation.ui.LocalUiColor
 import com.anafthdev.dujer.foundation.uimode.data.LocalUiMode
@@ -59,7 +60,6 @@ import com.anafthdev.dujer.ui.theme.shapes
 import com.anafthdev.dujer.uicomponent.FinancialTypeSelector
 import com.anafthdev.dujer.uicomponent.OutlinedTextField
 import com.anafthdev.dujer.uicomponent.TopAppBar
-import com.anafthdev.dujer.util.AppUtil.toast
 import com.google.accompanist.flowlayout.FlowCrossAxisAlignment
 import com.google.accompanist.flowlayout.FlowMainAxisAlignment
 import com.google.accompanist.flowlayout.FlowRow

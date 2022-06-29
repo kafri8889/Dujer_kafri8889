@@ -4,9 +4,9 @@ import android.annotation.SuppressLint
 import android.content.Context
 import android.widget.TextView
 import com.anafthdev.dujer.R
+import com.anafthdev.dujer.foundation.common.CurrencyFormatter
 import com.anafthdev.dujer.foundation.extension.deviceLocale
 import com.anafthdev.dujer.model.Currency
-import com.anafthdev.dujer.util.CurrencyFormatter
 import com.github.mikephil.charting.components.MarkerView
 import com.github.mikephil.charting.data.Entry
 import com.github.mikephil.charting.highlight.Highlight

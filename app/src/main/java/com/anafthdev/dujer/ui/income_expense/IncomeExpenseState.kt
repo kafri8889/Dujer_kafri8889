@@ -4,7 +4,7 @@ import com.anafthdev.dujer.data.FinancialGroupData
 import com.anafthdev.dujer.data.GroupType
 import com.anafthdev.dujer.data.SortType
 import com.anafthdev.dujer.data.db.model.Financial
-import com.anafthdev.dujer.util.AppUtil
+import com.anafthdev.dujer.foundation.common.AppUtil
 
 data class IncomeExpenseState(
 	val financial: Financial = Financial.default,

@@ -1,4 +1,4 @@
-package com.anafthdev.dujer.util
+package com.anafthdev.dujer.foundation.common
 
 import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.input.TextFieldValue
