@@ -187,24 +187,22 @@ fun AddBudgetScreen(
 							
 							val (startIndex, endIndex) = s.indexOf(selectedCategory.name)
 							
-							s.forEachIndexed { i, c ->
-								if (i in startIndex..endIndex) {
-									withStyle(
-										MaterialTheme.typography.bodyMedium.copy(
-											color = LocalUiColor.current.titleText,
-											fontWeight = FontWeight.SemiBold
-										).toSpanStyle()
-									) {
-										append(c)
-									}
-								} else withStyle(
-									MaterialTheme.typography.bodyMedium.copy(
-										color = LocalUiColor.current.bodyText
-									).toSpanStyle()
-								) {
-									append(c)
-								}
+							withStyle(
+								MaterialTheme.typography.bodyMedium.copy(
+									color = LocalUiColor.current.bodyText
+								).toSpanStyle()
+							) {
+								append(s)
 							}
+							
+							addStyle(
+								style = MaterialTheme.typography.bodyMedium.copy(
+									color = LocalUiColor.current.titleText,
+									fontWeight = FontWeight.SemiBold
+								).toSpanStyle(),
+								start = startIndex,
+								end = endIndex + 1
+							)
 						},
 						style = MaterialTheme.typography.bodyMedium.copy(
 							fontSize = MaterialTheme.typography.bodyMedium.fontSize.spScaled

@@ -9,7 +9,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.*
@@ -84,9 +83,6 @@ fun FinancialStatisticChart(
 	
 	Card(
 		shape = MaterialTheme.shapes.large,
-		elevation = CardDefaults.cardElevation(
-			defaultElevation = 1.dpScaled
-		),
 		modifier = modifier
 			.fillMaxWidth()
 			.padding(4.dpScaled)

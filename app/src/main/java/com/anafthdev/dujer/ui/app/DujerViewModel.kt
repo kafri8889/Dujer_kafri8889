@@ -2,6 +2,7 @@ package com.anafthdev.dujer.ui.app
 
 import androidx.lifecycle.viewModelScope
 import com.anafthdev.dujer.data.FinancialType
+import com.anafthdev.dujer.data.db.model.Budget
 import com.anafthdev.dujer.data.db.model.Category
 import com.anafthdev.dujer.data.db.model.Financial
 import com.anafthdev.dujer.data.db.model.Wallet
@@ -61,7 +62,36 @@ class DujerViewModel @Inject constructor(
 		}
 		
 		viewModelScope.launch(environment.dispatcher) {
-			environment.getAllBudget().collect { budgets ->
+			combine(
+				environment.getAllBudget(),
+				environment.getAllFinancial()
+			) { budgets, financials ->
+				budgets to financials
+			}.collect { (budgets, financials) ->
+				val budgetToUpdate = arrayListOf<Budget>()
+				val expenseTransaction = financials.filter { it.type == FinancialType.EXPENSE }
+				val categories = expenseTransaction.map { it.category.id }
+				
+				categories.forEach { categoryID ->
+					budgets.find { it.category.id == categoryID }?.let { budget ->
+						val expenseAmount = expenseTransaction
+							.filter { it.category.id == categoryID }
+							.sumOf { it.amount }
+						
+						val remaining = budget.max - expenseAmount
+						val isMaxReached = remaining <= 0.0
+						
+						budgetToUpdate.add(
+							budget.copy(
+								remaining = remaining,
+								isMaxReached = isMaxReached
+							)
+						)
+					}
+				}
+				
+				environment.updateBudget(*budgetToUpdate.toTypedArray())
+				
 				setState {
 					copy(
 						allBudget = budgets

@@ -1,4 +1,4 @@
-package com.anafthdev.dujer.ui.budget.component
+package com.anafthdev.dujer.ui.financial.component
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -11,19 +11,29 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.withStyle
 import com.anafthdev.dujer.R
+import com.anafthdev.dujer.data.db.model.Budget
+import com.anafthdev.dujer.data.db.model.Financial
+import com.anafthdev.dujer.foundation.common.CurrencyFormatter
+import com.anafthdev.dujer.foundation.extension.deviceLocale
+import com.anafthdev.dujer.foundation.extension.indexOf
 import com.anafthdev.dujer.foundation.extension.isLightTheme
+import com.anafthdev.dujer.foundation.ui.LocalUiColor
 import com.anafthdev.dujer.foundation.uimode.data.LocalUiMode
 import com.anafthdev.dujer.foundation.window.dpScaled
 import com.anafthdev.dujer.foundation.window.spScaled
 import com.anafthdev.dujer.ui.theme.medium_shape
 
 @Composable
-fun DeleteBudgetPopup(
-	onCancel: () -> Unit,
-	onDelete: () -> Unit,
-	onClickOutside: () -> Unit
+fun MaxBudgetReachedPopup(
+	budget: Budget,
+	financial: Financial,
+	financialEdit: Financial,
+	onClose: () -> Unit,
+	onIgnore: () -> Unit
 ) {
 	
 	val uiMode = LocalUiMode.current
@@ -41,9 +51,7 @@ fun DeleteBudgetPopup(
 				enabled = true,
 				interactionSource = MutableInteractionSource(),
 				indication = null,
-				onClick = {
-					onClickOutside()
-				}
+				onClick = onClose
 			)
 	) {
 		Column(
@@ -63,7 +71,7 @@ fun DeleteBudgetPopup(
 				)
 		) {
 			Text(
-				text = stringResource(id = R.string.delete_budget),
+				text = stringResource(id = R.string.budget_reaches_limit),
 				style = MaterialTheme.typography.bodyLarge.copy(
 					fontWeight = FontWeight.SemiBold,
 					fontSize = MaterialTheme.typography.bodyLarge.fontSize.spScaled
@@ -73,7 +81,41 @@ fun DeleteBudgetPopup(
 			)
 			
 			Text(
-				text = stringResource(id = R.string.delete_budget_confirmation),
+				text = buildAnnotatedString {
+					val amount = financial.amount - financialEdit.amount
+					val remainingAmount = budget.remaining - amount
+					val formattedRemaining = CurrencyFormatter.format(
+						locale = deviceLocale,
+						amount = remainingAmount,
+						useSymbol = true,
+						currencyCode = financial.currency.countryCode
+					)
+					
+					val s = stringResource(
+						id = R.string.budget_reaches_limit_message,
+						formattedRemaining
+					)
+					
+					val (startIndex, endIndex) = s.indexOf(formattedRemaining)
+					
+					withStyle(
+						MaterialTheme.typography.bodyMedium.copy(
+							fontSize = MaterialTheme.typography.bodyMedium.fontSize.spScaled
+						).toSpanStyle()
+					) {
+						append(s)
+					}
+					
+					addStyle(
+						style = MaterialTheme.typography.titleSmall.copy(
+							color = LocalUiColor.current.titleText,
+							fontWeight = FontWeight.SemiBold,
+							fontSize = MaterialTheme.typography.titleSmall.fontSize.spScaled
+						).toSpanStyle(),
+						start = startIndex,
+						end = endIndex + 1
+					)
+				},
 				style = MaterialTheme.typography.bodyMedium.copy(
 					fontSize = MaterialTheme.typography.bodyMedium.fontSize.spScaled
 				),
@@ -91,7 +133,7 @@ fun DeleteBudgetPopup(
 			) {
 				TextButton(
 					shape = MaterialTheme.shapes.medium,
-					onClick = onCancel
+					onClick = onClose
 				) {
 					Text(
 						text = stringResource(id = R.string.cancel)
@@ -100,14 +142,14 @@ fun DeleteBudgetPopup(
 				
 				Button(
 					shape = MaterialTheme.shapes.medium,
-					onClick = onDelete,
+					onClick = onIgnore,
 					modifier = Modifier
 						.padding(
 							horizontal = 8.dpScaled
 						)
 				) {
 					Text(
-						text = stringResource(id = R.string.delete),
+						text = stringResource(id = R.string.ignore),
 						style = LocalTextStyle.current.copy(
 							color = Color.White
 						)

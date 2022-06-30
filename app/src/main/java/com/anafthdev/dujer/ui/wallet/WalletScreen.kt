@@ -576,9 +576,6 @@ private fun WalletScreenContent(
 				
 				Card(
 					shape = MaterialTheme.shapes.large,
-					elevation = CardDefaults.cardElevation(
-						defaultElevation = 1.dpScaled
-					),
 					modifier = Modifier
 						.padding(
 							16.dpScaled

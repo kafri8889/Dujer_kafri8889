@@ -37,9 +37,6 @@ fun BalanceCard(
 	
 	Card(
 		shape = large_shape,
-		elevation = CardDefaults.cardElevation(
-			defaultElevation = 4.dp
-		),
 		colors = CardDefaults.cardColors(
 			containerColor = balance_card_background
 		),
