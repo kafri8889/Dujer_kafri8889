@@ -45,6 +45,7 @@ import com.anafthdev.dujer.foundation.common.TextFieldCurrencyFormatter
 import com.anafthdev.dujer.foundation.common.showDatePicker
 import com.anafthdev.dujer.foundation.extension.deviceLocale
 import com.anafthdev.dujer.foundation.extension.get
+import com.anafthdev.dujer.foundation.extension.isIncome
 import com.anafthdev.dujer.foundation.extension.toColor
 import com.anafthdev.dujer.foundation.ui.LocalUiColor
 import com.anafthdev.dujer.foundation.window.dpScaled
@@ -95,8 +96,16 @@ fun FinancialScreen(
 	var financialAmountDouble: Double by remember { mutableStateOf(0.0) }
 	var financialAmount: TextFieldValue by remember { mutableStateOf(TextFieldValue()) }
 	var financialDate: Long by remember { mutableStateOf(System.currentTimeMillis()) }
-	var financialCategory: Category by remember { mutableStateOf(Category.default) }
+	var financialCategoryForIncome: Category by remember { mutableStateOf(Category.otherIncome) }
+	var financialCategoryForExpense: Category by remember { mutableStateOf(Category.otherExpense) }
 	var financialType: FinancialType by remember { mutableStateOf(FinancialType.INCOME) }
+	val financialCategory = remember(
+		financialType,
+		financialCategoryForIncome,
+		financialCategoryForExpense
+	) {
+		if (financialType.isIncome()) financialCategoryForIncome else financialCategoryForExpense
+	}
 	
 	val calendar = remember { Calendar.getInstance() }
 	val textFieldDateFocusRequester = remember { FocusRequester() }
@@ -119,7 +128,8 @@ fun FinancialScreen(
 		financialNew = Financial.default
 		financialTitle = ""
 		financialDate = System.currentTimeMillis()
-		financialCategory = Category.default
+		financialCategoryForIncome = Category.otherIncome
+		financialCategoryForExpense = Category.otherExpense
 		financialType = FinancialType.INCOME
 		financialAmountDouble = 0.0
 		financialAmount = TextFieldValue(
@@ -142,7 +152,6 @@ fun FinancialScreen(
 			financialNew = financial
 			financialTitle = financial.name
 			financialDate = financial.dateCreated
-			financialCategory = financial.category
 			financialType = financial.type
 			financialAmountDouble = financial.amount
 			financialAmount = financialAmount.copy(
@@ -153,6 +162,12 @@ fun FinancialScreen(
 					currencyCode = financial.currency.countryCode
 				)
 			)
+			
+			if (financial.type.isIncome()) {
+				financialCategoryForIncome = financial.category
+			} else {
+				financialCategoryForExpense = financial.category
+			}
 			
 			selectedWallet = allWallet.get { it.id == financial.walletID } ?: Wallet.cash
 		}
@@ -458,7 +473,12 @@ fun FinancialScreen(
 						CategoryList(
 							categories = categorySelectorItems,
 							onItemClick = { category ->
-								financialCategory = category
+								if (financialType.isIncome()) {
+									financialCategoryForIncome = category
+								} else {
+									financialCategoryForExpense = category
+								}
+								
 								isCategoryListShowed = false
 							}
 						)
@@ -569,6 +589,7 @@ fun FinancialScreen(
 					)
 					
 					FinancialTypeSelector(
+						enableDoubleClick = false,
 						selectedFinancialType = financialType,
 						onFinancialTypeChanged = { type ->
 							financialType = type

@@ -24,6 +24,7 @@ import timber.log.Timber
 fun FinancialTypeSelector(
 	selectedFinancialType: FinancialType,
 	modifier: Modifier = Modifier,
+	enableDoubleClick: Boolean = true,
 	onDoubleClick: () -> Unit = {},
 	onFinancialTypeChanged: (FinancialType) -> Unit
 ) {
@@ -63,7 +64,7 @@ fun FinancialTypeSelector(
 		modifier = modifier
 	) {
 		FilterChip(
-			selected = (selectedFinancialType == FinancialType.INCOME) or selectAll,
+			selected = (selectedFinancialType == FinancialType.INCOME) or (selectAll and enableDoubleClick),
 			colors = FilterChipDefaults.filterChipColors(
 				selectedContainerColor = income_card_background
 			),
@@ -111,7 +112,7 @@ fun FinancialTypeSelector(
 		)
 		
 		FilterChip(
-			selected = (selectedFinancialType == FinancialType.EXPENSE) or selectAll,
+			selected = (selectedFinancialType == FinancialType.EXPENSE) or (selectAll and enableDoubleClick),
 			colors = FilterChipDefaults.filterChipColors(
 				selectedContainerColor = expense_card_background
 			),
