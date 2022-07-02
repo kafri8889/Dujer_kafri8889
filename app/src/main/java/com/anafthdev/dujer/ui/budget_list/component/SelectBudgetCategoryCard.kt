@@ -1,12 +1,19 @@
 package com.anafthdev.dujer.ui.budget_list.component
 
+import androidx.compose.animation.core.Animatable
+import androidx.compose.animation.core.Spring
+import androidx.compose.animation.core.spring
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -23,6 +30,7 @@ import com.anafthdev.dujer.foundation.window.dpScaled
 import com.anafthdev.dujer.foundation.window.spScaled
 import com.anafthdev.dujer.model.LocalCurrency
 import com.anafthdev.dujer.ui.theme.*
+import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -33,6 +41,47 @@ fun SelectBudgetCategoryCard(
 	onClick: () -> Unit,
 	modifier: Modifier = Modifier
 ) {
+	
+	val scaleCard = remember { Animatable(1f) }
+	val scaleRadioButton = remember { Animatable(1f) }
+	
+	LaunchedEffect(selected) {
+		if (selected) {
+			launch {
+				scaleCard.animateTo(
+					targetValue = 0.88f,
+					animationSpec = tween(
+						durationMillis = 50
+					)
+				)
+				
+				scaleCard.animateTo(
+					targetValue = 1f,
+					animationSpec = spring(
+						dampingRatio = Spring.DampingRatioLowBouncy,
+						stiffness = Spring.StiffnessLow
+					)
+				)
+			}
+			
+			launch {
+				scaleRadioButton.animateTo(
+					targetValue = 0.8f,
+					animationSpec = tween(
+						durationMillis = 50
+					)
+				)
+				
+				scaleRadioButton.animateTo(
+					targetValue = 1f,
+					animationSpec = spring(
+						dampingRatio = Spring.DampingRatioLowBouncy,
+						stiffness = Spring.StiffnessLow
+					)
+				)
+			}
+		}
+	}
 	
 	Card(
 		onClick = onClick,
@@ -50,6 +99,7 @@ fun SelectBudgetCategoryCard(
 			else Color.Transparent
 		),
 		modifier = modifier
+			.scale(scaleCard.value)
 	) {
 		Row(
 			verticalAlignment = Alignment.CenterVertically,
@@ -130,7 +180,9 @@ fun SelectBudgetCategoryCard(
 				colors = RadioButtonDefaults.colors(
 					selectedColor = md_theme_light_primary,
 					unselectedColor = md_theme_light_onSurface
-				)
+				),
+				modifier = Modifier
+					.scale(scaleRadioButton.value)
 			)
 		}
 	}
