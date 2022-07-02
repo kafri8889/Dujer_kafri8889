@@ -15,6 +15,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.anafthdev.dujer.data.FinancialType
 import com.anafthdev.dujer.data.db.model.Financial
+import com.anafthdev.dujer.foundation.common.AppUtil.dateFormatter
 import com.anafthdev.dujer.foundation.common.CurrencyFormatter
 import com.anafthdev.dujer.foundation.extension.deviceLocale
 import com.anafthdev.dujer.foundation.extension.isDarkTheme
@@ -27,7 +28,6 @@ import com.anafthdev.dujer.foundation.window.spScaled
 import com.anafthdev.dujer.model.LocalCurrency
 import com.anafthdev.dujer.ui.theme.large_shape
 import com.anafthdev.dujer.ui.theme.medium_shape
-import java.text.SimpleDateFormat
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -90,7 +90,7 @@ fun FinancialCard(
 					)
 					
 					Text(
-						text = SimpleDateFormat("dd MMM yyyy", deviceLocale).format(financial.dateCreated),
+						text = dateFormatter.format(financial.dateCreated),
 						style = MaterialTheme.typography.labelSmall.copy(
 							color = LocalUiColor.current.bodyText,
 							fontWeight = FontWeight.Normal,

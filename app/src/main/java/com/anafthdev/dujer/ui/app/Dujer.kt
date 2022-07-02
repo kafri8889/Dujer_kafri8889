@@ -2,7 +2,7 @@ package com.anafthdev.dujer.ui.app
 
 import android.annotation.SuppressLint
 import androidx.compose.foundation.ExperimentalFoundationApi
-import androidx.compose.foundation.gestures.LocalOverScrollConfiguration
+import androidx.compose.foundation.LocalOverscrollConfiguration
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.*
@@ -130,7 +130,7 @@ fun DujerApp() {
 			LocalCurrency provides currentCurrency,
 			LocalDujerState provides state,
 			LocalContentColor provides if (isSystemInDarkTheme) black10 else black01,
-			LocalOverScrollConfiguration provides null
+			LocalOverscrollConfiguration provides null
 		) {
 			Scaffold(
 				snackbarHost = {
