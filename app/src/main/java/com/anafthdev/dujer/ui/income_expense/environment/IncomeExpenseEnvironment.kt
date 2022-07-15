@@ -1,8 +1,5 @@
 package com.anafthdev.dujer.ui.income_expense.environment
 
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.asFlow
 import com.anafthdev.dujer.data.FinancialGroupData
 import com.anafthdev.dujer.data.GroupType
 import com.anafthdev.dujer.data.SortType
@@ -27,9 +24,6 @@ class IncomeExpenseEnvironment @Inject constructor(
 	private val financialSorter: FinancialSorter,
 	private val appRepository: IAppRepository
 ): IIncomeExpenseEnvironment {
-	
-	private val _financial = MutableLiveData(Financial.default)
-	private val financial: LiveData<Financial> = _financial
 	
 	private val _selectedSortType = MutableStateFlow(SortType.A_TO_Z)
 	private val selectedSortType: StateFlow<SortType> = _selectedSortType
@@ -110,14 +104,6 @@ class IncomeExpenseEnvironment @Inject constructor(
 	
 	override suspend fun deleteFinancial(vararg financial: Financial) {
 		appRepository.delete(*financial)
-	}
-	
-	override suspend fun getFinancial(): Flow<Financial> {
-		return financial.asFlow()
-	}
-	
-	override suspend fun setFinancialID(id: Int) {
-		_financial.value = appRepository.get(id) ?: Financial.default
 	}
 	
 }

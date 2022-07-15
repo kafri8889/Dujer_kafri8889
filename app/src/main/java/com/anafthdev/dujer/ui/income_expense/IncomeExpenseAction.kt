@@ -4,7 +4,6 @@ import com.anafthdev.dujer.data.GroupType
 import com.anafthdev.dujer.data.SortType
 
 sealed class IncomeExpenseAction {
-	data class SetFinancialID(val id: Int): IncomeExpenseAction()
 	data class SetSortType(val sortType: SortType): IncomeExpenseAction()
 	data class SetGroupType(val groupType: GroupType): IncomeExpenseAction()
 	data class SetFilterDate(val filterDate: Pair<Long, Long>): IncomeExpenseAction()

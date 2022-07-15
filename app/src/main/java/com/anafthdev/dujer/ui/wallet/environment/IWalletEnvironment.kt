@@ -17,8 +17,6 @@ interface IWalletEnvironment {
 	
 	fun getWallet(): Flow<Wallet>
 	
-	fun getFinancial(): Flow<Financial>
-	
 	fun getSortType(): Flow<SortType>
 	
 	fun getGroupType(): Flow<GroupType>
@@ -43,8 +41,6 @@ interface IWalletEnvironment {
 	suspend fun deleteWallet(wallet: Wallet)
 	
 	suspend fun setWalletID(id: Int)
-	
-	suspend fun setFinancialID(id: Int)
 	
 	suspend fun setSortType(sortType: SortType)
 	

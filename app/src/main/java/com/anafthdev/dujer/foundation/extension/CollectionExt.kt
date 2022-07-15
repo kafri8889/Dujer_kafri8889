@@ -122,15 +122,3 @@ fun <T> Collection<T>.containBy(predicate: (T) -> Boolean): Boolean {
 	
 	return false
 }
-
-/**
- * Return a item containing only elements matching the given [predicate].
- * @author kafri8889
- */
-fun <T> Collection<T>.get(predicate: (T) -> Boolean): T? {
-	this.forEach {
-		if (predicate(it)) return it
-	}
-	
-	return null
-}

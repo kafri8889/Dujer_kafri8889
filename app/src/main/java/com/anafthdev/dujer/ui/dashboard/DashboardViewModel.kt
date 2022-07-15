@@ -14,26 +14,6 @@ class DashboardViewModel @Inject constructor(
 	
 	init {
 		viewModelScope.launch(environment.dispatcher) {
-			environment.getFinancialAction().collect { action ->
-				setState {
-					copy(
-						financialAction = action
-					)
-				}
-			}
-		}
-		
-		viewModelScope.launch(environment.dispatcher) {
-			environment.getFinancial().collect { financial ->
-				setState {
-					copy(
-						financial = financial
-					)
-				}
-			}
-		}
-		
-		viewModelScope.launch(environment.dispatcher) {
 			environment.getTransactions().collect { transactions ->
 				setState {
 					copy(
@@ -129,16 +109,6 @@ class DashboardViewModel @Inject constructor(
 			is DashboardAction.NewWallet -> {
 				viewModelScope.launch(environment.dispatcher) {
 					environment.insertWallet(action.wallet)
-				}
-			}
-			is DashboardAction.SetFinancialID -> {
-				viewModelScope.launch(environment.dispatcher) {
-					environment.setFinancialID(action.id)
-				}
-			}
-			is DashboardAction.SetFinancialAction -> {
-				viewModelScope.launch(environment.dispatcher) {
-					environment.setFinancialAction(action.action)
 				}
 			}
 			is DashboardAction.SetSortType -> {

@@ -4,7 +4,6 @@ import com.anafthdev.dujer.data.FinancialGroupData
 import com.anafthdev.dujer.data.GroupType
 import com.anafthdev.dujer.data.SortType
 import com.anafthdev.dujer.data.db.model.Category
-import com.anafthdev.dujer.data.db.model.Financial
 import com.anafthdev.dujer.data.db.model.Wallet
 import com.github.mikephil.charting.data.Entry
 import kotlinx.coroutines.CoroutineDispatcher
@@ -13,10 +12,6 @@ import kotlinx.coroutines.flow.Flow
 interface IDashboardEnvironment {
 	
 	val dispatcher: CoroutineDispatcher
-	
-	fun getFinancial(): Flow<Financial>
-	
-	fun getFinancialAction(): Flow<String>
 	
 	fun getSortType(): Flow<SortType>
 	
@@ -37,8 +32,6 @@ interface IDashboardEnvironment {
 	fun getExpenseEntry(): Flow<List<Entry>>
 	
 	
-	suspend fun setFinancialID(id: Int)
-	
 	suspend fun insertWallet(wallet: Wallet)
 	
 	suspend fun setSortType(sortType: SortType)
@@ -48,8 +41,5 @@ interface IDashboardEnvironment {
 	suspend fun setFilterDate(date: Pair<Long, Long>)
 	
 	suspend fun setSelectedMonth(selectedMonth: List<Int>)
-	
-	
-	fun setFinancialAction(action: String)
 	
 }

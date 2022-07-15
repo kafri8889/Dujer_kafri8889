@@ -42,7 +42,7 @@ import com.anafthdev.dujer.foundation.uimode.data.UiMode
 import com.anafthdev.dujer.foundation.window.dpScaled
 import com.anafthdev.dujer.foundation.window.spScaled
 import com.anafthdev.dujer.model.LocalCurrency
-import com.anafthdev.dujer.ui.MainActivity
+import com.anafthdev.dujer.runtime.MainActivity
 import com.anafthdev.dujer.ui.app.LocalDujerState
 import com.anafthdev.dujer.ui.theme.Typography
 import com.anafthdev.dujer.ui.theme.shapes

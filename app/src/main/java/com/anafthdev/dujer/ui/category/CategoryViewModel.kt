@@ -4,7 +4,6 @@ import androidx.lifecycle.viewModelScope
 import com.anafthdev.dujer.data.FinancialType
 import com.anafthdev.dujer.data.db.model.Category
 import com.anafthdev.dujer.data.db.model.Financial
-import com.anafthdev.dujer.foundation.extension.get
 import com.anafthdev.dujer.foundation.viewmodel.StatefulViewModel
 import com.anafthdev.dujer.ui.category.environment.ICategoryEnvironment
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -44,7 +43,7 @@ class CategoryViewModel @Inject constructor(
 		environment.updateFinancial(
 			*financialList.map { financial ->
 				financial.copy(
-					category = categories.get { it.id == financial.category.id } ?:
+					category = categories.find { it.id == financial.category.id } ?:
 					if (financial.type == FinancialType.INCOME) Category.otherIncome else Category.otherExpense
 				)
 			}.toTypedArray()

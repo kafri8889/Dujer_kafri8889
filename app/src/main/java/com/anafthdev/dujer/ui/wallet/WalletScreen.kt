@@ -50,6 +50,7 @@ import com.anafthdev.dujer.foundation.window.dpScaled
 import com.anafthdev.dujer.foundation.window.spScaled
 import com.anafthdev.dujer.model.LocalCurrency
 import com.anafthdev.dujer.ui.app.LocalDujerState
+import com.anafthdev.dujer.ui.financial.data.FinancialAction
 import com.anafthdev.dujer.ui.statistic.component.FinancialStatisticChart
 import com.anafthdev.dujer.ui.statistic.data.PercentValueFormatter
 import com.anafthdev.dujer.ui.theme.Typography
@@ -59,7 +60,10 @@ import com.anafthdev.dujer.ui.theme.medium_shape
 import com.anafthdev.dujer.ui.wallet.component.DeleteWalletPopup
 import com.anafthdev.dujer.ui.wallet.subscreen.EditBalanceBottomSheet
 import com.anafthdev.dujer.ui.wallet.subscreen.SelectWalletBottomSheet
-import com.anafthdev.dujer.uicomponent.*
+import com.anafthdev.dujer.uicomponent.FilterSortFinancialPopup
+import com.anafthdev.dujer.uicomponent.FinancialTypeSelector
+import com.anafthdev.dujer.uicomponent.TopAppBar
+import com.anafthdev.dujer.uicomponent.swipeableFinancialCard
 import com.github.mikephil.charting.data.PieDataSet
 import com.github.mikephil.charting.data.PieEntry
 import com.github.mikephil.charting.highlight.Highlight
@@ -84,7 +88,6 @@ fun WalletScreen(
 	val state by viewModel.state.collectAsState()
 	
 	val wallet = state.wallet
-	val financial = state.financial
 	val sortType = state.sortType
 	val groupType = state.groupType
 	val filterDate = state.filterDate
@@ -100,11 +103,6 @@ fun WalletScreen(
 	)
 	
 	val selectWalletSheetState = rememberModalBottomSheetState(
-		initialValue = ModalBottomSheetValue.Hidden,
-		skipHalfExpanded = true
-	)
-	
-	val financialScreenSheetState = rememberModalBottomSheetState(
 		initialValue = ModalBottomSheetValue.Hidden,
 		skipHalfExpanded = true
 	)
@@ -136,11 +134,6 @@ fun WalletScreen(
 		Unit
 	}
 	
-	val hideFinancialSheetState = {
-		scope.launch { financialScreenSheetState.hide() }
-		Unit
-	}
-	
 	val showEditBalanceSheetState = {
 		scope.launch { editBalanceSheetState.show() }
 		Unit
@@ -148,11 +141,6 @@ fun WalletScreen(
 	
 	val showSelectWalletSheetState = {
 		scope.launch { selectWalletSheetState.show() }
-		Unit
-	}
-	
-	val showFinancialSheetState = {
-		scope.launch { financialScreenSheetState.show() }
 		Unit
 	}
 	
@@ -255,65 +243,57 @@ fun WalletScreen(
 			)
 		}
 		
-		FinancialBottomSheet(
-			state = financialScreenSheetState,
-			financial = financial,
-			onBack = hideFinancialSheetState,
-			onSave = hideFinancialSheetState
+		SelectWalletBottomSheet(
+			state = selectWalletSheetState,
+			wallet = wallet,
+			wallets = wallets,
+			onWalletSelected = { wallet ->
+				hideSelectWalletSheetState()
+				viewModel.dispatch(
+					WalletAction.GetWallet(wallet.id)
+				)
+			}
 		) {
-			SelectWalletBottomSheet(
-				state = selectWalletSheetState,
+			EditBalanceBottomSheet(
+				state = editBalanceSheetState,
 				wallet = wallet,
-				wallets = wallets,
-				onWalletSelected = { wallet ->
-					hideSelectWalletSheetState()
+				onCancel = hideEditBalanceSheetState,
+				onSave = { mWallet, financial ->
 					viewModel.dispatch(
-						WalletAction.GetWallet(wallet.id)
+						WalletAction.UpdateWallet(
+							mWallet.copy(
+								balance = (((mWallet.initialBalance + incomeAmount) - expenseAmount)).also {
+									Timber.i("$it, w: ${mWallet.initialBalance}, i: $incomeAmount, e: $expenseAmount")
+								}
+							).also { Timber.i("$it, in: $incomeTransaction, ex: $expenseTransaction") }
+						)
 					)
+					
+					if (financial.id != Financial.default.id) {
+						viewModel.dispatch(
+							WalletAction.InsertFinancial(financial)
+						)
+					}
+					
+					hideEditBalanceSheetState()
 				}
 			) {
-				EditBalanceBottomSheet(
-					state = editBalanceSheetState,
-					wallet = wallet,
-					onCancel = hideEditBalanceSheetState,
-					onSave = { mWallet, financial ->
-						viewModel.dispatch(
-							WalletAction.UpdateWallet(
-								mWallet.copy(
-									balance = (((mWallet.initialBalance + incomeAmount) - expenseAmount)).also {
-										Timber.i("$it, w: ${mWallet.initialBalance}, i: $incomeAmount, e: $expenseAmount")
-									}
-								).also { Timber.i("$it, in: $incomeTransaction, ex: $expenseTransaction") }
-							)
-						)
-						
-						if (financial.id != Financial.default.id) {
-							viewModel.dispatch(
-								WalletAction.InsertFinancial(financial)
-							)
-						}
-						
-						hideEditBalanceSheetState()
+				WalletScreenContent(
+					state = state,
+					navController = navController,
+					viewModel = viewModel,
+					incomeTransaction = incomeTransaction,
+					expenseTransaction = expenseTransaction,
+					onDeleteTransaction = onDeleteTransaction,
+					onShowEditBalanceSheet = showEditBalanceSheetState,
+					onShowSelectWalletSheet = showSelectWalletSheetState,
+					onDeleteWallet = {
+						isDeleteConfirmationPopupShowing = true
+					},
+					onFilterClicked = {
+						isFilterSortFinancialPopupShowed = true
 					}
-				) {
-					WalletScreenContent(
-						state = state,
-						navController = navController,
-						viewModel = viewModel,
-						incomeTransaction = incomeTransaction,
-						expenseTransaction = expenseTransaction,
-						onDeleteTransaction = onDeleteTransaction,
-						onShowFinancialSheet = showFinancialSheetState,
-						onShowEditBalanceSheet = showEditBalanceSheetState,
-						onShowSelectWalletSheet = showSelectWalletSheetState,
-						onDeleteWallet = {
-							isDeleteConfirmationPopupShowing = true
-						},
-						onFilterClicked = {
-							isFilterSortFinancialPopupShowed = true
-						}
-					)
-				}
+				)
 			}
 		}
 	}
@@ -327,7 +307,6 @@ private fun WalletScreenContent(
 	viewModel: WalletViewModel,
 	incomeTransaction: List<Financial>,
 	expenseTransaction: List<Financial>,
-	onShowFinancialSheet: () ->Unit,
 	onShowEditBalanceSheet: () ->Unit,
 	onShowSelectWalletSheet: () ->Unit,
 	onDeleteWallet: () -> Unit,
@@ -750,11 +729,12 @@ private fun WalletScreenContent(
 			data = transactions,
 			onFinancialCardDismissToEnd = { onDeleteTransaction(it) },
 			onFinancialCardClicked = { financial ->
-				viewModel.dispatch(
-					WalletAction.GetFinancial(financial.id)
+				navController.navigate(
+					DujerDestination.BottomSheet.Financial.createRoute(
+						action = FinancialAction.EDIT,
+						financialID = financial.id
+					)
 				)
-				
-				onShowFinancialSheet()
 			},
 			onNavigateCategoryClicked = { category ->
 				navController.navigate(

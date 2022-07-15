@@ -12,19 +12,15 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.ExperimentalMaterialApi
-import androidx.compose.material.ModalBottomSheetLayout
-import androidx.compose.material.ModalBottomSheetValue
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.ArrowBack
 import androidx.compose.material.icons.rounded.FilterList
-import androidx.compose.material.rememberModalBottomSheetState
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
@@ -53,13 +49,11 @@ import com.anafthdev.dujer.foundation.window.spScaled
 import com.anafthdev.dujer.model.LocalCurrency
 import com.anafthdev.dujer.ui.budget.component.DeleteBudgetPopup
 import com.anafthdev.dujer.ui.budget.component.ExpensesBarChart
-import com.anafthdev.dujer.ui.financial.FinancialScreen
 import com.anafthdev.dujer.ui.financial.data.FinancialAction
 import com.anafthdev.dujer.ui.theme.Typography
 import com.anafthdev.dujer.uicomponent.FilterSortFinancialPopup
 import com.anafthdev.dujer.uicomponent.TopAppBar
 import com.anafthdev.dujer.uicomponent.swipeableFinancialCard
-import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalComposeUiApi::class, ExperimentalMaterial3Api::class,
 	ExperimentalMaterialApi::class
@@ -78,64 +72,30 @@ fun BudgetScreen(
 	val financial = state.financial
 	
 	val scope = rememberCoroutineScope()
-	val financialScreenSheetState = rememberModalBottomSheetState(
-		initialValue = ModalBottomSheetValue.Hidden,
-		skipHalfExpanded = true
-	)
-	
-	val hideFinancialSheetState = {
-		scope.launch { financialScreenSheetState.hide() }
-		Unit
-	}
-	
-	val showFinancialSheetState = {
-		scope.launch { financialScreenSheetState.show() }
-		Unit
-	}
 	
 	BackHandler {
-		when {
-			financialScreenSheetState.isVisible -> hideFinancialSheetState()
-			else -> navController.popBackStack()
-		}
+		navController.popBackStack()
 	}
 	
-	ModalBottomSheetLayout(
-		scrimColor = Color.Unspecified,
-		sheetState = financialScreenSheetState,
-		sheetContent = {
-			FinancialScreen(
-				isScreenVisible = financialScreenSheetState.isVisible,
-				financial = financial,
-				financialAction = FinancialAction.EDIT,
-				onBack = {
-					scope.launch {
-						financialScreenSheetState.hide()
-					}
-				},
-				onSave = {
-					scope.launch {
-						financialScreenSheetState.hide()
-					}
-				}
+	BudgetScreenContent(
+		budgetID = budgetID,
+		navController = navController,
+		viewModel = viewModel,
+		state = state,
+		onDeleteTransaction = onDeleteTransaction,
+		onFinancialCardClicked = { mFinancial ->
+			viewModel.dispatch(
+				BudgetAction.GetFinancial(mFinancial.id)
+			)
+			
+			navController.navigate(
+				DujerDestination.BottomSheet.Financial.createRoute(
+					action = FinancialAction.EDIT,
+					financialID = mFinancial.id
+				)
 			)
 		}
-	) {
-		BudgetScreenContent(
-			budgetID = budgetID,
-			navController = navController,
-			viewModel = viewModel,
-			state = state,
-			onDeleteTransaction = onDeleteTransaction,
-			onFinancialCardClicked = { financial ->
-				viewModel.dispatch(
-					BudgetAction.GetFinancial(financial.id)
-				)
-				
-				showFinancialSheetState()
-			}
-		)
-	}
+	)
 	
 }
 

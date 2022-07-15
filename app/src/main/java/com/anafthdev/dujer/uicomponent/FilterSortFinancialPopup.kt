@@ -33,7 +33,7 @@ import com.anafthdev.dujer.foundation.ui.LocalUiColor
 import com.anafthdev.dujer.foundation.uimode.data.LocalUiMode
 import com.anafthdev.dujer.foundation.window.dpScaled
 import com.anafthdev.dujer.foundation.window.spScaled
-import com.anafthdev.dujer.ui.MainActivity
+import com.anafthdev.dujer.runtime.MainActivity
 import com.anafthdev.dujer.ui.theme.medium_shape
 import timber.log.Timber
 import java.util.*

@@ -10,13 +10,9 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CornerSize
-import androidx.compose.material.ExperimentalMaterialApi
-import androidx.compose.material.ModalBottomSheetLayout
-import androidx.compose.material.ModalBottomSheetValue
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.ArrowBack
 import androidx.compose.material.icons.rounded.FilterList
-import androidx.compose.material.rememberModalBottomSheetState
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -46,7 +42,6 @@ import com.anafthdev.dujer.foundation.window.dpScaled
 import com.anafthdev.dujer.foundation.window.spScaled
 import com.anafthdev.dujer.model.LocalCurrency
 import com.anafthdev.dujer.ui.app.LocalDujerState
-import com.anafthdev.dujer.ui.financial.FinancialScreen
 import com.anafthdev.dujer.ui.financial.data.FinancialAction
 import com.anafthdev.dujer.ui.income_expense.component.IncomeExpenseLineChart
 import com.anafthdev.dujer.ui.theme.Typography
@@ -56,10 +51,7 @@ import com.anafthdev.dujer.uicomponent.TopAppBar
 import com.anafthdev.dujer.uicomponent.swipeableFinancialCard
 import com.github.mikephil.charting.data.Entry
 import com.github.mikephil.charting.data.LineDataSet
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
 
-@OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun IncomeExpenseScreen(
 	navController: NavController,
@@ -72,15 +64,8 @@ fun IncomeExpenseScreen(
 	
 	val viewModel = hiltViewModel<IncomeExpenseViewModel>()
 	
-	val scope = rememberCoroutineScope { Dispatchers.Main }
-	val financialScreenSheetState = rememberModalBottomSheetState(
-		initialValue = ModalBottomSheetValue.Hidden,
-		skipHalfExpanded = true
-	)
-	
 	val state by viewModel.state.collectAsState()
 	
-	val financial = state.financial
 	val sortType = state.sortType
 	val groupType = state.groupType
 	val filterDate = state.filterDate
@@ -117,16 +102,6 @@ fun IncomeExpenseScreen(
 		mutableStateListOf<Entry>()
 	}
 	
-	val hideFinancialSheet = {
-		scope.launch { financialScreenSheetState.hide() }
-		Unit
-	}
-	
-	val showFinancialSheet = {
-		scope.launch { financialScreenSheetState.show() }
-		Unit
-	}
-	
 	val incomeExpenseLineDataset by rememberUpdatedState(
 		newValue = LineDataSet(
 			if (type == FinancialType.INCOME) incomeLineChartEntry else expenseLineChartEntry,
@@ -156,10 +131,9 @@ fun IncomeExpenseScreen(
 		expenseLineChartEntry.replace(expenseEntry)
 	}
 	
-	BackHandler(
-		enabled = financialScreenSheetState.isVisible,
-		onBack = hideFinancialSheet
-	)
+	BackHandler {
+		navController.popBackStack()
+	}
 	
 	AnimatedVisibility(
 		visible = isFilterSortFinancialPopupShowed,
@@ -210,199 +184,157 @@ fun IncomeExpenseScreen(
 		)
 	}
 	
-	ModalBottomSheetLayout(
-		scrimColor = Color.Unspecified,
-		sheetState = financialScreenSheetState,
-		sheetContent = {
-			FinancialScreen(
-				isScreenVisible = financialScreenSheetState.isVisible,
-				financial = financial,
-				financialAction = FinancialAction.EDIT,
-				onBack = hideFinancialSheet,
-				onSave = hideFinancialSheet
-			)
-		}
+	LazyColumn(
+		modifier = Modifier
+			.fillMaxSize()
+			.background(MaterialTheme.colorScheme.background)
+			.systemBarsPadding()
 	) {
-		LazyColumn(
-			modifier = Modifier
-				.fillMaxSize()
-				.background(MaterialTheme.colorScheme.background)
-				.systemBarsPadding()
-		) {
-			item {
+		item {
+			Column(
+				modifier = Modifier
+					.fillMaxSize()
+					.background(MaterialTheme.colorScheme.background)
+			) {
+				TopAppBar {
+					IconButton(
+						onClick = {
+							navController.popBackStack()
+						},
+						modifier = Modifier
+							.padding(start = 8.dpScaled)
+							.align(Alignment.CenterStart)
+					) {
+						Icon(
+							imageVector = Icons.Rounded.ArrowBack,
+							contentDescription = null
+						)
+					}
+					
+					Text(
+						text = stringResource(
+							id = if (type == FinancialType.INCOME) R.string.my_income else R.string.my_spending
+						),
+						style = Typography.titleLarge.copy(
+							color = LocalUiColor.current.titleText,
+							fontWeight = FontWeight.Bold,
+							fontSize = Typography.titleLarge.fontSize.spScaled
+						)
+					)
+					
+					IconButton(
+						onClick = {
+							isFilterSortFinancialPopupShowed = true
+						},
+						modifier = Modifier
+							.padding(end = 8.dpScaled)
+							.align(Alignment.CenterEnd)
+					) {
+						Icon(
+							imageVector = Icons.Rounded.FilterList,
+							contentDescription = null
+						)
+					}
+				}
+				
+				IncomeExpenseLineChart(
+					dataSet = incomeExpenseLineDataset
+				)
+				
 				Column(
 					modifier = Modifier
+						.padding(
+							top = 8.dpScaled
+						)
 						.fillMaxSize()
-						.background(MaterialTheme.colorScheme.background)
-				) {
-					TopAppBar {
-						IconButton(
-							onClick = {
-								navController.popBackStack()
-							},
-							modifier = Modifier
-								.padding(start = 8.dpScaled)
-								.align(Alignment.CenterStart)
-						) {
-							Icon(
-								imageVector = Icons.Rounded.ArrowBack,
-								contentDescription = null
-							)
-						}
-						
-						Text(
-							text = stringResource(
-								id = if (type == FinancialType.INCOME) R.string.my_income else R.string.my_spending
-							),
-							style = Typography.titleLarge.copy(
-								color = LocalUiColor.current.titleText,
-								fontWeight = FontWeight.Bold,
-								fontSize = Typography.titleLarge.fontSize.spScaled
+						.clip(
+							extra_large_shape.copy(
+								bottomStart = CornerSize(0.dpScaled),
+								bottomEnd = CornerSize(0.dpScaled)
 							)
 						)
-						
-						IconButton(
-							onClick = {
-								isFilterSortFinancialPopupShowed = true
-							},
+						.background(Color(0xFF2C383F))
+				) {
+					Column(
+						horizontalAlignment = Alignment.CenterHorizontally,
+						modifier = Modifier
+							.padding(24.dpScaled)
+							.fillMaxWidth()
+					) {
+						Row(
+							verticalAlignment = Alignment.CenterVertically,
 							modifier = Modifier
-								.padding(end = 8.dpScaled)
-								.align(Alignment.CenterEnd)
+								.fillMaxWidth()
 						) {
-							Icon(
-								imageVector = Icons.Rounded.FilterList,
-								contentDescription = null
+							Text(
+								text = stringResource(
+									id = if (type == FinancialType.INCOME) R.string.all_income else R.string.all_expenses
+								),
+								style = Typography.bodyMedium.copy(
+									color = Color.White,
+									fontWeight = FontWeight.SemiBold,
+									fontSize = Typography.bodyMedium.fontSize.spScaled
+								)
+							)
+							
+							Spacer(
+								modifier = Modifier
+									.weight(1f)
+							)
+							
+							Text(
+								text = CurrencyFormatter.format(
+									locale = deviceLocale,
+									amount = if (type == FinancialType.INCOME) incomeBalance else expenseBalance,
+									currencyCode = LocalCurrency.current.countryCode
+								),
+								style = Typography.titleMedium.copy(
+									color = Color.White,
+									fontWeight = FontWeight.Bold,
+									fontSize = Typography.titleMedium.fontSize.spScaled
+								),
+								modifier = Modifier
+									.padding(start = 16.dpScaled)
+									.horizontalScroll(
+										state = rememberScrollState(),
+										autoRestart = true
+									)
 							)
 						}
 					}
 					
-					IncomeExpenseLineChart(
-						dataSet = incomeExpenseLineDataset
-					)
-					
-					Column(
+					Box(
 						modifier = Modifier
-							.padding(
-								top = 8.dpScaled
-							)
-							.fillMaxSize()
+							.fillMaxWidth()
+							.height(24.dpScaled)
 							.clip(
 								extra_large_shape.copy(
 									bottomStart = CornerSize(0.dpScaled),
 									bottomEnd = CornerSize(0.dpScaled)
 								)
 							)
-							.background(Color(0xFF2C383F))
-					) {
-						Column(
-							horizontalAlignment = Alignment.CenterHorizontally,
-							modifier = Modifier
-								.padding(24.dpScaled)
-								.fillMaxWidth()
-						) {
-							Row(
-								verticalAlignment = Alignment.CenterVertically,
-								modifier = Modifier
-									.fillMaxWidth()
-							) {
-								Text(
-									text = stringResource(
-										id = if (type == FinancialType.INCOME) R.string.all_income else R.string.all_expenses
-									),
-									style = Typography.bodyMedium.copy(
-										color = Color.White,
-										fontWeight = FontWeight.SemiBold,
-										fontSize = Typography.bodyMedium.fontSize.spScaled
-									)
-								)
-								
-								Spacer(
-									modifier = Modifier
-										.weight(1f)
-								)
-								
-								Text(
-									text = CurrencyFormatter.format(
-										locale = deviceLocale,
-										amount = if (type == FinancialType.INCOME) incomeBalance else expenseBalance,
-										currencyCode = LocalCurrency.current.countryCode
-									),
-									style = Typography.titleMedium.copy(
-										color = Color.White,
-										fontWeight = FontWeight.Bold,
-										fontSize = Typography.titleMedium.fontSize.spScaled
-									),
-									modifier = Modifier
-										.padding(start = 16.dpScaled)
-										.horizontalScroll(
-											state = rememberScrollState(),
-											autoRestart = true
-										)
-								)
-							}
-						}
-						
-						Box(
-							modifier = Modifier
-								.fillMaxWidth()
-								.height(24.dpScaled)
-								.clip(
-									extra_large_shape.copy(
-										bottomStart = CornerSize(0.dpScaled),
-										bottomEnd = CornerSize(0.dpScaled)
-									)
-								)
-								.background(MaterialTheme.colorScheme.background)
-						)
-					}
+							.background(MaterialTheme.colorScheme.background)
+					)
 				}
 			}
-			
-			swipeableFinancialCard(
-				data = transactions,
-				onFinancialCardDismissToEnd = { onDeleteTransaction(it) },
-				onFinancialCardClicked = {
-					viewModel.dispatch(
-						IncomeExpenseAction.SetFinancialID(financial.id)
-					)
-					
-					showFinancialSheet()
-				},
-				onNavigateCategoryClicked = { category ->
-					navController.navigate(
-						DujerDestination.CategoryTransaction.createRoute(category.id)
-					)
-				}
-			)
-			
-//			items(
-//				items = if (type == FinancialType.INCOME) incomeTransaction else expenseTransaction,
-//				key = { item: Financial -> item.hashCode() }
-//			) { financial ->
-//				SwipeableFinancialCard(
-//					financial = financial,
-//					onDismissToEnd = {
-//						dujerViewModel.dispatch(
-//							DujerAction.DeleteFinancial(financial.toArray())
-//						)
-//					},
-//					onCanDelete = {
-//						dujerViewModel.dispatch(
-//							DujerAction.Vibrate(100)
-//						)
-//					},
-//					onClick = {
-//						viewModel.dispatch(
-//							IncomeExpenseAction.SetFinancialID(financial.id)
-//						)
-//
-//						showSheet()
-//					},
-//					modifier = Modifier
-//						.padding(horizontal = 8.dpScaled)
-//						.testTag("SwipeableFinancialCard")
-//				)
-//			}
 		}
+		
+		swipeableFinancialCard(
+			data = transactions,
+			onFinancialCardDismissToEnd = { onDeleteTransaction(it) },
+			onFinancialCardClicked = {
+				navController.navigate(
+					DujerDestination.BottomSheet.Financial.createRoute(
+						action = FinancialAction.EDIT,
+						financialID = it.id
+					)
+				)
+			},
+			onNavigateCategoryClicked = { category ->
+				navController.navigate(
+					DujerDestination.CategoryTransaction.createRoute(category.id)
+				)
+			}
+		)
 	}
 }

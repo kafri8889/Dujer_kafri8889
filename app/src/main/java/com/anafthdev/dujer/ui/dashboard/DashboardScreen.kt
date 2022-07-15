@@ -11,15 +11,14 @@ import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.CornerSize
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.*
+import androidx.compose.material.ExperimentalMaterialApi
+import androidx.compose.material.ModalBottomSheetLayout
+import androidx.compose.material.ModalBottomSheetValue
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.Add
 import androidx.compose.material.icons.rounded.FilterList
-import androidx.compose.material3.FloatingActionButton
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Text
+import androidx.compose.material.rememberModalBottomSheetState
+import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
@@ -50,7 +49,6 @@ import com.anafthdev.dujer.ui.app.LocalDujerState
 import com.anafthdev.dujer.ui.chart.ChartScreen
 import com.anafthdev.dujer.ui.dashboard.component.*
 import com.anafthdev.dujer.ui.dashboard.subscreen.AddWalletScreen
-import com.anafthdev.dujer.ui.financial.FinancialScreen
 import com.anafthdev.dujer.ui.financial.data.FinancialAction
 import com.anafthdev.dujer.ui.search.SearchScreen
 import com.anafthdev.dujer.ui.theme.Typography
@@ -62,112 +60,58 @@ import com.anafthdev.dujer.uicomponent.FilterSortFinancialPopup
 import com.anafthdev.dujer.uicomponent.TopAppBar
 import com.anafthdev.dujer.uicomponent.swipeableFinancialCard
 import com.github.mikephil.charting.data.LineDataSet
+import com.google.accompanist.navigation.material.BottomSheetNavigator
+import com.google.accompanist.navigation.material.ExperimentalMaterialNavigationApi
 import com.google.accompanist.pager.ExperimentalPagerApi
 import com.google.accompanist.pager.HorizontalPager
 import com.google.accompanist.pager.rememberPagerState
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
-@OptIn(ExperimentalMaterialApi::class)
+@OptIn(ExperimentalMaterialNavigationApi::class)
 @Composable
 fun DashboardScreen(
 	navController: NavController,
+	bottomSheetNavigator: BottomSheetNavigator,
 	onDeleteTransaction: (Financial) -> Unit
 ) {
 	
 	val dashboardViewModel = hiltViewModel<DashboardViewModel>()
 	
-	val scope = rememberCoroutineScope()
-	val financialScreenSheetState = rememberModalBottomSheetState(
-		initialValue = ModalBottomSheetValue.Hidden,
-		skipHalfExpanded = true
-	)
-	
 	val state by dashboardViewModel.state.collectAsState()
 	
-	val financial = state.financial
-	val financialAction = state.financialAction
-	
-	DisposableEffect(financialScreenSheetState.isVisible) {
-		onDispose {
-			if (!financialScreenSheetState.isVisible) {
-				dashboardViewModel.dispatch(
-					DashboardAction.SetFinancialID(Financial.default.id)
-				)
-				
-				dashboardViewModel.dispatch(
-					DashboardAction.SetFinancialAction(FinancialAction.NEW)
-				)
-			}
-		}
-	}
-	
-	BackHandler(enabled = financialScreenSheetState.isVisible) {
-		scope.launch {
-			financialScreenSheetState.hide()
-		}
-	}
-	
-	ModalBottomSheetLayout(
-		scrimColor = Color.Unspecified,
-		sheetState = financialScreenSheetState,
-		sheetContent = {
-			FinancialScreen(
-				isScreenVisible = financialScreenSheetState.isVisible,
-				financial = financial,
-				financialAction = financialAction,
-				onBack = {
-					scope.launch {
-						financialScreenSheetState.hide()
-					}
-				},
-				onSave = {
-					scope.launch {
-						financialScreenSheetState.hide()
+	SearchScreen(
+		navController = navController,
+		canBack = !bottomSheetNavigator.navigatorSheetState.isVisible,
+		content = {
+			DashboardContent(
+				state = state,
+				viewModel = dashboardViewModel,
+				navController = navController,
+				onDeleteTransaction = onDeleteTransaction,
+				onSettingClicked = {
+					navController.navigate(DujerDestination.Setting.route) {
+						navController.graph.startDestinationRoute?.let { startRoute ->
+							popUpTo(startRoute) {
+								saveState = true
+							}
+						}
+						
+						restoreState = true
+						launchSingleTop = true
 					}
 				}
 			)
+		},
+		onFinancialClicked = { clickedFinancial ->
+			navController.navigate(
+				DujerDestination.BottomSheet.Financial.createRoute(
+					action = FinancialAction.EDIT,
+					financialID = clickedFinancial.id
+				)
+			)
 		}
-	) {
-		SearchScreen(
-			navController = navController,
-			canBack = !financialScreenSheetState.isVisible,
-			content = {
-				DashboardContent(
-					state = state,
-					financialScreenSheetState = financialScreenSheetState,
-					viewModel = dashboardViewModel,
-					navController = navController,
-					onDeleteTransaction = onDeleteTransaction,
-					onSettingClicked = {
-						navController.navigate(DujerDestination.Setting.route) {
-							navController.graph.startDestinationRoute?.let { startRoute ->
-								popUpTo(startRoute) {
-									saveState = true
-								}
-							}
-							
-							restoreState = true
-							launchSingleTop = true
-						}
-					}
-				)
-			},
-			onFinancialClicked = { clickedFinancial ->
-				dashboardViewModel.dispatch(
-					DashboardAction.SetFinancialAction(FinancialAction.EDIT)
-				)
-				
-				dashboardViewModel.dispatch(
-					DashboardAction.SetFinancialID(clickedFinancial.id)
-				)
-				
-				scope.launch {
-					financialScreenSheetState.show()
-				}
-			}
-		)
-	}
+	)
 	
 }
 
@@ -177,7 +121,6 @@ fun DashboardScreen(
 @Composable
 private fun DashboardContent(
 	state: DashboardState,
-	financialScreenSheetState: ModalBottomSheetState,
 	viewModel: DashboardViewModel,
 	navController: NavController,
 	onSettingClicked: () -> Unit,
@@ -199,23 +142,12 @@ private fun DashboardContent(
 	var showFABNewTransaction by rememberSaveable { mutableStateOf(true) }
 	var isFilterSortFinancialPopupShowed by rememberSaveable { mutableStateOf(false) }
 	
-	val showFinancialSheet = {
-		scope.launch { financialScreenSheetState.show() }
-		Unit
-	}
-	
-	val hideFinancialSheet = {
-		scope.launch { financialScreenSheetState.hide() }
-		Unit
-	}
-	
 	LaunchedEffect(dashboardPagerState.currentPage) {
 		homeLazyListState.animateScrollToItem(0)
 	}
 	
 	BackHandler {
 		when {
-			financialScreenSheetState.isVisible -> hideFinancialSheet()
 			dashboardPagerState.currentPage != 0 -> {
 				scope.launch { dashboardPagerState.animateScrollToPage(0) }
 			}
@@ -291,11 +223,12 @@ private fun DashboardContent(
 		) {
 			FloatingActionButton(
 				onClick = {
-					viewModel.dispatch(
-						DashboardAction.SetFinancialAction(FinancialAction.NEW)
+					navController.navigate(
+						DujerDestination.BottomSheet.Financial.createRoute(
+							action = FinancialAction.NEW,
+							financialID = Financial.default.id
+						)
 					)
-					
-					showFinancialSheet()
 				}
 			) {
 				Icon(
@@ -370,15 +303,12 @@ private fun DashboardContent(
 						homeLazyListState = homeLazyListState,
 						navController = navController,
 						onFinancialCardClicked = { financial ->
-							viewModel.dispatch(
-								DashboardAction.SetFinancialAction(FinancialAction.EDIT)
+							navController.navigate(
+								DujerDestination.BottomSheet.Financial.createRoute(
+									action = FinancialAction.EDIT,
+									financialID = financial.id
+								)
 							)
-							
-							viewModel.dispatch(
-								DashboardAction.SetFinancialID(financial.id)
-							)
-							
-							showFinancialSheet()
 						},
 						onFinancialCardDismissToEnd = onDeleteTransaction,
 						onWalletSheetOpened = { isOpened ->
@@ -393,15 +323,12 @@ private fun DashboardContent(
 					1 -> ChartScreen(
 						onFinancialCardDismissToEnd = onDeleteTransaction,
 						onFinancialCardClicked = { financial ->
-							viewModel.dispatch(
-								DashboardAction.SetFinancialAction(FinancialAction.EDIT)
+							navController.navigate(
+								DujerDestination.BottomSheet.Financial.createRoute(
+									action = FinancialAction.EDIT,
+									financialID = financial.id
+								)
 							)
-							
-							viewModel.dispatch(
-								DashboardAction.SetFinancialID(financial.id)
-							)
-							
-							showFinancialSheet()
 						}
 					)
 				}

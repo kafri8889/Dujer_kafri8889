@@ -28,16 +28,6 @@ class CategoryTransactionViewModel @Inject constructor(
 				}
 			}
 		}
-		
-		viewModelScope.launch(environment.dispatcher) {
-			environment.getFinancial().collect { mFinancial ->
-				setState {
-					copy(
-						financial = mFinancial
-					)
-				}
-			}
-		}
 	}
 	
 	override fun dispatch(action: CategoryTransactionAction) {
@@ -45,11 +35,6 @@ class CategoryTransactionViewModel @Inject constructor(
 			is CategoryTransactionAction.GetCategory -> {
 				viewModelScope.launch(environment.dispatcher) {
 					environment.setCategory(action.id)
-				}
-			}
-			is CategoryTransactionAction.GetFinancial -> {
-				viewModelScope.launch(environment.dispatcher) {
-					environment.setFinancial(action.id)
 				}
 			}
 		}

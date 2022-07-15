@@ -27,16 +27,6 @@ class WalletViewModel @Inject constructor(
 		}
 		
 		viewModelScope.launch(environment.dispatcher) {
-			environment.getFinancial().collect { financial ->
-				setState {
-					copy(
-						financial = financial
-					)
-				}
-			}
-		}
-		
-		viewModelScope.launch(environment.dispatcher) {
 			environment.getSelectedFinancialType().collect { type ->
 				setState {
 					copy(
@@ -122,11 +112,6 @@ class WalletViewModel @Inject constructor(
 			is WalletAction.GetWallet -> {
 				viewModelScope.launch(environment.dispatcher) {
 					environment.setWalletID(action.id)
-				}
-			}
-			is WalletAction.GetFinancial -> {
-				viewModelScope.launch(environment.dispatcher) {
-					environment.setFinancialID(action.id)
 				}
 			}
 			is WalletAction.UpdateWallet -> {

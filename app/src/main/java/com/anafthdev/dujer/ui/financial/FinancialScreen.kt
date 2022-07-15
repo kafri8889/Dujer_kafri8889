@@ -1,6 +1,7 @@
 package com.anafthdev.dujer.ui.financial
 
 import android.annotation.SuppressLint
+import androidx.activity.compose.BackHandler
 import androidx.compose.animation.*
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
@@ -29,12 +30,11 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
-import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.navigation.NavController
 import com.anafthdev.dujer.R
-import com.anafthdev.dujer.data.FinancialType
 import com.anafthdev.dujer.data.db.model.Budget
 import com.anafthdev.dujer.data.db.model.Category
 import com.anafthdev.dujer.data.db.model.Financial
@@ -44,25 +44,23 @@ import com.anafthdev.dujer.foundation.common.CurrencyFormatter
 import com.anafthdev.dujer.foundation.common.TextFieldCurrencyFormatter
 import com.anafthdev.dujer.foundation.common.showDatePicker
 import com.anafthdev.dujer.foundation.extension.deviceLocale
-import com.anafthdev.dujer.foundation.extension.get
 import com.anafthdev.dujer.foundation.extension.isIncome
 import com.anafthdev.dujer.foundation.extension.toColor
 import com.anafthdev.dujer.foundation.ui.LocalUiColor
 import com.anafthdev.dujer.foundation.window.dpScaled
 import com.anafthdev.dujer.foundation.window.spScaled
 import com.anafthdev.dujer.model.LocalCurrency
-import com.anafthdev.dujer.ui.MainActivity
+import com.anafthdev.dujer.runtime.MainActivity
 import com.anafthdev.dujer.ui.app.LocalDujerState
+import com.anafthdev.dujer.ui.financial.FinancialAction.*
 import com.anafthdev.dujer.ui.financial.component.CategoryList
 import com.anafthdev.dujer.ui.financial.component.MaxBudgetReachedPopup
 import com.anafthdev.dujer.ui.financial.component.WalletList
 import com.anafthdev.dujer.ui.financial.data.FinancialAction
 import com.anafthdev.dujer.ui.theme.Inter
-import com.anafthdev.dujer.ui.theme.medium_shape
 import com.anafthdev.dujer.ui.theme.small_shape
 import com.anafthdev.dujer.uicomponent.FinancialTypeSelector
 import com.anafthdev.dujer.uicomponent.TopAppBar
-import timber.log.Timber
 import java.text.SimpleDateFormat
 import java.util.*
 import kotlin.random.Random
@@ -70,11 +68,10 @@ import kotlin.random.Random
 @SuppressLint("RememberReturnType")
 @Composable
 fun FinancialScreen(
+	navController: NavController,
 	isScreenVisible: Boolean,
-	financial: Financial,
-	financialAction: String,
-	onBack: () -> Unit,
-	onSave: () -> Unit
+	financialID: Int,
+	financialAction: String
 ) {
 	
 	val context = LocalContext.current
@@ -82,7 +79,9 @@ fun FinancialScreen(
 	val localCurrency = LocalCurrency.current
 	val focusManager = LocalFocusManager.current
 	
-	val financialViewModel = hiltViewModel<FinancialViewModel>()
+	val viewModel = hiltViewModel<FinancialViewModel>()
+	
+	val state by viewModel.state.collectAsState()
 	
 	val allWallet = dujerState.allWallet
 	val allCategory = dujerState.allCategory
@@ -91,20 +90,12 @@ fun FinancialScreen(
 	var currentFinancialMaxBudgetPopup by remember { mutableStateOf(Financial.default) }
 	var currentBudgetMaxBudgetPopup by remember { mutableStateOf(Budget.defalut) }
 	
-	var financialNew by remember { mutableStateOf(Financial.default.copy(id = -1)) }
-	var financialTitle: String by remember { mutableStateOf("") }
-	var financialAmountDouble: Double by remember { mutableStateOf(0.0) }
-	var financialAmount: TextFieldValue by remember { mutableStateOf(TextFieldValue()) }
-	var financialDate: Long by remember { mutableStateOf(System.currentTimeMillis()) }
-	var financialCategoryForIncome: Category by remember { mutableStateOf(Category.otherIncome) }
-	var financialCategoryForExpense: Category by remember { mutableStateOf(Category.otherExpense) }
-	var financialType: FinancialType by remember { mutableStateOf(FinancialType.INCOME) }
 	val financialCategory = remember(
-		financialType,
-		financialCategoryForIncome,
-		financialCategoryForExpense
+		state.financialType,
+		state.financialCategoryForIncome,
+		state.financialCategoryForExpense
 	) {
-		if (financialType.isIncome()) financialCategoryForIncome else financialCategoryForExpense
+		if (state.financialType.isIncome()) state.financialCategoryForIncome else state.financialCategoryForExpense
 	}
 	
 	val calendar = remember { Calendar.getInstance() }
@@ -117,64 +108,103 @@ fun FinancialScreen(
 	var dateFocusRequesterHasFocus by remember { mutableStateOf(false) }
 	var isCategoryListShowed by remember { mutableStateOf(false) }
 	var isWalletListShowed by remember { mutableStateOf(false) }
-	var selectedWallet by remember { mutableStateOf(Wallet.cash) }
 	
-	val categorySelectorItems = remember(allCategory, financialType) {
-		allCategory.filter { it.type == financialType }
+	val categorySelectorItems = remember(allCategory, state.financialType) {
+		allCategory.filter { it.type == state.financialType }
 	}
 	
-	val resetFinancial = {
-		selectedWallet = Wallet.cash
-		financialNew = Financial.default
-		financialTitle = ""
-		financialDate = System.currentTimeMillis()
-		financialCategoryForIncome = Category.otherIncome
-		financialCategoryForExpense = Category.otherExpense
-		financialType = FinancialType.INCOME
-		financialAmountDouble = 0.0
-		financialAmount = TextFieldValue(
-			text = CurrencyFormatter.format(
-				locale = deviceLocale,
-				amount = 0.0,
-				useSymbol = false,
-				currencyCode = financial.currency.countryCode
+	val saveFinancial = {
+		viewModel.dispatch(
+			ResetState(
+				currencyCode = state.selectedFinancial.currency.countryCode
+			)
+		)
+		
+		navController.popBackStack()
+	}
+	
+	when {
+		(financialAction == FinancialAction.EDIT) and (financialID != state.financialNew.id) -> {
+			viewModel.dispatch(
+				SetFinancialNew(
+					financial = state.selectedFinancial
+				)
+			)
+			
+			viewModel.dispatch(
+				SetFinancialTitle(
+					title = state.selectedFinancial.name
+				)
+			)
+			
+			viewModel.dispatch(
+				SetFinancialDate(
+					date = state.selectedFinancial.dateCreated
+				)
+			)
+			
+			viewModel.dispatch(
+				SetFinancialType(
+					type = state.selectedFinancial.type
+				)
+			)
+			
+			viewModel.dispatch(
+				SetFinancialAmountDouble(
+					amount = state.selectedFinancial.amount
+				)
+			)
+			
+			viewModel.dispatch(
+				SetFinancialAmount(
+					value = state.financialAmount.copy(
+						text = CurrencyFormatter.format(
+							locale = deviceLocale,
+							amount = state.selectedFinancial.amount,
+							useSymbol = false,
+							currencyCode = state.selectedFinancial.currency.countryCode
+						)
+					)
+				)
+			)
+			
+			viewModel.dispatch(
+				if (state.selectedFinancial.type.isIncome()) {
+					SetFinancialCategoryForIncome(
+						category = state.selectedFinancial.category
+					)
+				} else {
+					SetFinancialCategoryForExpense(
+						category = state.selectedFinancial.category
+					)
+				}
+			)
+			
+			viewModel.dispatch(
+				SetSelectedWallet(
+					wallet = allWallet.find { it.id == state.selectedFinancial.walletID } ?: Wallet.cash
+				)
+			)
+		}
+	}
+	
+	LaunchedEffect(financialID) {
+		viewModel.dispatch(
+			GetFinancial(
+				id = financialID
 			)
 		)
 	}
 	
-	val saveFinancial = {
-		onSave()
-		resetFinancial()
-	}
-	
-	when {
-		(financialAction == FinancialAction.EDIT) and (financial.id != financialNew.id) -> {
-			financialNew = financial
-			financialTitle = financial.name
-			financialDate = financial.dateCreated
-			financialType = financial.type
-			financialAmountDouble = financial.amount
-			financialAmount = financialAmount.copy(
-				CurrencyFormatter.format(
-					locale = deviceLocale,
-					amount = financial.amount,
-					useSymbol = false,
-					currencyCode = financial.currency.countryCode
+	LaunchedEffect(isScreenVisible) {
+		if (!isScreenVisible) {
+			viewModel.dispatch(
+				ResetState(
+					currencyCode = state.selectedFinancial.currency.countryCode
 				)
 			)
-			
-			if (financial.type.isIncome()) {
-				financialCategoryForIncome = financial.category
-			} else {
-				financialCategoryForExpense = financial.category
-			}
-			
-			selectedWallet = allWallet.get { it.id == financial.walletID } ?: Wallet.cash
 		}
-	}
-	
-	LaunchedEffect(isScreenVisible) {
-		resetFinancial()
+		
 		focusManager.clearFocus(force = true)
 	}
 	
@@ -182,12 +212,17 @@ fun FinancialScreen(
 		onDispose {
 			if (dateFocusRequesterHasFocus) {
 				(context as MainActivity).showDatePicker(
-					selection = financialDate,
+					selection = state.financialDate,
 					min = calendar.apply {
 						set(Calendar.YEAR, 2000)
 					}.timeInMillis,
 					onPick = { timeInMillis ->
-						financialDate = timeInMillis
+						viewModel.dispatch(
+							SetFinancialDate(
+								date = timeInMillis
+							)
+						)
+						
 						focusManager.moveFocus(FocusDirection.Next)
 					},
 					onCancel = {
@@ -203,7 +238,10 @@ fun FinancialScreen(
 			!isCategoryListShowed and categoryFocusRequesterHasFocus -> focusManager.clearFocus(force = true)
 			!isWalletListShowed and walletFocusRequesterHasFocus -> focusManager.clearFocus(force = true)
 		}
-		
+	}
+	
+	BackHandler {
+		navController.popBackStack()
 	}
 	
 	Box(
@@ -225,15 +263,15 @@ fun FinancialScreen(
 			MaxBudgetReachedPopup(
 				budget = currentBudgetMaxBudgetPopup,
 				financial = currentFinancialMaxBudgetPopup,
-				financialEdit = financialNew,
+				financialEdit = state.financialNew,
 				onClose = {
 					isMaxBudgetReachedPopupShowed = false
 				}, onIgnore = {
 					isMaxBudgetReachedPopupShowed = false
-					financialViewModel.dispatch(
+					viewModel.dispatch(
 						if (financialAction == FinancialAction.EDIT) {
-							com.anafthdev.dujer.ui.financial.FinancialAction.Update(currentFinancialMaxBudgetPopup)
-						} else com.anafthdev.dujer.ui.financial.FinancialAction.Insert(currentFinancialMaxBudgetPopup)
+							Update(currentFinancialMaxBudgetPopup)
+						} else Insert(currentFinancialMaxBudgetPopup)
 					)
 					
 					saveFinancial()
@@ -250,7 +288,9 @@ fun FinancialScreen(
 		) {
 			TopAppBar {
 				IconButton(
-					onClick = onBack,
+					onClick = {
+						navController.popBackStack()
+					},
 					modifier = Modifier
 						.padding(start = 8.dpScaled)
 						.align(Alignment.CenterStart)
@@ -295,14 +335,18 @@ fun FinancialScreen(
 					)
 					
 					OutlinedTextField(
-						value = financialTitle,
+						value = state.financialTitle,
 						singleLine = true,
 						shape = small_shape,
 						textStyle = LocalTextStyle.current.copy(
 							fontFamily = Inter
 						),
 						onValueChange = { s ->
-							financialTitle = s
+							viewModel.dispatch(
+								SetFinancialTitle(
+									title = s
+								)
+							)
 						},
 						keyboardOptions = KeyboardOptions(
 							keyboardType = KeyboardType.Text,
@@ -325,7 +369,7 @@ fun FinancialScreen(
 					)
 					
 					OutlinedTextField(
-						value = financialAmount,
+						value = state.financialAmount,
 						singleLine = true,
 						shape = small_shape,
 						textStyle = LocalTextStyle.current.copy(
@@ -334,16 +378,25 @@ fun FinancialScreen(
 						onValueChange = { s ->
 							val formattedValue = TextFieldCurrencyFormatter.getFormattedCurrency(
 								fieldValue = s,
-								countryCode = financial.currency.countryCode
+								countryCode = state.selectedFinancial.currency.countryCode
 							)
 							
-							financialAmountDouble = formattedValue.first
-							financialAmount = formattedValue.second
+							viewModel.dispatch(
+								SetFinancialAmountDouble(
+									amount = formattedValue.first
+								)
+							)
+							
+							viewModel.dispatch(
+								SetFinancialAmount(
+									value = formattedValue.second
+								)
+							)
 						},
 						leadingIcon = {
 							Text(
 								text = if (financialAction == FinancialAction.EDIT) {
-									financialNew.currency.symbol
+									state.financialNew.currency.symbol
 								} else CurrencyFormatter.getSymbol(
 									locale = deviceLocale,
 									currencyCode = localCurrency.countryCode
@@ -377,7 +430,7 @@ fun FinancialScreen(
 					
 					OutlinedTextField(
 						value = SimpleDateFormat("dd MMM yyyy", deviceLocale).format(
-							financialDate
+							state.financialDate
 						),
 						singleLine = true,
 						readOnly = true,
@@ -473,11 +526,17 @@ fun FinancialScreen(
 						CategoryList(
 							categories = categorySelectorItems,
 							onItemClick = { category ->
-								if (financialType.isIncome()) {
-									financialCategoryForIncome = category
-								} else {
-									financialCategoryForExpense = category
-								}
+								viewModel.dispatch(
+									if (state.financialType.isIncome()) {
+										SetFinancialCategoryForIncome(
+											category = category
+										)
+									} else {
+										SetFinancialCategoryForExpense(
+											category = category
+										)
+									}
+								)
 								
 								isCategoryListShowed = false
 							}
@@ -496,7 +555,7 @@ fun FinancialScreen(
 					)
 					
 					OutlinedTextField(
-						value = selectedWallet.name,
+						value = state.selectedWallet.name,
 						singleLine = true,
 						readOnly = true,
 						shape = small_shape,
@@ -511,18 +570,18 @@ fun FinancialScreen(
 										start = 8.dp
 									)
 									.size(44.dp)
-									.clip(MaterialTheme.shapes.small)
+									.clip(MaterialTheme.shapes.medium)
 									.border(
 										width = 1.dpScaled,
 										color = MaterialTheme.colorScheme.outline,
-										shape = medium_shape
+										shape = MaterialTheme.shapes.medium
 									)
-									.background(selectedWallet.tint.backgroundTint.toColor())
+									.background(state.selectedWallet.tint.backgroundTint.toColor())
 									.align(Alignment.CenterHorizontally)
 							) {
 								Icon(
-									painter = painterResource(id = selectedWallet.iconID),
-									tint = selectedWallet.tint.iconTint.toColor(),
+									painter = painterResource(id = state.selectedWallet.iconID),
+									tint = state.selectedWallet.tint.iconTint.toColor(),
 									contentDescription = null,
 									modifier = Modifier
 										.align(Alignment.Center)
@@ -571,7 +630,12 @@ fun FinancialScreen(
 						WalletList(
 							wallets = allWallet,
 							onWalletSelected = { wallet ->
-								selectedWallet = wallet
+								viewModel.dispatch(
+									SetSelectedWallet(
+										wallet = wallet
+									)
+								)
+								
 								isWalletListShowed = false
 							}
 						)
@@ -590,9 +654,13 @@ fun FinancialScreen(
 					
 					FinancialTypeSelector(
 						enableDoubleClick = false,
-						selectedFinancialType = financialType,
+						selectedFinancialType = state.financialType,
 						onFinancialTypeChanged = { type ->
-							financialType = type
+							viewModel.dispatch(
+								SetFinancialType(
+									type = type
+								)
+							)
 						},
 						modifier = Modifier
 							.padding(top = 8.dpScaled)
@@ -601,11 +669,11 @@ fun FinancialScreen(
 					Button(
 						onClick = {
 							when {
-								financialTitle.isBlank() -> {
+								state.financialTitle.isBlank() -> {
 									context.getString(R.string.title_cannot_be_empty).toast(context)
 									return@Button
 								}
-								financialAmount.text.isBlank() -> {
+								state.financialAmount.text.isBlank() -> {
 									context.getString(R.string.amount_cannot_be_empty).toast(context)
 									return@Button
 								}
@@ -618,13 +686,13 @@ fun FinancialScreen(
 							val budget = allBudget.find { it.category.id == financialCategory.id }
 							val isMaxReached = budget?.isMaxReached ?: false
 							val mFinancial = if (financialAction == FinancialAction.EDIT) {
-								financialNew.copy(
-									name = financialTitle,
-									amount = financialAmountDouble,
-									dateCreated = financialDate,
+								state.financialNew.copy(
+									name = state.financialTitle,
+									amount = state.financialAmountDouble,
+									dateCreated = state.financialDate,
 									category = financialCategory,
-									type = financialType,
-									walletID = selectedWallet.id
+									type = state.financialType,
+									walletID = state.selectedWallet.id
 								)
 							} else {
 								val random = Random(System.currentTimeMillis())
@@ -632,23 +700,21 @@ fun FinancialScreen(
 								
 								Financial(
 									id = id,
-									name = financialTitle,
-									amount = financialAmountDouble,
-									type = financialType,
+									name = state.financialTitle,
+									amount = state.financialAmountDouble,
+									type = state.financialType,
 									category = financialCategory,
 									currency = localCurrency,
-									dateCreated = financialDate,
-									walletID = selectedWallet.id
-								).also {
-									Timber.i("begin insert: $it")
-								}
+									dateCreated = state.financialDate,
+									walletID = state.selectedWallet.id
+								)
 							}
 							
 							val updateFinancial = {
-								financialViewModel.dispatch(
+								viewModel.dispatch(
 									if (financialAction == FinancialAction.EDIT) {
-										com.anafthdev.dujer.ui.financial.FinancialAction.Update(mFinancial)
-									} else com.anafthdev.dujer.ui.financial.FinancialAction.Insert(mFinancial)
+										Update(mFinancial)
+									} else Insert(mFinancial)
 								)
 								
 								saveFinancial()
@@ -666,9 +732,7 @@ fun FinancialScreen(
 							.padding(vertical = 24.dpScaled)
 							.fillMaxWidth()
 					) {
-						Text(
-							text = stringResource(id = R.string.save)
-						)
+						Text(text = stringResource(id = R.string.save))
 					}
 					
 				}

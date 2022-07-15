@@ -1,8 +1,5 @@
 package com.anafthdev.dujer.ui.dashboard.environment
 
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.asFlow
 import com.anafthdev.dujer.data.FinancialGroupData
 import com.anafthdev.dujer.data.FinancialType
 import com.anafthdev.dujer.data.GroupType
@@ -18,7 +15,6 @@ import com.anafthdev.dujer.foundation.di.DiName
 import com.anafthdev.dujer.foundation.extension.deviceLocale
 import com.anafthdev.dujer.foundation.extension.forEachMap
 import com.anafthdev.dujer.foundation.extension.indexOf
-import com.anafthdev.dujer.ui.financial.data.FinancialAction
 import com.github.mikephil.charting.data.Entry
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
@@ -37,12 +33,6 @@ class DashboardEnvironment @Inject constructor(
 	private val financialSorter: FinancialSorter,
 	private val appRepository: IAppRepository
 ): IDashboardEnvironment {
-	
-	private val _financial = MutableLiveData(Financial.default)
-	private val financial: LiveData<Financial> = _financial
-	
-	private val _financialAction = MutableLiveData(FinancialAction.NEW)
-	private val financialAction: LiveData<String> = _financialAction
 	
 	private val _selectedSortType = MutableStateFlow(SortType.A_TO_Z)
 	private val selectedSortType: StateFlow<SortType> = _selectedSortType
@@ -129,14 +119,6 @@ class DashboardEnvironment @Inject constructor(
 		}
 	}
 	
-	override fun getFinancial(): Flow<Financial> {
-		return financial.asFlow()
-	}
-	
-	override fun getFinancialAction(): Flow<String> {
-		return financialAction.asFlow()
-	}
-	
 	override fun getSortType(): Flow<SortType> {
 		return selectedSortType
 	}
@@ -173,10 +155,6 @@ class DashboardEnvironment @Inject constructor(
 		return expenseEntry
 	}
 	
-	override suspend fun setFinancialID(id: Int) {
-		_financial.postValue(appRepository.get(id) ?: Financial.default)
-	}
-	
 	override suspend fun insertWallet(wallet: Wallet) {
 		appRepository.walletRepository.insertWallet(wallet)
 	}
@@ -197,11 +175,7 @@ class DashboardEnvironment @Inject constructor(
 		_selectedMonth.emit(selectedMonth)
 	}
 	
-	override fun setFinancialAction(action: String) {
-		_financialAction.postValue(action)
-	}
-	
-	fun getLineDataSetEntry(
+	private fun getLineDataSetEntry(
 		incomeList: List<Financial>,
 		expenseList: List<Financial>
 	): Pair<List<Entry>, List<Entry>> {

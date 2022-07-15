@@ -37,16 +37,6 @@ class IncomeExpenseViewModel @Inject constructor(
 	
 	init {
 		viewModelScope.launch(environment.dispatcher) {
-			environment.getFinancial().collect { financial ->
-				setState {
-					copy(
-						financial = financial
-					)
-				}
-			}
-		}
-		
-		viewModelScope.launch(environment.dispatcher) {
 			environment.getTransactions().collect { transactions ->
 				setState {
 					copy(
@@ -99,11 +89,6 @@ class IncomeExpenseViewModel @Inject constructor(
 	
 	override fun dispatch(action: IncomeExpenseAction) {
 		when (action) {
-			is IncomeExpenseAction.SetFinancialID -> {
-				viewModelScope.launch(environment.dispatcher) {
-					environment.setFinancialID(action.id)
-				}
-			}
 			is IncomeExpenseAction.SetSortType -> {
 				viewModelScope.launch(environment.dispatcher) {
 					environment.setSortType(action.sortType)

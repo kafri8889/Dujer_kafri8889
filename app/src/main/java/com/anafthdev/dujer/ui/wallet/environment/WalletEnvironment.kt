@@ -35,9 +35,6 @@ class WalletEnvironment @Inject constructor(
 	private val _selectedWallet = MutableLiveData(Wallet.cash)
 	private val selectedWallet: LiveData<Wallet> = _selectedWallet
 	
-	private val _selectedFinancial = MutableLiveData(Financial.default)
-	private val selectedFinancial: LiveData<Financial> = _selectedFinancial
-	
 	private val _availableCategory = MutableStateFlow(emptyList<Category>())
 	private val availableCategory: StateFlow<List<Category>> = _availableCategory
 	
@@ -188,12 +185,6 @@ class WalletEnvironment @Inject constructor(
 		return transactions
 	}
 	
-	override suspend fun setFinancialID(id: Int) {
-		_selectedFinancial.postValue(
-			appRepository.get(id) ?: Financial.default
-		)
-	}
-	
 	override suspend fun setSortType(sortType: SortType) {
 		_selectedSortType.emit(sortType)
 	}
@@ -212,10 +203,6 @@ class WalletEnvironment @Inject constructor(
 	
 	override suspend fun setSelectedFinancialType(type: FinancialType) {
 		_selectedFinancialType.emit(type)
-	}
-	
-	override fun getFinancial(): Flow<Financial> {
-		return selectedFinancial.asFlow()
 	}
 	
 	override fun getPieEntries(): Flow<List<PieEntry>> {

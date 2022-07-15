@@ -1,4 +1,4 @@
-package com.anafthdev.dujer.ui
+package com.anafthdev.dujer.runtime
 
 import android.os.Bundle
 import androidx.activity.compose.setContent
