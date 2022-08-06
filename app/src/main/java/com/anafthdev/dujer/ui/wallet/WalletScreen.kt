@@ -25,6 +25,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -315,6 +316,7 @@ private fun WalletScreenContent(
 ) {
 	
 	val context = LocalContext.current
+	val uiColor = LocalUiColor.current
 	val dujerState = LocalDujerState.current
 	val localCurrency = LocalCurrency.current
 	
@@ -370,6 +372,7 @@ private fun WalletScreenContent(
 			isUsingSliceColorAsValueLineColor = true
 			
 			colors = pieColors
+			valueTextColor = uiColor.titleText.toArgb()
 			valueLineColor = android.graphics.Color.MAGENTA
 			yValuePosition = PieDataSet.ValuePosition.OUTSIDE_SLICE
 			valueFormatter = PercentValueFormatter()
@@ -683,6 +686,11 @@ private fun WalletScreenContent(
 					category = selectedCategory,
 					selectedColor = selectedPieColor,
 					onNothingSelected = resetPieChart,
+					onStatisticCardClicked = {
+						navController.navigate(
+							DujerDestination.CategoryTransaction.createRoute(selectedCategory.id)
+						)
+					},
 					onPieDataSelected = { highlight: Highlight, categoryID ->
 						val category = allCategory.find { it.id == categoryID } ?: Category.default
 						

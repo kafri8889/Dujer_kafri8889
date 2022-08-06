@@ -31,7 +31,8 @@ fun StatisticCategoryCard(
 	color: Color,
 	category: Category,
 	totalAmount: Double,
-	modifier: Modifier = Modifier
+	modifier: Modifier = Modifier,
+	onClick: () -> Unit
 ) {
 	
 	Card(
@@ -40,6 +41,7 @@ fun StatisticCategoryCard(
 			width = 1.dpScaled,
 			color = MaterialTheme.colorScheme.outline
 		),
+		onClick = onClick,
 		modifier = modifier
 	) {
 		Row(

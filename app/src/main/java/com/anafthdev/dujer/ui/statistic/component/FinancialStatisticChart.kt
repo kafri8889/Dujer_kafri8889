@@ -42,6 +42,7 @@ fun FinancialStatisticChart(
 	selectedColor: androidx.compose.ui.graphics.Color,
 	modifier: Modifier = Modifier,
 	onPieDataSelected: (Highlight, Int) -> Unit,
+	onStatisticCardClicked: () -> Unit,
 	onNothingSelected: () -> Unit
 ) {
 	
@@ -169,7 +170,8 @@ fun FinancialStatisticChart(
 			StatisticCategoryCard(
 				color = selectedColor,
 				category = selectedCategory,
-				totalAmount = (selectedEntry.data as Pair<*, *>).second as Double
+				totalAmount = (selectedEntry.data as Pair<*, *>).second as Double,
+				onClick = onStatisticCardClicked
 			)
 		}
 	}

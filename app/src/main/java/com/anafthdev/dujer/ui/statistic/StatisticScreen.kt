@@ -13,7 +13,6 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -25,7 +24,6 @@ import com.anafthdev.dujer.data.DujerDestination
 import com.anafthdev.dujer.data.FinancialType
 import com.anafthdev.dujer.data.db.model.Category
 import com.anafthdev.dujer.foundation.common.ColorTemplate
-import com.anafthdev.dujer.foundation.extension.merge
 import com.anafthdev.dujer.foundation.extension.toColor
 import com.anafthdev.dujer.foundation.ui.LocalUiColor
 import com.anafthdev.dujer.foundation.window.dpScaled
@@ -48,7 +46,6 @@ fun StatisticScreen(
 	
 	val context = LocalContext.current
 	val dujerState = LocalDujerState.current
-	val config = LocalConfiguration.current
 	
 	val statisticViewModel = hiltViewModel<StatisticViewModel>()
 	
@@ -68,11 +65,6 @@ fun StatisticScreen(
 	var isDataSetEmpty by remember { mutableStateOf(false) }
 	
 	val pieColors = remember { mutableStateListOf<Int>() }
-	val financialAmountForSelectedCategory = remember(incomeTransaction, expenseTransaction, selectedCategory) {
-		incomeTransaction.merge(expenseTransaction)
-			.filter { it.category.id == selectedCategory.id }
-			.sumOf { it.amount }
-	}
 	
 	val totalIncomeAmount = remember(incomeTransaction) {
 		incomeTransaction.sumOf { it.amount }
@@ -192,6 +184,11 @@ fun StatisticScreen(
 					isDataSetEmpty = isDataSetEmpty,
 					category = selectedCategory,
 					selectedColor = selectedPieColor,
+					onStatisticCardClicked = {
+						navController.navigate(
+							DujerDestination.CategoryTransaction.createRoute(selectedCategory.id)
+						)
+					},
 					onPieDataSelected = { highlight: Highlight, categoryID ->
 						val category = allCategory.find { it.id == categoryID } ?: Category.default
 						
