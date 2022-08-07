@@ -4,8 +4,8 @@ import android.content.Context
 import android.os.Environment
 import android.widget.Toast
 import com.anafthdev.dujer.R
-import com.anafthdev.dujer.data.db.model.Financial
-import com.anafthdev.dujer.data.db.model.Wallet
+import com.anafthdev.dujer.data.model.Financial
+import com.anafthdev.dujer.data.model.Wallet
 import com.anafthdev.dujer.foundation.common.AppUtil.dateFormatter
 import com.anafthdev.dujer.foundation.common.AppUtil.toast
 import com.anafthdev.dujer.foundation.common.CurrencyFormatter

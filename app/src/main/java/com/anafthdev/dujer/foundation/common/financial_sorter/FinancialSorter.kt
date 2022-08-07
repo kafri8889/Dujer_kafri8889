@@ -1,8 +1,8 @@
 package com.anafthdev.dujer.foundation.common.financial_sorter
 
 import com.anafthdev.dujer.data.*
-import com.anafthdev.dujer.data.db.model.Category
-import com.anafthdev.dujer.data.db.model.Financial
+import com.anafthdev.dujer.data.model.Category
+import com.anafthdev.dujer.data.model.Financial
 import com.anafthdev.dujer.foundation.common.AppUtil
 import com.anafthdev.dujer.foundation.common.AppUtil.dateFormatter
 import com.anafthdev.dujer.foundation.common.AppUtil.monthFormatter

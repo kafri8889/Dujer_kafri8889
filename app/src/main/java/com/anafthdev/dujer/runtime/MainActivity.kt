@@ -7,15 +7,18 @@ import androidx.biometric.BiometricPrompt
 import androidx.core.view.WindowCompat
 import androidx.lifecycle.lifecycleScope
 import com.anafthdev.dujer.BuildConfig
+import com.anafthdev.dujer.data.datasource.local.db.DujerWriteDao
 import com.anafthdev.dujer.data.datastore.AppDatastore
-import com.anafthdev.dujer.data.db.model.Financial
-import com.anafthdev.dujer.data.db.model.Wallet
+import com.anafthdev.dujer.data.model.Category
+import com.anafthdev.dujer.data.model.Financial
+import com.anafthdev.dujer.data.model.Wallet
+import com.anafthdev.dujer.feature.app.DujerApp
 import com.anafthdev.dujer.foundation.common.AppUtil.toast
 import com.anafthdev.dujer.foundation.common.BiometricManager
 import com.anafthdev.dujer.foundation.common.csv.CSVWriter
+import com.anafthdev.dujer.foundation.extension.toCategoryDb
 import com.anafthdev.dujer.foundation.localized.LocalizedActivity
 import com.anafthdev.dujer.model.Currency
-import com.anafthdev.dujer.ui.app.DujerApp
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.first
@@ -27,6 +30,7 @@ import javax.inject.Inject
 class MainActivity : LocalizedActivity() {
 	
 	@Inject lateinit var appDatastore: AppDatastore
+	@Inject lateinit var writeDao: DujerWriteDao
 	
 	private lateinit var biometricManager: BiometricManager
 	
@@ -61,7 +65,16 @@ class MainActivity : LocalizedActivity() {
 		}
 		
 		WindowCompat.setDecorFitsSystemWindows(window, false)
-
+		
+		insertDefaultCategory()
+		authenticate()
+		
+		setContent {
+			DujerApp()
+		}
+	}
+	
+	private fun authenticate() {
 		lifecycleScope.launch(Dispatchers.Main) {
 			val isUseBioAuthSecurity = appDatastore.isUseBioAuth.first()
 			
@@ -99,9 +112,13 @@ class MainActivity : LocalizedActivity() {
 				).authenticate(biometricManager.createPromptInfo())
 			}
 		}
-		
-		setContent {
-			DujerApp()
+	}
+	
+	private fun insertDefaultCategory() {
+		lifecycleScope.launch {
+			writeDao.insertCategoryDb(
+				*Category.values.map { it.toCategoryDb() }.toTypedArray()
+			)
 		}
 	}
 	

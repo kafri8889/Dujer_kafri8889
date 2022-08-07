@@ -6,8 +6,8 @@ import androidx.compose.ui.test.performTouchInput
 import androidx.compose.ui.test.swipeRight
 import androidx.navigation.compose.rememberNavController
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import com.anafthdev.dujer.ui.app.viewmodel.FakeDujerViewModel
-import com.anafthdev.dujer.ui.screen.dashboard.DashboardScreen
+import com.anafthdev.dujer.feature.app.viewmodel.FakeDujerViewModel
+import com.anafthdev.dujer.feature.screen.dashboard.DashboardScreen
 import dagger.hilt.android.testing.HiltAndroidRule
 import dagger.hilt.android.testing.HiltAndroidTest
 import org.junit.Before

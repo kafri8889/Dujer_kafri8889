@@ -2,7 +2,7 @@ package com.anafthdev.dujer.foundation.ui
 
 import androidx.compose.runtime.compositionLocalOf
 import androidx.compose.ui.graphics.Color
-import com.anafthdev.dujer.ui.theme.*
+import com.anafthdev.dujer.feature.theme.*
 
 data class UiColor(
 	val headlineText: Color,

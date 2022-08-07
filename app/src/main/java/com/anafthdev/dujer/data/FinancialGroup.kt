@@ -1,7 +1,7 @@
 package com.anafthdev.dujer.data
 
-import com.anafthdev.dujer.data.db.model.Category
-import com.anafthdev.dujer.data.db.model.Financial
+import com.anafthdev.dujer.data.model.Category
+import com.anafthdev.dujer.data.model.Financial
 
 sealed interface FinancialGroup {
 	
