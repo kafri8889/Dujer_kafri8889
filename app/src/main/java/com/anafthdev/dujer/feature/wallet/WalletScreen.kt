@@ -376,12 +376,6 @@ private fun WalletScreenContent(
 		selectedPieColor = Color.Transparent
 	}
 	
-	LaunchedEffect(transactions) {
-		viewModel.dispatch(
-			WalletAction.GetWallet(wallet.id)
-		)
-	}
-	
 	LaunchedEffect(pieEntries) {
 		if (pieEntries.isEmpty()) {
 			selectedCategory = Category.default
