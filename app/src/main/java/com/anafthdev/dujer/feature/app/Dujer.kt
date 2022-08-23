@@ -22,11 +22,11 @@ import com.anafthdev.dujer.foundation.extension.isDarkTheme
 import com.anafthdev.dujer.foundation.ui.LocalUiColor
 import com.anafthdev.dujer.foundation.uimode.UiModeViewModel
 import com.anafthdev.dujer.foundation.uimode.data.LocalUiMode
+import com.anafthdev.dujer.foundation.viewmodel.HandleEffect
 import com.anafthdev.dujer.foundation.window.dpScaled
 import com.anafthdev.dujer.model.LocalCurrency
 import com.anafthdev.dujer.runtime.navigation.DujerNavigation
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
-import kotlinx.coroutines.Dispatchers
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @OptIn(
@@ -54,11 +54,6 @@ fun DujerApp() {
 	val systemUiController = rememberSystemUiController()
 	val snackbarHostState = remember { SnackbarHostState() }
 	
-	val effect by viewModel.effect.collectAsState(
-		initial = DujerEffect.Nothing,
-		context = Dispatchers.Main
-	)
-	
 	LaunchedEffect(lifecycleOwner) {
 		lifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
 			viewModel.dispatch(
@@ -67,25 +62,28 @@ fun DujerApp() {
 		}
 	}
 	
-	LaunchedEffect(effect) {
-		when (effect) {
-			is DujerEffect.DeleteFinancial -> {
-				snackbarHostState.currentSnackbarData?.dismiss()
-				snackbarHostState.showSnackbar(
-					message = "${context.getString(R.string.finance_removed)} \"${(effect as DujerEffect.DeleteFinancial).financial.name}\"",
-					duration = SnackbarDuration.Short
-				)
+	HandleEffect(
+		viewModel = viewModel,
+		handle = { effect ->
+			when (effect) {
+				is DujerEffect.DeleteFinancial -> {
+					snackbarHostState.currentSnackbarData?.dismiss()
+					snackbarHostState.showSnackbar(
+						message = "${context.getString(R.string.finance_removed)} \"${effect.financial.name}\"",
+						duration = SnackbarDuration.Short
+					)
+				}
+				is DujerEffect.DeleteCategory -> {
+					snackbarHostState.currentSnackbarData?.dismiss()
+					snackbarHostState.showSnackbar(
+						message = "${context.getString(R.string.category_removed)} \"${effect.category.name}\"",
+						duration = SnackbarDuration.Short
+					)
+				}
+				else -> {}
 			}
-			is DujerEffect.DeleteCategory -> {
-				snackbarHostState.currentSnackbarData?.dismiss()
-				snackbarHostState.showSnackbar(
-					message = "${context.getString(R.string.category_removed)} \"${(effect as DujerEffect.DeleteCategory).category.name}\"",
-					duration = SnackbarDuration.Short
-				)
-			}
-			else -> {}
 		}
-	}
+	)
 	
 	SideEffect {
 		systemUiController.setSystemBarsColor(
