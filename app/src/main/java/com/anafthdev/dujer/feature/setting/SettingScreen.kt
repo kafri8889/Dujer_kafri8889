@@ -1,7 +1,10 @@
 package com.anafthdev.dujer.feature.setting
 
 import android.Manifest
+import android.os.Bundle
 import androidx.activity.compose.BackHandler
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -29,12 +32,15 @@ import androidx.navigation.NavController
 import com.anafthdev.dujer.R
 import com.anafthdev.dujer.data.DujerDestination
 import com.anafthdev.dujer.data.model.Category
+import com.anafthdev.dujer.data.model.Financial
+import com.anafthdev.dujer.data.model.Wallet
 import com.anafthdev.dujer.data.preference.Language
 import com.anafthdev.dujer.feature.app.LocalDujerState
 import com.anafthdev.dujer.feature.category.data.CategorySwipeAction
 import com.anafthdev.dujer.feature.theme.Typography
 import com.anafthdev.dujer.feature.theme.shapes
 import com.anafthdev.dujer.foundation.common.AppUtil.timeFormatter
+import com.anafthdev.dujer.foundation.common.AppUtil.toast
 import com.anafthdev.dujer.foundation.common.PermissionUtil
 import com.anafthdev.dujer.foundation.common.csv.CSVWriter
 import com.anafthdev.dujer.foundation.extension.*
@@ -50,8 +56,8 @@ import com.anafthdev.dujer.foundation.uimode.UiModeViewModel
 import com.anafthdev.dujer.foundation.uimode.data.UiMode
 import com.anafthdev.dujer.foundation.window.dpScaled
 import com.anafthdev.dujer.foundation.window.spScaled
+import com.anafthdev.dujer.model.Currency
 import com.anafthdev.dujer.model.LocalCurrency
-import com.anafthdev.dujer.runtime.MainActivity
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterialApi::class)
@@ -68,16 +74,35 @@ fun SettingScreen(
 	val uiModeViewModel = hiltViewModel<UiModeViewModel>()
 	val localizedViewModel = hiltViewModel<LocalizedViewModel>()
 	
+	val state by viewModel.state.collectAsState()
 	val uiModeState by uiModeViewModel.state.collectAsState()
-	val settingState by viewModel.state.collectAsState()
 	val localizedState by localizedViewModel.state.collectAsState()
 	
 	val uiMode = uiModeState.uiMode
 	val languageUsed = localizedState.language
-	val isUseBioAuth = settingState.isUseBioAuth
+	val isUseBioAuth = state.isUseBioAuth
 	
 	val scope = rememberCoroutineScope()
 	val sheetStateChangeLanguage = rememberModalBottomSheetState(initialValue = ModalBottomSheetValue.Hidden)
+	val requestMultiplePermissionResultLauncher = rememberLauncherForActivityResult(
+		contract = ActivityResultContracts.RequestMultiplePermissions(),
+		onResult = { result ->
+			if (result.all { it.value }) {
+				val fileName = state.exportFinancialDataBundle.getString("fileName", "financial-export")
+				val mLocalCurrency = state.exportFinancialDataBundle.getParcelable("currency") ?: Currency.DOLLAR
+				val wallets = state.exportFinancialDataBundle.getParcelableArrayList<Wallet>("wallets") ?: emptyList()
+				val financials = state.exportFinancialDataBundle.getParcelableArrayList<Financial>("financials") ?: emptyList()
+				
+				CSVWriter.writeFinancial(
+					context,
+					fileName,
+					mLocalCurrency,
+					wallets.toList(),
+					financials.toList()
+				)
+			} else "Permission denied, export canceled!".toast(context)
+		}
+	)
 	
 	val hideSheet = {
 		scope.launch { sheetStateChangeLanguage.hide() }
@@ -301,14 +326,18 @@ fun SettingScreen(
 									financials
 								)
 							} else {
-								(context as MainActivity).exportFinancialDataBundle.apply {
-									putString("fileName", fileName)
-									putParcelable("currency", localCurrency)
-									putParcelableArrayList("wallets", wallets.toArrayList())
-									putParcelableArrayList("financials", financials.toArrayList())
-								}
+								viewModel.dispatch(
+									SettingAction.SetExportFinancialDataBundle(
+										Bundle().apply {
+											putString("fileName", fileName)
+											putParcelable("currency", localCurrency)
+											putParcelableArrayList("wallets", wallets.toArrayList())
+											putParcelableArrayList("financials", financials.toArrayList())
+										}
+									)
+								)
 								
-								context.permissionLauncher.launch(
+								requestMultiplePermissionResultLauncher.launch(
 									arrayOf(
 										Manifest.permission.WRITE_EXTERNAL_STORAGE,
 										Manifest.permission.READ_EXTERNAL_STORAGE

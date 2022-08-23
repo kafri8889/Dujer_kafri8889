@@ -1,5 +1,8 @@
 package com.anafthdev.dujer.feature.setting
 
-sealed class SettingAction {
-	data class SetUseBioAuth(val isUseBioAuth: Boolean): SettingAction()
+import android.os.Bundle
+
+sealed interface SettingAction {
+	data class SetUseBioAuth(val isUseBioAuth: Boolean): SettingAction
+	data class SetExportFinancialDataBundle(val bundle: Bundle): SettingAction
 }

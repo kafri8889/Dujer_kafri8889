@@ -31,6 +31,15 @@ class SettingViewModel @Inject constructor(
 					environment.setIsUseBioAuth(action.isUseBioAuth)
 				}
 			}
+			is SettingAction.SetExportFinancialDataBundle -> {
+				viewModelScope.launch {
+					setState {
+						copy(
+							exportFinancialDataBundle = action.bundle
+						)
+					}
+				}
+			}
 		}
 	}
 	

@@ -28,7 +28,8 @@
         <item name="colorSurfaceInverse">@color/md_theme_dark_inverseSurface</item>
         <item name="colorPrimaryInverse">@color/md_theme_dark_primaryInverse</item>
 
-        <item name="android:statusBarColor">@color/transparent</item>
+        <item name="android:windowBackground">@drawable/splash_drawable</item>
+        <item name="android:statusBarColor">@color/ic_launcher_background</item>
     </style>
 
 </resources>
