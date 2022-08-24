@@ -175,6 +175,11 @@ sealed class DujerDestination(val route: String) {
 				)
 			}
 		}
+		
+		class AddWallet {
+			object Root: DujerDestination("bottom-sheet/add-wallet/root")
+			object Home: DujerDestination("bottom-sheet/add-wallet/home")
+		}
 	}
 	
 }

@@ -1,5 +1,6 @@
-package com.anafthdev.dujer.feature.dashboard.subscreen
+package com.anafthdev.dujer.feature.add_wallet
 
+import androidx.activity.compose.BackHandler
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
@@ -16,6 +17,7 @@ import androidx.compose.material.icons.rounded.Close
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.rotate
@@ -29,12 +31,11 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
-import androidx.compose.ui.text.input.TextFieldValue
+import androidx.navigation.NavController
 import com.anafthdev.dujer.R
 import com.anafthdev.dujer.data.WalletIcons
 import com.anafthdev.dujer.data.model.Wallet
 import com.anafthdev.dujer.feature.theme.*
-import com.anafthdev.dujer.foundation.common.AppUtil.toast
 import com.anafthdev.dujer.foundation.common.CurrencyFormatter
 import com.anafthdev.dujer.foundation.common.TextFieldCurrencyFormatter
 import com.anafthdev.dujer.foundation.extension.deviceLocale
@@ -42,6 +43,7 @@ import com.anafthdev.dujer.foundation.extension.isLightTheme
 import com.anafthdev.dujer.foundation.extension.toColor
 import com.anafthdev.dujer.foundation.ui.LocalUiColor
 import com.anafthdev.dujer.foundation.uimode.data.LocalUiMode
+import com.anafthdev.dujer.foundation.viewmodel.HandleEffect
 import com.anafthdev.dujer.foundation.window.dpScaled
 import com.anafthdev.dujer.foundation.window.spScaled
 import com.anafthdev.dujer.model.CategoryTint
@@ -51,41 +53,49 @@ import com.google.accompanist.flowlayout.FlowMainAxisAlignment
 import com.google.accompanist.flowlayout.FlowRow
 import kotlin.random.Random
 
-@OptIn(ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalComposeUiApi::class)
 @Composable
 fun AddWalletScreen(
-	isScreenVisible: Boolean,
-	walletNameFocusRequester: FocusRequester,
-	onCancel: () -> Unit,
-	onSave: (Wallet) -> Unit
+	navController: NavController,
+	viewModel: AddWalletViewModel
 ) {
 	
 	val uiMode = LocalUiMode.current
-	val localCurrency = LocalCurrency.current
 	val context = LocalContext.current
 	val focusManager = LocalFocusManager.current
+	val localCurrency = LocalCurrency.current
 	
-	var walletName by remember { mutableStateOf("") }
-	var walletTint by remember { mutableStateOf(CategoryTint.tint_1) }
-	var walletIcon by remember { mutableStateOf(WalletIcons.WALLET) }
-	var walletInitialBalance by remember { mutableStateOf(0.0) }
+	val state by viewModel.state.collectAsState()
 	
-	var walletBalanceFieldValue by remember { mutableStateOf(TextFieldValue()) }
-	
-	var isSelectorWalletTintShowed by remember { mutableStateOf(false) }
-	var isSelectorWalletIconShowed by remember { mutableStateOf(false) }
+	val (
+		walletNameFocusRequester
+	) = remember { FocusRequester.createRefs() }
 	
 	val walletTintIconButtonRotation by animateFloatAsState(
-		targetValue = if (isSelectorWalletTintShowed) 180f else 0f
-	)
-	val walletIconIconButtonRotation by animateFloatAsState(
-		targetValue = if (isSelectorWalletIconShowed) 180f else 0f
+		targetValue = if (state.isSelectorWalletTintShowed) 180f else 0f
 	)
 	
-	LaunchedEffect(isScreenVisible) {
-		walletName = ""
-		walletTint = CategoryTint.tint_1
-		walletIcon = WalletIcons.WALLET
+	val walletIconIconButtonRotation by animateFloatAsState(
+		targetValue = if (state.isSelectorWalletIconShowed) 180f else 0f
+	)
+	
+	HandleEffect(
+		viewModel = viewModel,
+		handle = { effect ->
+			when (effect) {
+				is AddWalletEffect.BlankWalletName -> {
+				
+				}
+			}
+		}
+	)
+	
+	LaunchedEffect(Unit) {
+		walletNameFocusRequester.requestFocus()
+	}
+	
+	BackHandler {
+		navController.popBackStack()
 	}
 	
 	Column(
@@ -103,7 +113,9 @@ fun AddWalletScreen(
 				.fillMaxWidth()
 		) {
 			IconButton(
-				onClick = onCancel,
+				onClick = {
+					navController.popBackStack()
+				},
 				modifier = Modifier
 					.align(Alignment.CenterStart)
 			) {
@@ -126,21 +138,22 @@ fun AddWalletScreen(
 			
 			IconButton(
 				onClick = {
-					when {
-						walletName.isBlank() -> {
-							context.getString(R.string.wallet_name_cannot_be_empty).toast(context)
-						}
-						else -> onSave(
-							Wallet(
-								id = Random.nextInt(),
-								name = walletName,
-								initialBalance = walletInitialBalance,
-								balance = walletInitialBalance,
-								iconID = walletIcon,
-								tint = walletTint,
-								defaultWallet = false
+					if (viewModel.validateWalletName(state.name)) {
+						viewModel.dispatch(
+							AddWalletAction.Save(
+								Wallet(
+									id = Random.nextInt(),
+									name = state.name,
+									initialBalance = state.initialBalance,
+									balance = state.initialBalance,
+									iconID = state.icon,
+									tint = state.tint,
+									defaultWallet = false
+								)
 							)
 						)
+						
+						navController.popBackStack()
 					}
 				},
 				modifier = Modifier
@@ -175,9 +188,11 @@ fun AddWalletScreen(
 			OutlinedTextField(
 				singleLine = true,
 				shape = small_shape,
-				value = walletName,
-				onValueChange = { s ->
-					walletName = s
+				value = state.name,
+				onValueChange = { name ->
+					viewModel.dispatch(
+						AddWalletAction.ChangeName(name)
+					)
 				},
 				textStyle = LocalTextStyle.current.copy(
 					fontFamily = Inter
@@ -209,21 +224,23 @@ fun AddWalletScreen(
 					fontSize = Typography.titleMedium.fontSize.spScaled
 				),
 				modifier = Modifier
-				
+			
 			)
 			
 			OutlinedTextField(
 				singleLine = true,
 				shape = small_shape,
-				value = walletBalanceFieldValue,
+				value = state.balanceFieldValue,
 				onValueChange = { s ->
 					val formattedValue = TextFieldCurrencyFormatter.getFormattedCurrency(
 						fieldValue = s,
 						countryCode = localCurrency.countryCode
 					)
 					
-					walletInitialBalance = formattedValue.first
-					walletBalanceFieldValue = formattedValue.second
+					viewModel.dispatches(
+						AddWalletAction.ChangeInitialBalance(formattedValue.first),
+						AddWalletAction.ChangeBalanceFieldValue(formattedValue.second)
+					)
 				},
 				textStyle = LocalTextStyle.current.copy(
 					fontFamily = Inter
@@ -294,21 +311,27 @@ fun AddWalletScreen(
 								.weight(1f)
 								.height(24.dpScaled)
 								.clip(MaterialTheme.shapes.small)
-								.background(walletTint.backgroundTint.toColor())
+								.background(state.tint.backgroundTint.toColor())
 						)
 						
 						IconButton(
 							onClick = {
 								when {
-									isSelectorWalletIconShowed and !isSelectorWalletTintShowed -> {
-										isSelectorWalletTintShowed = true
-										isSelectorWalletIconShowed = false
+									state.isSelectorWalletIconShowed and !state.isSelectorWalletTintShowed -> {
+										viewModel.dispatches(
+											AddWalletAction.SetIsSelectorWalletTintShowed(true),
+											AddWalletAction.SetIsSelectorWalletIconShowed(false)
+										)
 									}
-									isSelectorWalletTintShowed -> {
-										isSelectorWalletTintShowed = false
+									state.isSelectorWalletTintShowed -> {
+										viewModel.dispatch(
+											AddWalletAction.SetIsSelectorWalletTintShowed(false)
+										)
 									}
-									!isSelectorWalletTintShowed -> {
-										isSelectorWalletTintShowed = true
+									!state.isSelectorWalletTintShowed -> {
+										viewModel.dispatch(
+											AddWalletAction.SetIsSelectorWalletTintShowed(true)
+										)
 									}
 								}
 							},
@@ -354,7 +377,7 @@ fun AddWalletScreen(
 							.fillMaxWidth()
 					) {
 						Icon(
-							painter = painterResource(id = walletIcon),
+							painter = painterResource(id = state.icon),
 							contentDescription = null,
 							modifier = Modifier
 								.size(28.dpScaled)
@@ -363,15 +386,21 @@ fun AddWalletScreen(
 						IconButton(
 							onClick = {
 								when {
-									isSelectorWalletTintShowed and !isSelectorWalletIconShowed -> {
-										isSelectorWalletIconShowed = true
-										isSelectorWalletTintShowed = false
+									state.isSelectorWalletTintShowed and !state.isSelectorWalletIconShowed -> {
+										viewModel.dispatches(
+											AddWalletAction.SetIsSelectorWalletTintShowed(false),
+											AddWalletAction.SetIsSelectorWalletIconShowed(true)
+										)
 									}
-									isSelectorWalletIconShowed -> {
-										isSelectorWalletIconShowed = false
+									state.isSelectorWalletIconShowed -> {
+										viewModel.dispatch(
+											AddWalletAction.SetIsSelectorWalletIconShowed(false)
+										)
 									}
-									!isSelectorWalletIconShowed -> {
-										isSelectorWalletIconShowed = true
+									!state.isSelectorWalletIconShowed -> {
+										viewModel.dispatch(
+											AddWalletAction.SetIsSelectorWalletIconShowed(true)
+										)
 									}
 								}
 							},
@@ -390,7 +419,7 @@ fun AddWalletScreen(
 			}
 			
 			AnimatedVisibility(
-				visible = isSelectorWalletTintShowed,
+				visible = state.isSelectorWalletTintShowed,
 				enter = expandVertically(
 					animationSpec = tween(400)
 				),
@@ -419,7 +448,9 @@ fun AddWalletScreen(
 								.clip(full_shape)
 								.background(tint.backgroundTint.toColor())
 								.clickable {
-									walletTint = tint
+									viewModel.dispatch(
+										AddWalletAction.ChangeTint(tint)
+									)
 								}
 						)
 					}
@@ -427,7 +458,7 @@ fun AddWalletScreen(
 			}
 			
 			AnimatedVisibility(
-				visible = isSelectorWalletIconShowed,
+				visible = state.isSelectorWalletIconShowed,
 				enter = expandVertically(
 					animationSpec = tween(400)
 				),
@@ -456,7 +487,7 @@ fun AddWalletScreen(
 								.size(48.dpScaled)
 								.clip(shapes.small)
 								.background(
-									color = if (walletIcon == icon) MaterialTheme.colorScheme.primaryContainer
+									color = if (state.icon == icon) MaterialTheme.colorScheme.primaryContainer
 									else Color.Transparent
 								)
 								.border(
@@ -465,12 +496,14 @@ fun AddWalletScreen(
 									shape = shapes.small
 								)
 								.clickable {
-									walletIcon = icon
+									viewModel.dispatch(
+										AddWalletAction.ChangeIcon(icon)
+									)
 								}
 						) {
 							Icon(
 								painter = painterResource(id = icon),
-								tint = if ((walletIcon == icon) and uiMode.isLightTheme()) black01 else black10,
+								tint = if (state.icon == icon && uiMode.isLightTheme()) black01 else black10,
 								contentDescription = null
 							)
 						}

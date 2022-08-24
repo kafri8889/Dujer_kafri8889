@@ -41,12 +41,16 @@ abstract class StatefulViewModel<STATE, EFFECT, ACTION, ENVIRONMENT>(
 		_effect.update { newEffect }
 	}
 	
-	fun resetEffect() {
-		_effect.update { null }
-	}
-	
 	private fun stateValue(): STATE {
 		return state.value
+	}
+	
+	fun dispatches(vararg actions: ACTION) {
+		actions.forEach { action -> dispatch(action) }
+	}
+	
+	fun resetEffect() {
+		_effect.update { null }
 	}
 	
 }

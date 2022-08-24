@@ -9,23 +9,16 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.rememberLazyListState
-import androidx.compose.foundation.shape.CornerSize
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.ExperimentalMaterialApi
-import androidx.compose.material.ModalBottomSheetLayout
-import androidx.compose.material.ModalBottomSheetValue
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.Add
 import androidx.compose.material.icons.rounded.FilterList
-import androidx.compose.material.rememberModalBottomSheetState
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.focus.FocusRequester
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
@@ -43,14 +36,15 @@ import com.anafthdev.dujer.data.model.Financial
 import com.anafthdev.dujer.data.model.Wallet
 import com.anafthdev.dujer.feature.app.LocalDujerState
 import com.anafthdev.dujer.feature.chart.ChartScreen
-import com.anafthdev.dujer.feature.dashboard.component.*
-import com.anafthdev.dujer.feature.dashboard.subscreen.AddWalletScreen
+import com.anafthdev.dujer.feature.dashboard.component.BalanceCard
+import com.anafthdev.dujer.feature.dashboard.component.ExpenseCard
+import com.anafthdev.dujer.feature.dashboard.component.HighestExpenseCard
+import com.anafthdev.dujer.feature.dashboard.component.IncomeCard
 import com.anafthdev.dujer.feature.financial.data.FinancialAction
 import com.anafthdev.dujer.feature.search.SearchScreen
 import com.anafthdev.dujer.feature.theme.Typography
 import com.anafthdev.dujer.feature.theme.expense_color
 import com.anafthdev.dujer.feature.theme.income_color
-import com.anafthdev.dujer.feature.theme.shapes
 import com.anafthdev.dujer.foundation.ui.LocalUiColor
 import com.anafthdev.dujer.foundation.uicomponent.BudgetCard
 import com.anafthdev.dujer.foundation.uicomponent.FilterSortFinancialPopup
@@ -64,7 +58,6 @@ import com.google.accompanist.navigation.material.ExperimentalMaterialNavigation
 import com.google.accompanist.pager.ExperimentalPagerApi
 import com.google.accompanist.pager.HorizontalPager
 import com.google.accompanist.pager.rememberPagerState
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterialNavigationApi::class)
@@ -365,11 +358,6 @@ private fun DashboardHomeScreen(
 	
 	val scope = rememberCoroutineScope()
 	
-	val addWalletSheetState = rememberModalBottomSheetState(
-		initialValue = ModalBottomSheetValue.Hidden,
-		skipHalfExpanded = true
-	)
-	
 	val allIncomeTransaction = dujerState.allIncomeTransaction
 	val allExpenseTransaction = dujerState.allExpenseTransaction
 
@@ -385,8 +373,6 @@ private fun DashboardHomeScreen(
 		
 		amount.sum()
 	}
-	
-	val walletNameFocusRequester by remember { mutableStateOf(FocusRequester()) }
 	
 	val incomeLineDataset by rememberUpdatedState(
 		newValue = LineDataSet(
@@ -422,171 +408,124 @@ private fun DashboardHomeScreen(
 		}
 	)
 	
-	val hideAddWalletSheet = {
-		scope.launch { addWalletSheetState.hide() }
-		Unit
-	}
-	
-	val showAddWalletSheet = {
-		scope.launch { addWalletSheetState.show() }
-		Unit
-	}
-	
-	LaunchedEffect(addWalletSheetState.isVisible) {
-		onWalletSheetOpened(addWalletSheetState.isVisible)
-		if (!addWalletSheetState.isVisible) {
-			keyboardController?.hide()
-			focusManager.clearFocus(force = true)
-		}
-		if (addWalletSheetState.isVisible) {
-			delay(200)
-			walletNameFocusRequester.requestFocus()
-		}
-	}
-	
-	BackHandler(enabled = addWalletSheetState.isVisible) {
-		hideAddWalletSheet()
-	}
-	
-	ModalBottomSheetLayout(
-		sheetElevation = 8.dpScaled,
-		scrimColor = Color.Transparent,
-		sheetState = addWalletSheetState,
-		sheetShape = RoundedCornerShape(
-			topStart = shapes.medium.topStart,
-			topEnd = shapes.medium.topEnd,
-			bottomEnd = CornerSize(0.dpScaled),
-			bottomStart = CornerSize(0.dpScaled)
-		),
-		sheetContent = {
-			AddWalletScreen(
-				isScreenVisible = addWalletSheetState.isVisible,
-				walletNameFocusRequester = walletNameFocusRequester,
-				onCancel = hideAddWalletSheet,
-				onSave = { wallet ->
-					onAddWallet(wallet)
-					hideAddWalletSheet()
-				}
-			)
-		}
+	LazyColumn(
+		state = homeLazyListState
 	) {
-		LazyColumn(
-			state = homeLazyListState
-		) {
-			
-			item {
-				Column(
+		
+		item {
+			Column(
+				modifier = Modifier
+					.padding(horizontal = 12.dpScaled)
+			) {
+				
+				BalanceCard(
+					wallets = wallets,
+					onAddWallet = {
+						navController.navigate(DujerDestination.BottomSheet.AddWallet.Home.route)
+					},
+					onWalletClicked = { wallet ->
+						navController.navigate(
+							DujerDestination.Wallet.Home.createRoute(wallet.id)
+						)
+					}
+				)
+				
+				BudgetCard(
+					totalExpense = totalAmountBudgetExpenses,
+					totalBudget = totalAmountBudget,
+					onClick = {
+						navController.navigate(DujerDestination.BudgetList.Home.route)
+					},
 					modifier = Modifier
-						.padding(horizontal = 12.dpScaled)
-				) {
-					
-					BalanceCard(
-						wallets = wallets,
-						onAddWallet = showAddWalletSheet,
-						onWalletClicked = { wallet ->
-							navController.navigate(
-								DujerDestination.Wallet.Home.createRoute(wallet.id)
-							)
-						}
+						.padding(top = 16.dpScaled)
+				)
+				
+				AnimatedVisibility(
+					visible = (highestExpenseCategory.id != Category.default.id).and(
+						highestExpenseCategoryAmount != 0.0
 					)
-					
-					BudgetCard(
-						totalExpense = totalAmountBudgetExpenses,
-						totalBudget = totalAmountBudget,
+				) {
+					HighestExpenseCard(
+						category = highestExpenseCategory,
+						totalExpense = highestExpenseCategoryAmount,
 						onClick = {
-							navController.navigate(DujerDestination.BudgetList.Home.route)
+							if (highestExpenseCategory.id != Category.default.id) {
+								navController.navigate(
+									DujerDestination.CategoryTransaction.Home.createRoute(
+										highestExpenseCategory.id
+									)
+								) {
+									launchSingleTop = true
+								}
+							}
 						},
 						modifier = Modifier
 							.padding(top = 16.dpScaled)
 					)
-					
-					AnimatedVisibility(
-						visible = (highestExpenseCategory.id != Category.default.id).and(
-							highestExpenseCategoryAmount != 0.0
-						)
-					) {
-						HighestExpenseCard(
-							category = highestExpenseCategory,
-							totalExpense = highestExpenseCategoryAmount,
-							onClick = {
-								if (highestExpenseCategory.id != Category.default.id) {
-									navController.navigate(
-										DujerDestination.CategoryTransaction.Home.createRoute(
-											highestExpenseCategory.id
-										)
-									) {
-										launchSingleTop = true
-									}
-								}
-							},
-							modifier = Modifier
-								.padding(top = 16.dpScaled)
-						)
-					}
-					
-					Row(
-						verticalAlignment = Alignment.CenterVertically,
-						modifier = Modifier
-							.fillMaxWidth()
-							.padding(
-								vertical = 16.dpScaled
-							)
-					) {
-						IncomeCard(
-							income = allIncomeTransaction.sumOf { it.amount },
-							onClick = {
-								navController.navigate(
-									DujerDestination.IncomeExpense.Home.createRoute(FinancialType.INCOME)
-								) {
-									launchSingleTop = true
-								}
-							},
-							modifier = Modifier
-								.padding(end = 4.dpScaled)
-								.weight(1f)
-						)
-						
-						ExpenseCard(
-							expense = allExpenseTransaction.sumOf { it.amount },
-							onClick = {
-								navController.navigate(
-									DujerDestination.IncomeExpense.Home.createRoute(FinancialType.EXPENSE)
-								) {
-									launchSingleTop = true
-								}
-							},
-							modifier = Modifier
-								.padding(start = 4.dpScaled)
-								.weight(1f)
-						)
-					}
-					
-					FinancialLineChart(
-						incomeLineDataset = incomeLineDataset,
-						expenseLineDataset = expenseLineDataset
-					)
 				}
-			}
-			
-			swipeableFinancialCard(
-				data = transactions,
-				onFinancialCardDismissToEnd = { onFinancialCardDismissToEnd(it) },
-				onFinancialCardClicked = { onFinancialCardClicked(it) },
-				onNavigateCategoryClicked = { category ->
-					navController.navigate(
-						DujerDestination.CategoryTransaction.Home.createRoute(category.id)
-					)
-				}
-			)
-			
-			item {
-				// fab size: 56 dp, fab bottom padding: 24 dp, card to fab padding: 16 dp = 96 dp
-				Spacer(
+				
+				Row(
+					verticalAlignment = Alignment.CenterVertically,
 					modifier = Modifier
 						.fillMaxWidth()
-						.height(96.dpScaled)
+						.padding(
+							vertical = 16.dpScaled
+						)
+				) {
+					IncomeCard(
+						income = allIncomeTransaction.sumOf { it.amount },
+						onClick = {
+							navController.navigate(
+								DujerDestination.IncomeExpense.Home.createRoute(FinancialType.INCOME)
+							) {
+								launchSingleTop = true
+							}
+						},
+						modifier = Modifier
+							.padding(end = 4.dpScaled)
+							.weight(1f)
+					)
+					
+					ExpenseCard(
+						expense = allExpenseTransaction.sumOf { it.amount },
+						onClick = {
+							navController.navigate(
+								DujerDestination.IncomeExpense.Home.createRoute(FinancialType.EXPENSE)
+							) {
+								launchSingleTop = true
+							}
+						},
+						modifier = Modifier
+							.padding(start = 4.dpScaled)
+							.weight(1f)
+					)
+				}
+
+//					FinancialLineChart(
+//						incomeLineDataset = incomeLineDataset,
+//						expenseLineDataset = expenseLineDataset
+//					)
+			}
+		}
+		
+		swipeableFinancialCard(
+			data = transactions,
+			onFinancialCardDismissToEnd = { onFinancialCardDismissToEnd(it) },
+			onFinancialCardClicked = { onFinancialCardClicked(it) },
+			onNavigateCategoryClicked = { category ->
+				navController.navigate(
+					DujerDestination.CategoryTransaction.Home.createRoute(category.id)
 				)
 			}
+		)
+		
+		item {
+			// fab size: 56 dp, fab bottom padding: 24 dp, card to fab padding: 16 dp = 96 dp
+			Spacer(
+				modifier = Modifier
+					.fillMaxWidth()
+					.height(96.dpScaled)
+			)
 		}
 	}
 }

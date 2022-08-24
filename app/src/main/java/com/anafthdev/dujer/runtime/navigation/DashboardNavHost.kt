@@ -7,6 +7,8 @@ import androidx.navigation.compose.composable
 import androidx.navigation.navigation
 import com.anafthdev.dujer.data.DujerDestination
 import com.anafthdev.dujer.data.model.Financial
+import com.anafthdev.dujer.feature.add_wallet.AddWalletScreen
+import com.anafthdev.dujer.feature.add_wallet.AddWalletViewModel
 import com.anafthdev.dujer.feature.dashboard.DashboardScreen
 import com.anafthdev.dujer.feature.dashboard.DashboardViewModel
 import com.anafthdev.dujer.feature.financial.FinancialScreen
@@ -37,6 +39,8 @@ fun NavGraphBuilder.DashboardNavHost(
 			)
 		}
 		
+		AddWalletBottomSheet(navController)
+		
 		FinancialBottomSheet(
 			navController = navController,
 			isVisible = bottomSheetNavigator.navigatorSheetState.isVisible
@@ -57,6 +61,22 @@ private fun NavGraphBuilder.FinancialBottomSheet(
 		
 		FinancialScreen(
 			isScreenVisible = isVisible,
+			navController = navController,
+			viewModel = viewModel
+		)
+	}
+}
+
+@OptIn(ExperimentalMaterialNavigationApi::class)
+private fun NavGraphBuilder.AddWalletBottomSheet(
+	navController: NavController
+) {
+	bottomSheet(
+		route = DujerDestination.BottomSheet.AddWallet.Home.route
+	) { backEntry ->
+		val viewModel = hiltViewModel<AddWalletViewModel>(backEntry)
+		
+		AddWalletScreen(
 			navController = navController,
 			viewModel = viewModel
 		)
