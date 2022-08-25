@@ -2,6 +2,7 @@ package com.anafthdev.dujer.feature.add_wallet
 
 import androidx.lifecycle.viewModelScope
 import com.anafthdev.dujer.feature.add_wallet.environment.IAddWalletEnvironment
+import com.anafthdev.dujer.foundation.common.BaseEffect
 import com.anafthdev.dujer.foundation.viewmodel.StatefulViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
@@ -10,7 +11,7 @@ import javax.inject.Inject
 @HiltViewModel
 class AddWalletViewModel @Inject constructor(
 	addWalletEnvironment: IAddWalletEnvironment
-): StatefulViewModel<AddWalletState, AddWalletEffect, AddWalletAction, IAddWalletEnvironment>(
+): StatefulViewModel<AddWalletState, BaseEffect, AddWalletAction, IAddWalletEnvironment>(
 	AddWalletState(),
 	addWalletEnvironment
 ) {
@@ -85,7 +86,8 @@ class AddWalletViewModel @Inject constructor(
 				}
 			}
 			is AddWalletAction.Save -> {
-				viewModelScope.launch(environment.dispatcher) {
+				viewModelScope.launch {
+					setEffect(AddWalletEffect.WalletCreated)
 					environment.save(action.wallet)
 				}
 			}

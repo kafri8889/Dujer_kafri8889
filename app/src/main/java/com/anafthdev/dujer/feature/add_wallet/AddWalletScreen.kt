@@ -35,6 +35,7 @@ import androidx.navigation.NavController
 import com.anafthdev.dujer.R
 import com.anafthdev.dujer.data.WalletIcons
 import com.anafthdev.dujer.data.model.Wallet
+import com.anafthdev.dujer.feature.app.data.LocalDujerController
 import com.anafthdev.dujer.feature.theme.*
 import com.anafthdev.dujer.foundation.common.CurrencyFormatter
 import com.anafthdev.dujer.foundation.common.TextFieldCurrencyFormatter
@@ -64,6 +65,7 @@ fun AddWalletScreen(
 	val context = LocalContext.current
 	val focusManager = LocalFocusManager.current
 	val localCurrency = LocalCurrency.current
+	val dujerController = LocalDujerController.current
 	
 	val state by viewModel.state.collectAsState()
 	
@@ -84,7 +86,11 @@ fun AddWalletScreen(
 		handle = { effect ->
 			when (effect) {
 				is AddWalletEffect.BlankWalletName -> {
-				
+					dujerController.sendEffect(effect)
+				}
+				is AddWalletEffect.WalletCreated -> {
+					dujerController.sendEffect(effect)
+					navController.popBackStack()
 				}
 			}
 		}
@@ -152,8 +158,6 @@ fun AddWalletScreen(
 								)
 							)
 						)
-						
-						navController.popBackStack()
 					}
 				},
 				modifier = Modifier
