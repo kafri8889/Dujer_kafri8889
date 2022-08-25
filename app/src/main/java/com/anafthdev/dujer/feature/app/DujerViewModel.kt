@@ -8,6 +8,7 @@ import com.anafthdev.dujer.data.model.Financial
 import com.anafthdev.dujer.data.model.Wallet
 import com.anafthdev.dujer.feature.app.data.UndoType
 import com.anafthdev.dujer.feature.app.environment.IDujerEnvironment
+import com.anafthdev.dujer.foundation.common.BaseEffect
 import com.anafthdev.dujer.foundation.extension.merge
 import com.anafthdev.dujer.foundation.viewmodel.StatefulViewModel
 import com.anafthdev.dujer.model.Currency
@@ -22,7 +23,7 @@ import javax.inject.Inject
 @HiltViewModel
 class DujerViewModel @Inject constructor(
 	dujerEnvironment: IDujerEnvironment
-): StatefulViewModel<DujerState, DujerEffect, DujerAction, IDujerEnvironment>(DujerState(), dujerEnvironment) {
+): StatefulViewModel<DujerState, BaseEffect, DujerAction, IDujerEnvironment>(DujerState(), dujerEnvironment) {
 	
 	init {
 		viewModelScope.launch(environment.dispatcher) {
@@ -153,6 +154,15 @@ class DujerViewModel @Inject constructor(
 					environment.insertWallet(action.wallet)
 				}
 			}
+			is DujerAction.SetController -> {
+				viewModelScope.launch(environment.dispatcher) {
+					setState {
+						copy(
+							controller = action.controller
+						)
+					}
+				}
+			}
 			is DujerAction.DeleteFinancial -> {
 				viewModelScope.launch(environment.dispatcher) {
 					environment.deleteFinancial(*action.financials)
@@ -196,6 +206,12 @@ class DujerViewModel @Inject constructor(
 				it.copy(walletID = Wallet.cash.id)
 			}.toTypedArray()
 		)
+	}
+	
+	fun sendEffect(effect: BaseEffect) {
+		viewModelScope.launch {
+			setEffect(effect)
+		}
 	}
 	
 }

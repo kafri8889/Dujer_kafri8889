@@ -3,12 +3,14 @@ package com.anafthdev.dujer.feature.app
 import com.anafthdev.dujer.data.model.Category
 import com.anafthdev.dujer.data.model.Financial
 import com.anafthdev.dujer.data.model.Wallet
+import com.anafthdev.dujer.feature.app.data.DujerController
 import com.anafthdev.dujer.feature.app.data.UndoType
 
-sealed class DujerAction {
-	data class Undo(val type: UndoType): DujerAction()
-	data class InsertWallet(val wallet: Wallet): DujerAction()
-	data class DeleteFinancial(val financials: Array<out Financial>): DujerAction() {
+sealed interface DujerAction {
+	data class Undo(val type: UndoType): DujerAction
+	data class InsertWallet(val wallet: Wallet): DujerAction
+	data class SetController(val controller: DujerController): DujerAction
+	data class DeleteFinancial(val financials: Array<out Financial>): DujerAction {
 		override fun equals(other: Any?): Boolean {
 			if (this === other) return true
 			if (javaClass != other?.javaClass) return false
@@ -25,7 +27,7 @@ sealed class DujerAction {
 		}
 	}
 	
-	data class DeleteCategory(val categories: Array<out Category>): DujerAction() {
+	data class DeleteCategory(val categories: Array<out Category>): DujerAction {
 		override fun equals(other: Any?): Boolean {
 			if (this === other) return true
 			if (javaClass != other?.javaClass) return false

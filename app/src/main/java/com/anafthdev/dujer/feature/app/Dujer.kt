@@ -16,10 +16,15 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.repeatOnLifecycle
 import com.anafthdev.dujer.R
 import com.anafthdev.dujer.data.model.Wallet
-import com.anafthdev.dujer.feature.app.component.CustomSnackbar
+import com.anafthdev.dujer.feature.add_wallet.AddWalletEffect
+import com.anafthdev.dujer.feature.app.data.DujerController
+import com.anafthdev.dujer.feature.app.data.LocalDujerController
 import com.anafthdev.dujer.feature.theme.*
+import com.anafthdev.dujer.foundation.common.AppUtil.toast
+import com.anafthdev.dujer.foundation.common.BaseEffect
 import com.anafthdev.dujer.foundation.extension.isDarkTheme
 import com.anafthdev.dujer.foundation.ui.LocalUiColor
+import com.anafthdev.dujer.foundation.uicomponent.CustomSnackbar
 import com.anafthdev.dujer.foundation.uimode.UiModeViewModel
 import com.anafthdev.dujer.foundation.uimode.data.LocalUiMode
 import com.anafthdev.dujer.foundation.viewmodel.HandleEffect
@@ -56,15 +61,22 @@ fun DujerApp() {
 	
 	LaunchedEffect(lifecycleOwner) {
 		lifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
-			viewModel.dispatch(
-				DujerAction.InsertWallet(Wallet.cash)
+			viewModel.dispatches(
+				DujerAction.InsertWallet(Wallet.cash),
+				DujerAction.SetController(
+					object : DujerController {
+						override fun sendEffect(effect: BaseEffect) {
+							viewModel.sendEffect(effect)
+						}
+					}
+				)
 			)
 		}
 	}
 	
 	HandleEffect(
 		viewModel = viewModel,
-		handle = { effect ->
+		handle = { effect: BaseEffect ->
 			when (effect) {
 				is DujerEffect.DeleteFinancial -> {
 					snackbarHostState.currentSnackbarData?.dismiss()
@@ -79,6 +91,17 @@ fun DujerApp() {
 						message = "${context.getString(R.string.category_removed)} \"${effect.category.name}\"",
 						duration = SnackbarDuration.Short
 					)
+				}
+				is AddWalletEffect.WalletCreated -> {
+					snackbarHostState.currentSnackbarData?.dismiss()
+					snackbarHostState.showSnackbar(
+						message = context.getString(R.string.wallet_created),
+						duration = SnackbarDuration.Short,
+						withDismissAction = true
+					)
+				}
+				is AddWalletEffect.BlankWalletName -> {
+					context.getString(R.string.wallet_name_cannot_be_empty).toast(context)
 				}
 				else -> {}
 			}
@@ -107,6 +130,7 @@ fun DujerApp() {
 			LocalCurrency provides currentCurrency,
 			LocalDujerState provides state,
 			LocalContentColor provides if (isSystemInDarkTheme) black10 else black01,
+			LocalDujerController provides state.controller,
 			LocalOverscrollConfiguration provides null
 		) {
 			Scaffold(
