@@ -1,8 +1,11 @@
-package com.anafthdev.dujer.feature.app.component
+package com.anafthdev.dujer.foundation.uicomponent
 
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.rounded.Close
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -15,7 +18,6 @@ import com.anafthdev.dujer.R
 import com.anafthdev.dujer.foundation.window.dpScaled
 import com.anafthdev.dujer.foundation.window.spScaled
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun CustomSnackbar(
 	snackbarData: SnackbarData,
@@ -46,35 +48,50 @@ fun CustomSnackbar(
 					fontSize = MaterialTheme.typography.bodyMedium.fontSize.spScaled
 				),
 				modifier = Modifier
-					.weight(0.8f)
+					.weight(1f)
 			)
 			
-			TextButton(
-				contentPadding = PaddingValues(8.dpScaled),
-				colors = ButtonDefaults.textButtonColors(
-					contentColor = MaterialTheme.colorScheme.primaryContainer
-				),
-				onClick = {
-					onCancel()
-					snackbarData.dismiss()
+			AnimatedVisibility(visible = snackbarData.visuals.actionLabel != null) {
+				TextButton(
+					contentPadding = PaddingValues(8.dpScaled),
+					colors = ButtonDefaults.textButtonColors(
+						contentColor = MaterialTheme.colorScheme.primaryContainer
+					),
+					onClick = {
+						onCancel()
+						snackbarData.dismiss()
+					}
+				) {
+					Row(
+						verticalAlignment = Alignment.CenterVertically
+					) {
+						Icon(
+							painter = painterResource(id = R.drawable.ic_undo),
+							contentDescription = null,
+							modifier = Modifier
+								.padding(8.dpScaled)
+						)
+						
+						Text(
+							text = stringResource(id = R.string.cancel),
+							style = LocalTextStyle.current.copy(
+								fontWeight = FontWeight.Medium,
+								fontSize = LocalTextStyle.current.fontSize.spScaled
+							)
+						)
+					}
 				}
-			) {
-				Row(
-					verticalAlignment = Alignment.CenterVertically
+			}
+			
+			AnimatedVisibility(visible = snackbarData.visuals.withDismissAction) {
+				IconButton(
+					onClick = {
+						snackbarData.dismiss()
+					}
 				) {
 					Icon(
-						painter = painterResource(id = R.drawable.ic_undo),
-						contentDescription = null,
-						modifier = Modifier
-							.padding(8.dpScaled)
-					)
-					
-					Text(
-						text = stringResource(id = R.string.cancel),
-						style = LocalTextStyle.current.copy(
-							fontWeight = FontWeight.Medium,
-							fontSize = LocalTextStyle.current.fontSize.spScaled
-						)
+						imageVector = Icons.Rounded.Close,
+						contentDescription = null
 					)
 				}
 			}
