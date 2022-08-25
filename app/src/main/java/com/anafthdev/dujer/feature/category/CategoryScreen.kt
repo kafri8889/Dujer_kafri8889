@@ -41,6 +41,7 @@ import com.anafthdev.dujer.data.CategoryIcons
 import com.anafthdev.dujer.data.DujerDestination
 import com.anafthdev.dujer.data.FinancialType
 import com.anafthdev.dujer.data.model.Category
+import com.anafthdev.dujer.data.model.Financial
 import com.anafthdev.dujer.feature.app.LocalDujerState
 import com.anafthdev.dujer.feature.category.component.SwipeableCategory
 import com.anafthdev.dujer.feature.category.data.CategorySwipeAction
@@ -71,7 +72,7 @@ import kotlin.random.Random
 fun CategoryScreen(
 	navController: NavController,
 	viewModel: CategoryViewModel,
-	onDismissToEnd: (Category) -> Unit
+	onDismissToEnd: (Category, List<Financial>) -> Unit
 ) {
 	
 	val uiMode = LocalUiMode.current
@@ -397,6 +398,13 @@ fun CategoryScreen(
 					items = if (state.selectedFinancialType.isIncome()) incomeCategories else expenseCategories,
 					key = { _: Int, item: Category -> item.id }
 				) { i, item ->
+					
+					val financials = remember(item) {
+						dujerState.allTransaction.filter {
+							it.category.id == item.id
+						}
+					}
+					
 					SwipeableCategory(
 						category = item,
 						onClick = {
@@ -412,7 +420,10 @@ fun CategoryScreen(
 							showSheet()
 						},
 						onDismissToEnd = {
-							onDismissToEnd(item)
+							onDismissToEnd(
+								item,
+								financials
+							)
 						},
 						modifier = Modifier
 							.padding(

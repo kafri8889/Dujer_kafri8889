@@ -112,6 +112,7 @@ class DujerViewModel @Inject constructor(
 				setState {
 					copy(
 						allWallet = wallets,
+						allTransaction = financials,
 						allIncomeTransaction = financials.filter { it.type == FinancialType.INCOME },
 						allExpenseTransaction = financials.filter { it.type == FinancialType.EXPENSE },
 					)
@@ -144,9 +145,11 @@ class DujerViewModel @Inject constructor(
 		when (action) {
 			is DujerAction.Undo -> {
 				viewModelScope.launch(environment.dispatcher) {
-					if (action.type == UndoType.Financial) {
-						environment.undoFinancial()
-					} else environment.undoCategory()
+					when (action.type) {
+						is UndoType.Wallet -> environment.undoWallet()
+						is UndoType.Category -> environment.undoCategory()
+						is UndoType.Financial -> environment.undoFinancial()
+					}
 				}
 			}
 			is DujerAction.InsertWallet -> {
@@ -166,20 +169,36 @@ class DujerViewModel @Inject constructor(
 			is DujerAction.DeleteFinancial -> {
 				viewModelScope.launch(environment.dispatcher) {
 					environment.deleteFinancial(*action.financials)
-					withContext(Dispatchers.Main) {
-						setEffect(
-							DujerEffect.DeleteFinancial(action.financials[0])
-						)
+					action.financials.getOrNull(0)?.let {
+						withContext(Dispatchers.Main) {
+							setEffect(
+								DujerEffect.DeleteFinancial(it)
+							)
+						}
 					}
 				}
 			}
 			is DujerAction.DeleteCategory -> {
 				viewModelScope.launch(environment.dispatcher) {
-					environment.deleteCategory(*action.categories)
-					withContext(Dispatchers.Main) {
-						setEffect(
-							DujerEffect.DeleteCategory(action.categories[0])
-						)
+					environment.deleteCategory(action.categories, action.financials)
+					action.categories.getOrNull(0)?.let {
+						withContext(Dispatchers.Main) {
+							setEffect(
+								DujerEffect.DeleteCategory(it)
+							)
+						}
+					}
+				}
+			}
+			is DujerAction.DeleteWallet -> {
+				viewModelScope.launch(environment.dispatcher) {
+					environment.deleteWallet(*action.wallets)
+					action.wallets.getOrNull(0)?.let {
+						withContext(Dispatchers.Main) {
+							setEffect(
+								DujerEffect.DeleteWallet(it)
+							)
+						}
 					}
 				}
 			}

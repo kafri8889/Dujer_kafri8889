@@ -148,10 +148,6 @@ class WalletEnvironment @Inject constructor(
 		
 	}
 	
-	override suspend fun deleteWallet(wallet: Wallet) {
-		repository.deleteWallet(wallet)
-	}
-	
 	override suspend fun setWalletID(id: Int) {
 		_lastSelectedWalletID.emit(Wallet.default.id)
 		_lastSelectedWalletID.emit(id)

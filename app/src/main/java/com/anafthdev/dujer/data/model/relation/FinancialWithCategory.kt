@@ -13,5 +13,5 @@ data class FinancialWithCategory(
 		parentColumn = "financial_categoryID",
 		entityColumn = "category_id"
 	)
-	val categoryDb: CategoryDb
+	val categoryDb: CategoryDb?
 )

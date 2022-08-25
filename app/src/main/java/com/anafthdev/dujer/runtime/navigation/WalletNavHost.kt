@@ -7,12 +7,14 @@ import androidx.navigation.compose.composable
 import androidx.navigation.navigation
 import com.anafthdev.dujer.data.DujerDestination
 import com.anafthdev.dujer.data.model.Financial
+import com.anafthdev.dujer.data.model.Wallet
 import com.anafthdev.dujer.feature.wallet.WalletScreen
 import com.anafthdev.dujer.feature.wallet.WalletViewModel
 
 fun NavGraphBuilder.WalletNavHost(
 	navController: NavController,
-	onDeleteTransaction: (Financial) -> Unit
+	onDeleteTransaction: (Financial) -> Unit,
+	onDeleteWallet: (Wallet) -> Unit
 ) {
 	navigation(
 		startDestination = DujerDestination.Wallet.Home.route,
@@ -27,7 +29,8 @@ fun NavGraphBuilder.WalletNavHost(
 			WalletScreen(
 				navController = navController,
 				viewModel = viewModel,
-				onDeleteTransaction = onDeleteTransaction
+				onDeleteTransaction = onDeleteTransaction,
+				onDeleteWallet = onDeleteWallet
 			)
 		}
 	}

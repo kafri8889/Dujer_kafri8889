@@ -131,11 +131,6 @@ class WalletViewModel @Inject constructor(
 					environment.updateWallet(action.wallet)
 				}
 			}
-			is WalletAction.DeleteWallet -> {
-				viewModelScope.launch(environment.dispatcher) {
-					environment.deleteWallet(action.wallet)
-				}
-			}
 			is WalletAction.InsertFinancial -> {
 				viewModelScope.launch(environment.dispatcher) {
 					environment.insertFinancial(action.financial)

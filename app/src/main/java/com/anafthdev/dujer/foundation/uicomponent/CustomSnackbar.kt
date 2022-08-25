@@ -11,10 +11,13 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import com.anafthdev.dujer.R
+import com.anafthdev.dujer.feature.theme.black01
+import com.anafthdev.dujer.feature.theme.black10
+import com.anafthdev.dujer.foundation.extension.isDarkTheme
+import com.anafthdev.dujer.foundation.uimode.data.LocalUiMode
 import com.anafthdev.dujer.foundation.window.dpScaled
 import com.anafthdev.dujer.foundation.window.spScaled
 
@@ -23,6 +26,9 @@ fun CustomSnackbar(
 	snackbarData: SnackbarData,
 	onCancel: () -> Unit
 ) {
+	
+	val uiMode = LocalUiMode.current
+	
 	ElevatedCard(
 		shape = MaterialTheme.shapes.large,
 		colors = CardDefaults.elevatedCardColors(
@@ -51,35 +57,37 @@ fun CustomSnackbar(
 					.weight(1f)
 			)
 			
-			AnimatedVisibility(visible = snackbarData.visuals.actionLabel != null) {
-				TextButton(
-					contentPadding = PaddingValues(8.dpScaled),
-					colors = ButtonDefaults.textButtonColors(
-						contentColor = MaterialTheme.colorScheme.primaryContainer
-					),
-					onClick = {
-						onCancel()
-						snackbarData.dismiss()
-					}
+			TextButton(
+				enabled = snackbarData.visuals.actionLabel != null,
+				contentPadding = PaddingValues(8.dpScaled),
+				colors = ButtonDefaults.textButtonColors(
+					contentColor = MaterialTheme.colorScheme.primaryContainer
+				),
+				onClick = {
+					onCancel()
+					snackbarData.dismiss()
+				}
+			) {
+				Row(
+					verticalAlignment = Alignment.CenterVertically
 				) {
-					Row(
-						verticalAlignment = Alignment.CenterVertically
-					) {
+					if (snackbarData.visuals.actionLabel != null) {
 						Icon(
 							painter = painterResource(id = R.drawable.ic_undo),
 							contentDescription = null,
+							tint = if (uiMode.isDarkTheme()) black01 else black10,
 							modifier = Modifier
 								.padding(8.dpScaled)
 						)
-						
-						Text(
-							text = stringResource(id = R.string.cancel),
-							style = LocalTextStyle.current.copy(
-								fontWeight = FontWeight.Medium,
-								fontSize = LocalTextStyle.current.fontSize.spScaled
-							)
-						)
 					}
+					
+					Text(
+						text = snackbarData.visuals.actionLabel ?: "",
+						style = LocalTextStyle.current.copy(
+							fontWeight = FontWeight.Medium,
+							fontSize = LocalTextStyle.current.fontSize.spScaled
+						)
+					)
 				}
 			}
 			

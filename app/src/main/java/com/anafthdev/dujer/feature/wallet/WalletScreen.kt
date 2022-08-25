@@ -39,6 +39,7 @@ import com.anafthdev.dujer.data.DujerDestination
 import com.anafthdev.dujer.data.FinancialType
 import com.anafthdev.dujer.data.model.Category
 import com.anafthdev.dujer.data.model.Financial
+import com.anafthdev.dujer.data.model.Wallet
 import com.anafthdev.dujer.feature.app.LocalDujerState
 import com.anafthdev.dujer.feature.financial.data.FinancialAction
 import com.anafthdev.dujer.feature.statistic.component.FinancialStatisticChart
@@ -50,7 +51,6 @@ import com.anafthdev.dujer.feature.theme.medium_shape
 import com.anafthdev.dujer.feature.wallet.component.DeleteWalletPopup
 import com.anafthdev.dujer.feature.wallet.subscreen.EditBalanceBottomSheet
 import com.anafthdev.dujer.feature.wallet.subscreen.SelectWalletBottomSheet
-import com.anafthdev.dujer.foundation.common.AppUtil.toast
 import com.anafthdev.dujer.foundation.common.ColorTemplate
 import com.anafthdev.dujer.foundation.common.CurrencyFormatter
 import com.anafthdev.dujer.foundation.extension.deviceLocale
@@ -75,10 +75,10 @@ import timber.log.Timber
 fun WalletScreen(
 	navController: NavController,
 	viewModel: WalletViewModel,
-	onDeleteTransaction: (Financial) -> Unit
+	onDeleteTransaction: (Financial) -> Unit,
+	onDeleteWallet: (Wallet) -> Unit
 ) {
 	
-	val context = LocalContext.current
 	val dujerState = LocalDujerState.current
 	
 	val state by viewModel.state.collectAsState()
@@ -213,13 +213,7 @@ fun WalletScreen(
 		) {
 			DeleteWalletPopup(
 				onDelete = {
-					viewModel.dispatch(
-						WalletAction.DeleteWallet(
-							wallet
-						)
-					)
-					
-					context.getString(R.string.wallet_deleted).toast(context)
+					onDeleteWallet(state.wallet)
 					navController.popBackStack()
 				},
 				onCancel = {

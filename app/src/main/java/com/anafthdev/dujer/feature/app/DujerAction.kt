@@ -27,7 +27,7 @@ sealed interface DujerAction {
 		}
 	}
 	
-	data class DeleteCategory(val categories: Array<out Category>): DujerAction {
+	data class DeleteCategory(val categories: Array<out Category>, val financials: Array<out Financial>): DujerAction {
 		override fun equals(other: Any?): Boolean {
 			if (this === other) return true
 			if (javaClass != other?.javaClass) return false
@@ -41,6 +41,23 @@ sealed interface DujerAction {
 		
 		override fun hashCode(): Int {
 			return categories.contentHashCode()
+		}
+	}
+	
+	data class DeleteWallet(val wallets: Array<out Wallet>): DujerAction {
+		override fun equals(other: Any?): Boolean {
+			if (this === other) return true
+			if (javaClass != other?.javaClass) return false
+			
+			other as DeleteWallet
+			
+			if (!wallets.contentEquals(other.wallets)) return false
+			
+			return true
+		}
+		
+		override fun hashCode(): Int {
+			return wallets.contentHashCode()
 		}
 	}
 }

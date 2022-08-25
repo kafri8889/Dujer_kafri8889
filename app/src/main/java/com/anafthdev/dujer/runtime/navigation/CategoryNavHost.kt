@@ -7,12 +7,13 @@ import androidx.navigation.compose.composable
 import androidx.navigation.navigation
 import com.anafthdev.dujer.data.DujerDestination
 import com.anafthdev.dujer.data.model.Category
+import com.anafthdev.dujer.data.model.Financial
 import com.anafthdev.dujer.feature.category.CategoryScreen
 import com.anafthdev.dujer.feature.category.CategoryViewModel
 
 fun NavGraphBuilder.CategoryNavHost(
 	navController: NavController,
-	onDismissToEnd: (Category) -> Unit
+	onDismissToEnd: (Category, List<Financial>) -> Unit
 ) {
 	navigation(
 		startDestination = DujerDestination.Category.Home.route,

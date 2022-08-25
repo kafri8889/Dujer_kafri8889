@@ -20,6 +20,7 @@ data class DujerState(
 	val allCategory: List<Category> = emptyList(),
 	val allIncomeTransaction: List<Financial> = emptyList(),
 	val allExpenseTransaction: List<Financial> = emptyList(),
+	val allTransaction: List<Financial> = emptyList(),
 	val controller: DujerController = object : DujerController {
 		override fun sendEffect(effect: BaseEffect) {}
 	}

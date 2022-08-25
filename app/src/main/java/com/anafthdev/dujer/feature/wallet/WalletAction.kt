@@ -13,7 +13,6 @@ sealed class WalletAction {
 	data class SetFilterDate(val filterDate: Pair<Long, Long>): WalletAction()
 	data class SetSelectedMonth(val selectedMonth: List<Int>): WalletAction()
 	data class UpdateWallet(val wallet: Wallet): WalletAction()
-	data class DeleteWallet(val wallet: Wallet): WalletAction()
 	data class InsertFinancial(val financial: Financial): WalletAction()
 	data class SetSelectedFinancialType(val type: FinancialType): WalletAction()
 }

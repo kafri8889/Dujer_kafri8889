@@ -38,8 +38,6 @@ interface IWalletEnvironment {
 	
 	suspend fun updateWallet(wallet: Wallet)
 	
-	suspend fun deleteWallet(wallet: Wallet)
-	
 	suspend fun setWalletID(id: Int)
 	
 	suspend fun setSortType(sortType: SortType)

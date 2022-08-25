@@ -2,6 +2,7 @@ package com.anafthdev.dujer.runtime
 
 import android.os.Bundle
 import androidx.activity.compose.setContent
+import androidx.activity.viewModels
 import androidx.biometric.BiometricPrompt
 import androidx.core.view.WindowCompat
 import androidx.lifecycle.lifecycleScope
@@ -10,6 +11,7 @@ import com.anafthdev.dujer.data.datasource.local.db.DujerWriteDao
 import com.anafthdev.dujer.data.datastore.AppDatastore
 import com.anafthdev.dujer.data.model.Category
 import com.anafthdev.dujer.feature.app.DujerApp
+import com.anafthdev.dujer.feature.app.DujerViewModel
 import com.anafthdev.dujer.foundation.common.BiometricManager
 import com.anafthdev.dujer.foundation.extension.toCategoryDb
 import com.anafthdev.dujer.foundation.localized.LocalizedActivity
@@ -25,6 +27,8 @@ class MainActivity : LocalizedActivity() {
 	
 	@Inject lateinit var appDatastore: AppDatastore
 	@Inject lateinit var writeDao: DujerWriteDao
+	
+	private val dujerViewModel: DujerViewModel by viewModels()
 	
 	private lateinit var biometricManager: BiometricManager
 	
@@ -44,7 +48,9 @@ class MainActivity : LocalizedActivity() {
 		authenticate()
 		
 		setContent {
-			DujerApp()
+			DujerApp(
+				viewModel = dujerViewModel
+			)
 		}
 	}
 	

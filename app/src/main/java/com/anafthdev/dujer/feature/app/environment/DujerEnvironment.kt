@@ -1,5 +1,6 @@
 package com.anafthdev.dujer.feature.app.environment
 
+import android.content.Context
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.asFlow
@@ -14,6 +15,7 @@ import com.anafthdev.dujer.feature.app.DujerAction.DeleteFinancial
 import com.anafthdev.dujer.feature.app.data.UndoType
 import com.anafthdev.dujer.foundation.di.DiName
 import com.anafthdev.dujer.model.Currency
+import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject
@@ -21,6 +23,7 @@ import javax.inject.Named
 
 class DujerEnvironment @Inject constructor(
 	@Named(DiName.DISPATCHER_IO) override val dispatcher: CoroutineDispatcher,
+	@ApplicationContext private val context: Context,
 	private val repository: Repository,
 	private val appDatastore: AppDatastore,
 ): IDujerEnvironment {
@@ -37,6 +40,16 @@ class DujerEnvironment @Inject constructor(
 	 * deleted financial from [DeleteCategory]
 	 */
 	private val categoryTemp: ArrayList<Category> = arrayListOf()
+	
+	/**
+	 * financials with `categoryId` is category to be deleted
+	 */
+	private val financialCategoryTemp: ArrayList<Financial> = arrayListOf()
+	
+	/**
+	 * deleted wallet
+	 */
+	private val walletTemp: ArrayList<Wallet> = arrayListOf()
 	
 	override fun getAllBudget(): Flow<List<Budget>> {
 		return repository.getAllBudget()
@@ -85,11 +98,22 @@ class DujerEnvironment @Inject constructor(
 		repository.deleteFinancial(*financial)
 	}
 	
-	override suspend fun deleteCategory(vararg category: Category) {
+	override suspend fun deleteCategory(categories: Array<out Category>, financial: Array<out Financial>) {
 		categoryTemp.clear()
-		categoryTemp.addAll(category)
+		categoryTemp.addAll(categories)
+		
+		financialCategoryTemp.clear()
+		financialCategoryTemp.addAll(financial)
+		
 		_dataCanReturned.postValue(UndoType.Category)
-		repository.deleteCategory(*category)
+		repository.deleteCategory(*categories)
+	}
+	
+	override suspend fun deleteWallet(vararg wallet: Wallet) {
+		walletTemp.clear()
+		walletTemp.addAll(wallet)
+		_dataCanReturned.postValue(UndoType.Wallet)
+		repository.deleteWallet(*wallet)
 	}
 	
 	override suspend fun undoFinancial() {
@@ -98,6 +122,19 @@ class DujerEnvironment @Inject constructor(
 	
 	override suspend fun undoCategory() {
 		repository.insertCategory(*categoryTemp.toTypedArray())
+		categoryTemp.getOrNull(0)?.let { category ->
+			repository.updateFinancial(
+				*financialCategoryTemp.map {
+					it.copy(
+						category = category
+					)
+				}.toTypedArray()
+			)
+		}
+	}
+	
+	override suspend fun undoWallet() {
+		repository.insertWallet(*walletTemp.toTypedArray())
 	}
 	
 }

@@ -35,10 +35,14 @@ interface IDujerEnvironment {
 	
 	suspend fun deleteFinancial(vararg financial: Financial)
 	
-	suspend fun deleteCategory(vararg category: Category)
+	suspend fun deleteCategory(categories: Array<out Category>, financial: Array<out Financial>)
+	
+	suspend fun deleteWallet(vararg wallet: Wallet)
 	
 	suspend fun undoFinancial()
 	
 	suspend fun undoCategory()
+	
+	suspend fun undoWallet()
 	
 }

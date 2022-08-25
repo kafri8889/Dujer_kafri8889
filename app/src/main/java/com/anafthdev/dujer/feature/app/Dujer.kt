@@ -39,22 +39,19 @@ import com.google.accompanist.systemuicontroller.rememberSystemUiController
 	ExperimentalMaterial3Api::class
 )
 @Composable
-fun DujerApp() {
+fun DujerApp(
+	viewModel: DujerViewModel
+) {
 	
 	val context = LocalContext.current
 	val lifecycleOwner = LocalLifecycleOwner.current
 	
-	val viewModel = hiltViewModel<DujerViewModel>()
 	val uiModeViewModel = hiltViewModel<UiModeViewModel>()
 	
 	val state by viewModel.state.collectAsState()
 	val uiModeState by uiModeViewModel.state.collectAsState()
 	
-	val currentCurrency = state.currentCurrency
-	val dataCanReturned = state.dataCanReturned
-	val uiMode = uiModeState.uiMode
-	
-	val isSystemInDarkTheme = uiMode.isDarkTheme()
+	val isSystemInDarkTheme = uiModeState.uiMode.isDarkTheme()
 	
 	val systemUiController = rememberSystemUiController()
 	val snackbarHostState = remember { SnackbarHostState() }
@@ -81,15 +78,25 @@ fun DujerApp() {
 				is DujerEffect.DeleteFinancial -> {
 					snackbarHostState.currentSnackbarData?.dismiss()
 					snackbarHostState.showSnackbar(
-						message = "${context.getString(R.string.finance_removed)} \"${effect.financial.name}\"",
-						duration = SnackbarDuration.Short
+						message = "${context.getString(R.string.transaction_deleted)} \"${effect.financial.name}\"",
+						duration = SnackbarDuration.Short,
+						actionLabel = context.getString(R.string.cancel)
 					)
 				}
 				is DujerEffect.DeleteCategory -> {
 					snackbarHostState.currentSnackbarData?.dismiss()
 					snackbarHostState.showSnackbar(
-						message = "${context.getString(R.string.category_removed)} \"${effect.category.name}\"",
-						duration = SnackbarDuration.Short
+						message = "${context.getString(R.string.category_deleted)} \"${effect.category.name}\"",
+						duration = SnackbarDuration.Short,
+						actionLabel = context.getString(R.string.cancel)
+					)
+				}
+				is DujerEffect.DeleteWallet -> {
+					snackbarHostState.currentSnackbarData?.dismiss()
+					snackbarHostState.showSnackbar(
+						message = "${context.getString(R.string.wallet_deleted)} \"${effect.wallet.name}\"",
+						duration = SnackbarDuration.Short,
+						actionLabel = context.getString(R.string.cancel)
 					)
 				}
 				is AddWalletEffect.WalletCreated -> {
@@ -119,7 +126,7 @@ fun DujerApp() {
 		isSystemInDarkTheme = isSystemInDarkTheme
 	) {
 		CompositionLocalProvider(
-			LocalUiMode provides uiMode,
+			LocalUiMode provides uiModeState.uiMode,
 			LocalUiColor provides LocalUiColor.current.copy(
 				headlineText = if (isSystemInDarkTheme) black09 else black02,
 				titleText = if (isSystemInDarkTheme) black08 else black03,
@@ -127,7 +134,7 @@ fun DujerApp() {
 				bodyText = if (isSystemInDarkTheme) black08 else black05,
 				labelText = if (isSystemInDarkTheme) black06 else black06
 			),
-			LocalCurrency provides currentCurrency,
+			LocalCurrency provides state.currentCurrency,
 			LocalDujerState provides state,
 			LocalContentColor provides if (isSystemInDarkTheme) black10 else black01,
 			LocalDujerController provides state.controller,
@@ -142,7 +149,7 @@ fun DujerApp() {
 								snackbarData = snackbarData,
 								onCancel = {
 									viewModel.dispatch(
-										DujerAction.Undo(dataCanReturned)
+										DujerAction.Undo(state.dataCanReturned)
 									)
 								}
 							)
