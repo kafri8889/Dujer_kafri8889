@@ -1,7 +1,6 @@
 package com.anafthdev.dujer.feature.wallet.subscreen
 
 import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.text.KeyboardActions
@@ -35,10 +34,8 @@ import com.anafthdev.dujer.foundation.common.CurrencyFormatter
 import com.anafthdev.dujer.foundation.common.TextFieldCurrencyFormatter
 import com.anafthdev.dujer.foundation.extension.deviceLocale
 import com.anafthdev.dujer.foundation.extension.isIncome
-import com.anafthdev.dujer.foundation.extension.isLightTheme
 import com.anafthdev.dujer.foundation.extension.toPositive
 import com.anafthdev.dujer.foundation.ui.LocalUiColor
-import com.anafthdev.dujer.foundation.uimode.data.LocalUiMode
 import com.anafthdev.dujer.foundation.window.dpScaled
 import com.anafthdev.dujer.foundation.window.spScaled
 import com.anafthdev.dujer.model.LocalCurrency
@@ -52,7 +49,6 @@ fun EditWalletBalanceScreen(
 	onSave: (Wallet, Financial) -> Unit
 ) {
 	
-	val uiMode = LocalUiMode.current
 	val context = LocalContext.current
 	val localCurrency = LocalCurrency.current
 	val focusManager = LocalFocusManager.current
@@ -82,14 +78,8 @@ fun EditWalletBalanceScreen(
 	Column(
 		modifier = Modifier
 			.imePadding()
+			.systemBarsPadding()
 			.fillMaxWidth()
-			.background(
-				if (uiMode.isLightTheme()) MaterialTheme.colorScheme.background
-				else MaterialTheme.colorScheme.surfaceVariant
-			)
-			.padding(
-				vertical = 16.dpScaled
-			)
 	) {
 		Box(
 			modifier = Modifier
@@ -294,6 +284,8 @@ fun EditWalletBalanceScreen(
 				)
 			)
 		}
+		
+		Spacer(modifier = Modifier.height(16.dpScaled))
 	}
 }
 

@@ -8,7 +8,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -115,16 +114,11 @@ fun DujerApp(
 		}
 	)
 	
-	SideEffect {
-		systemUiController.setSystemBarsColor(
-			color = Color.Transparent,
-			darkIcons = !isSystemInDarkTheme
-		)
-	}
-	
 	DujerTheme(
 		isSystemInDarkTheme = isSystemInDarkTheme
 	) {
+		val backgroundColor = MaterialTheme.colorScheme.background
+		
 		CompositionLocalProvider(
 			LocalUiMode provides uiModeState.uiMode,
 			LocalUiColor provides LocalUiColor.current.copy(
@@ -162,6 +156,12 @@ fun DujerApp(
 					)
 				}
 			) {
+				SideEffect {
+					systemUiController.setSystemBarsColor(
+						color = backgroundColor
+					)
+				}
+				
 				DujerNavigation(
 					dujerViewModel = viewModel,
 					modifier = Modifier

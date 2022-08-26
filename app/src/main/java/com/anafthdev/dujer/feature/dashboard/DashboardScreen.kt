@@ -203,6 +203,7 @@ private fun DashboardContent(
 				animationSpec = tween(200)
 			),
 			modifier = Modifier
+				.systemBarsPadding()
 				.padding(32.dpScaled)
 				.align(Alignment.BottomEnd)
 				.zIndex(2f)

@@ -4,7 +4,6 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -18,9 +17,7 @@ import com.anafthdev.dujer.data.model.Wallet
 import com.anafthdev.dujer.feature.theme.Typography
 import com.anafthdev.dujer.feature.theme.full_shape
 import com.anafthdev.dujer.feature.wallet.component.SelectWalletItem
-import com.anafthdev.dujer.foundation.extension.isLightTheme
 import com.anafthdev.dujer.foundation.ui.LocalUiColor
-import com.anafthdev.dujer.foundation.uimode.data.LocalUiMode
 import com.anafthdev.dujer.foundation.window.dpScaled
 import com.anafthdev.dujer.foundation.window.spScaled
 
@@ -31,18 +28,10 @@ fun SelectWalletScreen(
 	onWalletSelected: (Wallet) -> Unit
 ) {
 	
-	val uiMode = LocalUiMode.current
-
 	Column(
 		modifier = Modifier
+			.systemBarsPadding()
 			.fillMaxWidth()
-			.background(
-				if (uiMode.isLightTheme()) MaterialTheme.colorScheme.background
-				else MaterialTheme.colorScheme.surfaceVariant
-			)
-			.padding(
-				vertical = 16.dpScaled
-			)
 	) {
 		Box(
 			modifier = Modifier
@@ -77,5 +66,7 @@ fun SelectWalletScreen(
 				)
 			}
 		}
+		
+		Spacer(modifier = Modifier.height(16.dpScaled))
 	}
 }
