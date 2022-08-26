@@ -180,6 +180,27 @@ sealed class DujerDestination(val route: String) {
 			object Root: DujerDestination("bottom-sheet/add-wallet/root")
 			object Home: DujerDestination("bottom-sheet/add-wallet/home")
 		}
+		
+		class EditWalletBalance {
+			object Root: DujerDestination("bottom-sheet/edit-wallet-balance/root")
+			object Home: DujerDestination(
+				route = "bottom-sheet/edit-wallet-balance/home?" +
+						"$ARG_WALLET_ID={$ARG_WALLET_ID}"
+			) {
+				fun createRoute(
+					walletID: Int
+				): String {
+					return "bottom-sheet/edit-wallet-balance/home?$ARG_WALLET_ID=$walletID"
+				}
+				
+				val arguments = listOf(
+					navArgument(ARG_WALLET_ID) {
+						defaultValue = com.anafthdev.dujer.data.model.Wallet.cash.id
+						type = NavType.IntType
+					}
+				)
+			}
+		}
 	}
 	
 }

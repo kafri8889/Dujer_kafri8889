@@ -1,8 +1,5 @@
 package com.anafthdev.dujer.feature.wallet.environment
 
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.asFlow
 import com.anafthdev.dujer.data.FinancialGroupData
 import com.anafthdev.dujer.data.FinancialType
 import com.anafthdev.dujer.data.GroupType
@@ -17,11 +14,14 @@ import com.anafthdev.dujer.foundation.common.financial_sorter.FinancialSorter
 import com.anafthdev.dujer.foundation.di.DiName
 import com.anafthdev.dujer.foundation.extension.combine
 import com.github.mikephil.charting.data.PieEntry
-import kotlinx.coroutines.*
+import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.launch
 import timber.log.Timber
 import javax.inject.Inject
 import javax.inject.Named
@@ -31,9 +31,6 @@ class WalletEnvironment @Inject constructor(
 	private val financialSorter: FinancialSorter,
 	private val repository: Repository
 ): IWalletEnvironment {
-	
-	private val _selectedWallet = MutableLiveData(Wallet.cash)
-	private val selectedWallet: LiveData<Wallet> = _selectedWallet
 	
 	private val _availableCategory = MutableStateFlow(emptyList<Category>())
 	private val availableCategory: StateFlow<List<Category>> = _availableCategory
@@ -135,30 +132,16 @@ class WalletEnvironment @Inject constructor(
 	}
 	
 	override suspend fun updateWallet(wallet: Wallet) {
-		withContext(Dispatchers.Main) {
-			repository.updateWallet(
-				wallet.also {
-					Timber.i("wallet to update: $wallet")
-				}
-			)
-		}
-		
-		_selectedWallet.postValue(Wallet.default)
-		_selectedWallet.postValue(wallet)
-		
+		repository.updateWallet(wallet)
 	}
 	
 	override suspend fun setWalletID(id: Int) {
 		_lastSelectedWalletID.emit(Wallet.default.id)
 		_lastSelectedWalletID.emit(id)
-		
-		_selectedWallet.postValue(
-			repository.getWalletByID(id) ?: Wallet.cash
-		)
 	}
 	
-	override fun getWallet(): Flow<Wallet> {
-		return selectedWallet.asFlow()
+	override fun getWallet(walletId: Int): Flow<Wallet> {
+		return repository.getWalletByID(walletId)
 	}
 	
 	override fun getSortType(): Flow<SortType> {

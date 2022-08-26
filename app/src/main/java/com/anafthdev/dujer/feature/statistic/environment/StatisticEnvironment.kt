@@ -11,11 +11,13 @@ import com.anafthdev.dujer.foundation.extension.deviceLocale
 import com.anafthdev.dujer.foundation.extension.isExpense
 import com.anafthdev.dujer.foundation.extension.isIncome
 import com.github.mikephil.charting.data.PieEntry
-import kotlinx.coroutines.*
+import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.launch
 import timber.log.Timber
 import java.text.SimpleDateFormat
 import javax.inject.Inject
@@ -27,9 +29,6 @@ class StatisticEnvironment @Inject constructor(
 ): IStatisticEnvironment {
 	
 	private val monthYearFormatter = SimpleDateFormat("MMM yyyy", deviceLocale)
-	
-	private val _selectedWallet = MutableStateFlow(Wallet.cash)
-	private val selectedWallet: StateFlow<Wallet> = _selectedWallet
 	
 	private val _incomeTransaction = MutableStateFlow(emptyList<Financial>())
 	private val incomeTransaction: StateFlow<List<Financial>> = _incomeTransaction
@@ -112,15 +111,10 @@ class StatisticEnvironment @Inject constructor(
 	
 	override suspend fun setWallet(walletID: Int) {
 		_lastSelectedWalletID.tryEmit(walletID)
-		withContext(Dispatchers.IO) {
-			_selectedWallet.emit(
-				repository.getWalletByID(walletID) ?: Wallet.cash
-			)
-		}
 	}
 	
-	override fun getWallet(): Flow<Wallet> {
-		return selectedWallet
+	override fun getWallet(walletID: Int): Flow<Wallet> {
+		return repository.getWalletByID(walletID)
 	}
 	
 	override fun getPieEntry(): Flow<List<PieEntry>> {

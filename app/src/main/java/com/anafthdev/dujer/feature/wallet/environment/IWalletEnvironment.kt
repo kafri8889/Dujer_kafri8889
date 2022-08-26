@@ -15,8 +15,6 @@ interface IWalletEnvironment {
 
 	val dispatcher: CoroutineDispatcher
 	
-	fun getWallet(): Flow<Wallet>
-	
 	fun getSortType(): Flow<SortType>
 	
 	fun getGroupType(): Flow<GroupType>
@@ -32,6 +30,8 @@ interface IWalletEnvironment {
 	fun getAvailableCategory(): Flow<List<Category>>
 	
 	fun getSelectedFinancialType(): Flow<FinancialType>
+	
+	fun getWallet(walletId: Int): Flow<Wallet>
 	
 	
 	suspend fun insertFinancial(financial: Financial)

@@ -49,7 +49,6 @@ import com.anafthdev.dujer.feature.theme.expense_color
 import com.anafthdev.dujer.feature.theme.income_color
 import com.anafthdev.dujer.feature.theme.medium_shape
 import com.anafthdev.dujer.feature.wallet.component.DeleteWalletPopup
-import com.anafthdev.dujer.feature.wallet.subscreen.EditBalanceBottomSheet
 import com.anafthdev.dujer.feature.wallet.subscreen.SelectWalletBottomSheet
 import com.anafthdev.dujer.foundation.common.ColorTemplate
 import com.anafthdev.dujer.foundation.common.CurrencyFormatter
@@ -68,7 +67,6 @@ import com.github.mikephil.charting.data.PieDataSet
 import com.github.mikephil.charting.data.PieEntry
 import com.github.mikephil.charting.highlight.Highlight
 import kotlinx.coroutines.launch
-import timber.log.Timber
 
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
@@ -120,18 +118,8 @@ fun WalletScreen(
 		expenseTransaction.sumOf { it.amount }
 	}
 	
-	val hideEditBalanceSheetState = {
-		scope.launch { editBalanceSheetState.hide() }
-		Unit
-	}
-	
 	val hideSelectWalletSheetState = {
 		scope.launch { selectWalletSheetState.hide() }
-		Unit
-	}
-	
-	val showEditBalanceSheetState = {
-		scope.launch { editBalanceSheetState.show() }
 		Unit
 	}
 	
@@ -236,47 +224,45 @@ fun WalletScreen(
 				)
 			}
 		) {
-			EditBalanceBottomSheet(
-				state = editBalanceSheetState,
-				wallet = wallet,
-				onCancel = hideEditBalanceSheetState,
-				onSave = { mWallet, financial ->
-					viewModel.dispatch(
-						WalletAction.UpdateWallet(
-							mWallet.copy(
-								balance = (((mWallet.initialBalance + incomeAmount) - expenseAmount)).also {
-									Timber.i("$it, w: ${mWallet.initialBalance}, i: $incomeAmount, e: $expenseAmount")
-								}
-							).also { Timber.i("$it, in: $incomeTransaction, ex: $expenseTransaction") }
-						)
-					)
-					
-					if (financial.id != Financial.default.id) {
-						viewModel.dispatch(
-							WalletAction.InsertFinancial(financial)
-						)
-					}
-					
-					hideEditBalanceSheetState()
+			WalletScreenContent(
+				state = state,
+				navController = navController,
+				viewModel = viewModel,
+				incomeTransaction = incomeTransaction,
+				expenseTransaction = expenseTransaction,
+				onDeleteTransaction = onDeleteTransaction,
+				onShowSelectWalletSheet = showSelectWalletSheetState,
+				onDeleteWallet = {
+					isDeleteConfirmationPopupShowing = true
+				},
+				onFilterClicked = {
+					isFilterSortFinancialPopupShowed = true
 				}
-			) {
-				WalletScreenContent(
-					state = state,
-					navController = navController,
-					viewModel = viewModel,
-					incomeTransaction = incomeTransaction,
-					expenseTransaction = expenseTransaction,
-					onDeleteTransaction = onDeleteTransaction,
-					onShowEditBalanceSheet = showEditBalanceSheetState,
-					onShowSelectWalletSheet = showSelectWalletSheetState,
-					onDeleteWallet = {
-						isDeleteConfirmationPopupShowing = true
-					},
-					onFilterClicked = {
-						isFilterSortFinancialPopupShowed = true
-					}
-				)
-			}
+			)
+//			EditBalanceBottomSheet(
+//				state = editBalanceSheetState,
+//				wallet = wallet,
+//				onCancel = hideEditBalanceSheetState,
+//				onSave = { mWallet, financial ->
+//					viewModel.dispatch(
+//						WalletAction.UpdateWallet(
+//							mWallet.copy(
+//								balance = (((mWallet.initialBalance + incomeAmount) - expenseAmount)).also {
+//									Timber.i("$it, w: ${mWallet.initialBalance}, i: $incomeAmount, e: $expenseAmount")
+//								}
+//							).also { Timber.i("$it, in: $incomeTransaction, ex: $expenseTransaction") }
+//						)
+//					)
+//
+//					if (financial.id != Financial.default.id) {
+//						viewModel.dispatch(
+//							WalletAction.InsertFinancial(financial)
+//						)
+//					}
+//
+//					hideEditBalanceSheetState()
+//				}
+//			) {}
 		}
 	}
 }
@@ -288,7 +274,6 @@ private fun WalletScreenContent(
 	viewModel: WalletViewModel,
 	incomeTransaction: List<Financial>,
 	expenseTransaction: List<Financial>,
-	onShowEditBalanceSheet: () ->Unit,
 	onShowSelectWalletSheet: () ->Unit,
 	onDeleteWallet: () -> Unit,
 	onDeleteTransaction: (Financial) -> Unit,
@@ -300,7 +285,6 @@ private fun WalletScreenContent(
 	val dujerState = LocalDujerState.current
 	val localCurrency = LocalCurrency.current
 	
-	val wallet = state.wallet
 	val transactions = state.transactions
 	val pieEntries = state.pieEntries
 	val selectedFinancialType = state.selectedFinancialType
@@ -313,18 +297,18 @@ private fun WalletScreenContent(
 	var selectedCategory = rememberSaveable(saver = Category.Saver) { Category.default }
 	var isDataSetEmpty by rememberSaveable { mutableStateOf(false) }
 
-	val balance = remember(wallet.balance) {
+	val balance = remember(state.wallet.balance) {
 		CurrencyFormatter.format(
 			locale = deviceLocale,
-			amount = wallet.balance,
+			amount = state.wallet.balance,
 			useSymbol = true,
 			currencyCode = localCurrency.countryCode
 		)
 	}
-	val initialBalance = remember(wallet.initialBalance) {
+	val initialBalance = remember(state.wallet.initialBalance) {
 		CurrencyFormatter.format(
 			locale = deviceLocale,
-			amount = wallet.initialBalance,
+			amount = state.wallet.initialBalance,
 			useSymbol = true,
 			currencyCode = localCurrency.countryCode
 		)
@@ -417,7 +401,7 @@ private fun WalletScreenContent(
 						IconButton(
 							onClick = {
 								navController.navigate(
-									DujerDestination.Statistic.Home.createRoute(wallet.id)
+									DujerDestination.Statistic.Home.createRoute(state.wallet.id)
 								)
 							},
 						) {
@@ -427,7 +411,7 @@ private fun WalletScreenContent(
 							)
 						}
 						
-						if (!wallet.defaultWallet) {
+						if (!state.wallet.defaultWallet) {
 							IconButton(
 								onClick = onDeleteWallet,
 							) {
@@ -452,12 +436,12 @@ private fun WalletScreenContent(
 							color = MaterialTheme.colorScheme.outline,
 							shape = medium_shape
 						)
-						.background(wallet.tint.backgroundTint.toColor())
+						.background(state.wallet.tint.backgroundTint.toColor())
 						.align(Alignment.CenterHorizontally)
 				) {
 					Icon(
-						painter = painterResource(id = wallet.iconID),
-						tint = wallet.tint.iconTint.toColor(),
+						painter = painterResource(id = state.wallet.iconID),
+						tint = state.wallet.tint.iconTint.toColor(),
 						contentDescription = null,
 						modifier = Modifier
 							.size(28.dpScaled)
@@ -482,7 +466,7 @@ private fun WalletScreenContent(
 						.align(Alignment.CenterHorizontally)
 				) {
 					Text(
-						text = wallet.name,
+						text = state.wallet.name,
 						style = MaterialTheme.typography.titleMedium.copy(
 							color = LocalUiColor.current.titleText,
 							fontSize = MaterialTheme.typography.titleMedium.fontSize.spScaled
@@ -521,7 +505,13 @@ private fun WalletScreenContent(
 				)
 				
 				FilledTonalButton(
-					onClick = onShowEditBalanceSheet,
+					onClick = {
+						navController.navigate(
+							DujerDestination.BottomSheet.EditWalletBalance.Home.createRoute(
+								walletID = state.wallet.id
+							)
+						)
+					},
 					modifier = Modifier
 						.align(Alignment.CenterHorizontally)
 				) {

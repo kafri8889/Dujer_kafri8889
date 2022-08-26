@@ -80,7 +80,7 @@ class Repository @Inject constructor(
 		return localDatasource.getAllWallet()
 	}
 	
-	fun getWalletByID(mID: Int): Wallet? {
+	fun getWalletByID(mID: Int): Flow<Wallet> {
 		return localDatasource.getWalletByID(mID)
 	}
 	

@@ -105,8 +105,10 @@ class LocalDatasource @Inject constructor(
 			.map { it.toWallet() }
 	}
 	
-	fun getWalletByID(mID: Int): Wallet? {
-		return readDao.getWalletByID(mID)?.toWallet()
+	fun getWalletByID(mID: Int): Flow<Wallet> {
+		return readDao.getWalletByID(mID)
+			.filterNotNull()
+			.map { it.toWallet() }
 	}
 	
 	suspend fun deleteWallet(vararg wallet: Wallet) {

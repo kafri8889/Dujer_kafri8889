@@ -28,19 +28,15 @@ class StatisticViewModel @Inject constructor(
 		viewModelScope.launch(environment.dispatcher) {
 			walletID.collect { id ->
 				environment.setWallet(id)
-			}
-		}
-		
-		viewModelScope.launch(environment.dispatcher) {
-			environment.getWallet().collect { wallet ->
-				setState {
-					copy(
-						wallet = wallet
-					)
+				environment.getWallet(id).collect { wallet ->
+					setState {
+						copy(
+							wallet = wallet
+						)
+					}
 				}
 			}
 		}
-		
 		viewModelScope.launch(environment.dispatcher) {
 			environment.getIncomeTransaction().collect { transaction ->
 				setState {

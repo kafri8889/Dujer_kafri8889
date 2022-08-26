@@ -10,13 +10,11 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.rememberNavController
 import com.anafthdev.dujer.data.DujerDestination
 import com.anafthdev.dujer.feature.app.DujerAction
 import com.anafthdev.dujer.feature.app.DujerViewModel
-import com.anafthdev.dujer.feature.app.LocalDujerState
 import com.anafthdev.dujer.foundation.extension.toArray
 import com.google.accompanist.navigation.material.BottomSheetNavigator
 import com.google.accompanist.navigation.material.ExperimentalMaterialNavigationApi
@@ -29,10 +27,6 @@ fun DujerNavigation(
 	modifier: Modifier = Modifier
 ) {
 	
-	val dujerState = LocalDujerState.current
-	
-	val allTransaction = dujerState.allTransaction
-	
 	val sheetState = rememberModalBottomSheetState(
 		initialValue = ModalBottomSheetValue.Hidden,
 		skipHalfExpanded = true,
@@ -42,12 +36,12 @@ fun DujerNavigation(
 	val bottomSheetNavigator = remember(sheetState) {
 		BottomSheetNavigator(sheetState = sheetState)
 	}
-	val context = LocalContext.current
 	
 	val navController = rememberNavController(bottomSheetNavigator)
 	
 	ModalBottomSheetLayout(
 		bottomSheetNavigator = bottomSheetNavigator,
+		sheetBackgroundColor = MaterialTheme.colorScheme.background,
 		sheetShape = MaterialTheme.shapes.large.copy(
 			bottomEnd = CornerSize(0),
 			bottomStart = CornerSize(0)

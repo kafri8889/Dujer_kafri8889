@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -22,6 +23,7 @@ import com.anafthdev.dujer.feature.theme.*
 import com.anafthdev.dujer.foundation.common.AppUtil.toast
 import com.anafthdev.dujer.foundation.common.BaseEffect
 import com.anafthdev.dujer.foundation.extension.isDarkTheme
+import com.anafthdev.dujer.foundation.extension.isLightTheme
 import com.anafthdev.dujer.foundation.ui.LocalUiColor
 import com.anafthdev.dujer.foundation.uicomponent.CustomSnackbar
 import com.anafthdev.dujer.foundation.uimode.UiModeViewModel
@@ -158,6 +160,11 @@ fun DujerApp(
 			) {
 				SideEffect {
 					systemUiController.setSystemBarsColor(
+						color = Color.Transparent,
+						darkIcons = uiModeState.uiMode.isLightTheme()
+					)
+					
+					systemUiController.setNavigationBarColor(
 						color = backgroundColor
 					)
 				}

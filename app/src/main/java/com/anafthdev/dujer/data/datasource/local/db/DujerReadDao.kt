@@ -56,7 +56,7 @@ interface DujerReadDao {
 	
 	@Transaction
 	@Query("SELECT * FROM wallet_table WHERE wallet_id LIKE :mID")
-	fun getWalletByID(mID: Int): WalletWithFinancial?
+	fun getWalletByID(mID: Int): Flow<WalletWithFinancial>
 	
 	
 	
