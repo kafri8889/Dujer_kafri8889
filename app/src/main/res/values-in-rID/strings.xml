@@ -108,7 +108,7 @@
     <string name="select_your_language">Pilih bahasa mu</string>
     <string name="bio_auth_description">Verifikasi bahwa ini adalah Anda</string>
     <string name="set_a_monthly_budget">tetapkan anggaran bulanan</string>
-    <string name="change_initial_amount">Ubah jumlah awal</string>
+    <string name="change_starting_balance">Ubah saldo awal</string>
     <string name="no_fp_sensor_detected">Sensor sidik jari tidak terdeteksi</string>
     <string name="title_cannot_be_empty">Judul tidak boleh kosong</string>
     <string name="add_fingerprint_first">Tambah sidik jari terlebih dahulu</string>

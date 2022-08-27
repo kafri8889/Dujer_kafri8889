@@ -37,9 +37,7 @@ import com.anafthdev.dujer.feature.theme.small_shape
 import com.anafthdev.dujer.foundation.common.AppUtil.toast
 import com.anafthdev.dujer.foundation.common.CurrencyFormatter
 import com.anafthdev.dujer.foundation.common.TextFieldCurrencyFormatter
-import com.anafthdev.dujer.foundation.extension.deviceLocale
-import com.anafthdev.dujer.foundation.extension.isIncome
-import com.anafthdev.dujer.foundation.extension.toPositive
+import com.anafthdev.dujer.foundation.extension.*
 import com.anafthdev.dujer.foundation.ui.LocalUiColor
 import com.anafthdev.dujer.foundation.window.dpScaled
 import com.anafthdev.dujer.foundation.window.spScaled
@@ -128,8 +126,7 @@ fun EditWalletBalanceScreen(
 								val amount = state.balanceAmount - state.wallet!!.balance
 								
 								val mWallet = state.wallet!!.copy(
-									balance = state.wallet!!.balance + amount,
-									initialBalance = if (state.editBalanceOption == EditBalanceOption.CHANGE_INITIAL_AMOUNT) state.balanceAmount
+									initialBalance = if (state.editBalanceOption.isChangeInitialAmount()) state.balanceAmount
 									else state.wallet!!.initialBalance
 								)
 								
@@ -146,17 +143,15 @@ fun EditWalletBalanceScreen(
 									dateCreated = System.currentTimeMillis()
 								)
 								
-//								viewModel.dispatch(
-//									EditWalletBalanceAction.Update(
-//
-//									)
-//								)
-//								onSave(
-//									mWallet,
-//									if (state.editBalanceOption == EditBalanceOption.CHANGE_BALANCE) financial
-//									else Financial.default
-//								)
-							} else navController.popBackStack()
+								viewModel.dispatch(
+									EditWalletBalanceAction.Update(
+										mWallet,
+										if (state.editBalanceOption.isChangeBalance()) financial else null
+									)
+								)
+							}
+							
+							navController.popBackStack()
 						}
 					}
 				},
@@ -237,7 +232,7 @@ fun EditWalletBalanceScreen(
 				}
 		) {
 			RadioButton(
-				selected = state.editBalanceOption == EditBalanceOption.CHANGE_BALANCE,
+				selected = state.editBalanceOption.isChangeBalance(),
 				onClick = {
 					viewModel.dispatch(
 						EditWalletBalanceAction.ChangeBalanceOption(EditBalanceOption.CHANGE_BALANCE)
@@ -260,7 +255,7 @@ fun EditWalletBalanceScreen(
 				)
 				
 				AnimatedVisibility(
-					visible = state.editBalanceOption == EditBalanceOption.CHANGE_BALANCE
+					visible = state.editBalanceOption.isChangeBalance()
 				) {
 					Text(
 						text = stringResource(id = R.string.new_transaction_will_be_added),
@@ -288,7 +283,7 @@ fun EditWalletBalanceScreen(
 				}
 		) {
 			RadioButton(
-				selected = state.editBalanceOption == EditBalanceOption.CHANGE_INITIAL_AMOUNT,
+				selected = state.editBalanceOption.isChangeInitialAmount(),
 				onClick = {
 					viewModel.dispatch(
 						EditWalletBalanceAction.ChangeBalanceOption(EditBalanceOption.CHANGE_INITIAL_AMOUNT)
@@ -301,7 +296,7 @@ fun EditWalletBalanceScreen(
 			)
 			
 			Text(
-				text = stringResource(id = R.string.change_initial_amount),
+				text = stringResource(id = R.string.change_starting_balance),
 				style = Typography.bodyMedium.copy(
 					color = LocalUiColor.current.titleText,
 					fontWeight = FontWeight.Normal,

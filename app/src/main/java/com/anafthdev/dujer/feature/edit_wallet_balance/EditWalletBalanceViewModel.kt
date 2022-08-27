@@ -40,7 +40,10 @@ class EditWalletBalanceViewModel @Inject constructor(
 		when (action) {
 			is EditWalletBalanceAction.Update -> {
 				viewModelScope.launch(environment.dispatcher) {
-				
+					environment.update(
+						wallet = action.wallet,
+						financial = action.financial
+					)
 				}
 			}
 			is EditWalletBalanceAction.ChangeBalance -> {

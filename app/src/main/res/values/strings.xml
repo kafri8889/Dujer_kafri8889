@@ -108,7 +108,7 @@
     <string name="select_your_language">Select your language</string>
     <string name="bio_auth_description">Verify that this is you</string>
     <string name="set_a_monthly_budget">Set a monthly budget</string>
-    <string name="change_initial_amount">Change initial amount</string>
+    <string name="change_starting_balance">Change starting balance</string>
     <string name="no_fp_sensor_detected">Fingerprint sensor not detected</string>
     <string name="title_cannot_be_empty">Title cannot be empty</string>
     <string name="add_fingerprint_first">Add fingerprint first</string>
