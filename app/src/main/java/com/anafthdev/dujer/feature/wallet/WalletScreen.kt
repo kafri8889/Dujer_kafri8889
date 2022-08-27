@@ -91,11 +91,6 @@ fun WalletScreen(
 	
 	val scope = rememberCoroutineScope()
 	
-	val editBalanceSheetState = rememberModalBottomSheetState(
-		initialValue = ModalBottomSheetValue.Hidden,
-		skipHalfExpanded = true
-	)
-	
 	val selectWalletSheetState = rememberModalBottomSheetState(
 		initialValue = ModalBottomSheetValue.Hidden,
 		skipHalfExpanded = true
@@ -109,13 +104,6 @@ fun WalletScreen(
 	}
 	val expenseTransaction = remember(dujerState.allExpenseTransaction, wallet.id) {
 		dujerState.allExpenseTransaction.filter { it.walletID == wallet.id }
-	}
-	
-	val incomeAmount = remember(incomeTransaction) {
-		incomeTransaction.sumOf { it.amount }
-	}
-	val expenseAmount = remember(expenseTransaction) {
-		expenseTransaction.sumOf { it.amount }
 	}
 	
 	val hideSelectWalletSheetState = {

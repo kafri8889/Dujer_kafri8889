@@ -25,12 +25,15 @@ class WalletViewModel @Inject constructor(
 		viewModelScope.launch(environment.dispatcher) {
 			walletID.collect { id ->
 				environment.setWalletID(id)
-				environment.getWallet(id).collect { wallet ->
-					setState {
-						copy(
-							wallet = wallet
-						)
-					}
+			}
+		}
+		
+		viewModelScope.launch(environment.dispatcher) {
+			environment.getWallet().collect { wallet ->
+				setState {
+					copy(
+						wallet = wallet
+					)
 				}
 			}
 		}

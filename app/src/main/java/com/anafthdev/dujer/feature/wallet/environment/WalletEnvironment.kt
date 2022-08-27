@@ -35,6 +35,9 @@ class WalletEnvironment @Inject constructor(
 	private val _availableCategory = MutableStateFlow(emptyList<Category>())
 	private val availableCategory: StateFlow<List<Category>> = _availableCategory
 	
+	private val _currentWallet = MutableStateFlow(Wallet.cash)
+	private val currentWallet: StateFlow<Wallet> = _currentWallet
+	
 	private val _selectedFinancialType = MutableStateFlow(FinancialType.INCOME)
 	private val selectedFinancialType: StateFlow<FinancialType> = _selectedFinancialType
 	
@@ -74,6 +77,7 @@ class WalletEnvironment @Inject constructor(
 				Hexad(id, month, date, sortType, groupType, financials)
 			}.collect { (id, month, date, sortType, groupType, financials) ->
 				val mFinancials = financials.filter { it.walletID == id }
+				
 				_transactions.emit(
 					financialSorter.beginSort(
 						sortType = sortType,
@@ -138,10 +142,14 @@ class WalletEnvironment @Inject constructor(
 	override suspend fun setWalletID(id: Int) {
 		_lastSelectedWalletID.emit(Wallet.default.id)
 		_lastSelectedWalletID.emit(id)
+		
+		repository.getWalletByID(id).collect { wallet ->
+			_currentWallet.emit(wallet)
+		}
 	}
 	
-	override fun getWallet(walletId: Int): Flow<Wallet> {
-		return repository.getWalletByID(walletId)
+	override fun getWallet(): Flow<Wallet> {
+		return currentWallet
 	}
 	
 	override fun getSortType(): Flow<SortType> {
