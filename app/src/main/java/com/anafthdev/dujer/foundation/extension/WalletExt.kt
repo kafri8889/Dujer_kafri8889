@@ -8,7 +8,6 @@ fun Wallet.toWalletDb(): WalletDb {
 		id = id,
 		name = name,
 		initialBalance = initialBalance,
-		balance = balance,
 		iconID = iconID,
 		tint = tint,
 		defaultWallet = defaultWallet
@@ -21,7 +20,6 @@ fun Collection<Wallet>.toWalletDb(): List<WalletDb> {
 			id = wallet.id,
 			name = wallet.name,
 			initialBalance = wallet.initialBalance,
-			balance = wallet.balance,
 			iconID = wallet.iconID,
 			tint = wallet.tint,
 			defaultWallet = wallet.defaultWallet
@@ -35,7 +33,6 @@ fun Array<out Wallet>.toWalletDb(): Array<out WalletDb> {
 			id = wallet.id,
 			name = wallet.name,
 			initialBalance = wallet.initialBalance,
-			balance = wallet.balance,
 			iconID = wallet.iconID,
 			tint = wallet.tint,
 			defaultWallet = wallet.defaultWallet

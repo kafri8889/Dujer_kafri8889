@@ -14,7 +14,7 @@ data class Wallet(
 	val id: Int,
 	var name: String,
 	var initialBalance: Double,
-	var balance: Double, // TODO: hapus?
+	var balance: Double,
 	var iconID: Int,
 	val tint: @RawValue CategoryTint,
 	val defaultWallet: Boolean,

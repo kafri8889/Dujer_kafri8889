@@ -51,6 +51,11 @@ class DujerEnvironment @Inject constructor(
 	 */
 	private val walletTemp: ArrayList<Wallet> = arrayListOf()
 	
+	/**
+	 * financials with `walletId` is wallet to be deleted
+	 */
+	private val financialWalletTemp: ArrayList<Financial> = arrayListOf()
+	
 	override fun getAllBudget(): Flow<List<Budget>> {
 		return repository.getAllBudget()
 	}
@@ -112,6 +117,11 @@ class DujerEnvironment @Inject constructor(
 	override suspend fun deleteWallet(vararg wallet: Wallet) {
 		walletTemp.clear()
 		walletTemp.addAll(wallet)
+		
+		wallet.forEach { mWallet ->
+			financialWalletTemp.addAll(mWallet.financials)
+		}
+		
 		_dataCanReturned.postValue(UndoType.Wallet)
 		repository.deleteWallet(*wallet)
 	}
@@ -124,8 +134,8 @@ class DujerEnvironment @Inject constructor(
 		repository.insertCategory(*categoryTemp.toTypedArray())
 		categoryTemp.getOrNull(0)?.let { category ->
 			repository.updateFinancial(
-				*financialCategoryTemp.map {
-					it.copy(
+				*financialCategoryTemp.map { financial ->
+					financial.copy(
 						category = category
 					)
 				}.toTypedArray()
@@ -135,6 +145,15 @@ class DujerEnvironment @Inject constructor(
 	
 	override suspend fun undoWallet() {
 		repository.insertWallet(*walletTemp.toTypedArray())
+		walletTemp.getOrNull(0)?.let { wallet ->
+			repository.updateFinancial(
+				*financialWalletTemp.map { financial ->
+					financial.copy(
+						walletID = wallet.id
+					)
+				}.toTypedArray()
+			)
+		}
 	}
 	
 }

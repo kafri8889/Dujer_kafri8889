@@ -5,7 +5,6 @@ import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
-import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
@@ -16,7 +15,6 @@ import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.onPlaced
 import androidx.compose.ui.platform.LocalDensity
-import com.anafthdev.dujer.foundation.extension.sumOf
 import com.anafthdev.dujer.foundation.uicomponent.charting.pie.model.PieData
 import com.anafthdev.dujer.foundation.window.DPI
 import com.anafthdev.dujer.foundation.window.dpScaled
@@ -47,7 +45,6 @@ fun PieChartPreview() {
 	)
 }
 
-@OptIn(ExperimentalComposeUiApi::class)
 @Composable
 fun PieChart(
 	pieDataList: List<PieData>,
@@ -60,7 +57,7 @@ fun PieChart(
 	
 	val density = LocalDensity.current
 	
-	val totalY = pieDataList.sumOf { it.y }
+	val totalY = pieDataList.map { it.y }.sum()
 	
 	val proportion = pieDataList.map {
 		it.y * 100 / totalY
