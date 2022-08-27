@@ -13,6 +13,8 @@ import com.anafthdev.dujer.foundation.common.Hexad
 import com.anafthdev.dujer.foundation.common.financial_sorter.FinancialSorter
 import com.anafthdev.dujer.foundation.di.DiName
 import com.anafthdev.dujer.foundation.extension.combine
+import com.anafthdev.dujer.foundation.extension.isExpense
+import com.anafthdev.dujer.foundation.extension.isIncome
 import com.github.mikephil.charting.data.PieEntry
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
@@ -67,17 +69,25 @@ class WalletEnvironment @Inject constructor(
 	init {
 		CoroutineScope(Dispatchers.Main).launch {
 			combine(
-				lastSelectedWalletID,
 				selectedMonth,
 				filterDate,
 				selectedSortType,
 				selectedGroupType,
-				repository.getAllFinancial()
-			) { id, month, date, sortType, groupType, financials ->
-				Hexad(id, month, date, sortType, groupType, financials)
-			}.collect { (id, month, date, sortType, groupType, financials) ->
-				val mFinancials = financials.filter { it.walletID == id }
-				
+				selectedFinancialType,
+				currentWallet
+			) { month, date, sortType, groupType, financialType, wallet ->
+				Hexad(month, date, sortType, groupType, financialType, wallet)
+			}.collect { (month, date, sortType, groupType, financialType, wallet) ->
+				val mFinancials = wallet.financials
+					.filter {
+						when (financialType) {
+							FinancialType.INCOME -> it.type.isIncome()
+							FinancialType.EXPENSE -> it.type.isExpense()
+							FinancialType.NOTHING -> it.type.isIncome() or it.type.isExpense()
+							FinancialType.ALL -> it.type.isIncome() or it.type.isExpense()
+						}
+					}
+
 				_transactions.emit(
 					financialSorter.beginSort(
 						sortType = sortType,
