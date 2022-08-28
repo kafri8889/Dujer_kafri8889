@@ -50,6 +50,7 @@
     <string name="category">Category</string>
     <string name="language">Language</string>
     <string name="currency">Currency</string>
+    <string name="_continue">Continue</string>
     <string name="statistic">Statistic</string>
     <string name="dashboard">Dashboard</string>
     <string name="my_income">My Income</string>

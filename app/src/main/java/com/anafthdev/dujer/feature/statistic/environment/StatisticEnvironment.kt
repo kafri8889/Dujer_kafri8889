@@ -60,33 +60,36 @@ class StatisticEnvironment @Inject constructor(
 				selectedDate
 			) { financials, walletID, financialType, selectedDate ->
 				Quad(financials, walletID, financialType, selectedDate)
-			}.collect { quad ->
+			}.collect { (financials, walletID, financialType, selectedDate) ->
 				
-				val incomeList = quad.first
+				val incomeList = financials
 					.asSequence()
-					.filter { it.walletID == quad.second }
+					.filter { it.walletID == walletID }
 					.filter { it.type.isIncome() }
 					.filter {
 						monthYearFormatter.format(it.dateCreated).equals(
-							other = monthYearFormatter.format(quad.fourth),
+							other = monthYearFormatter.format(selectedDate),
 							ignoreCase = true
 						)
 					}.toList()
 				
-				val expenseList = quad.first
+				val expenseList = financials
 					.asSequence()
-					.filter { it.walletID == quad.second }
+					.filter { it.walletID == walletID }
 					.filter { it.type.isExpense() }
 					.filter {
 						monthYearFormatter.format(it.dateCreated).equals(
-							other = monthYearFormatter.format(quad.fourth),
+							other = monthYearFormatter.format(selectedDate),
 							ignoreCase = true
 						)
 					}.toList()
 				
-				val categories = (if (quad.third == FinancialType.INCOME) incomeList.map {
-					it.category
-				} else expenseList.map { it.category }).distinctBy { it.id }
+				val categories = when (financialType) {
+					FinancialType.INCOME -> incomeList
+					FinancialType.EXPENSE -> expenseList
+					FinancialType.ALL -> incomeList + expenseList
+					else -> incomeList + expenseList
+				}.map { it.category }.distinctBy { it.id }
 				
 				_incomeTransaction.emit(incomeList)
 				_expenseTransaction.emit(expenseList)
@@ -101,7 +104,7 @@ class StatisticEnvironment @Inject constructor(
 				)
 				_pieEntry.emit(
 					calculatePieEntry(
-						if (quad.third == FinancialType.INCOME) incomeList else expenseList,
+						if (financialType == FinancialType.INCOME) incomeList else expenseList,
 						categories
 					)
 				)

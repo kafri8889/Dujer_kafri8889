@@ -2,6 +2,7 @@ package com.anafthdev.dujer.feature.statistic
 
 import android.graphics.Color
 import androidx.activity.compose.BackHandler
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -37,6 +38,7 @@ import com.github.mikephil.charting.data.PieDataSet
 import com.github.mikephil.charting.data.PieEntry
 import com.github.mikephil.charting.highlight.Highlight
 
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun StatisticScreen(
 	navController: NavController,
@@ -164,6 +166,11 @@ fun StatisticScreen(
 							StatisticAction.SetSelectedFinancialType(type)
 						)
 					},
+					onDoubleClick = {
+						viewModel.dispatch(
+							StatisticAction.SetSelectedFinancialType(FinancialType.ALL)
+						)
+					},
 					modifier = Modifier
 						.padding(
 							horizontal = 8.dpScaled
@@ -247,7 +254,9 @@ fun StatisticScreen(
 					navController.navigate(
 						DujerDestination.CategoryTransaction.Home.createRoute(category.id)
 					)
-				}
+				},
+				modifier = Modifier
+					.animateItemPlacement()
 			)
 		}
 	}

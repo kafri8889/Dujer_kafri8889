@@ -149,7 +149,7 @@ fun MaxBudgetReachedPopup(
 						)
 				) {
 					Text(
-						text = stringResource(id = R.string.ignore),
+						text = stringResource(id = R.string._continue),
 						style = LocalTextStyle.current.copy(
 							color = Color.White
 						)

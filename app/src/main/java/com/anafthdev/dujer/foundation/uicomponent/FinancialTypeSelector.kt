@@ -31,11 +31,8 @@ fun FinancialTypeSelector(
 	
 	val isSystemInDarkTheme = LocalUiMode.current.isDarkTheme()
 	
-	val eventCountdownTimer by remember {
-		mutableStateOf(
-			DelayManager(),
-			referentialEqualityPolicy()
-		)
+	val eventCountdownTimer = remember {
+		DelayManager()
 	}
 	
 	val isRunning by eventCountdownTimer.isRunning.collectAsState()
