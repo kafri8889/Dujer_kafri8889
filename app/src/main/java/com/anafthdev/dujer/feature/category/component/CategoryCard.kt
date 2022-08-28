@@ -36,10 +36,8 @@ fun CategoryCard(
 		elevation = CardDefaults.cardElevation(
 			defaultElevation = 1.dp
 		),
-		colors = CardDefaults.cardColors(
-			containerColor = if (LocalUiMode.current.isDarkTheme()) CardDefaults.cardColors().containerColor(true).value
-			else Color.White
-		),
+		colors = if (LocalUiMode.current.isDarkTheme()) CardDefaults.cardColors() else
+		CardDefaults.cardColors(containerColor = Color.White),
 		modifier = modifier
 			.clip(large_shape)
 	) {
