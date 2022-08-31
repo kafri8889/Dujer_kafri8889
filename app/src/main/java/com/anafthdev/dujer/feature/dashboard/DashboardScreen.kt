@@ -98,7 +98,6 @@ fun DashboardScreen(
 			}
 		}
 	)
-	
 }
 
 @OptIn(
@@ -301,15 +300,7 @@ private fun DashboardContent(
 								launchSingleTop = true
 							}
 						},
-						onFinancialCardDismissToEnd = onDeleteTransaction,
-						onWalletSheetOpened = { isOpened ->
-							showFABNewTransaction = !isOpened
-						},
-						onAddWallet = { wallet ->
-							viewModel.dispatch(
-								DashboardAction.NewWallet(wallet)
-							)
-						}
+						onFinancialCardDismissToEnd = onDeleteTransaction
 					)
 					1 -> ChartScreen(
 						onFinancialCardDismissToEnd = onDeleteTransaction,
@@ -330,22 +321,17 @@ private fun DashboardContent(
 	}
 }
 
-@OptIn(ExperimentalMaterialApi::class, ExperimentalComposeUiApi::class)
 @Composable
 private fun DashboardHomeScreen(
 	state: DashboardState,
 	homeLazyListState: LazyListState,
 	navController: NavController,
 	onFinancialCardDismissToEnd: (Financial) -> Unit,
-	onFinancialCardClicked: (Financial) -> Unit,
-	onWalletSheetOpened: (Boolean) -> Unit,
-	onAddWallet: (Wallet) -> Unit
+	onFinancialCardClicked: (Financial) -> Unit
 ) {
 	
 	val context = LocalContext.current
 	val dujerState = LocalDujerState.current
-	val focusManager = LocalFocusManager.current
-	val keyboardController = LocalSoftwareKeyboardController.current
 	
 	val transactions = state.transactions
 	
@@ -375,39 +361,39 @@ private fun DashboardHomeScreen(
 		amount.sum()
 	}
 	
-	val incomeLineDataset by rememberUpdatedState(
-		newValue = LineDataSet(
-			incomeEntry,
-			context.getString(R.string.income)
-		).apply {
-			lineWidth = 2.5f
-			cubicIntensity = .2f
-			mode = LineDataSet.Mode.CUBIC_BEZIER
-			color = income_color.toArgb()
-			setDrawValues(false)
-			setDrawFilled(false)
-			setDrawCircles(false)
-			setCircleColor(income_color.toArgb())
-			setDrawHorizontalHighlightIndicator(false)
-		}
-	)
-	
-	val expenseLineDataset by rememberUpdatedState(
-		newValue = LineDataSet(
-			expenseEntry,
-			context.getString(R.string.expenses)
-		).apply {
-			lineWidth = 2.5f
-			cubicIntensity = .2f
-			mode = LineDataSet.Mode.CUBIC_BEZIER
-			color = expense_color.toArgb()
-			setDrawValues(false)
-			setDrawFilled(false)
-			setDrawCircles(false)
-			setCircleColor(expense_color.toArgb())
-			setDrawHorizontalHighlightIndicator(false)
-		}
-	)
+//	val incomeLineDataset by rememberUpdatedState(
+//		newValue = LineDataSet(
+//			incomeEntry,
+//			context.getString(R.string.income)
+//		).apply {
+//			lineWidth = 2.5f
+//			cubicIntensity = .2f
+//			mode = LineDataSet.Mode.CUBIC_BEZIER
+//			color = income_color.toArgb()
+//			setDrawValues(false)
+//			setDrawFilled(false)
+//			setDrawCircles(false)
+//			setCircleColor(income_color.toArgb())
+//			setDrawHorizontalHighlightIndicator(false)
+//		}
+//	)
+//
+//	val expenseLineDataset by rememberUpdatedState(
+//		newValue = LineDataSet(
+//			expenseEntry,
+//			context.getString(R.string.expenses)
+//		).apply {
+//			lineWidth = 2.5f
+//			cubicIntensity = .2f
+//			mode = LineDataSet.Mode.CUBIC_BEZIER
+//			color = expense_color.toArgb()
+//			setDrawValues(false)
+//			setDrawFilled(false)
+//			setDrawCircles(false)
+//			setCircleColor(expense_color.toArgb())
+//			setDrawHorizontalHighlightIndicator(false)
+//		}
+//	)
 	
 	LazyColumn(
 		state = homeLazyListState
@@ -464,7 +450,7 @@ private fun DashboardHomeScreen(
 							.padding(top = 16.dpScaled)
 					)
 				}
-				
+				//
 				Row(
 					verticalAlignment = Alignment.CenterVertically,
 					modifier = Modifier
