@@ -1,7 +1,9 @@
 package com.anafthdev.dujer.foundation.extension
 
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.CornerBasedShape
 import androidx.compose.foundation.shape.CornerSize
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Shapes
 import androidx.compose.runtime.Composable
@@ -19,12 +21,12 @@ fun Shapes.fromToken(value: ShapeKeyTokens): Shape {
 		ShapeKeyTokens.CornerExtraLargeTop -> extraLarge.top()
 		ShapeKeyTokens.CornerExtraSmall -> extraSmall
 		ShapeKeyTokens.CornerExtraSmallTop -> extraSmall.top()
-		ShapeKeyTokens.CornerFull -> Shapes.Full
+		ShapeKeyTokens.CornerFull -> CircleShape
 		ShapeKeyTokens.CornerLarge -> large
 		ShapeKeyTokens.CornerLargeEnd -> large.end()
 		ShapeKeyTokens.CornerLargeTop -> large.top()
 		ShapeKeyTokens.CornerMedium -> medium
-		ShapeKeyTokens.CornerNone -> Shapes.None
+		ShapeKeyTokens.CornerNone -> RoundedCornerShape(0)
 		ShapeKeyTokens.CornerSmall -> small
 	}
 }

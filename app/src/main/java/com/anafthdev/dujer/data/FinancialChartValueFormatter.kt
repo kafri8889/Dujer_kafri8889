@@ -49,7 +49,7 @@ class FinancialChartValueFormatter: ValueFormatter() {
 		return if (value > 0) format(value.toDouble()) else ""
 	}
 	
-	private fun format(number: Double): String {
+	fun format(number: Double): String {
 		var r: String = mFormat.format(number)
 		
 		val numericValue1 = Character.getNumericValue(r[r.length - 1])
@@ -58,13 +58,26 @@ class FinancialChartValueFormatter: ValueFormatter() {
 		val suffix = mSuffix[combined / 3]
 		
 		r = r.replace("E[0-9][0-9]".toRegex(), suffix)
+		
+		var isComma = true
+		val commaLoc = r.indexOfFirst {
+			isComma = it == ','
+			
+			isComma || it == '.'
+		}
+		
 		r = r.removeNonDigitChar()
 		
 		while (r.length > mMaxLength || r.matches("[0-9]+\\.[a-z]".toRegex())) {
 			r = r.substring(0, r.length - 2) + r.substring(r.length - 1)
+			println(r)
 		}
 		
 		r += suffix
+		r = r.addStringBefore(
+			if (isComma) "," else ".",
+			commaLoc
+		)
 		
 		return if (!r.endsWithNumber()) r.addStringBefore(
 			" ",

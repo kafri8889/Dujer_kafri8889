@@ -1,11 +1,10 @@
 package com.anafthdev.dujer.foundation.viewmodel
 
 import androidx.lifecycle.ViewModel
-import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.receiveAsFlow
+import kotlinx.coroutines.flow.update
 
 /**
  * State: A type that describes the data your feature needs to perform its logic and render its UI.
@@ -25,23 +24,33 @@ abstract class StatefulViewModel<STATE, EFFECT, ACTION, ENVIRONMENT>(
 ): ViewModel() {
 	
 	private val _state = MutableStateFlow(initialState)
+	
+	private val _effect: MutableStateFlow<EFFECT?> = MutableStateFlow(null)
+	
 	val state: StateFlow<STATE> = _state.asStateFlow()
 	
-	private val _effect = Channel<EFFECT>(Channel.BUFFERED)
-	val effect = _effect.receiveAsFlow()
+	val effect: StateFlow<EFFECT?> = _effect.asStateFlow()
 	
-	protected suspend fun setEffect(newEffect: EFFECT) {
-		_effect.send(newEffect)
+	abstract fun dispatch(action: ACTION)
+	
+	protected fun setState(newState: STATE.() -> STATE) {
+		_state.update(newState)
 	}
 	
-	protected suspend fun setState(newState: STATE.() -> STATE) {
-		_state.emit(stateValue().newState())
+	protected fun setEffect(newEffect: EFFECT) {
+		_effect.update { newEffect }
 	}
 	
 	private fun stateValue(): STATE {
 		return state.value
 	}
 	
-	abstract fun dispatch(action: ACTION)
-
+	fun dispatches(vararg actions: ACTION) {
+		actions.forEach { action -> dispatch(action) }
+	}
+	
+	fun resetEffect() {
+		_effect.update { null }
+	}
+	
 }

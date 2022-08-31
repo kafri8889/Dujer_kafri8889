@@ -29,6 +29,7 @@ abstract class LocalizedActivity: AppCompatActivity() {
 							locale = this@LocalizedActivity.getLocale()
 						)
 					}
+					else -> {}
 				}
 			}
 		}
