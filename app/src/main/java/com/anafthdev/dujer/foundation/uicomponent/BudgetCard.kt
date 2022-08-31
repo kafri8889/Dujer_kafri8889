@@ -29,6 +29,7 @@ import com.anafthdev.dujer.foundation.uimode.data.LocalUiMode
 import com.anafthdev.dujer.foundation.window.dpScaled
 import com.anafthdev.dujer.foundation.window.spScaled
 import com.anafthdev.dujer.model.LocalCurrency
+import timber.log.Timber
 import java.util.*
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -42,9 +43,16 @@ fun BudgetCard(
 	
 	val uiMode = LocalUiMode.current
 	
-	val indicatorProgress = try {
-		(totalExpense / totalBudget).toFloat()
-	} catch (e: Exception) { 0f }
+	val indicatorProgress = remember(totalExpense, totalBudget) {
+		try {
+			val progress = totalExpense.toFloat() / totalBudget.toFloat()
+			
+			if (progress.isNaN()) 0f else progress
+		} catch (e: IllegalArgumentException) {
+			Timber.e(e)
+			0f
+		}
+	}
 	
 	val remainingBudget = remember(totalExpense, totalBudget) {
 		totalBudget - totalExpense
