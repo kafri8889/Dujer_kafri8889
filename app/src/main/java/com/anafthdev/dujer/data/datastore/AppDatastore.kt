@@ -11,6 +11,7 @@ import com.anafthdev.dujer.foundation.uimode.data.UiMode
 import com.anafthdev.dujer.model.Currency
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
+import java.util.*
 import javax.inject.Inject
 
 class AppDatastore @Inject constructor(private val context: Context) {
@@ -41,16 +42,51 @@ class AppDatastore @Inject constructor(private val context: Context) {
 	
 	val getCurrentCurrency: Flow<Currency> = context.datastore.data.map { preferences ->
 		val code = preferences[currentCurrency]
-		val currency = if (code == null) android.icu.util.Currency.getInstance(deviceLocale)
+		
+		val currency1 = if (code == null) android.icu.util.Currency.getInstance(deviceLocale)
 		else android.icu.util.Currency.getInstance(code)
 		
-		with(currency) {
-			Currency(
-				name = "",
-				country = displayName,
-				countryCode = currencyCode,
-				symbol = symbol
-			)
+		val currency2 = if (currency1 == null) {
+			if (code == null) java.util.Currency.getInstance(deviceLocale)
+			else java.util.Currency.getInstance(code)
+		} else null
+		
+		val currency3 = if (currency2 == null) {
+			java.util.Currency.getInstance(Locale.US)
+		} else null
+		
+		when {
+			currency1 != null -> {
+				with(currency1) {
+					Currency(
+						name = "",
+						country = displayName,
+						countryCode = currencyCode,
+						symbol = symbol
+					)
+				}
+			}
+			currency2 != null -> {
+				with(currency2) {
+					Currency(
+						name = "",
+						country = displayName,
+						countryCode = currencyCode,
+						symbol = symbol
+					)
+				}
+			}
+			currency3 != null -> {
+				with(currency3) {
+					Currency(
+						name = "",
+						country = displayName,
+						countryCode = currencyCode,
+						symbol = symbol
+					)
+				}
+			}
+			else -> Currency.DOLLAR
 		}
 	}
 	
