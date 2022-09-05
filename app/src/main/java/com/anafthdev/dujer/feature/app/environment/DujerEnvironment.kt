@@ -18,6 +18,7 @@ import com.anafthdev.dujer.model.Currency
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.filterNotNull
 import javax.inject.Inject
 import javax.inject.Named
 
@@ -74,6 +75,7 @@ class DujerEnvironment @Inject constructor(
 	
 	override fun getCurrentCurrency(): Flow<Currency> {
 		return appDatastore.getCurrentCurrency
+			.filterNotNull()
 	}
 	
 	override fun getDataCanBeReturned(): Flow<UndoType> {
