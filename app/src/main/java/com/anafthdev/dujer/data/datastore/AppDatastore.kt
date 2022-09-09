@@ -52,7 +52,13 @@ class AppDatastore @Inject constructor(private val context: Context) {
 		} else null
 		
 		val currency3 = if (currency2 == null) {
-			java.util.Currency.getInstance(Locale.US)
+			var loc = Locale("en", "UK")
+			
+			if (loc.country.equals("UK")) {
+				loc = Locale(loc.language, "GB")
+			}
+			
+			java.util.Currency.getInstance(loc)
 		} else null
 		
 		when {
