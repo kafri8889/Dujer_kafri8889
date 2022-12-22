@@ -12,6 +12,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.map
+import timber.log.Timber
 import javax.inject.Inject
 
 class LocalDatasource @Inject constructor(
@@ -116,10 +117,12 @@ class LocalDatasource @Inject constructor(
 	}
 	
 	suspend fun updateWallet(vararg wallet: Wallet) {
+		Timber.i("updated wallet to: ${wallet.toList()}")
 		writeDao.updateWalletDb(*wallet.toWalletDb())
 	}
 	
 	suspend fun insertWallet(vararg wallet: Wallet) {
+		Timber.i("inserted wallet to: ${wallet.toList()}")
 		writeDao.insertWalletDb(*wallet.toWalletDb())
 	}
 	

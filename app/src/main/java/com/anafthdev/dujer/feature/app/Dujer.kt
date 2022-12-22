@@ -22,6 +22,7 @@ import com.anafthdev.dujer.feature.app.data.LocalDujerController
 import com.anafthdev.dujer.feature.theme.*
 import com.anafthdev.dujer.foundation.common.AppUtil.toast
 import com.anafthdev.dujer.foundation.common.BaseEffect
+import com.anafthdev.dujer.foundation.extension.containBy
 import com.anafthdev.dujer.foundation.extension.isDarkTheme
 import com.anafthdev.dujer.foundation.extension.isLightTheme
 import com.anafthdev.dujer.foundation.ui.LocalUiColor
@@ -59,8 +60,13 @@ fun DujerApp(
 	
 	LaunchedEffect(lifecycleOwner) {
 		lifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
-			viewModel.dispatches(
-				DujerAction.InsertWallet(Wallet.cash),
+			if (!state.allWallet.containBy { it.id == Wallet.cash.id }) {
+				viewModel.dispatch(
+					DujerAction.InsertWallet(Wallet.cash)
+				)
+			}
+			
+			viewModel.dispatch(
 				DujerAction.SetController(
 					object : DujerController {
 						override fun sendEffect(effect: BaseEffect) {
